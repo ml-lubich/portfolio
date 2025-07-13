@@ -7,8 +7,19 @@ import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight, ExternalLink, Users, Zap, Shield, GitBranch } from "lucide-react"
 import { useInView } from "react-intersection-observer"
 import Link from "next/link"
+import Image from "next/image"
 
-const projects = [
+type Project = {
+  title: string
+  description: string
+  icon: typeof Users | typeof Zap | typeof Shield | typeof GitBranch
+  impact: string
+  technologies: string[]
+  gradient: string
+  link?: string // Make link optional
+}
+
+const projects: Project[] = [
   {
     title: "Equiverse.ml",
     description:
@@ -16,7 +27,6 @@ const projects = [
     icon: Users,
     impact: "5,000+ students impacted",
     technologies: ["AI/ML", "Python", "Data Analytics", "Educational Technology"],
-    link: "https://equiverse.ml",
     gradient: "from-blue-500 to-cyan-500",
   },
   {
@@ -26,7 +36,6 @@ const projects = [
     icon: Zap,
     impact: "1,500+ active users",
     technologies: ["AI/ML", "Startup", "Team Leadership", "MVP Development"],
-    link: "https://flyoneo.ml",
     gradient: "from-purple-500 to-pink-500",
   },
   {
@@ -74,6 +83,7 @@ export function ProjectsCarousel() {
     threshold: 0.1,
   })
 
+  // Use fixed items per view for better control
   const itemsPerView = 3
   const maxIndex = Math.max(0, projects.length - itemsPerView)
 
@@ -86,7 +96,7 @@ export function ProjectsCarousel() {
   }
 
   return (
-    <section id="projects" className="py-20 px-4" ref={ref}>
+    <section id="projects" className="py-20 px-4 relative" ref={ref}>
       <div className="max-w-7xl mx-auto">
         <div
           className={`text-center mb-16 transition-all duration-1000 ${inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
@@ -103,40 +113,50 @@ export function ProjectsCarousel() {
         <div className="relative">
           <div className="overflow-hidden">
             <div
-              className="flex transition-transform duration-500 ease-in-out gap-6"
-              style={{ transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)` }}
+              className="flex transition-transform duration-500 ease-in-out gap-4"
+              style={{ 
+                transform: `translateX(calc(-${currentIndex * (100 / itemsPerView)}% - ${currentIndex * 1}rem))`
+              }}
             >
               {projects.map((project, index) => {
                 const IconComponent = project.icon
                 return (
-                  <div key={index} className="w-full md:w-1/2 lg:w-1/3 flex-shrink-0">
+                  <div 
+                    key={index} 
+                    className="flex-shrink-0"
+                    style={{ 
+                      width: `calc(${100 / itemsPerView}% - ${(itemsPerView - 1) * 1}rem / ${itemsPerView})`
+                    }}
+                  >
                     <Card className="h-full group bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-gray-200/20 dark:border-gray-700/20 hover:shadow-2xl transition-all duration-300 hover:scale-105">
-                      <CardHeader>
-                        <div className="flex items-center gap-3 mb-3">
+                      <CardHeader className="pb-4">
+                        <div className="flex items-start gap-3 mb-3">
                           <div
-                            className={`p-3 rounded-xl bg-gradient-to-r ${project.gradient} group-hover:scale-110 transition-transform duration-300`}
+                            className={`p-3 rounded-xl bg-gradient-to-r ${project.gradient} group-hover:scale-110 transition-transform duration-300 flex-shrink-0`}
                           >
                             <IconComponent className="h-6 w-6 text-white" />
                           </div>
-                          <CardTitle className="text-xl text-gray-900 dark:text-white">{project.title}</CardTitle>
-                        </div>
-                        <div
-                          className={`text-sm font-bold bg-gradient-to-r ${project.gradient} bg-clip-text text-transparent`}
-                        >
-                          {project.impact}
+                          <div className="min-w-0 flex-1">
+                            <CardTitle className="text-lg text-gray-900 dark:text-white leading-tight">{project.title}</CardTitle>
+                            <div
+                              className={`text-sm font-bold bg-gradient-to-r ${project.gradient} bg-clip-text text-transparent mt-1`}
+                            >
+                              {project.impact}
+                            </div>
+                          </div>
                         </div>
                       </CardHeader>
-                      <CardContent className="flex-1 flex flex-col">
-                        <p className="text-gray-600 dark:text-gray-300 mb-4 flex-1 leading-relaxed">
+                      <CardContent className="flex-1 flex flex-col pt-0">
+                        <p className="text-gray-600 dark:text-gray-300 mb-4 flex-1 leading-relaxed text-sm">
                           {project.description}
                         </p>
 
-                        <div className="flex flex-wrap gap-2 mb-4">
+                        <div className="flex flex-wrap gap-1.5 mb-4">
                           {project.technologies.map((tech, idx) => (
                             <Badge
                               key={idx}
                               variant="secondary"
-                              className="text-xs bg-gray-100 dark:bg-slate-700 hover:scale-105 transition-transform duration-200"
+                              className="text-xs bg-gray-100 dark:bg-slate-700 hover:scale-105 transition-transform duration-200 px-2 py-1"
                             >
                               {tech}
                             </Badge>

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Moon, Sun, Menu, X } from "lucide-react"
 import { useTheme } from "next-themes"
 import Link from "next/link"
+import Image from "next/image"
 
 export function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -39,9 +40,16 @@ export function Navigation() {
         <div className="flex items-center justify-between h-16">
           <Link
             href="#"
-            className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
+            className="flex items-center hover:scale-105 transition-transform duration-200"
           >
-            ML
+            <Image
+              src="/logo.png"
+              alt="Misha Lubich Logo"
+              width={40}
+              height={40}
+              className="object-contain"
+              priority
+            />
           </Link>
 
           {/* Desktop Navigation */}

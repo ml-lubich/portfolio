@@ -16,6 +16,7 @@ const publications = [
     volume: "Volume 14, Issue 7, Pages 1032",
     type: "Journal Article",
     gradient: "from-blue-500 to-cyan-500",
+    href: "https://scholar.google.com/citations?view_op=view_citation&hl=en&user=Be6ZA78AAAAJ&citation_for_view=Be6ZA78AAAAJ:qjMakFHDy7sC",
   },
   {
     title:
@@ -25,6 +26,7 @@ const publications = [
     volume: "Volume 2022, Pages H12E-04",
     type: "Conference Abstract",
     gradient: "from-purple-500 to-pink-500",
+    href: "https://scholar.google.com/citations?view_op=view_citation&hl=en&user=Be6ZA78AAAAJ&citation_for_view=Be6ZA78AAAAJ:u5HHmVD_uO8C",
   },
   {
     title: "Multiscale Effects of Climate-driven Disturbances on River Water Quality",
@@ -33,6 +35,7 @@ const publications = [
     volume: "Pages 152-01",
     type: "Journal Article",
     gradient: "from-teal-500 to-green-500",
+    href: "https://scholar.google.com/citations?view_op=view_citation&hl=en&user=Be6ZA78AAAAJ&citation_for_view=Be6ZA78AAAAJ:d1gkVwhDpl0C",
   },
   {
     title:
@@ -42,6 +45,7 @@ const publications = [
     volume: "Volume 2021, Pages H22E-01",
     type: "Conference Abstract",
     gradient: "from-orange-500 to-red-500",
+    href: "https://scholar.google.com/citations?view_op=view_citation&hl=en&user=Be6ZA78AAAAJ&citation_for_view=Be6ZA78AAAAJ:2osOgNQ5qMEC",
   },
   {
     title: "Data-Model Integration and Machine Learning Approaches for Hydrobiogeochemical Modeling Applications",
@@ -50,6 +54,7 @@ const publications = [
     volume: "Volume 2021, Pages B15J-1551",
     type: "Conference Abstract",
     gradient: "from-indigo-500 to-purple-500",
+    href: "https://scholar.google.com/citations?view_op=view_citation&hl=en&user=Be6ZA78AAAAJ&citation_for_view=Be6ZA78AAAAJ:9yKSN-GCB0IC",
   },
   {
     title: "Predicting Stream Temperature Across Spatial Scales With Low Complexity ML",
@@ -58,6 +63,7 @@ const publications = [
     volume: "Volume 2021, Pages H35D-1070",
     type: "Conference Abstract",
     gradient: "from-pink-500 to-rose-500",
+    href: "https://scholar.google.com/citations?view_op=view_citation&hl=en&user=Be6ZA78AAAAJ&citation_for_view=Be6ZA78AAAAJ:u-x6o8ySG0sC",
   },
 ]
 
@@ -86,43 +92,53 @@ export function Publications() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {publications.map((pub, index) => (
-            <Card
+            <Link
               key={index}
-              className={`group hover:shadow-2xl transition-all duration-500 hover:scale-105 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-gray-200/20 dark:border-gray-700/20 ${
-                inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-              }`}
-              style={{ transitionDelay: `${index * 100}ms` }}
+              href={pub.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block"
             >
-              <CardHeader>
-                <div className="flex items-start gap-3">
-                  <div
-                    className={`p-3 rounded-xl bg-gradient-to-r ${pub.gradient} group-hover:scale-110 transition-transform duration-300 flex-shrink-0`}
-                  >
-                    <BookOpen className="h-6 w-6 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <CardTitle className="text-lg leading-tight mb-3 text-gray-900 dark:text-white">
-                      {pub.title}
-                    </CardTitle>
-                    <div className="flex items-center gap-2 mb-2">
-                      <Badge variant="outline" className="text-xs hover:scale-105 transition-transform duration-200">
-                        {pub.type}
-                      </Badge>
-                      <Badge
-                        variant="secondary"
-                        className="text-xs bg-gray-100 dark:bg-slate-700 hover:scale-105 transition-transform duration-200"
-                      >
-                        {pub.year}
-                      </Badge>
+              <Card
+                className={`group hover:shadow-2xl transition-all duration-500 hover:scale-105 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-gray-200/20 dark:border-gray-700/20 cursor-pointer ${
+                  inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+                }`}
+                style={{ transitionDelay: `${index * 100}ms` }}
+              >
+                <CardHeader>
+                  <div className="flex items-start gap-3">
+                    <div
+                      className={`p-3 rounded-xl bg-gradient-to-r ${pub.gradient} group-hover:scale-110 transition-transform duration-300 flex-shrink-0`}
+                    >
+                      <BookOpen className="h-6 w-6 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <CardTitle className="text-lg leading-tight mb-3 text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200">
+                        {pub.title}
+                      </CardTitle>
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge variant="outline" className="text-xs hover:scale-105 transition-transform duration-200">
+                          {pub.type}
+                        </Badge>
+                        <Badge
+                          variant="secondary"
+                          className="text-xs bg-gray-100 dark:bg-slate-700 hover:scale-105 transition-transform duration-200"
+                        >
+                          {pub.year}
+                        </Badge>
+                      </div>
+                    </div>
+                    <div className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                      <ExternalLink className="h-5 w-5 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
                     </div>
                   </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{pub.journal}</p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">{pub.volume}</p>
-              </CardContent>
-            </Card>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{pub.journal}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{pub.volume}</p>
+                </CardContent>
+              </Card>
+            </Link>
           ))}
         </div>
 
@@ -136,7 +152,7 @@ export function Publications() {
             size="lg"
             className="hover:scale-105 transition-all duration-200 bg-transparent"
           >
-            <Link href="#" target="_blank">
+            <Link href="https://scholar.google.com/citations?user=Be6ZA78AAAAJ&hl=en" target="_blank">
               <ExternalLink className="mr-2 h-5 w-5" />
               View Google Scholar Profile
             </Link>

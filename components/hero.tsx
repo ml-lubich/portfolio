@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Github, Linkedin, Mail, ArrowDown } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 
 export function Hero() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
@@ -38,6 +39,23 @@ export function Hero() {
             <span className="text-sm font-medium text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30 px-3 py-1 rounded-full animate-pulse">
               Available for new opportunities
             </span>
+          </div>
+
+          {/* Profile Photo */}
+          <div className="flex justify-center mb-8">
+            <div className="relative group">
+              <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 via-purple-600 to-teal-600 rounded-full blur-sm opacity-40 group-hover:opacity-60 transition-all duration-1000 animate-slow-pulse"></div>
+              <div className="relative">
+                <Image
+                  src="/profile.png"
+                  alt="Misha Lubich"
+                  width={280}
+                  height={280}
+                  className="rounded-full object-cover shadow-2xl group-hover:scale-105 transition-transform duration-700 ring-4 ring-white/30 dark:ring-slate-800/30 backdrop-blur-sm animate-gentle-float"
+                />
+                <div className="absolute inset-0 rounded-full bg-gradient-to-t from-blue-600/10 via-transparent to-purple-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              </div>
+            </div>
           </div>
 
           <h1 className="text-6xl md:text-8xl font-bold mb-6 animate-fade-in-up animation-delay-200">
@@ -111,10 +129,11 @@ export function Hero() {
             </div>
           ))}
         </div>
+      </div>
 
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-          <ArrowDown className="h-6 w-6 text-gray-400" />
-        </div>
+      {/* Arrow positioned at the very bottom of the screen */}
+      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 animate-bounce z-20">
+        <ArrowDown className="h-6 w-6 text-gray-400" />
       </div>
     </section>
   )

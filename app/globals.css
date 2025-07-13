@@ -86,6 +86,14 @@
     width: 0;
   }
 
+  .animate-slow-pulse {
+    animation: slow-pulse 4s ease-in-out infinite;
+  }
+
+  .animate-gentle-float {
+    animation: gentle-float 6s ease-in-out infinite;
+  }
+
   .animation-delay-200 {
     animation-delay: 200ms;
   }
@@ -131,6 +139,29 @@
 @keyframes typewriter {
   to {
     width: 100%;
+  }
+}
+
+@keyframes slow-pulse {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes gentle-float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  33% {
+    transform: translateY(-8px) rotate(1deg);
+  }
+  66% {
+    transform: translateY(-4px) rotate(-1deg);
   }
 }
 

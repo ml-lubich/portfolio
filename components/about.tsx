@@ -3,6 +3,7 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { GraduationCap, Award, Users, Code } from "lucide-react"
 import { useInView } from "react-intersection-observer"
+import Image from "next/image"
 
 export function About() {
   const { ref, inView } = useInView({
@@ -47,6 +48,17 @@ export function About() {
         <div
           className={`text-center mb-16 transition-all duration-1000 ${inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
         >
+          {/* Logo */}
+          <div className="flex justify-center mb-8">
+            <Image
+              src="/logo.png"
+              alt="Misha Lubich Logo"
+              width={80}
+              height={80}
+              className="object-contain opacity-60 hover:opacity-100 transition-opacity duration-500"
+            />
+          </div>
+
           <h2 className="text-5xl font-bold text-gray-900 dark:text-white mb-6">
             About <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Me</span>
           </h2>

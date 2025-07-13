@@ -2,9 +2,10 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Mail, Phone, MapPin, Github, Linkedin, GraduationCap, Send } from "lucide-react"
+import { Mail, Phone, MapPin, Github, Linkedin, GraduationCap, Send, FileDown } from "lucide-react"
 import { useInView } from "react-intersection-observer"
 import Link from "next/link"
+import Image from "next/image"
 
 export function Contact() {
   const { ref, inView } = useInView({
@@ -52,8 +53,15 @@ export function Contact() {
     {
       icon: GraduationCap,
       label: "Google Scholar",
-      href: "#",
+      href: "https://scholar.google.com/citations?user=Be6ZA78AAAAJ&hl=en",
       gradient: "from-purple-600 to-indigo-600",
+    },
+    {
+      icon: FileDown,
+      label: "Download Resume",
+      href: "/lubich_michaelle_swe.pdf",
+      gradient: "from-emerald-600 to-teal-600",
+      isDownload: true,
     },
   ]
 
@@ -119,10 +127,22 @@ export function Contact() {
                 size="lg"
                 className={`bg-gradient-to-r ${social.gradient} hover:scale-110 transition-all duration-300 shadow-lg hover:shadow-xl`}
               >
-                <Link href={social.href} target="_blank">
-                  <IconComponent className="mr-2 h-5 w-5" />
-                  {social.label}
-                </Link>
+                {social.isDownload ? (
+                  <a 
+                    href={social.href} 
+                    download="Michaelle_Lubich_Resume.pdf"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <IconComponent className="mr-2 h-5 w-5" />
+                    {social.label}
+                  </a>
+                ) : (
+                  <Link href={social.href} target="_blank">
+                    <IconComponent className="mr-2 h-5 w-5" />
+                    {social.label}
+                  </Link>
+                )}
               </Button>
             )
           })}
@@ -151,6 +171,22 @@ export function Contact() {
               ))}
             </div>
           </div>
+        </div>
+
+        {/* Footer with Logo */}
+        <div className="flex flex-col items-center justify-center mt-16 pt-8 border-t border-gray-200/20 dark:border-gray-700/20">
+          <div className="flex items-center justify-center mb-4">
+            <Image
+              src="/logo.png"
+              alt="Misha Lubich Logo"
+              width={60}
+              height={60}
+              className="object-contain opacity-80 hover:opacity-100 transition-opacity duration-300"
+            />
+          </div>
+          <p className="text-gray-500 dark:text-gray-400 text-sm text-center">
+            © 2025 Misha Lubich. Crafted with passion for innovation and excellence.
+          </p>
         </div>
       </div>
     </section>
