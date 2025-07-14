@@ -1,13 +1,22 @@
 "use client"
 
-import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { ChevronLeft, ChevronRight, CalendarDays, MapPin } from "lucide-react"
+import { CalendarDays, MapPin } from "lucide-react"
 import { useInView } from "react-intersection-observer"
+import { Carousel3D } from "./carousel-3d"
 
-const experiences = [
+interface Experience {
+  title: string
+  company: string
+  location: string
+  period: string
+  highlights: string[]
+  technologies: string[]
+  gradient: string
+}
+
+const experiences: Experience[] = [
   {
     title: "Software Development Engineer in Test & Developer",
     company: "Polaris Wireless",
@@ -51,160 +60,111 @@ const experiences = [
     gradient: "from-teal-500 to-green-500",
   },
   {
-    title: "Software Engineer Intern, Machine Learning",
-    company: "Lawrence Berkeley National Laboratory",
-    location: "Berkeley, CA",
-    period: "May 2021 – August 2021",
-    highlights: [
-      "Enhanced ML model clustering accuracy from 82% to 87%",
-      "Performed data correlation analysis identifying key trends",
-      "Streamlined data processing workflows saving 200+ hours annually",
-      "Built reusable data visualization libraries",
-    ],
-    technologies: ["Python", "K-Means", "Machine Learning", "Data Analysis"],
-    gradient: "from-orange-500 to-red-500",
-  },
-  {
     title: "Software Engineer Intern",
-    company: "Honda Innovations",
-    location: "Mountain View, CA",
-    period: "January 2021 – May 2021",
+    company: "Verizon",
+    location: "Basking Ridge, NJ",
+    period: "July 2021 – August 2021",
     highlights: [
-      "Engineered fleet optimization achieving 500% improvement in delivery rates",
-      "Implemented Agile methodologies increasing team productivity by 30%",
-      "Automated CI/CD workflows improving code integration efficiency by 35%",
-      "Contributed to Capstone Project delivering $1M cost-saving outcome",
+      "Designed technology solutions to reduce hiring discrimination by 25%",
+      "Developed machine learning models for bias detection in recruitment",
+      "Collaborated with HR teams to implement fair hiring practices",
+      "Created documentation and training materials for diversity initiatives",
     ],
-    technologies: ["GitHub Actions", "Agile", "Fleet Optimization", "CI/CD"],
-    gradient: "from-indigo-500 to-purple-500",
+    technologies: ["Python", "Machine Learning", "HR Tech", "Data Analysis"],
+    gradient: "from-orange-500 to-red-500",
   },
 ]
 
 export function ExperienceCarousel() {
-  const [currentIndex, setCurrentIndex] = useState(0)
   const { ref, inView } = useInView({
     triggerOnce: true,
     threshold: 0.1,
   })
 
-  const nextSlide = () => {
-    setCurrentIndex((prev) => (prev + 1) % experiences.length)
-  }
-
-  const prevSlide = () => {
-    setCurrentIndex((prev) => (prev - 1 + experiences.length) % experiences.length)
-  }
+  const renderExperience = (exp: Experience, index: number, isActive: boolean) => (
+    <Card className="h-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-gray-200/20 dark:border-gray-700/20 hover:shadow-2xl transition-all duration-300">
+      <CardHeader>
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div>
+            <CardTitle className="text-xl lg:text-2xl text-gray-900 dark:text-white mb-2 leading-tight">
+              {exp.title}
+            </CardTitle>
+            <p
+              className={`text-lg lg:text-xl font-bold bg-gradient-to-r ${exp.gradient} bg-clip-text text-transparent`}
+            >
+              {exp.company}
+            </p>
+          </div>
+          <div className="flex flex-col lg:items-end gap-2">
+            <div className="flex items-center text-gray-600 dark:text-gray-400">
+              <CalendarDays className="h-4 w-4 mr-2 flex-shrink-0" />
+              <span className="text-xs lg:text-sm">{exp.period}</span>
+            </div>
+            <div className="flex items-center text-gray-600 dark:text-gray-400">
+              <MapPin className="h-4 w-4 mr-2 flex-shrink-0" />
+              <span className="text-xs lg:text-sm">{exp.location}</span>
+            </div>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <ul className="space-y-2 lg:space-y-3 mb-4 lg:mb-6">
+          {exp.highlights.map((highlight, idx) => (
+            <li key={idx} className="flex items-start">
+              <span className="text-blue-600 dark:text-blue-400 mr-3 mt-1 flex-shrink-0">•</span>
+              <span className="text-sm lg:text-base text-gray-700 dark:text-gray-300 leading-relaxed">
+                {highlight}
+              </span>
+            </li>
+          ))}
+        </ul>
+        <div className="flex flex-wrap gap-1 lg:gap-2">
+          {exp.technologies.map((tech, idx) => (
+            <Badge
+              key={idx}
+              variant="secondary"
+              className="text-xs bg-gray-100 dark:bg-slate-700 hover:scale-105 transition-transform duration-200"
+            >
+              {tech}
+            </Badge>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  )
 
   return (
-    <section id="experience" className="py-20 px-4 bg-white/50 dark:bg-slate-900/50" ref={ref}>
-      <div className="max-w-6xl mx-auto">
+    <section ref={ref} className="py-20 bg-gray-50 dark:bg-slate-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div
-          className={`text-center mb-16 transition-all duration-1000 ${inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+          className={`text-center mb-16 transition-all duration-1000 ${
+            inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+          }`}
         >
-          <h2 className="text-5xl font-bold text-gray-900 dark:text-white mb-6">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-6">
             Professional{" "}
             <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               Experience
             </span>
           </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-300">
+          <p className="text-lg lg:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
             Building scalable solutions and innovating within teams at industry-leading companies
           </p>
         </div>
 
-        <div className="relative">
-          <div className="overflow-hidden rounded-2xl">
-            <div
-              className="flex transition-transform duration-500 ease-in-out"
-              style={{ transform: `translateX(-${currentIndex * 100}%)` }}
-            >
-              {experiences.map((exp, index) => (
-                <div key={index} className="w-full flex-shrink-0 px-4">
-                  <Card className="h-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-gray-200/20 dark:border-gray-700/20 hover:shadow-2xl transition-all duration-300">
-                    <CardHeader>
-                      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                        <div>
-                          <CardTitle className="text-2xl text-gray-900 dark:text-white mb-2">{exp.title}</CardTitle>
-                          <p
-                            className={`text-xl font-bold bg-gradient-to-r ${exp.gradient} bg-clip-text text-transparent`}
-                          >
-                            {exp.company}
-                          </p>
-                        </div>
-                        <div className="flex flex-col lg:items-end gap-2">
-                          <div className="flex items-center text-gray-600 dark:text-gray-400">
-                            <CalendarDays className="h-4 w-4 mr-2" />
-                            <span className="text-sm">{exp.period}</span>
-                          </div>
-                          <div className="flex items-center text-gray-600 dark:text-gray-400">
-                            <MapPin className="h-4 w-4 mr-2" />
-                            <span className="text-sm">{exp.location}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <ul className="space-y-3 mb-6">
-                        {exp.highlights.map((highlight, idx) => (
-                          <li key={idx} className="flex items-start">
-                            <span className="text-blue-600 dark:text-blue-400 mr-3 mt-1">•</span>
-                            <span className="text-gray-700 dark:text-gray-300">{highlight}</span>
-                          </li>
-                        ))}
-                      </ul>
-                      <div className="flex flex-wrap gap-2">
-                        {exp.technologies.map((tech, idx) => (
-                          <Badge
-                            key={idx}
-                            variant="secondary"
-                            className="text-xs bg-gray-100 dark:bg-slate-700 hover:scale-105 transition-transform duration-200"
-                          >
-                            {tech}
-                          </Badge>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex items-center justify-between mt-8">
-            <Button
-              variant="outline"
-              size="lg"
-              onClick={prevSlide}
-              className="rounded-full hover:scale-110 transition-all duration-200 bg-transparent"
-            >
-              <ChevronLeft className="h-5 w-5" />
-            </Button>
-
-            <div className="flex space-x-2">
-              {experiences.map((_, index) => (
-                <button
-                  key={index}
-                  className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                    index === currentIndex
-                      ? "bg-gradient-to-r from-blue-600 to-purple-600 scale-125"
-                      : "bg-gray-300 dark:bg-gray-600 hover:scale-110"
-                  }`}
-                  onClick={() => setCurrentIndex(index)}
-                  aria-label={`Go to slide ${index + 1}`}
-                />
-              ))}
-            </div>
-
-            <Button
-              variant="outline"
-              size="lg"
-              onClick={nextSlide}
-              className="rounded-full hover:scale-110 transition-all duration-200 bg-transparent"
-            >
-              <ChevronRight className="h-5 w-5" />
-            </Button>
-          </div>
-        </div>
+        <Carousel3D
+          items={experiences}
+          renderItem={renderExperience}
+          itemsPerView={{
+            mobile: 1,
+            tablet: 1,
+            desktop: 1
+          }}
+          spacing={32}
+          autoPlay={true}
+          autoPlayInterval={8000}
+          className="max-w-6xl mx-auto"
+        />
       </div>
     </section>
   )
