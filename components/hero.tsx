@@ -8,6 +8,12 @@ import Image from "next/image"
 
 export function Hero() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+  const [nameText, setNameText] = useState("")
+  const [titleText, setTitleText] = useState("")
+  const [isTyping, setIsTyping] = useState(true)
+
+  const fullName = "misha lubich"
+  const fullTitle = "Software Engineer & Technical Leader"
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -16,6 +22,60 @@ export function Hero() {
     window.addEventListener("mousemove", handleMouseMove)
     return () => window.removeEventListener("mousemove", handleMouseMove)
   }, [])
+
+  useEffect(() => {
+    let timeout: NodeJS.Timeout
+
+    const typeText = () => {
+      // Phase 1: Type name
+      if (nameText.length < fullName.length) {
+        timeout = setTimeout(() => {
+          setNameText(fullName.slice(0, nameText.length + 1))
+        }, 100)
+      }
+      // Phase 2: Type title after name is complete
+      else if (titleText.length < fullTitle.length) {
+        timeout = setTimeout(() => {
+          setTitleText(fullTitle.slice(0, titleText.length + 1))
+        }, 50)
+      }
+      // Phase 3: Wait then start deleting
+      else if (isTyping) {
+        timeout = setTimeout(() => {
+          setIsTyping(false)
+        }, 2000)
+      }
+    }
+
+    const deleteText = () => {
+      // Phase 1: Delete title first
+      if (titleText.length > 0) {
+        timeout = setTimeout(() => {
+          setTitleText(titleText.slice(0, -1))
+        }, 30)
+      }
+      // Phase 2: Delete name after title is gone
+      else if (nameText.length > 0) {
+        timeout = setTimeout(() => {
+          setNameText(nameText.slice(0, -1))
+        }, 50)
+      }
+      // Phase 3: Wait then start typing again
+      else {
+        timeout = setTimeout(() => {
+          setIsTyping(true)
+        }, 500)
+      }
+    }
+
+    if (isTyping) {
+      typeText()
+    } else {
+      deleteText()
+    }
+
+    return () => clearTimeout(timeout)
+  }, [nameText, titleText, isTyping, fullName, fullTitle])
 
   return (
     <section className="min-h-screen flex items-center justify-center px-4 py-20 relative overflow-hidden">
@@ -62,12 +122,20 @@ export function Hero() {
 
           <h1 className="text-6xl md:text-8xl font-bold mb-6 animate-fade-in-up animation-delay-200">
             <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-teal-600 bg-clip-text text-transparent animate-gradient-x">
-              misha lubich
+              {nameText}
+              {nameText.length < fullName.length && (
+                <span className="animate-pulse">|</span>
+              )}
             </span>
           </h1>
 
           <div className="text-xl md:text-3xl text-gray-600 dark:text-gray-300 mb-6 animate-fade-in-up animation-delay-400">
-            <span className="inline-block animate-typewriter">Software Engineer & Technical Leader</span>
+            <span className="inline-block">
+              {titleText}
+              {nameText.length === fullName.length && titleText.length < fullTitle.length && (
+                <span className="animate-pulse">|</span>
+              )}
+            </span>
           </div>
 
           <p className="text-lg text-gray-500 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed animate-fade-in-up animation-delay-600">
