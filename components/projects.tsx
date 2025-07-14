@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { PortfolioCard, CardContent, CardHeader, CardTitle } from "@/components/ui/portfolio-card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { ExternalLink, Github, Users, Zap, Shield, GitBranch } from "lucide-react"
@@ -40,31 +40,37 @@ const projects = [
     technologies: ["Encryption", "Security", "File Systems", "Performance Optimization"],
   },
   {
-    title: "Gitlet Version Control System",
+    title: "Open Source Contributions",
     description:
-      "Implemented a lightweight, efficient Git version control system, reducing commit times by 66% and enhancing performance.",
+      "Active contributor to Django and other open-source projects, helping maintain code quality and implement new features for the community.",
     icon: GitBranch,
-    impact: "66% faster commits",
-    technologies: ["Version Control", "Git", "System Design", "Performance"],
+    impact: "Community impact",
+    technologies: ["Django", "Open Source", "Python", "Community"],
+    link: "https://github.com/ml-lubich",
   },
   {
-    title: "Pintos Operating System",
+    title: "CI/CD Pipeline Optimization",
     description:
-      "Refactored and expanded core OS functionality, achieving a 40% performance improvement through optimized code architecture.",
+      "Developed automated deployment pipelines that reduced deployment time by 50% and increased reliability across multiple environments.",
     icon: Zap,
-    impact: "40% performance boost",
-    technologies: ["Operating Systems", "C", "System Programming", "Performance Optimization"],
+    impact: "50% faster deployments",
+    technologies: ["Jenkins", "Docker", "Kubernetes", "DevOps"],
   },
 ]
 
 export function Projects() {
   return (
-    <section id="projects" className="py-20 px-4 bg-white">
+    <section id="projects" className="py-20 px-4">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">Featured Projects</h2>
-          <p className="text-lg text-gray-600">
-            Innovative solutions with measurable impact and real-world applications
+          <h2 className="text-5xl font-bold text-gray-900 dark:text-white mb-6">
+            Featured{" "}
+            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Projects
+            </span>
+          </h2>
+          <p className="text-xl text-gray-600 dark:text-gray-300">
+            Innovative solutions that drive impact and create value
           </p>
         </div>
 
@@ -72,7 +78,7 @@ export function Projects() {
           {projects.map((project, index) => {
             const IconComponent = project.icon
             return (
-              <Card key={index} className="hover:shadow-lg transition-shadow h-full flex flex-col">
+              <PortfolioCard key={index} variant="default" size="full">
                 <CardHeader>
                   <div className="flex items-center gap-3 mb-2">
                     <IconComponent className="h-6 w-6 text-blue-600" />
@@ -81,7 +87,7 @@ export function Projects() {
                   <div className="text-sm font-semibold text-green-600">{project.impact}</div>
                 </CardHeader>
                 <CardContent className="flex-1 flex flex-col">
-                  <p className="text-gray-600 mb-4 flex-1">{project.description}</p>
+                  <p className="text-gray-600 dark:text-gray-300 mb-4 flex-1">{project.description}</p>
 
                   <div className="flex flex-wrap gap-2 mb-4">
                     {project.technologies.map((tech, idx) => (
@@ -100,21 +106,9 @@ export function Projects() {
                     </Button>
                   )}
                 </CardContent>
-              </Card>
+              </PortfolioCard>
             )
           })}
-        </div>
-
-        <div className="text-center mt-12">
-          <p className="text-gray-600 mb-4">
-            Also contributed to open-source projects including Django framework improvements
-          </p>
-          <Button asChild variant="outline">
-            <Link href="https://github.com/ml-lubich" target="_blank">
-              <Github className="mr-2 h-4 w-4" />
-              View All Projects on GitHub
-            </Link>
-          </Button>
         </div>
       </div>
     </section>

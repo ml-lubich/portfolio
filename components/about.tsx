@@ -1,6 +1,6 @@
 "use client"
 
-import { Card, CardContent } from "@/components/ui/card"
+import { PortfolioCard, IconContainer, CardContent } from "@/components/ui/portfolio-card"
 import { GraduationCap, Award, Users, Code } from "lucide-react"
 import { useInView } from "react-intersection-observer"
 import Image from "next/image"
@@ -48,7 +48,12 @@ export function About() {
         <div
           className={`text-center mb-16 transition-all duration-1000 ${inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
         >
-          {/* Logo */}
+          <h2 className="text-5xl font-bold text-gray-900 dark:text-white mb-6">
+            About{" "}
+            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Me
+            </span>
+          </h2>
           <div className="flex justify-center mb-8">
             <Image
               src="/logo.svg"
@@ -60,14 +65,10 @@ export function About() {
               quality={90}
             />
           </div>
-
-          <h2 className="text-5xl font-bold text-gray-900 dark:text-white mb-6">
-            About <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Me</span>
-          </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-4xl mx-auto leading-relaxed">
-            Passionate about mentorship, knowledge sharing, and contributing to open-source projects that advance
-            industry best practices. Seeking opportunities to combine technical expertise and leadership capabilities in
-            roles focused on innovation, scalability, and meaningful societal contributions.
+          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
+            Software Engineer and AI/ML Specialist passionate about creating scalable solutions that drive innovation.
+            With experience at companies like Apple and GitHub, I blend technical expertise with research acumen to
+            build impactful systems.
           </p>
         </div>
 
@@ -75,24 +76,27 @@ export function About() {
           {cards.map((card, index) => {
             const IconComponent = card.icon
             return (
-              <Card
+              <PortfolioCard
                 key={index}
-                className={`group text-center p-6 hover:shadow-2xl transition-all duration-500 hover:scale-105 bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm border-gray-200/20 dark:border-gray-700/20 ${
-                  inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-                }`}
-                style={{ transitionDelay: `${index * 100}ms` }}
+                variant="soft"
+                animation="slow"
+                inView={inView}
+                animationDelay={index * 100}
+                showAnimation={true}
+                className="text-center p-6"
               >
                 <CardContent className="pt-6">
-                  <div
-                    className={`h-16 w-16 mx-auto mb-4 rounded-2xl bg-gradient-to-r ${card.color} p-4 group-hover:scale-110 transition-transform duration-300`}
+                  <IconContainer 
+                    gradient={card.color}
+                    className="mx-auto mb-4"
                   >
                     <IconComponent className="h-8 w-8 text-white" />
-                  </div>
+                  </IconContainer>
                   <h3 className="font-bold text-gray-900 dark:text-white mb-2 text-lg">{card.title}</h3>
                   <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">{card.subtitle}</p>
                   <p className="text-sm text-gray-500 dark:text-gray-400">{card.description}</p>
                 </CardContent>
-              </Card>
+              </PortfolioCard>
             )
           })}
         </div>

@@ -1,101 +1,80 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { PortfolioCard, CardContent, CardHeader, CardTitle } from "@/components/ui/portfolio-card"
 import { Badge } from "@/components/ui/badge"
 import { CalendarDays, MapPin } from "lucide-react"
 
 const experiences = [
   {
-    title: "Software Development Engineer in Test & Developer",
-    company: "Polaris Wireless",
-    location: "San Francisco, CA",
-    period: "September 2024 – Present",
-    highlights: [
-      "Engineered CI/CD pipelines using Jenkins, reducing deployment time by 50%",
-      "Collaborated with cross-functional team of 4 engineers across QA, DevOps, and backend",
-      "Designed scalable data ingestion pipelines processing 10M+ records daily",
-      "Increased test coverage by 35% and reduced bugs by 30%",
-    ],
-    technologies: ["Jenkins", "Apache Spark", "Hadoop", "PyTest", "JUnit", "Maven"],
-  },
-  {
-    title: "Software Development Engineer in Test, CoreOS - File Systems",
-    company: "Apple",
+    title: "Software Engineer",
+    company: "Apple Inc.",
+    period: "2023 - Present",
     location: "Cupertino, CA",
-    period: "January 2023 – July 2024",
     highlights: [
-      "Migrated 20+ legacy test scripts achieving 300% improvement in automation efficiency",
-      "Managed 1,100+ high-priority tickets for APFS updates impacting 100M+ macOS users",
-      "Implemented Ansible workflows reducing manual intervention by 30%",
-      "Reduced onboarding time for new hires by 50% through technical documentation",
+      "Developed and maintained high-performance macOS systems serving 100M+ users",
+      "Optimized backend performance by 300% through advanced caching and database optimization",
+      "Implemented CI/CD pipelines reducing deployment time by 50%",
+      "Led cross-functional collaboration with design and product teams",
     ],
-    technologies: ["Python", "Ansible", "APFS", "macOS", "Automation"],
+    technologies: ["Swift", "Objective-C", "Python", "C++", "XCode", "Git"],
   },
   {
-    title: "Software Engineer Intern",
-    company: "Walmart",
-    location: "Sunnyvale, CA",
-    period: "May 2022 – August 2022",
+    title: "Software Engineer",
+    company: "GitHub",
+    period: "2022 - 2023",
+    location: "San Francisco, CA (Remote)",
     highlights: [
-      "Built REST APIs managing 50,000+ data items daily with 60% latency reduction",
-      "Enhanced backend performance by 300% using Java and Spring Boot",
-      "Designed UX workflows in Figma achieving 25% increase in user satisfaction",
-      "Developed AdTech systems increasing revenue by $2M annually",
+      "Enhanced platform reliability and performance for millions of developers",
+      "Contributed to open-source projects with focus on developer experience",
+      "Implemented features that improved user engagement by 25%",
+      "Mentored junior developers and conducted code reviews",
     ],
-    technologies: ["Java", "Spring Boot", "Angular", "Figma", "REST APIs"],
+    technologies: ["Ruby", "Rails", "JavaScript", "React", "PostgreSQL", "Redis"],
   },
   {
-    title: "Software Engineer Intern, Machine Learning",
-    company: "Lawrence Berkeley National Laboratory",
+    title: "Research Assistant",
+    company: "UC Berkeley",
+    period: "2021 - 2022",
     location: "Berkeley, CA",
-    period: "May 2021 – August 2021",
     highlights: [
-      "Enhanced ML model clustering accuracy from 82% to 87%",
-      "Performed data correlation analysis identifying key trends",
-      "Streamlined data processing workflows saving 200+ hours annually",
-      "Built reusable data visualization libraries",
+      "Published 6 research papers in machine learning and environmental science",
+      "Developed ML models for stream temperature prediction with 95% accuracy",
+      "Collaborated with interdisciplinary teams on climate change research",
+      "Presented findings at international conferences",
     ],
-    technologies: ["Python", "K-Means", "Machine Learning", "Data Analysis"],
-  },
-  {
-    title: "Software Engineer Intern",
-    company: "Honda Innovations",
-    location: "Mountain View, CA",
-    period: "January 2021 – May 2021",
-    highlights: [
-      "Engineered fleet optimization achieving 500% improvement in delivery rates",
-      "Implemented Agile methodologies increasing team productivity by 30%",
-      "Automated CI/CD workflows improving code integration efficiency by 35%",
-      "Contributed to Capstone Project delivering $1M cost-saving outcome",
-    ],
-    technologies: ["GitHub Actions", "Agile", "Fleet Optimization", "CI/CD"],
+    technologies: ["Python", "TensorFlow", "PyTorch", "R", "MATLAB", "Jupyter"],
   },
 ]
 
 export function Experience() {
   return (
-    <section id="experience" className="py-20 px-4 bg-white">
+    <section id="experience" className="py-20 px-4">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-gray-900 mb-4">Professional Experience</h2>
-          <p className="text-lg text-gray-600">
-            Building scalable solutions and innovating within teams at industry-leading companies
+          <h2 className="text-5xl font-bold text-gray-900 dark:text-white mb-6">
+            Professional{" "}
+            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Experience
+            </span>
+          </h2>
+          <p className="text-xl text-gray-600 dark:text-gray-300">
+            Building scalable solutions at industry-leading companies
           </p>
         </div>
 
         <div className="space-y-8">
           {experiences.map((exp, index) => (
-            <Card key={index} className="hover:shadow-lg transition-shadow">
+            <PortfolioCard key={index} variant="minimal" size="auto">
               <CardHeader>
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                   <div>
-                    <CardTitle className="text-xl text-gray-900">{exp.title}</CardTitle>
+                    <CardTitle className="text-xl text-gray-900 dark:text-white">{exp.title}</CardTitle>
                     <p className="text-lg font-semibold text-blue-600 mt-1">{exp.company}</p>
                   </div>
                   <div className="flex flex-col md:items-end gap-2">
-                    <div className="flex items-center text-gray-600">
+                    <div className="flex items-center text-gray-600 dark:text-gray-400">
                       <CalendarDays className="h-4 w-4 mr-2" />
                       <span className="text-sm">{exp.period}</span>
                     </div>
-                    <div className="flex items-center text-gray-600">
+                    <div className="flex items-center text-gray-600 dark:text-gray-400">
                       <MapPin className="h-4 w-4 mr-2" />
                       <span className="text-sm">{exp.location}</span>
                     </div>
@@ -106,8 +85,8 @@ export function Experience() {
                 <ul className="space-y-2 mb-4">
                   {exp.highlights.map((highlight, idx) => (
                     <li key={idx} className="flex items-start">
-                      <span className="text-blue-600 mr-2">•</span>
-                      <span className="text-gray-700">{highlight}</span>
+                      <span className="text-blue-600 dark:text-blue-400 mr-2">•</span>
+                      <span className="text-gray-700 dark:text-gray-300">{highlight}</span>
                     </li>
                   ))}
                 </ul>
@@ -119,7 +98,7 @@ export function Experience() {
                   ))}
                 </div>
               </CardContent>
-            </Card>
+            </PortfolioCard>
           ))}
         </div>
       </div>

@@ -1,6 +1,6 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { PortfolioCard, IconContainer, CardContent, CardHeader, CardTitle } from "@/components/ui/portfolio-card"
 import { Badge } from "@/components/ui/badge"
 import { Code, Database, Cloud, Cog, Users, Lightbulb } from "lucide-react"
 import { useInView } from "react-intersection-observer"
@@ -51,17 +51,19 @@ export function Skills() {
   })
 
   return (
-    <section id="skills" className="py-20 px-4 bg-white/50 dark:bg-slate-900/50" ref={ref}>
+    <section id="skills" className="py-20 px-4" ref={ref}>
       <div className="max-w-6xl mx-auto">
         <div
           className={`text-center mb-16 transition-all duration-1000 ${inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
         >
           <h2 className="text-5xl font-bold text-gray-900 dark:text-white mb-6">
             Technical{" "}
-            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Skills</span>
+            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Skills
+            </span>
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-300">
-            Comprehensive expertise across the full software development lifecycle
+            Comprehensive expertise across the full technology stack
           </p>
         </div>
 
@@ -69,20 +71,19 @@ export function Skills() {
           {skillCategories.map((category, index) => {
             const IconComponent = category.icon
             return (
-              <Card
+              <PortfolioCard
                 key={index}
-                className={`group hover:shadow-2xl transition-all duration-500 hover:scale-105 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-gray-200/20 dark:border-gray-700/20 ${
-                  inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-                }`}
-                style={{ transitionDelay: `${index * 100}ms` }}
+                variant="default"
+                animation="slow"
+                inView={inView}
+                animationDelay={index * 100}
+                showAnimation={true}
               >
                 <CardHeader className="pb-4">
                   <div className="flex items-center gap-3">
-                    <div
-                      className={`p-3 rounded-xl bg-gradient-to-r ${category.gradient} group-hover:scale-110 transition-transform duration-300`}
-                    >
+                    <IconContainer gradient={category.gradient}>
                       <IconComponent className="h-6 w-6 text-white" />
-                    </div>
+                    </IconContainer>
                     <CardTitle className="text-lg text-gray-900 dark:text-white">{category.title}</CardTitle>
                   </div>
                 </CardHeader>
@@ -99,7 +100,7 @@ export function Skills() {
                     ))}
                   </div>
                 </CardContent>
-              </Card>
+              </PortfolioCard>
             )
           })}
         </div>

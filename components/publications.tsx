@@ -1,6 +1,6 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { PortfolioCard, IconContainer, CardContent, CardHeader, CardTitle } from "@/components/ui/portfolio-card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { BookOpen, ExternalLink } from "lucide-react"
@@ -90,54 +90,57 @@ export function Publications() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Responsive, scalable grid with equal-height cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-6">
           {publications.map((pub, index) => (
             <Link
               key={index}
               href={pub.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="block"
+              className="block h-full"
             >
-              <Card
-                className={`group hover:shadow-2xl transition-all duration-500 hover:scale-105 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-gray-200/20 dark:border-gray-700/20 cursor-pointer ${
-                  inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-                }`}
-                style={{ transitionDelay: `${index * 100}ms` }}
+              <PortfolioCard
+                variant="interactive"
+                size="full"
+                animation="fast"
+                inView={inView}
+                animationDelay={index * 100}
+                showAnimation={true}
               >
                 <CardHeader>
                   <div className="flex items-start gap-3">
-                    <div
-                      className={`p-3 rounded-xl bg-gradient-to-r ${pub.gradient} group-hover:scale-110 transition-transform duration-300 flex-shrink-0`}
-                    >
+                    <IconContainer gradient={pub.gradient}>
                       <BookOpen className="h-6 w-6 text-white" />
-                    </div>
+                    </IconContainer>
                     <div className="flex-1">
-                      <CardTitle className="text-lg leading-tight mb-3 text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200">
+                      <CardTitle className="text-lg leading-tight mb-3 text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-150">
                         {pub.title}
                       </CardTitle>
                       <div className="flex items-center gap-2 mb-2">
-                        <Badge variant="outline" className="text-xs hover:scale-105 transition-transform duration-200">
+                        <Badge variant="outline" className="text-xs hover:scale-105 transition-transform duration-150">
                           {pub.type}
                         </Badge>
                         <Badge
                           variant="secondary"
-                          className="text-xs bg-gray-100 dark:bg-slate-700 hover:scale-105 transition-transform duration-200"
+                          className="text-xs bg-gray-100 dark:bg-slate-700 hover:scale-105 transition-transform duration-150"
                         >
                           {pub.year}
                         </Badge>
                       </div>
                     </div>
-                    <div className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <div className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
                       <ExternalLink className="h-5 w-5 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
                     </div>
                   </div>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{pub.journal}</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{pub.volume}</p>
+                <CardContent className="flex-1 flex flex-col justify-between">
+                  <div>
+                    <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{pub.journal}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{pub.volume}</p>
+                  </div>
                 </CardContent>
-              </Card>
+              </PortfolioCard>
             </Link>
           ))}
         </div>
