@@ -10,7 +10,7 @@ const experiences = [
     period: "September 2024 – Present",
     highlights: [
       "Engineered CI/CD pipelines using Jenkins, reducing deployment time by 50%",
-      "Led cross-functional team of 4 engineers across QA, DevOps, and backend",
+      "Collaborated with cross-functional team of 4 engineers across QA, DevOps, and backend",
       "Designed scalable data ingestion pipelines processing 10M+ records daily",
       "Increased test coverage by 35% and reduced bugs by 30%",
     ],
@@ -64,7 +64,7 @@ const experiences = [
       "Engineered fleet optimization achieving 500% improvement in delivery rates",
       "Implemented Agile methodologies increasing team productivity by 30%",
       "Automated CI/CD workflows improving code integration efficiency by 35%",
-      "Led Capstone Project delivering $1M cost-saving outcome",
+      "Contributed to Capstone Project delivering $1M cost-saving outcome",
     ],
     technologies: ["GitHub Actions", "Agile", "Fleet Optimization", "CI/CD"],
   },
@@ -77,7 +77,7 @@ export function Experience() {
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">Professional Experience</h2>
           <p className="text-lg text-gray-600">
-            Building scalable solutions and leading teams at industry-leading companies
+            Building scalable solutions and innovating within teams at industry-leading companies
           </p>
         </div>
 

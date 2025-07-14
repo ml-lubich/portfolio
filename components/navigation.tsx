@@ -43,7 +43,7 @@ export function Navigation() {
             className="flex items-center hover:scale-105 transition-transform duration-200"
           >
             <Image
-              src="/logo.png"
+              src="/logo.svg"
               alt="Misha Lubich Logo"
               width={40}
               height={40}

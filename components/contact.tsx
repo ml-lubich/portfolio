@@ -177,7 +177,7 @@ export function Contact() {
         <div className="flex flex-col items-center justify-center mt-16 pt-8 border-t border-gray-200/20 dark:border-gray-700/20">
           <div className="flex items-center justify-center mb-4">
             <Image
-              src="/logo.png"
+              src="/logo.svg"
               alt="Misha Lubich Logo"
               width={60}
               height={60}

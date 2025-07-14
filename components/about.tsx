@@ -51,13 +51,13 @@ export function About() {
           {/* Logo */}
           <div className="flex justify-center mb-8">
             <Image
-              src="/logo.png"
+              src="/logo.svg"
               alt="Misha Lubich Logo"
               width={80}
               height={80}
-              className="object-contain opacity-60 hover:opacity-100 transition-opacity duration-500"
+              className="opacity-60 hover:opacity-100 transition-opacity duration-500"
               sizes="80px"
-              loading="lazy"
+              quality={90}
             />
           </div>
 

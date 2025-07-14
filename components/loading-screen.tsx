@@ -44,7 +44,7 @@ export function LoadingScreen({ isLoading, onLoadingComplete }: LoadingScreenPro
         <div className="relative">
           <div className="absolute -inset-4 bg-gradient-to-r from-blue-600 via-purple-600 to-teal-600 rounded-full blur-lg opacity-20 animate-pulse"></div>
           <Image
-            src="/logo.png"
+            src="/logo.svg"
             alt="Misha Lubich Logo"
             width={80}
             height={80}

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Github, Linkedin, Mail, ArrowDown } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
-import { FallingCode } from "./falling-code"
+import { LazyFallingCode } from "./lazy-falling-code"
 
 export function Hero() {
   const [nameText, setNameText] = useState("")
@@ -72,8 +72,8 @@ export function Hero() {
   return (
     <section className="min-h-screen flex items-center justify-center px-4 py-20 relative overflow-hidden">
       {/* Falling Code Animation */}
-      <FallingCode />
-      
+      <LazyFallingCode />
+
       {/* Simple animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute w-96 h-96 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-full blur-3xl animate-pulse top-1/4 left-1/4 transform -translate-x-1/2 -translate-y-1/2" />
@@ -95,7 +95,7 @@ export function Hero() {
               <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 via-purple-600 to-teal-600 rounded-full blur-sm opacity-40 group-hover:opacity-60 transition-all duration-1000 animate-slow-pulse"></div>
               <div className="relative">
                 <Image
-                  src="/profile.jpg"
+                  src="/profile1.jpg"
                   alt="Misha Lubich"
                   width={280}
                   height={280}
@@ -127,7 +127,7 @@ export function Hero() {
           </div>
 
           <p className="text-lg text-gray-500 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed animate-fade-in-up animation-delay-600">
-            Crafting scalable solutions and leading cross-functional teams at industry leaders like{" "}
+            Crafting scalable solutions and innovating within cross-functional teams at industry leaders like{" "}
             <span className="text-blue-600 dark:text-blue-400 font-semibold">Apple</span> and{" "}
             <span className="text-blue-600 dark:text-blue-400 font-semibold">Walmart</span>
           </p>
