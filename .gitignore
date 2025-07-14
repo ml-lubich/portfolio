@@ -24,4 +24,124 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+# macOS system files
+.DS_Store
+
+# Next.js type definitions
 next-env.d.ts
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Icon?
+Desktop.ini
+
+# IDEs and editors
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+*.code-workspace
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Build output
+dist/
+build/
+out/
+.next/
+.cache/
+tmp/
+temp/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Dependency directories
+node_modules/
+bower_components/
+jspm_packages/
+
+# Misc
+*.tsbuildinfo
+*.log
+*.swp
+*.swo
+*.bak
+*.orig
+*.tmp
+*.temp
+*.pid
+*.seed
+*.pid.lock
+
+# Vercel
+.vercel
+
+# Local history for JetBrains IDEs
+.idea/.idea.*
+
+# Mac Quick Look
+._*
+
+# VS Code settings
+*.code-workspace
+
+# SASS cache
+.sass-cache/
+
+# Parcel cache
+.cache/
+
+# Firebase cache
+.firebase/
+
+# Storybook build
+storybook-static/
+
+# Cypress
+cypress/videos/
+cypress/screenshots/
+
+# Playwright
+test-results/
+playwright-report/
+
+# npm package lock
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Docker
+docker-compose.override.yml
+
+# Local env
+local.env
+
+# Miscellaneous
+*.local
+*.secret
+*.bak
+*.backup
+*.old
+*.orig
+*.rej
+*.swp
+*.swo
+*.tmp
+*.temp
+*.log
+
+# Ignore all .env files except .env.example
+!.env.example
