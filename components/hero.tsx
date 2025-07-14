@@ -5,23 +5,15 @@ import { Button } from "@/components/ui/button"
 import { Github, Linkedin, Mail, ArrowDown } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
+import { FallingCode } from "./falling-code"
 
 export function Hero() {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const [nameText, setNameText] = useState("")
   const [titleText, setTitleText] = useState("")
   const [isTyping, setIsTyping] = useState(true)
 
   const fullName = "misha lubich"
   const fullTitle = "Software Engineer & Technical Leader"
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY })
-    }
-    window.addEventListener("mousemove", handleMouseMove)
-    return () => window.removeEventListener("mousemove", handleMouseMove)
-  }, [])
 
   useEffect(() => {
     let timeout: NodeJS.Timeout
@@ -79,16 +71,12 @@ export function Hero() {
 
   return (
     <section className="min-h-screen flex items-center justify-center px-4 py-20 relative overflow-hidden">
-      {/* Animated background elements */}
+      {/* Falling Code Animation */}
+      <FallingCode />
+      
+      {/* Simple animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <div
-          className="absolute w-96 h-96 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-full blur-3xl animate-pulse"
-          style={{
-            left: mousePosition.x / 10,
-            top: mousePosition.y / 10,
-            transform: "translate(-50%, -50%)",
-          }}
-        />
+        <div className="absolute w-96 h-96 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-full blur-3xl animate-pulse top-1/4 left-1/4 transform -translate-x-1/2 -translate-y-1/2" />
         <div className="absolute top-1/4 right-1/4 w-64 h-64 bg-gradient-to-r from-teal-400/20 to-blue-400/20 rounded-full blur-2xl animate-bounce" />
         <div className="absolute bottom-1/4 left-1/4 w-48 h-48 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-full blur-2xl animate-pulse" />
       </div>
