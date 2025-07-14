@@ -47,7 +47,7 @@ export function Hero() {
               <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 via-purple-600 to-teal-600 rounded-full blur-sm opacity-40 group-hover:opacity-60 transition-all duration-1000 animate-slow-pulse"></div>
               <div className="relative">
                 <Image
-                  src="/profile.png"
+                  src="/profile.jpg"
                   alt="Misha Lubich"
                   width={280}
                   height={280}
