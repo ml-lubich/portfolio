@@ -56,6 +56,8 @@ export function About() {
               width={80}
               height={80}
               className="object-contain opacity-60 hover:opacity-100 transition-opacity duration-500"
+              sizes="80px"
+              loading="lazy"
             />
           </div>
 

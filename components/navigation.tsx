@@ -49,6 +49,7 @@ export function Navigation() {
               height={40}
               className="object-contain"
               priority
+              sizes="40px"
             />
           </Link>
 

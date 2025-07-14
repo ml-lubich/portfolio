@@ -182,6 +182,8 @@ export function Contact() {
               width={60}
               height={60}
               className="object-contain opacity-80 hover:opacity-100 transition-opacity duration-300"
+              sizes="60px"
+              loading="lazy"
             />
           </div>
           <p className="text-gray-500 dark:text-gray-400 text-sm text-center">

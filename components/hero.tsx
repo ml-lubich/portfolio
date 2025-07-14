@@ -51,7 +51,9 @@ export function Hero() {
                   alt="Misha Lubich"
                   width={280}
                   height={280}
+                  priority
                   className="rounded-full object-cover shadow-2xl group-hover:scale-105 transition-transform duration-700 ring-4 ring-white/30 dark:ring-slate-800/30 backdrop-blur-sm animate-gentle-float"
+                  unoptimized
                 />
                 <div className="absolute inset-0 rounded-full bg-gradient-to-t from-blue-600/10 via-transparent to-purple-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               </div>
