@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Github, Linkedin, Mail, ArrowDown } from "lucide-react"
+import { Github, Linkedin, Mail, ArrowDown, Calendar } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { LazyFallingCode } from "./lazy-falling-code"
@@ -18,115 +18,84 @@ export function Hero() {
   useEffect(() => {
     let timeout: NodeJS.Timeout
 
-    const typeText = () => {
-      // Phase 1: Type name
-      if (nameText.length < fullName.length) {
-        timeout = setTimeout(() => {
-          setNameText(fullName.slice(0, nameText.length + 1))
-        }, 100)
-      }
-      // Phase 2: Type title after name is complete
-      else if (titleText.length < fullTitle.length) {
-        timeout = setTimeout(() => {
-          setTitleText(fullTitle.slice(0, titleText.length + 1))
-        }, 50)
-      }
-      // Phase 3: Wait then start deleting
-      else if (isTyping) {
-        timeout = setTimeout(() => {
+    const typeText = (text: string, setter: (text: string) => void, delay = 100) => {
+      let index = 0
+      const type = () => {
+        if (index < text.length) {
+          setter(text.slice(0, index + 1))
+          index++
+          timeout = setTimeout(type, delay)
+        } else if (setter === setNameText) {
+          // Start typing title after name is complete
+          setTimeout(() => typeText(fullTitle, setTitleText, 80), 500)
+        } else {
           setIsTyping(false)
-        }, 2000)
+        }
       }
+      type()
     }
 
-    const deleteText = () => {
-      // Phase 1: Delete title first
-      if (titleText.length > 0) {
-        timeout = setTimeout(() => {
-          setTitleText(titleText.slice(0, -1))
-        }, 30)
-      }
-      // Phase 2: Delete name after title is gone
-      else if (nameText.length > 0) {
-        timeout = setTimeout(() => {
-          setNameText(nameText.slice(0, -1))
-        }, 50)
-      }
-      // Phase 3: Wait then start typing again
-      else {
-        timeout = setTimeout(() => {
-          setIsTyping(true)
-        }, 500)
-      }
-    }
-
-    if (isTyping) {
-      typeText()
-    } else {
-      deleteText()
-    }
+    // Start typing name
+    typeText(fullName, setNameText, 120)
 
     return () => clearTimeout(timeout)
-  }, [nameText, titleText, isTyping, fullName, fullTitle])
+  }, [])
 
   return (
-    <section className="min-h-screen flex items-center justify-center px-4 py-20 relative overflow-hidden">
-      {/* Falling Code Animation */}
-      <LazyFallingCode />
-
-      {/* Simple animated background elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute w-96 h-96 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-full blur-3xl animate-pulse top-1/4 left-1/4 transform -translate-x-1/2 -translate-y-1/2" />
-        <div className="absolute top-1/4 right-1/4 w-64 h-64 bg-gradient-to-r from-teal-400/20 to-blue-400/20 rounded-full blur-2xl animate-bounce" />
-        <div className="absolute bottom-1/4 left-1/4 w-48 h-48 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-full blur-2xl animate-pulse" />
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+      {/* Animated Background */}
+      <div className="absolute inset-0 w-full h-full">
+        <LazyFallingCode />
       </div>
 
-      <div className="max-w-6xl mx-auto text-center relative z-10">
-        <div className="mb-8 animate-fade-in-up">
-          <div className="inline-block mb-4">
-            <span className="text-sm font-medium text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30 px-3 py-1 rounded-full animate-pulse">
-              Available for new opportunities
-            </span>
-          </div>
+      {/* Background Elements */}
+      <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-teal-500/5" />
+      <div className="absolute top-20 left-20 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl animate-pulse" />
+      <div className="absolute bottom-20 right-20 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl animate-pulse animation-delay-1000" />
 
+      <div className="relative z-10 text-center px-4 max-w-6xl mx-auto">
+        <div className="flex flex-col items-center mb-8">
           {/* Profile Photo */}
-          <div className="flex justify-center mb-8">
-            <div className="relative group">
-              <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 via-purple-600 to-teal-600 rounded-full blur-sm opacity-40 group-hover:opacity-60 transition-all duration-1000 animate-slow-pulse"></div>
-              <div className="relative">
-                <Image
-                  src="/profile1.jpg"
-                  alt="Misha Lubich"
-                  width={280}
-                  height={280}
-                  priority
-                  className="rounded-full object-cover shadow-2xl group-hover:scale-105 transition-transform duration-700 ring-4 ring-white/30 dark:ring-slate-800/30 backdrop-blur-sm animate-gentle-float"
-                  unoptimized
-                />
-                <div className="absolute inset-0 rounded-full bg-gradient-to-t from-blue-600/10 via-transparent to-purple-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              </div>
+          <div className="relative group mb-8 animate-fade-in-up">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-teal-600 rounded-full blur-sm opacity-40 group-hover:opacity-60 transition-all duration-1000 animate-slow-pulse"></div>
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full opacity-20"></div>
+              <Image
+                src="/profile.jpg"
+                alt="Misha Lubich"
+                width={300}
+                height={360}
+                className="rounded-full object-cover shadow-2xl group-hover:scale-105 transition-transform duration-700 ring-4 ring-white/30 dark:ring-slate-800/30 backdrop-blur-sm animate-gentle-float"
+                style={{borderRadius: '150px'}}
+                quality={100}
+                unoptimized
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/30 via-slate-900/10 to-slate-900/20 opacity-80 group-hover:opacity-60 transition-opacity duration-500" style={{borderRadius: '150px'}}></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-transparent to-purple-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
             </div>
           </div>
 
-          <h1 className="text-6xl md:text-8xl font-bold mb-6 animate-fade-in-up animation-delay-200">
-            <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-teal-600 bg-clip-text text-transparent animate-gradient-x">
+          {/* Name with typing animation */}
+          <div className="mb-4 animate-fade-in-up animation-delay-200">
+            <h1 className="text-6xl md:text-8xl font-bold text-gray-900 dark:text-white mb-2 tracking-tight">
               {nameText}
-              {nameText.length < fullName.length && (
-                <span className="animate-pulse">|</span>
+              {isTyping && nameText.length < fullName.length && (
+                <span className="animate-pulse text-blue-600">|</span>
               )}
-            </span>
-          </h1>
-
-          <div className="text-xl md:text-3xl text-gray-600 dark:text-gray-300 mb-6 animate-fade-in-up animation-delay-400">
-            <span className="inline-block">
-              {titleText}
-              {nameText.length === fullName.length && titleText.length < fullTitle.length && (
-                <span className="animate-pulse">|</span>
-              )}
-            </span>
+            </h1>
           </div>
 
-          <p className="text-lg text-gray-500 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed animate-fade-in-up animation-delay-600">
+          {/* Title with typing animation */}
+          <div className="mb-6 animate-fade-in-up animation-delay-400">
+            <h2 className="text-2xl md:text-3xl text-gray-600 dark:text-gray-300 font-light">
+              {titleText}
+              {isTyping && titleText.length < fullTitle.length && nameText.length >= fullName.length && (
+                <span className="animate-pulse text-purple-600">|</span>
+              )}
+            </h2>
+          </div>
+
+          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed mb-8 animate-fade-in-up animation-delay-600">
             Crafting scalable solutions and innovating within cross-functional teams at industry leaders like{" "}
             <span className="text-blue-600 dark:text-blue-400 font-semibold">Apple</span> and{" "}
             <span className="text-blue-600 dark:text-blue-400 font-semibold">Walmart</span>
@@ -142,6 +111,16 @@ export function Hero() {
             <Link href="#contact">
               <Mail className="mr-2 h-5 w-5" />
               Get In Touch
+            </Link>
+          </Button>
+          <Button
+            asChild
+            size="lg"
+            className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 transform hover:scale-105 transition-all duration-200 text-white border-0"
+          >
+            <Link href="https://calendly.com/michaelle-lubich/" target="_blank" rel="noopener noreferrer">
+              <Calendar className="mr-2 h-5 w-5" />
+              Schedule a Call
             </Link>
           </Button>
           <Button
@@ -168,30 +147,34 @@ export function Hero() {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16 animate-fade-in-up animation-delay-1000">
+        {/* Stats Section */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12 animate-fade-in-up animation-delay-1000">
           {[
-            { value: "50%", label: "Deployment time reduction", color: "from-blue-500 to-cyan-500" },
-            { value: "300%", label: "Backend performance boost", color: "from-purple-500 to-pink-500" },
-            { value: "100M+", label: "macOS users impacted", color: "from-teal-500 to-green-500" },
+            { number: "100M+", label: "Users Impacted", color: "from-blue-600 to-cyan-600" },
+            { number: "6", label: "Research Papers", color: "from-purple-600 to-pink-600" },
+            { number: "300%", label: "Performance Gains", color: "from-teal-600 to-green-600" },
+            { number: "5+", label: "Years Experience", color: "from-orange-600 to-red-600" },
           ].map((stat, index) => (
             <div
               key={index}
-              className="group bg-white/10 dark:bg-slate-800/10 backdrop-blur-sm rounded-2xl p-6 border border-gray-200/20 dark:border-gray-700/20 hover:bg-white/20 dark:hover:bg-slate-800/20 transition-all duration-300 hover:scale-105 hover:shadow-xl"
+              className="group p-6 rounded-2xl bg-white/80 dark:bg-slate-800/20 transition-all duration-300 hover:scale-105 hover:shadow-xl"
             >
               <div
                 className={`text-4xl font-bold bg-gradient-to-r ${stat.color} bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-transform duration-300`}
               >
-                {stat.value}
+                {stat.number}
               </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400">{stat.label}</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400 font-medium">{stat.label}</div>
             </div>
           ))}
         </div>
-      </div>
 
-      {/* Arrow positioned at the very bottom of the screen */}
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 animate-bounce z-20">
-        <ArrowDown className="h-6 w-6 text-gray-400" />
+        {/* Scroll indicator */}
+        <div className="animate-bounce animate-fade-in-up animation-delay-1200">
+          <Link href="#about" className="inline-block text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+            <ArrowDown className="h-6 w-6" />
+          </Link>
+        </div>
       </div>
     </section>
   )
