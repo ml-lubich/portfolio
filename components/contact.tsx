@@ -6,13 +6,29 @@ import { Mail, Phone, MapPin, Github, Linkedin, GraduationCap, Send, FileDown, C
 import { useInView } from "react-intersection-observer"
 import Link from "next/link"
 import Image from "next/image"
-import { CalendlyEmbed } from "./calendly-embed"
+import { useEffect } from "react"
 
 export function Contact() {
   const { ref, inView } = useInView({
     triggerOnce: true,
     threshold: 0.1,
   })
+
+  // Load Calendly script
+  useEffect(() => {
+    const script = document.createElement('script')
+    script.src = 'https://assets.calendly.com/assets/external/widget.js'
+    script.async = true
+    document.body.appendChild(script)
+
+    return () => {
+      // Cleanup script if component unmounts
+      const existingScript = document.querySelector('script[src="https://assets.calendly.com/assets/external/widget.js"]')
+      if (existingScript) {
+        document.body.removeChild(existingScript)
+      }
+    }
+  }, [])
 
   const contactMethods = [
     {
@@ -152,7 +168,12 @@ export function Contact() {
             className={`transition-all duration-1000 ${inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
             style={{ animationDelay: '600ms' }}
           >
-            <CalendlyEmbed url="https://calendly.com/michaelle-lubich" height="650px" />
+            {/* Calendly inline widget */}
+            <div 
+              className="calendly-inline-widget" 
+              data-url="https://calendly.com/michaelle-lubich/" 
+              style={{ minWidth: '320px', height: '700px' }}
+            ></div>
           </div>
         </div>
 
