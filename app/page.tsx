@@ -6,6 +6,7 @@ import { Skills } from "@/components/skills"
 import { Publications } from "@/components/publications"
 import { Contact } from "@/components/contact"
 import { Navigation } from "@/components/navigation"
+import { ScrollToTop } from "@/components/scroll-to-top"
 
 export default function Home() {
   return (
@@ -18,6 +19,7 @@ export default function Home() {
       <Skills />
       <Publications />
       <Contact />
+      <ScrollToTop />
     </main>
   )
 }
