@@ -10,22 +10,48 @@ import Image from "next/image"
 export function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [activeSection, setActiveSection] = useState("")
   const { theme, setTheme } = useTheme()
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50)
+      
+      // Scroll spy functionality
+      const sections = ["about", "experience", "projects", "skills", "publications", "contact"]
+      const scrollPosition = window.scrollY + 100 // Offset for better detection
+      
+      for (const sectionId of sections) {
+        const element = document.getElementById(sectionId)
+        if (element) {
+          const offsetTop = element.offsetTop
+          const offsetHeight = element.offsetHeight
+          
+          if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
+            setActiveSection(sectionId)
+            break
+          }
+        }
+      }
+      
+      // Set hero as active when at top
+      if (window.scrollY < 100) {
+        setActiveSection("")
+      }
     }
+    
+    handleScroll() // Initial check
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
   const navItems = [
-    { href: "#about", label: "About" },
-    { href: "#experience", label: "Experience" },
-    { href: "#projects", label: "Projects" },
-    { href: "#skills", label: "Skills" },
-    { href: "#contact", label: "Contact" },
+    { href: "#about", label: "About", id: "about" },
+    { href: "#experience", label: "Experience", id: "experience" },
+    { href: "#projects", label: "Projects", id: "projects" },
+    { href: "#skills", label: "Skills", id: "skills" },
+    { href: "#publications", label: "Publications", id: "publications" },
+    { href: "#contact", label: "Contact", id: "contact" },
   ]
 
   return (
@@ -59,9 +85,19 @@ export function Navigation() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 font-medium"
+                className={`relative text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-200 font-medium py-2 ${
+                  activeSection === item.id
+                    ? "text-blue-600 dark:text-blue-400"
+                    : ""
+                }`}
               >
                 {item.label}
+                {/* Active indicator bar */}
+                <span
+                  className={`absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-blue-600 to-purple-600 transition-all duration-300 ${
+                    activeSection === item.id ? "w-full" : "w-0"
+                  }`}
+                />
               </Link>
             ))}
           </div>
@@ -97,10 +133,18 @@ export function Navigation() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="block px-3 py-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
+                  className={`relative block px-3 py-2 rounded-md transition-all duration-200 ${
+                    activeSection === item.id
+                      ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20"
+                      : "text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-slate-800/50"
+                  }`}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {item.label}
+                  {/* Active indicator */}
+                  {activeSection === item.id && (
+                    <span className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-600 to-purple-600 rounded-r" />
+                  )}
                 </Link>
               ))}
             </div>
