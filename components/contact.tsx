@@ -6,6 +6,7 @@ import { Mail, Phone, MapPin, Github, Linkedin, GraduationCap, Send, FileDown, C
 import { useInView } from "react-intersection-observer"
 import Link from "next/link"
 import Image from "next/image"
+import { CalendlyEmbed } from "./calendly-embed"
 
 export function Contact() {
   const { ref, inView } = useInView({
@@ -89,7 +90,8 @@ export function Contact() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        {/* Contact Methods */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
           {contactMethods.map((method, index) => {
             const IconComponent = method.icon
             return (
@@ -129,9 +131,35 @@ export function Contact() {
           })}
         </div>
 
+        {/* Calendly Booking Section */}
+        <div className="mb-16">
+          <div
+            className={`text-center mb-8 transition-all duration-1000 ${inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+            style={{ animationDelay: '400ms' }}
+          >
+            <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+              Schedule a{" "}
+              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                Meeting
+              </span>
+            </h3>
+            <p className="text-lg text-gray-600 dark:text-gray-300">
+              Book a time that works best for you - let's discuss your project or collaboration opportunities
+            </p>
+          </div>
+          
+          <div
+            className={`transition-all duration-1000 ${inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
+            style={{ animationDelay: '600ms' }}
+          >
+            <CalendlyEmbed url="https://calendly.com/michaelle-lubich" height="650px" />
+          </div>
+        </div>
+
+        {/* Social Links */}
         <div className="text-center">
           <p className="text-gray-600 dark:text-gray-300 mb-8 text-lg">
-            Schedule a call or find me on these platforms
+            Or find me on these platforms
           </p>
           <div className="flex justify-center gap-4 flex-wrap">
             {socialLinks.map((social, index) => {

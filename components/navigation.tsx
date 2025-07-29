@@ -17,31 +17,39 @@ export function Navigation() {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50)
       
-      // Scroll spy functionality
+      // Improved scroll spy functionality
       const sections = ["about", "experience", "projects", "skills", "publications", "contact"]
-      const scrollPosition = window.scrollY + 100 // Offset for better detection
+      const scrollPosition = window.scrollY + window.innerHeight / 3 // Better detection point
       
-      for (const sectionId of sections) {
+      let currentSection = ""
+      
+      // Check each section to find which one is currently in view
+      for (let i = sections.length - 1; i >= 0; i--) {
+        const sectionId = sections[i]
         const element = document.getElementById(sectionId)
+        
         if (element) {
-          const offsetTop = element.offsetTop
-          const offsetHeight = element.offsetHeight
+          const rect = element.getBoundingClientRect()
+          const elementTop = window.scrollY + rect.top
           
-          if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
-            setActiveSection(sectionId)
+          // Consider a section active if we've scrolled past its midpoint
+          if (window.scrollY >= elementTop - window.innerHeight / 3) {
+            currentSection = sectionId
             break
           }
         }
       }
       
       // Set hero as active when at top
-      if (window.scrollY < 100) {
-        setActiveSection("")
+      if (window.scrollY < 200) {
+        currentSection = ""
       }
+      
+      setActiveSection(currentSection)
     }
     
     handleScroll() // Initial check
-    window.addEventListener("scroll", handleScroll)
+    window.addEventListener("scroll", handleScroll, { passive: true })
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
