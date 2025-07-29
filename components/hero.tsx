@@ -106,7 +106,7 @@ export function Hero() {
           <Button
             asChild
             size="lg"
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-200"
+            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
           >
             <Link href="#contact">
               <Mail className="mr-2 h-5 w-5" />
@@ -116,7 +116,7 @@ export function Hero() {
           <Button
             asChild
             size="lg"
-            className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 transform hover:scale-105 transition-all duration-200 text-white border-0"
+            className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white border-0 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
           >
             <Link href="https://calendly.com/michaelle-lubich/" target="_blank" rel="noopener noreferrer">
               <Calendar className="mr-2 h-5 w-5" />
@@ -127,7 +127,7 @@ export function Hero() {
             asChild
             variant="outline"
             size="lg"
-            className="hover:scale-105 transition-all duration-200 bg-transparent"
+            className="border-2 border-gray-300 dark:border-gray-600 bg-white/10 dark:bg-slate-800/20 backdrop-blur-sm text-gray-700 dark:text-gray-300 hover:bg-white/20 dark:hover:bg-slate-700/30 hover:border-blue-500 dark:hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400 hover:scale-105 transition-all duration-200"
           >
             <Link href="https://github.com/ml-lubich" target="_blank">
               <Github className="mr-2 h-5 w-5" />
@@ -138,7 +138,7 @@ export function Hero() {
             asChild
             variant="outline"
             size="lg"
-            className="hover:scale-105 transition-all duration-200 bg-transparent"
+            className="border-2 border-gray-300 dark:border-gray-600 bg-white/10 dark:bg-slate-800/20 backdrop-blur-sm text-gray-700 dark:text-gray-300 hover:bg-white/20 dark:hover:bg-slate-700/30 hover:border-purple-500 dark:hover:border-purple-400 hover:text-purple-600 dark:hover:text-purple-400 hover:scale-105 transition-all duration-200"
           >
             <Link href="https://linkedin.com/in/misha-lubich" target="_blank">
               <Linkedin className="mr-2 h-5 w-5" />

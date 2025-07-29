@@ -116,7 +116,7 @@ export function Contact() {
                     <Button
                       asChild
                       variant="outline"
-                      className="w-full group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-purple-600 group-hover:text-white transition-all duration-300 bg-transparent"
+                      className="w-full border-2 border-gray-300 dark:border-gray-600 bg-white/10 dark:bg-slate-800/20 backdrop-blur-sm text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-blue-600 hover:to-purple-600 hover:text-white hover:border-transparent transition-all duration-300"
                     >
                       <Link href={method.href}>{method.value}</Link>
                     </Button>
@@ -144,8 +144,14 @@ export function Contact() {
                   size="lg"
                   className={`${
                     social.isPrimary 
-                      ? `bg-gradient-to-r ${social.gradient} text-white hover:scale-110 transition-all duration-300 shadow-lg hover:shadow-xl border-0`
-                      : `bg-gradient-to-r ${social.gradient} hover:scale-110 transition-all duration-300 shadow-lg hover:shadow-xl`
+                      ? `bg-gradient-to-r ${social.gradient} text-white border-0 shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300`
+                      : social.label === "LinkedIn"
+                      ? `border-2 border-gray-300 dark:border-gray-600 bg-white/10 dark:bg-slate-800/20 backdrop-blur-sm text-gray-700 dark:text-gray-300 hover:bg-white/20 dark:hover:bg-slate-700/30 hover:border-purple-500 dark:hover:border-purple-400 hover:text-purple-600 dark:hover:text-purple-400 hover:scale-110 transition-all duration-300`
+                      : social.label === "GitHub"
+                      ? `border-2 border-gray-300 dark:border-gray-600 bg-white/10 dark:bg-slate-800/20 backdrop-blur-sm text-gray-700 dark:text-gray-300 hover:bg-white/20 dark:hover:bg-slate-700/30 hover:border-blue-500 dark:hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400 hover:scale-110 transition-all duration-300`
+                      : social.label === "Google Scholar"
+                      ? `border-2 border-gray-300 dark:border-gray-600 bg-white/10 dark:bg-slate-800/20 backdrop-blur-sm text-gray-700 dark:text-gray-300 hover:bg-white/20 dark:hover:bg-slate-700/30 hover:border-indigo-500 dark:hover:border-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:scale-110 transition-all duration-300`
+                      : `border-2 border-gray-300 dark:border-gray-600 bg-white/10 dark:bg-slate-800/20 backdrop-blur-sm text-gray-700 dark:text-gray-300 hover:bg-white/20 dark:hover:bg-slate-700/30 hover:border-emerald-500 dark:hover:border-emerald-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:scale-110 transition-all duration-300`
                   }`}
                 >
                   <Link
