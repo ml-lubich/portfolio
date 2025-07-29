@@ -2,7 +2,7 @@
 
 import { PortfolioCard, IconContainer, CardContent, CardHeader, CardTitle } from "@/components/ui/portfolio-card"
 import { Button } from "@/components/ui/button"
-import { Mail, Phone, MapPin, Github, Linkedin, GraduationCap, Send, FileDown } from "lucide-react"
+import { Mail, Phone, MapPin, Github, Linkedin, GraduationCap, Send, FileDown, Calendar } from "lucide-react"
 import { useInView } from "react-intersection-observer"
 import Link from "next/link"
 import Image from "next/image"
@@ -38,6 +38,13 @@ export function Contact() {
   ]
 
   const socialLinks = [
+    {
+      icon: Calendar,
+      label: "Schedule a Call",
+      href: "https://calendly.com/michaelle-lubich/",
+      gradient: "from-blue-600 to-purple-600",
+      isPrimary: true,
+    },
     {
       icon: Linkedin,
       label: "LinkedIn",
@@ -124,7 +131,7 @@ export function Contact() {
 
         <div className="text-center">
           <p className="text-gray-600 dark:text-gray-300 mb-8 text-lg">
-            Find me on these platforms
+            Schedule a call or find me on these platforms
           </p>
           <div className="flex justify-center gap-4 flex-wrap">
             {socialLinks.map((social, index) => {
@@ -133,9 +140,13 @@ export function Contact() {
                 <Button
                   key={index}
                   asChild
-                  variant="outline"
+                  variant={social.isPrimary ? "default" : "outline"}
                   size="lg"
-                  className={`bg-gradient-to-r ${social.gradient} hover:scale-110 transition-all duration-300 shadow-lg hover:shadow-xl`}
+                  className={`${
+                    social.isPrimary 
+                      ? `bg-gradient-to-r ${social.gradient} text-white hover:scale-110 transition-all duration-300 shadow-lg hover:shadow-xl border-0`
+                      : `bg-gradient-to-r ${social.gradient} hover:scale-110 transition-all duration-300 shadow-lg hover:shadow-xl`
+                  }`}
                 >
                   <Link
                     href={social.href}
