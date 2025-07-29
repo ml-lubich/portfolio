@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Github, Linkedin, Mail, ArrowDown, Calendar } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
-import { LazyFallingCode } from "./lazy-falling-code"
+import { FallingCode } from "./falling-code"
 
 export function Hero() {
   const [nameText, setNameText] = useState("")
@@ -104,16 +104,22 @@ export function Hero() {
   }, [])
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-      {/* Animated Background */}
-      <div className="absolute inset-0 w-full h-full">
-        <LazyFallingCode />
-      </div>
-
+    <section 
+      id="hero" 
+      className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 relative overflow-hidden bg-slate-900 dark:bg-slate-900"
+    >
       {/* Background Elements */}
-      <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-purple-500/5 to-teal-500/5" />
-      <div className="absolute top-20 left-20 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl animate-pulse" />
-      <div className="absolute bottom-20 right-20 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl animate-pulse animation-delay-1000" />
+      <div className="absolute inset-0 bg-slate-900 dark:bg-slate-900"></div>
+      <div className="absolute inset-0">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl animate-slow-pulse"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl animate-slow-pulse animation-delay-1000"></div>
+        <div className="absolute top-3/4 left-1/3 w-64 h-64 bg-teal-600/10 rounded-full blur-2xl animate-slow-pulse animation-delay-2000"></div>
+      </div>
+      
+      {/* Falling Code Background */}
+      <div className="absolute inset-0 pointer-events-none">
+        <FallingCode />
+      </div>
 
       <div className="relative z-10 text-center px-4 max-w-6xl mx-auto">
         <div className="flex flex-col items-center mb-8">
