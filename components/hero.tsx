@@ -10,33 +10,95 @@ import { LazyFallingCode } from "./lazy-falling-code"
 export function Hero() {
   const [nameText, setNameText] = useState("")
   const [titleText, setTitleText] = useState("")
-  const [isTyping, setIsTyping] = useState(true)
+  const [nameComplete, setNameComplete] = useState(false)
+  const [currentTitleIndex, setCurrentTitleIndex] = useState(0)
+  const [isTypingName, setIsTypingName] = useState(false)
 
   const fullName = "misha lubich"
-  const fullTitle = "Software Engineer & Technical Leader"
+  const titles = [
+    "Software Engineer & Technical Leader",
+    "Full-Stack Developer",
+    "AI/ML Research Engineer", 
+    "Ex-Apple Software Engineer",
+    "Ex-Walmart Tech Innovator",
+    "React & Next.js Specialist",
+    "Cloud Architecture Expert",
+    "Published Research Author",
+    "Performance Optimization Expert",
+    "Team Innovation Leader"
+  ]
 
   useEffect(() => {
     let timeout: NodeJS.Timeout
 
-    const typeText = (text: string, setter: (text: string) => void, delay = 100) => {
+    // Type out name once with a small delay
+    const typeName = () => {
+      setIsTypingName(true)
       let index = 0
       const type = () => {
-        if (index < text.length) {
-          setter(text.slice(0, index + 1))
+        if (index < fullName.length) {
+          setNameText(fullName.slice(0, index + 1))
           index++
-          timeout = setTimeout(type, delay)
-        } else if (setter === setNameText) {
-          // Start typing title after name is complete
-          setTimeout(() => typeText(fullTitle, setTitleText, 80), 500)
+          timeout = setTimeout(type, 120)
         } else {
-          setIsTyping(false)
+          setIsTypingName(false)
+          setNameComplete(true)
+          // Start cycling titles after name is complete
+          timeout = setTimeout(() => startTitleCycle(), 500)
         }
       }
-      type()
+      timeout = setTimeout(type, 2000) // Initial delay before typing starts
+    }
+
+    // Cycle through titles continuously
+    const startTitleCycle = () => {
+      const typeTitle = (titleIndex: number) => {
+        const currentTitle = titles[titleIndex]
+        let charIndex = 0
+        
+        // Type out the title
+        const typeChar = () => {
+          if (charIndex < currentTitle.length) {
+            setTitleText(currentTitle.slice(0, charIndex + 1))
+            charIndex++
+            timeout = setTimeout(typeChar, 80)
+          } else {
+            // Hold the complete title for 2 seconds
+            timeout = setTimeout(() => {
+              // Erase the title
+              eraseTitle(titleIndex)
+            }, 2000)
+          }
+        }
+        typeChar()
+      }
+
+      const eraseTitle = (titleIndex: number) => {
+        const currentTitle = titles[titleIndex]
+        let charIndex = currentTitle.length
+        
+        const eraseChar = () => {
+          if (charIndex > 0) {
+            setTitleText(currentTitle.slice(0, charIndex - 1))
+            charIndex--
+            timeout = setTimeout(eraseChar, 40)
+          } else {
+            // Move to next title
+            const nextIndex = (titleIndex + 1) % titles.length
+            setCurrentTitleIndex(nextIndex)
+            // Short pause before typing next title
+            timeout = setTimeout(() => typeTitle(nextIndex), 300)
+          }
+        }
+        eraseChar()
+      }
+
+      // Start with first title
+      typeTitle(0)
     }
 
     // Start typing name
-    typeText(fullName, setNameText, 120)
+    typeName()
 
     return () => clearTimeout(timeout)
   }, [])
@@ -56,7 +118,7 @@ export function Hero() {
       <div className="relative z-10 text-center px-4 max-w-6xl mx-auto">
         <div className="flex flex-col items-center mb-8">
           {/* Profile Photo */}
-          <div className="relative group mb-8 animate-fade-in-up">
+          <div className="relative group mb-8 mt-8 sm:mt-12 md:mt-16 animate-fade-in-up">
             <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-teal-600 rounded-full blur-sm opacity-40 group-hover:opacity-60 transition-all duration-1000 animate-slow-pulse"></div>
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full opacity-20"></div>
@@ -77,20 +139,22 @@ export function Hero() {
 
           {/* Name with typing animation */}
           <div className="mb-4 animate-fade-in-up animation-delay-200">
-            <h1 className="text-6xl md:text-8xl font-bold text-gray-900 dark:text-white mb-2 tracking-tight">
-              {nameText}
-              {isTyping && nameText.length < fullName.length && (
-                <span className="animate-pulse text-blue-600">|</span>
+            <h1 className="text-6xl md:text-8xl font-bold mb-2 tracking-tight">
+              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-teal-600 bg-clip-text text-transparent">
+                {nameText}
+              </span>
+              {(isTypingName || nameComplete) && (
+                <span className="animate-pulse text-blue-600 ml-1">|</span>
               )}
             </h1>
           </div>
 
           {/* Title with typing animation */}
-          <div className="mb-6 animate-fade-in-up animation-delay-400">
-            <h2 className="text-2xl md:text-3xl text-gray-600 dark:text-gray-300 font-light">
+          <div className="mb-6 animate-fade-in-up animation-delay-400 h-20 flex items-center justify-center">
+            <h2 className="text-2xl md:text-3xl text-gray-600 dark:text-gray-300 font-light text-center">
               {titleText}
-              {isTyping && titleText.length < fullTitle.length && nameText.length >= fullName.length && (
-                <span className="animate-pulse text-purple-600">|</span>
+              {nameComplete && titleText && (
+                <span className="animate-pulse text-purple-600 ml-1">|</span>
               )}
             </h2>
           </div>

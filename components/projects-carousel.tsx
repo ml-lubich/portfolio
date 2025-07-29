@@ -212,15 +212,15 @@ export function ProjectsCarousel() {
             >
             <div
               className="flex transition-transform duration-500 ease-in-out"
-              style={{
+              style={{ 
                 transform: `translateX(-${currentIndex * (100 / itemsPerView)}%) translateX(${dragOffset + touchOffset}px)`,
               }}
             >
               {projects.map((project, index) => {
                 const IconComponent = project.icon
                 return (
-                  <div
-                    key={index}
+                  <div 
+                    key={index} 
                     className={`w-full ${itemsPerView === 1 ? "px-2" : itemsPerView === 2 ? "md:w-1/2 px-2" : "md:w-1/3 px-2"} flex-shrink-0`}
                   >
                     <PortfolioCard
@@ -299,14 +299,14 @@ export function ProjectsCarousel() {
             </Button>
             <div className="flex space-x-2">
               {Array.from({ length: Math.ceil(projects.length / itemsPerView) }).map((_, index) => (
-                                 <button
-                   key={index}
+                <button
+                  key={index}
                    onClick={() => goToSlide(index)}
                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
                      index === currentIndex ? "bg-blue-600 scale-125" : "bg-gray-300 hover:bg-gray-400"
-                   }`}
+                  }`}
                    aria-label={`Go to slide ${index + 1}`}
-                 />
+                />
               ))}
             </div>
             <Button
