@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Github, Linkedin, Mail, ArrowDown, Calendar } from "lucide-react"
+import { Github, Linkedin, Mail, ArrowDown, Calendar, Download } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { FallingCode } from "./falling-code"
@@ -26,6 +26,16 @@ export function Hero() {
       "calendly",
       `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`
     )
+  }
+
+  // Proper download handler
+  const handleDownloadResume = () => {
+    const link = document.createElement('a')
+    link.href = '/lubich_michaelle_swe.pdf'
+    link.download = 'Misha_Lubich_Resume.pdf'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
   }
 
   const fullName = "misha lubich"
@@ -152,8 +162,8 @@ export function Hero() {
                 quality={100}
                 unoptimized
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/30 via-slate-900/10 to-slate-900/20 opacity-80 group-hover:opacity-60 transition-opacity duration-500" style={{borderRadius: '150px'}}></div>
-              <div className="absolute inset-0 bg-gradient-to-t from-transparent to-purple-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/30 via-slate-900/10 to-slate-900/20 opacity-80 group-hover:opacity-60 transition-opacity duration-500 rounded-full"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-transparent to-purple-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-full"></div>
             </div>
           </div>
 
@@ -196,6 +206,14 @@ export function Hero() {
               <Mail className="mr-2 h-5 w-5" />
               Get In Touch
             </Link>
+          </Button>
+          <Button
+            size="lg"
+            onClick={handleDownloadResume}
+            className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white border-0 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+          >
+            <Download className="mr-2 h-5 w-5" />
+            Download Resume
           </Button>
           <Button
             size="lg"

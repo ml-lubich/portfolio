@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { Moon, Sun, Menu, X } from "lucide-react"
+import { Moon, Sun, Menu, X, Download } from "lucide-react"
 import { useTheme } from "next-themes"
 import Link from "next/link"
 import Image from "next/image"
@@ -12,6 +12,16 @@ export function Navigation() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [activeSection, setActiveSection] = useState("")
   const { theme, setTheme } = useTheme()
+
+  // Proper download handler
+  const handleDownloadResume = () => {
+    const link = document.createElement('a')
+    link.href = '/lubich_michaelle_swe.pdf'
+    link.download = 'Misha_Lubich_Resume.pdf'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
 
   useEffect(() => {
     const handleScroll = () => {
@@ -106,6 +116,15 @@ export function Navigation() {
 
           <div className="flex items-center space-x-4">
             <Button
+              variant="outline"
+              size="sm"
+              onClick={handleDownloadResume}
+              className="hidden sm:flex border-2 border-blue-600/30 bg-blue-600/10 text-blue-600 hover:bg-blue-600 hover:text-white transition-all duration-200"
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Resume
+            </Button>
+            <Button
               variant="ghost"
               size="sm"
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
@@ -149,6 +168,18 @@ export function Navigation() {
                   )}
                 </Link>
               ))}
+              {/* Mobile Resume Button */}
+              <button
+                onClick={() => {
+                  handleDownloadResume()
+                  setIsMobileMenuOpen(false)
+                }}
+                className="relative flex items-center px-3 py-2 rounded-md text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-all duration-200 font-medium w-full text-left"
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Download Resume
+                <span className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-600 to-purple-600 rounded-r" />
+              </button>
             </div>
           </div>
         )}

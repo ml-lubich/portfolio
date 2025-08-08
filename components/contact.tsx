@@ -54,6 +54,16 @@ export function Contact() {
     },
   ]
 
+  // Proper download handler
+  const handleDownloadResume = () => {
+    const link = document.createElement('a')
+    link.href = '/lubich_michaelle_swe.pdf'
+    link.download = 'Misha_Lubich_Resume.pdf'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
   const socialLinks = [
     {
       icon: Calendar,
@@ -83,7 +93,7 @@ export function Contact() {
     {
       icon: FileDown,
       label: "Download Resume",
-      href: "/lubich_michaelle_swe.pdf",
+      onClick: handleDownloadResume,
       gradient: "from-emerald-600 to-teal-600",
       isDownload: true,
     },
@@ -185,6 +195,23 @@ export function Contact() {
           <div className="flex justify-center gap-4 flex-wrap">
             {socialLinks.map((social, index) => {
               const IconComponent = social.icon
+
+              // Handle download button with onClick
+              if (social.onClick) {
+                return (
+                  <Button
+                    key={index}
+                    onClick={social.onClick}
+                    variant="outline"
+                    size="lg"
+                    className="border-2 border-gray-300 dark:border-gray-600 bg-white/10 dark:bg-slate-800/20 backdrop-blur-sm text-gray-700 dark:text-gray-300 hover:bg-white/20 dark:hover:bg-slate-700/30 hover:border-emerald-500 dark:hover:border-emerald-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:scale-110 transition-all duration-300"
+                  >
+                    <IconComponent className="mr-2 h-5 w-5" />
+                    {social.label}
+                  </Button>
+                )
+              }
+
               return (
                 <Button
                   key={index}
@@ -207,7 +234,6 @@ export function Contact() {
                     href={social.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    {...(social.isDownload && { download: true })}
                   >
                     <IconComponent className="mr-2 h-5 w-5" />
                     {social.label}

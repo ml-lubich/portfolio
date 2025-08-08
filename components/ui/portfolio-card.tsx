@@ -93,13 +93,13 @@ const portfolioCardVariants = cva(
 
 // Icon container variants for consistent gradient icons
 const iconContainerVariants = cva(
-  "flex-shrink-0 rounded-xl bg-gradient-to-r p-3 group-hover:scale-110 transition-transform duration-300",
+  "flex-shrink-0 rounded-xl bg-gradient-to-r group-hover:scale-110 transition-transform duration-300 flex items-center justify-center",
   {
     variants: {
       size: {
-        sm: "h-12 w-12 p-2",
-        default: "h-16 w-16 p-3",
-        lg: "h-20 w-20 p-4"
+        sm: "h-12 w-12",
+        default: "h-16 w-16", 
+        lg: "h-20 w-20"
       }
     },
     defaultVariants: {
@@ -171,11 +171,15 @@ export const IconContainer = React.forwardRef<
     ref={ref}
     className={cn(
       iconContainerVariants({ size }),
-      `bg-gradient-to-r ${gradient}`
+      `bg-gradient-to-r ${gradient}`,
+      "relative",
+      className
     )}
     {...props}
   >
-    {children}
+    <div className="absolute inset-0 flex items-center justify-center">
+      {children}
+    </div>
   </div>
 ))
 

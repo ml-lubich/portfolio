@@ -283,8 +283,9 @@ export function FallingCode() {
         style={{ 
           imageRendering: 'pixelated',
           backfaceVisibility: 'hidden',
-          perspective: 1000,
+          perspective: '1000px',
           transform: 'translateZ(0)', // Force hardware acceleration
+          willChange: 'transform'
         }}
       />
       

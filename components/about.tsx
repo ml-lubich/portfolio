@@ -82,9 +82,10 @@ export function About() {
                 <CardContent className="pt-6">
                   <IconContainer 
                     gradient={card.color}
+                    size="default"
                     className="mx-auto mb-4"
                   >
-                    <IconComponent className="h-8 w-8 text-white" />
+                    <IconComponent className="h-7 w-7 text-white" strokeWidth={1.5} />
                   </IconContainer>
                   <h3 className="font-bold text-gray-900 dark:text-white mb-2 text-lg">{card.title}</h3>
                   <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">{card.subtitle}</p>
