@@ -1,9 +1,11 @@
 "use client"
 
 import * as React from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 import { cva, type VariantProps } from "class-variance-authority"
+
+// Import card components with explicit path
+import { Card, CardContent, CardHeader, CardTitle } from "./card"
 
 // Unified card variants following existing patterns
 const portfolioCardVariants = cva(
@@ -134,4 +136,4 @@ PortfolioCard.displayName = "PortfolioCard"
 IconContainer.displayName = "IconContainer"
 
 // Re-export Card components for convenience
-export { CardContent, CardHeader, CardTitle } from "@/components/ui/card" 
+export { CardContent, CardHeader, CardTitle } from "./card" 

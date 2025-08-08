@@ -41,7 +41,7 @@ const isLowEndDevice = () => {
 
 export function FallingCode() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const animationRef = useRef<number>()
+  const animationRef = useRef<number | undefined>(undefined)
   const particlesRef = useRef<CodeParticle[]>([])
   const [isEnabled, setIsEnabled] = useState(true)
   const [performance, setPerformance] = useState<'high' | 'medium' | 'low'>('high')
