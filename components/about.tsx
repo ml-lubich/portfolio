@@ -55,15 +55,9 @@ export function About() {
             </span>
           </h2>
           <div className="flex justify-center mb-8">
-            <Image
-              src="/logo.svg"
-              alt="Misha Lubich Logo"
-              width={80}
-              height={80}
-              className="opacity-60 hover:opacity-100 transition-opacity duration-500"
-              sizes="80px"
-              quality={90}
-            />
+            <div className="text-6xl font-bold text-blue-600 dark:text-blue-400 opacity-60 hover:opacity-100 transition-opacity duration-500">
+              ML
+            </div>
           </div>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
             Software Engineer and AI/ML Specialist passionate about creating scalable solutions that drive innovation.

@@ -76,15 +76,9 @@ export function Navigation() {
             href="#"
             className="flex items-center hover:scale-105 transition-transform duration-200"
           >
-            <Image
-              src="/logo.svg"
-              alt="Misha Lubich Logo"
-              width={40}
-              height={40}
-              className="object-contain"
-              priority
-              sizes="40px"
-            />
+            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+              ML
+            </div>
           </Link>
 
           {/* Desktop Navigation */}

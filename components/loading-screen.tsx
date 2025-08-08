@@ -43,14 +43,9 @@ export function LoadingScreen({ isLoading, onLoadingComplete }: LoadingScreenPro
         {/* Logo */}
         <div className="relative">
           <div className="absolute -inset-4 bg-gradient-to-r from-blue-600 via-purple-600 to-teal-600 rounded-full blur-lg opacity-20 animate-pulse"></div>
-          <Image
-            src="/logo.svg"
-            alt="Misha Lubich Logo"
-            width={80}
-            height={80}
-            className="relative object-contain animate-pulse"
-            priority
-          />
+          <div className="relative text-6xl font-bold text-blue-600 dark:text-blue-400 animate-pulse">
+            ML
+          </div>
         </div>
 
         {/* Loading spinner */}
