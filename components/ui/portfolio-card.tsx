@@ -4,8 +4,8 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 import { cva, type VariantProps } from "class-variance-authority"
 
-// Import card components with explicit path
-import { Card, CardContent, CardHeader, CardTitle } from "./card"
+// Import card components with absolute path
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 // Unified card variants following existing patterns
 const portfolioCardVariants = cva(
@@ -136,4 +136,4 @@ PortfolioCard.displayName = "PortfolioCard"
 IconContainer.displayName = "IconContainer"
 
 // Re-export Card components for convenience
-export { CardContent, CardHeader, CardTitle } from "./card" 
+export { CardContent, CardHeader, CardTitle } from "@/components/ui/card" 
