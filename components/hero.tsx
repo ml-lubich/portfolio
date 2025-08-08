@@ -14,6 +14,20 @@ export function Hero() {
   const [currentTitleIndex, setCurrentTitleIndex] = useState(0)
   const [isTypingName, setIsTypingName] = useState(false)
 
+  // Function to open Calendly in a smaller popup window
+  const openCalendly = () => {
+    const width = 800
+    const height = 600
+    const left = (window.screen.width - width) / 2
+    const top = (window.screen.height - height) / 2
+    
+    window.open(
+      "https://calendly.com/michaelle-lubich/",
+      "calendly",
+      `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`
+    )
+  }
+
   const fullName = "misha lubich"
   const titles = [
     "Software Engineer & Technical Leader",
@@ -184,14 +198,12 @@ export function Hero() {
             </Link>
           </Button>
           <Button
-            asChild
             size="lg"
+            onClick={openCalendly}
             className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white border-0 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
           >
-            <Link href="https://calendly.com/michaelle-lubich/" target="_blank" rel="noopener noreferrer">
-              <Calendar className="mr-2 h-5 w-5" />
-              Schedule a Call
-            </Link>
+            <Calendar className="mr-2 h-5 w-5" />
+            Schedule a Call
           </Button>
           <Button
             asChild
