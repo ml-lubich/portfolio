@@ -106,10 +106,10 @@ export function Hero() {
   return (
     <section 
       id="hero" 
-      className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 relative overflow-hidden bg-slate-900 dark:bg-slate-900"
+      className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 relative overflow-hidden"
     >
       {/* Background Elements */}
-      <div className="absolute inset-0 bg-slate-900 dark:bg-slate-900"></div>
+      <div className="absolute inset-0"></div>
       <div className="absolute inset-0">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl animate-slow-pulse"></div>
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl animate-slow-pulse animation-delay-1000"></div>
