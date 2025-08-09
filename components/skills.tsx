@@ -1,6 +1,7 @@
 "use client"
 
 import { SkillCard } from "@/components/ui/skill-card"
+import { Carousel3D } from "@/components/ui/carousel-3d"
 import { Code, Database, Cloud, Cog, Users, Lightbulb } from "lucide-react"
 import { useInView } from "react-intersection-observer"
 
@@ -49,9 +50,19 @@ export function Skills() {
     threshold: 0.1,
   })
 
+  const renderSkillCard = (category: typeof skillCategories[0], index: number, isActive: boolean) => (
+    <SkillCard
+      title={category.title}
+      icon={category.icon}
+      skills={category.skills}
+      gradient={category.gradient}
+      className="w-full h-full"
+    />
+  )
+
   return (
     <section id="skills" className="py-20 px-4" ref={ref}>
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         <div
           className={`text-center mb-16 transition-all duration-1000 ${inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
         >
@@ -66,19 +77,10 @@ export function Skills() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {skillCategories.map((category, index) => (
-            <SkillCard
-              key={index}
-              title={category.title}
-              icon={category.icon}
-              skills={category.skills}
-              gradient={category.gradient}
-              
-              inView={inView}
-            />
-          ))}
-        </div>
+        <Carousel3D
+          items={skillCategories}
+          renderCard={renderSkillCard}
+        />
       </div>
     </section>
   )

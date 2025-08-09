@@ -10,6 +10,7 @@ interface SkillCardProps {
   skills: string[]
   gradient: string
   inView?: boolean
+  className?: string
 }
 
 export function SkillCard({
@@ -17,15 +18,17 @@ export function SkillCard({
   icon: IconComponent,
   skills,
   gradient,
-  inView = true
+  inView = true,
+  className = ""
 }: SkillCardProps) {
   return (
     <PortfolioCard
-      variant="default"
+      variant="static"
       inView={inView}
       showAnimation={true}
+      className={`w-full h-full flex flex-col ${className}`}
     >
-      <CardHeader className="pb-4">
+      <CardHeader className="pb-4 flex-shrink-0">
         <div className="flex items-center gap-3">
           <IconContainer gradient={gradient}>
             <IconComponent className="h-6 w-6 text-white" />
@@ -35,8 +38,8 @@ export function SkillCard({
           </CardTitle>
         </div>
       </CardHeader>
-      <CardContent>
-        <div className="flex flex-wrap gap-2">
+      <CardContent className="flex-1 overflow-hidden">
+        <div className="flex flex-wrap gap-2 content-start h-full overflow-y-auto">
           {skills.map((skill, idx) => (
             <TechBadge
               key={idx}

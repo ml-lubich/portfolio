@@ -68,7 +68,9 @@ const portfolioCardVariants = cva(
         // Interactive cards with cursor pointer
         interactive: `${animations.hoverShadow} ${animations.hoverScale} cursor-pointer`,
         // Carousel cards with enhanced mobile responsiveness
-        carousel: `${animations.hoverShadow} ${animations.hoverScale}`
+        carousel: `${animations.hoverShadow} ${animations.hoverScale}`,
+        // Static cards for 3D carousel (no hover effects)
+        static: `shadow-sm`
       },
       size: {
         default: "h-full",
