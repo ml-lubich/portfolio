@@ -105,7 +105,6 @@ export interface PortfolioCardProps
     VariantProps<typeof portfolioCardVariants> {
   children: React.ReactNode
   inView?: boolean
-  animationDelay?: number
   // For intersection observer animations
   showAnimation?: boolean
 }
@@ -125,8 +124,7 @@ export const PortfolioCard = React.forwardRef<
   className, 
   variant, 
   size,
-  inView = true, 
-  animationDelay = 0,
+  inView = true,
   showAnimation = false,
   children, 
   ...props 
@@ -140,7 +138,7 @@ export const PortfolioCard = React.forwardRef<
   return (
     <div
       className={animationClasses}
-      style={animationDelay > 0 ? { transitionDelay: `${animationDelay}ms` } : undefined}
+      style={{ transitionDelay: `${0}ms` }}
     >
       <div
         ref={ref}

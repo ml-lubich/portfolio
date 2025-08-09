@@ -74,7 +74,6 @@ export function About() {
                 key={index}
                 variant="soft"
                 inView={inView}
-                animationDelay={0}
                 showAnimation={true}
                 className="text-center p-6"
               >

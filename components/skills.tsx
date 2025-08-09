@@ -74,7 +74,7 @@ export function Skills() {
               icon={category.icon}
               skills={category.skills}
               gradient={category.gradient}
-              animationDelay={0}
+              
               inView={inView}
             />
           ))}

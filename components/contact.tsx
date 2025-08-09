@@ -125,7 +125,7 @@ export function Contact() {
                 key={index}
                 variant="default"
                 inView={inView}
-                animationDelay={0}
+                
                 showAnimation={true}
                 className="text-center"
               >
@@ -160,7 +160,6 @@ export function Contact() {
         <div className="mb-16">
           <div
             className={`text-center mb-8 transition-all duration-1000 ${inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
-            style={{ animationDelay: '400ms' }}
           >
             <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
               Schedule a{" "}
@@ -175,7 +174,6 @@ export function Contact() {
           
           <div
             className={`transition-all duration-1000 ${inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
-            style={{ animationDelay: '600ms' }}
           >
             {/* Calendly inline widget */}
             <div 

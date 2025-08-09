@@ -15,7 +15,6 @@ interface ResearchCardProps {
   type: "Journal Article" | "Conference Abstract"
   gradient: string
   href: string
-  animationDelay?: number
   inView?: boolean
 }
 
@@ -27,7 +26,6 @@ export function ResearchCard({
   type,
   gradient,
   href,
-  animationDelay = 0,
   inView = true
 }: ResearchCardProps) {
   return (
@@ -41,8 +39,8 @@ export function ResearchCard({
         variant="interactive"
         size="full"
         inView={inView}
-        animationDelay={animationDelay}
         showAnimation={true}
+        className="h-64 flex flex-col"
       >
         <CardHeader>
           <div className="flex items-start gap-3">
@@ -51,8 +49,8 @@ export function ResearchCard({
             </IconContainer>
             <div className="flex-1">
               <CardTitle className={cn(
-                "text-lg leading-tight mb-3 text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400",
-                animations.allTransitionNormal
+                "text-lg mb-3 text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400",
+                animations.allTransition
               )}>
                 {title}
               </CardTitle>
@@ -67,13 +65,13 @@ export function ResearchCard({
             </div>
             <div className={cn(
               "flex-shrink-0 opacity-0 group-hover:opacity-100",
-              animations.allTransitionNormal
+              animations.allTransition
             )}>
               <ExternalLink className="h-5 w-5 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
             </div>
           </div>
         </CardHeader>
-        <CardContent className="flex-1 flex flex-col justify-between">
+        <CardContent className="flex-1">
           <div>
             <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
               {journal}

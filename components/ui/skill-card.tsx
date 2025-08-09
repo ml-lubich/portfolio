@@ -9,7 +9,6 @@ interface SkillCardProps {
   icon: LucideIcon
   skills: string[]
   gradient: string
-  animationDelay?: number
   inView?: boolean
 }
 
@@ -18,14 +17,12 @@ export function SkillCard({
   icon: IconComponent,
   skills,
   gradient,
-  animationDelay = 0,
   inView = true
 }: SkillCardProps) {
   return (
     <PortfolioCard
       variant="default"
       inView={inView}
-      animationDelay={animationDelay}
       showAnimation={true}
     >
       <CardHeader className="pb-4">
