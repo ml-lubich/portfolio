@@ -1,11 +1,9 @@
 "use client"
 
-import { PortfolioCard, IconContainer, CardContent, CardHeader, CardTitle } from "@/components/ui/portfolio-card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { BookOpen, ExternalLink } from "lucide-react"
+import { ActionButton } from "@/components/ui/action-button"
+import { ResearchCard } from "@/components/ui/research-card"
+import { ExternalLink } from "lucide-react"
 import { useInView } from "react-intersection-observer"
-import Link from "next/link"
 
 const publications = [
   {
@@ -93,55 +91,18 @@ export function Publications() {
         {/* Responsive, scalable grid with equal-height cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-6">
           {publications.map((pub, index) => (
-            <Link
+            <ResearchCard
               key={index}
+              title={pub.title}
+              journal={pub.journal}
+              year={pub.year}
+              volume={pub.volume}
+              type={pub.type as "Journal Article" | "Conference Abstract"}
+              gradient={pub.gradient}
               href={pub.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block h-full"
-            >
-              <PortfolioCard
-                variant="interactive"
-                size="full"
-                animation="fast"
-                inView={inView}
-                animationDelay={index * 100}
-                showAnimation={true}
-              >
-                <CardHeader>
-                  <div className="flex items-start gap-3">
-                    <IconContainer gradient={pub.gradient}>
-                      <BookOpen className="h-6 w-6 text-white" />
-                    </IconContainer>
-                    <div className="flex-1">
-                      <CardTitle className="text-lg leading-tight mb-3 text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-150">
-                        {pub.title}
-                      </CardTitle>
-                      <div className="flex items-center gap-2 mb-2">
-                        <Badge variant="outline" className="text-xs hover:scale-105 transition-transform duration-150">
-                          {pub.type}
-                        </Badge>
-                        <Badge
-                          variant="secondary"
-                          className="text-xs bg-gray-100 dark:bg-slate-700 hover:scale-105 transition-transform duration-150"
-                        >
-                          {pub.year}
-                        </Badge>
-                      </div>
-                    </div>
-                    <div className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-                      <ExternalLink className="h-5 w-5 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400" />
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="flex-1 flex flex-col justify-between">
-                  <div>
-                    <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{pub.journal}</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{pub.volume}</p>
-                  </div>
-                </CardContent>
-              </PortfolioCard>
-            </Link>
+              animationDelay={0}
+              inView={inView}
+            />
           ))}
         </div>
 
@@ -149,17 +110,15 @@ export function Publications() {
           <p className="text-gray-600 dark:text-gray-300 mb-6 text-lg">
             Research focus on machine learning applications in hydrology and environmental science
           </p>
-          <Button
-            asChild
+          <ActionButton
             variant="outline"
-            size="lg"
-            className="hover:scale-105 transition-all duration-200 bg-transparent"
+            href="https://scholar.google.com/citations?user=Be6ZA78AAAAJ&hl=en"
+            external
+            className="bg-transparent hover:border-blue-500 dark:hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400"
           >
-            <Link href="https://scholar.google.com/citations?user=Be6ZA78AAAAJ&hl=en" target="_blank">
-              <ExternalLink className="mr-2 h-5 w-5" />
-              View Google Scholar Profile
-            </Link>
-          </Button>
+            <ExternalLink className="mr-2 h-5 w-5" />
+            View Google Scholar Profile
+          </ActionButton>
         </div>
       </div>
     </section>

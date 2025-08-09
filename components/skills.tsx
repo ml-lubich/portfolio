@@ -1,7 +1,6 @@
 "use client"
 
-import { PortfolioCard, IconContainer, CardContent, CardHeader, CardTitle } from "@/components/ui/portfolio-card"
-import { Badge } from "@/components/ui/badge"
+import { SkillCard } from "@/components/ui/skill-card"
 import { Code, Database, Cloud, Cog, Users, Lightbulb } from "lucide-react"
 import { useInView } from "react-intersection-observer"
 
@@ -68,41 +67,17 @@ export function Skills() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {skillCategories.map((category, index) => {
-            const IconComponent = category.icon
-            return (
-              <PortfolioCard
-                key={index}
-                variant="default"
-                animation="slow"
-                inView={inView}
-                animationDelay={index * 100}
-                showAnimation={true}
-              >
-                <CardHeader className="pb-4">
-                  <div className="flex items-center gap-3">
-                    <IconContainer gradient={category.gradient}>
-                      <IconComponent className="h-6 w-6 text-white" />
-                    </IconContainer>
-                    <CardTitle className="text-lg text-gray-900 dark:text-white">{category.title}</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex flex-wrap gap-2">
-                    {category.skills.map((skill, idx) => (
-                      <Badge
-                        key={idx}
-                        variant="outline"
-                        className="text-xs hover:scale-105 transition-transform duration-200 bg-gray-50 dark:bg-slate-700/50 hover:bg-gradient-to-r hover:from-blue-600 hover:to-purple-600 hover:text-white hover:border-transparent"
-                      >
-                        {skill}
-                      </Badge>
-                    ))}
-                  </div>
-                </CardContent>
-              </PortfolioCard>
-            )
-          })}
+          {skillCategories.map((category, index) => (
+            <SkillCard
+              key={index}
+              title={category.title}
+              icon={category.icon}
+              skills={category.skills}
+              gradient={category.gradient}
+              animationDelay={0}
+              inView={inView}
+            />
+          ))}
         </div>
       </div>
     </section>

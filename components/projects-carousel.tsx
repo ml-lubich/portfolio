@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import { PortfolioCard, IconContainer, CardContent, CardHeader, CardTitle } from "@/components/ui/portfolio-card"
-import { Badge } from "@/components/ui/badge"
+import { TechBadge } from "@/components/ui/tech-badge"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight, ExternalLink, Users, Zap, Shield, GitBranch } from "lucide-react"
 import { useInView } from "react-intersection-observer"
@@ -176,7 +176,7 @@ export function ProjectsCarousel() {
               variant="outline"
               size="lg"
               onClick={prevSlide}
-              className="p-3 hover:scale-105 transition-transform duration-200"
+              className="p-3 hover:scale-105 transition-transform duration-100"
             >
               <ChevronLeft className="h-6 w-6" />
             </Button>
@@ -196,7 +196,7 @@ export function ProjectsCarousel() {
               variant="outline"
               size="lg"
               onClick={nextSlide}
-              className="p-3 hover:scale-105 transition-transform duration-200"
+              className="p-3 hover:scale-105 transition-transform duration-100"
             >
               <ChevronRight className="h-6 w-6" />
             </Button>
@@ -256,13 +256,9 @@ export function ProjectsCarousel() {
 
                         <div className="flex flex-wrap gap-1 sm:gap-1.5 mb-4">
                           {project.technologies.map((tech, idx) => (
-                            <Badge
-                              key={idx}
-                              variant="secondary"
-                              className="text-xs bg-gray-100 dark:bg-slate-700 hover:scale-105 transition-transform duration-200 px-2 py-1"
-                            >
+                            <TechBadge key={idx} className="px-2 py-1">
                               {tech}
-                            </Badge>
+                            </TechBadge>
                           ))}
                         </div>
 
@@ -271,7 +267,7 @@ export function ProjectsCarousel() {
                             asChild
                             variant="outline"
                             size="sm"
-                            className="w-full group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-purple-600 group-hover:text-white transition-all duration-300 bg-transparent"
+                            className="w-full group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-purple-600 group-hover:text-white transition-all duration-100 bg-transparent"
                           >
                             <Link href={project.link} target="_blank">
                               <ExternalLink className="mr-2 h-4 w-4" />

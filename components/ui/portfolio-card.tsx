@@ -3,18 +3,16 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 import { cva, type VariantProps } from "class-variance-authority"
+import { animations } from "@/lib/animations"
 
-// Define card components locally to avoid import issues
+// Card components for internal structure
 const Card = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn(
-      "rounded-lg border bg-card text-card-foreground shadow-sm",
-      className
-    )}
+    className={cn("rounded-lg", className)}
     {...props}
   />
 ))
@@ -55,45 +53,39 @@ const CardTitle = React.forwardRef<
 ))
 CardTitle.displayName = "CardTitle"
 
-// Unified card variants following existing patterns
+// Unified card variants using standardized animations
 const portfolioCardVariants = cva(
-  "group transition-all duration-300 border-gray-200/20 dark:border-gray-700/20 backdrop-blur-sm",
+  `group border-gray-200/20 dark:border-gray-700/20 backdrop-blur-sm rounded-2xl border bg-white/80 dark:bg-slate-800/80 text-card-foreground ${animations.allTransition}`,
   {
     variants: {
       variant: {
         // Standard card with moderate transparency
-        default: "bg-white/80 dark:bg-slate-800/80 hover:shadow-2xl hover:scale-105",
+        default: `${animations.hoverShadow} ${animations.hoverScale}`,
         // Softer transparency for about section
-        soft: "bg-white/50 dark:bg-slate-800/50 hover:shadow-2xl hover:scale-105",
+        soft: `${animations.hoverShadow} ${animations.hoverScale}`,
         // Minimal hover for experience cards
-        minimal: "bg-white/80 dark:bg-slate-800/80 hover:shadow-lg",
+        minimal: `hover:shadow-lg ${animations.hoverScale}`,
         // Interactive cards with cursor pointer
-        interactive: "bg-white/80 dark:bg-slate-800/80 hover:shadow-2xl hover:scale-105 cursor-pointer",
+        interactive: `${animations.hoverShadow} ${animations.hoverScale} cursor-pointer`,
         // Carousel cards with enhanced mobile responsiveness
-        carousel: "bg-white/80 dark:bg-slate-800/80 hover:shadow-2xl hover:scale-105"
+        carousel: `${animations.hoverShadow} ${animations.hoverScale}`
       },
       size: {
         default: "h-full",
         auto: "h-auto",
         full: "h-full flex flex-col"
-      },
-      animation: {
-        fast: "transition-all duration-150",
-        normal: "transition-all duration-300",
-        slow: "transition-all duration-500"
       }
     },
     defaultVariants: {
       variant: "default",
-      size: "default",
-      animation: "normal"
+      size: "default"
     }
   }
 )
 
-// Icon container variants for consistent gradient icons
+// Icon container variants using standardized animations
 const iconContainerVariants = cva(
-  "flex-shrink-0 rounded-xl bg-gradient-to-r group-hover:scale-110 transition-transform duration-300 flex items-center justify-center",
+  `flex-shrink-0 rounded-xl bg-gradient-to-r flex items-center justify-center ${animations.iconHover}`,
   {
     variants: {
       size: {
@@ -132,8 +124,7 @@ export const PortfolioCard = React.forwardRef<
 >(({ 
   className, 
   variant, 
-  size, 
-  animation, 
+  size,
   inView = true, 
   animationDelay = 0,
   showAnimation = false,
@@ -147,18 +138,21 @@ export const PortfolioCard = React.forwardRef<
     : ""
 
   return (
-    <Card
-      ref={ref}
-      className={cn(
-        portfolioCardVariants({ variant, size, animation }),
-        animationClasses,
-        className
-      )}
+    <div
+      className={animationClasses}
       style={animationDelay > 0 ? { transitionDelay: `${animationDelay}ms` } : undefined}
-      {...props}
     >
-      {children}
-    </Card>
+      <div
+        ref={ref}
+        className={cn(
+          portfolioCardVariants({ variant, size }),
+          className
+        )}
+        {...props}
+      >
+        {children}
+      </div>
+    </div>
   )
 })
 

@@ -73,9 +73,8 @@ export function About() {
               <PortfolioCard
                 key={index}
                 variant="soft"
-                animation="slow"
                 inView={inView}
-                animationDelay={index * 100}
+                animationDelay={0}
                 showAnimation={true}
                 className="text-center p-6"
               >

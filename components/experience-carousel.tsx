@@ -2,10 +2,11 @@
 
 import { useState, useEffect, useRef } from "react"
 import { PortfolioCard, CardContent, CardHeader, CardTitle } from "@/components/ui/portfolio-card"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight, CalendarDays, MapPin } from "lucide-react"
 import { useInView } from "react-intersection-observer"
+import { TechBadge } from "@/components/ui/tech-badge"
+import { animations } from "@/lib/animations"
 
 const experiences = [
   {
@@ -184,7 +185,7 @@ export function ExperienceCarousel() {
               variant="outline"
               size="lg"
               onClick={prevSlide}
-              className="p-3 hover:scale-105 transition-transform duration-200"
+              className={`p-3 ${animations.buttonHover}`}
             >
               <ChevronLeft className="h-6 w-6" />
             </Button>
@@ -193,7 +194,7 @@ export function ExperienceCarousel() {
                 <button
                   key={index}
                   onClick={() => goToSlide(index)}
-                  className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                  className={`w-3 h-3 rounded-full transition-all duration-100 ${
                     index === currentIndex ? "bg-blue-600 scale-125" : "bg-gray-300 hover:bg-gray-400"
                   }`}
                   aria-label={`Go to slide ${index + 1}`}
@@ -204,7 +205,7 @@ export function ExperienceCarousel() {
               variant="outline"
               size="lg"
               onClick={nextSlide}
-              className="p-3 hover:scale-105 transition-transform duration-200"
+              className={`p-3 ${animations.buttonHover}`}
             >
               <ChevronRight className="h-6 w-6" />
             </Button>
@@ -263,13 +264,9 @@ export function ExperienceCarousel() {
                       </ul>
                       <div className="flex flex-wrap gap-1 sm:gap-2">
                         {exp.technologies.map((tech, idx) => (
-                          <Badge
-                            key={idx}
-                            variant="secondary"
-                            className="text-xs bg-gray-100 dark:bg-slate-700 hover:scale-105 transition-transform duration-200"
-                          >
+                          <TechBadge key={idx}>
                             {tech}
-                          </Badge>
+                          </TechBadge>
                         ))}
                       </div>
                     </CardContent>
@@ -285,7 +282,7 @@ export function ExperienceCarousel() {
               variant="outline"
               size="sm"
               onClick={prevSlide}
-              className="p-2 hover:scale-105 transition-transform duration-200"
+              className={`p-2 ${animations.buttonHover}`}
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
@@ -294,7 +291,7 @@ export function ExperienceCarousel() {
                 <button
                   key={index}
                   onClick={() => goToSlide(index)}
-                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  className={`w-2 h-2 rounded-full transition-all duration-100 ${
                     index === currentIndex ? "bg-blue-600 scale-125" : "bg-gray-300 hover:bg-gray-400"
                   }`}
                   aria-label={`Go to slide ${index + 1}`}
@@ -305,7 +302,7 @@ export function ExperienceCarousel() {
               variant="outline"
               size="sm"
               onClick={nextSlide}
-              className="p-2 hover:scale-105 transition-transform duration-200"
+              className={`p-2 ${animations.buttonHover}`}
             >
               <ChevronRight className="h-4 w-4" />
             </Button>

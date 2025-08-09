@@ -6,6 +6,7 @@ import { Moon, Sun, Menu, X, Download } from "lucide-react"
 import { useTheme } from "next-themes"
 import Link from "next/link"
 import Image from "next/image"
+import { animations } from "@/lib/animations"
 
 export function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -74,7 +75,7 @@ export function Navigation() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-100 ${
         isScrolled
           ? "bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-gray-200/20 dark:border-gray-700/20"
           : "bg-transparent"
@@ -84,7 +85,7 @@ export function Navigation() {
         <div className="flex items-center justify-between h-16">
           <Link
             href="#"
-            className="flex items-center hover:scale-105 transition-transform duration-200"
+            className="flex items-center hover:scale-105 transition-transform duration-100"
           >
             <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
               ML
@@ -97,7 +98,7 @@ export function Navigation() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`relative text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-200 font-medium py-2 ${
+                  className={`relative text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-100 font-medium py-2 ${
                   activeSection === item.id
                     ? "text-blue-600 dark:text-blue-400"
                     : ""
@@ -106,7 +107,7 @@ export function Navigation() {
                 {item.label}
                 {/* Active indicator bar */}
                 <span
-                  className={`absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-blue-600 to-purple-600 transition-all duration-300 ${
+                  className={`absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-blue-600 to-purple-600 transition-all duration-100 ${
                     activeSection === item.id ? "w-full" : "w-0"
                   }`}
                 />
@@ -119,7 +120,7 @@ export function Navigation() {
               variant="outline"
               size="sm"
               onClick={handleDownloadResume}
-              className="hidden sm:flex border-2 border-blue-600/30 bg-blue-600/10 text-blue-600 hover:bg-blue-600 hover:text-white transition-all duration-200"
+              className={`hidden sm:flex border-2 border-blue-600/30 bg-blue-600/10 text-blue-600 hover:bg-blue-600 hover:text-white ${animations.allTransition}`}
             >
               <Download className="h-4 w-4 mr-2" />
               Resume
@@ -154,7 +155,7 @@ export function Navigation() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`relative block px-3 py-2 rounded-md transition-all duration-200 ${
+                  className={`relative block px-3 py-2 rounded-md transition-all duration-100 ${
                     activeSection === item.id
                       ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20"
                       : "text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-slate-800/50"
@@ -174,7 +175,7 @@ export function Navigation() {
                   handleDownloadResume()
                   setIsMobileMenuOpen(false)
                 }}
-                className="relative flex items-center px-3 py-2 rounded-md text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-all duration-200 font-medium w-full text-left"
+                className={`relative flex items-center px-3 py-2 rounded-md text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 ${animations.allTransition} font-medium w-full text-left`}
               >
                 <Download className="h-4 w-4 mr-2" />
                 Download Resume

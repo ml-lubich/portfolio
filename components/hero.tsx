@@ -1,11 +1,13 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Button } from "@/components/ui/button"
 import { Github, Linkedin, Mail, ArrowDown, Calendar, Download } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { FallingCode } from "./falling-code"
+import { ActionButton } from "@/components/ui/action-button"
+import { StatCard } from "@/components/ui/stat-card"
+import { animations } from "@/lib/animations"
 
 export function Hero() {
   const [nameText, setNameText] = useState("")
@@ -157,13 +159,13 @@ export function Hero() {
                 alt="Misha Lubich"
                 width={300}
                 height={360}
-                className="rounded-full object-cover shadow-2xl group-hover:scale-105 transition-transform duration-700 ring-4 ring-white/30 dark:ring-slate-800/30 backdrop-blur-sm animate-gentle-float"
+                className={`rounded-full object-cover shadow-2xl ring-4 ring-white/30 dark:ring-slate-800/30 backdrop-blur-sm animate-gentle-float ${animations.hoverScale} ${animations.scaleTransition}`}
                 style={{borderRadius: '150px'}}
                 quality={100}
                 unoptimized
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/30 via-slate-900/10 to-slate-900/20 opacity-80 group-hover:opacity-60 transition-opacity duration-500 rounded-full"></div>
-              <div className="absolute inset-0 bg-gradient-to-t from-transparent to-purple-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-full"></div>
+              <div className={`absolute inset-0 bg-gradient-to-t from-slate-900/30 via-slate-900/10 to-slate-900/20 opacity-80 group-hover:opacity-60 rounded-full ${animations.allTransitionNormal}`}></div>
+              <div className={`absolute inset-0 bg-gradient-to-t from-transparent to-purple-600/10 opacity-0 group-hover:opacity-100 rounded-full ${animations.allTransitionNormal}`}></div>
             </div>
           </div>
 
@@ -197,76 +199,56 @@ export function Hero() {
         </div>
 
         <div className="flex flex-wrap justify-center gap-4 mb-12 animate-fade-in-up animation-delay-800">
-          <Button
-            asChild
-            size="lg"
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+          <ActionButton
+            variant="gradient"
+            gradient="primary"
+            href="#contact"
           >
-            <Link href="#contact">
-              <Mail className="mr-2 h-5 w-5" />
-              Get In Touch
-            </Link>
-          </Button>
-          <Button
-            size="lg"
+            <Mail className="mr-2 h-5 w-5" />
+            Get In Touch
+          </ActionButton>
+          <ActionButton
+            variant="gradient"
+            gradient="secondary"
             onClick={handleDownloadResume}
-            className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white border-0 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
           >
             <Download className="mr-2 h-5 w-5" />
             Download Resume
-          </Button>
-          <Button
-            size="lg"
+          </ActionButton>
+          <ActionButton
+            variant="gradient"
+            gradient="tertiary"
             onClick={openCalendly}
-            className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white border-0 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
           >
             <Calendar className="mr-2 h-5 w-5" />
             Schedule a Call
-          </Button>
-          <Button
-            asChild
+          </ActionButton>
+          <ActionButton
             variant="outline"
-            size="lg"
-            className="border-2 border-gray-300 dark:border-gray-600 bg-white/10 dark:bg-slate-800/20 backdrop-blur-sm text-gray-700 dark:text-gray-300 hover:bg-white/20 dark:hover:bg-slate-700/30 hover:border-blue-500 dark:hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400 hover:scale-105 transition-all duration-200"
+            href="https://github.com/ml-lubich"
+            external
+            className="hover:border-blue-500 dark:hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400"
           >
-            <Link href="https://github.com/ml-lubich" target="_blank">
-              <Github className="mr-2 h-5 w-5" />
-              GitHub
-            </Link>
-          </Button>
-          <Button
-            asChild
+            <Github className="mr-2 h-5 w-5" />
+            GitHub
+          </ActionButton>
+          <ActionButton
             variant="outline"
-            size="lg"
-            className="border-2 border-gray-300 dark:border-gray-600 bg-white/10 dark:bg-slate-800/20 backdrop-blur-sm text-gray-700 dark:text-gray-300 hover:bg-white/20 dark:hover:bg-slate-700/30 hover:border-purple-500 dark:hover:border-purple-400 hover:text-purple-600 dark:hover:text-purple-400 hover:scale-105 transition-all duration-200"
+            href="https://linkedin.com/in/misha-lubich"
+            external
+            className="hover:border-purple-500 dark:hover:border-purple-400 hover:text-purple-600 dark:hover:text-purple-400"
           >
-            <Link href="https://linkedin.com/in/misha-lubich" target="_blank">
-              <Linkedin className="mr-2 h-5 w-5" />
-              LinkedIn
-            </Link>
-          </Button>
+            <Linkedin className="mr-2 h-5 w-5" />
+            LinkedIn
+          </ActionButton>
         </div>
 
         {/* Stats Section */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12 animate-fade-in-up animation-delay-1000">
-          {[
-            { number: "100M+", label: "Users Impacted", color: "from-blue-600 to-cyan-600" },
-            { number: "6", label: "Research Papers", color: "from-purple-600 to-pink-600" },
-            { number: "300%", label: "Performance Gains", color: "from-teal-600 to-green-600" },
-            { number: "5+", label: "Years Experience", color: "from-orange-600 to-red-600" },
-          ].map((stat, index) => (
-            <div
-              key={index}
-              className="group p-6 rounded-2xl bg-white/80 dark:bg-slate-800/20 transition-all duration-300 hover:scale-105 hover:shadow-xl"
-            >
-              <div
-                className={`text-4xl font-bold bg-gradient-to-r ${stat.color} bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-transform duration-300`}
-              >
-                {stat.number}
-              </div>
-              <div className="text-sm text-gray-600 dark:text-gray-400 font-medium">{stat.label}</div>
-            </div>
-          ))}
+          <StatCard number="100M+" label="Users Impacted" gradient="from-blue-600 to-cyan-600" />
+          <StatCard number="6" label="Research Papers" gradient="from-purple-600 to-pink-600" />
+          <StatCard number="300%" label="Performance Gains" gradient="from-teal-600 to-green-600" />
+          <StatCard number="5+" label="Years Experience" gradient="from-orange-600 to-red-600" />
         </div>
 
         {/* Scroll indicator */}
