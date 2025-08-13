@@ -19,7 +19,7 @@ export function LazyReveal({
   direction = "up",
   duration = 600,
   className = "",
-  triggerOnce = true,
+  triggerOnce = false,
   threshold = 0.1
 }: LazyRevealProps) {
   const { ref, inView } = useInView({
@@ -49,7 +49,7 @@ export function LazyReveal({
   return (
     <div
       ref={ref}
-      className={`transition-all ease-out ${inView ? "opacity-100" : "opacity-0"} ${getTransform()} ${className}`}
+      className={`transition-all ease-out will-change-transform will-change-opacity ${inView ? "opacity-100" : "opacity-0"} ${getTransform()} ${className}`}
       style={{
         transitionDuration: `${duration}ms`,
         transitionDelay: `${delay}ms`

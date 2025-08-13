@@ -3,6 +3,7 @@
 import { PortfolioCard, CardContent, CardHeader, CardTitle } from "@/components/ui/portfolio-card"
 import { CalendarDays, MapPin } from "lucide-react"
 import { useInView } from "react-intersection-observer"
+import { LazyReveal } from "@/components/ui/lazy-reveal"
 import { TechBadge } from "@/components/ui/tech-badge"
 import { animations } from "@/lib/animations"
 
@@ -174,19 +175,19 @@ export function ExperienceCarousel() {
   return (
     <section id="experience" className="py-20 px-4" ref={ref}>
       <div className="max-w-5xl mx-auto">
-        <div
-          className={`text-center mb-20 transition-all duration-1000 ${inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
-        >
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-6">
-            My{" "}
-            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Journey
-            </span>
-          </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-300">
-            From Apple to Walmart, delivering impactful solutions across diverse tech environments
-          </p>
-        </div>
+        <LazyReveal direction="up" duration={500}>
+          <div className="text-center mb-20">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-6">
+              My{" "}
+              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                Journey
+              </span>
+            </h2>
+            <p className="text-xl text-gray-600 dark:text-gray-300">
+              From Apple to Walmart, delivering impactful solutions across diverse tech environments
+            </p>
+          </div>
+        </LazyReveal>
 
         {/* Timeline with Zigzag Layout */}
         <div className="relative">
@@ -196,12 +197,13 @@ export function ExperienceCarousel() {
           {/* Timeline Cards */}
           <div className="relative space-y-8">
             {experiences.map((experience, index) => (
-              <TimelineCard 
-                key={index} 
-                experience={experience} 
-                index={index} 
-                isLeft={index % 2 === 0}
-              />
+              <LazyReveal key={index} direction={index % 2 === 0 ? "left" : "right"} duration={450}>
+                <TimelineCard 
+                  experience={experience} 
+                  index={index} 
+                  isLeft={index % 2 === 0}
+                />
+              </LazyReveal>
             ))}
           </div>
 

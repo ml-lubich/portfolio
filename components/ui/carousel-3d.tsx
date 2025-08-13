@@ -74,10 +74,15 @@ export function Carousel3D({
   useEffect(() => {
     const updateLayout = () => {
       const containerWidth = containerRef.current?.clientWidth ?? (typeof window !== 'undefined' ? window.innerWidth : 360)
-      const boundedWidth = Math.max(240, Math.min(800, containerWidth))
-      const cardWidth = Math.round(Math.max(200, Math.min(300, boundedWidth * 0.75)))
-      const cardHeight = Math.round(cardWidth * 4 / 3)
-      const radius = Math.round(Math.max(160, Math.min(320, boundedWidth * 0.45)))
+      const boundedWidth = Math.max(280, Math.min(900, containerWidth))
+      // Card scales proportionally to container width, clamped for tiny/large screens
+      const cardWidth = Math.round(Math.max(200, Math.min(300, boundedWidth * 0.8)))
+      const cardHeight = Math.round((cardWidth * 4) / 3)
+      // Ensure the circular path keeps side cards fully within the container
+      const margin = 8
+      const maxRadiusByFit = Math.max(60, (boundedWidth - cardWidth) / 2 - margin)
+      const baseRadius = Math.min(320, boundedWidth * 0.45)
+      const radius = Math.round(Math.max(60, Math.min(baseRadius, maxRadiusByFit)))
       setLayout({ radius, cardWidth, cardHeight })
     }
     updateLayout()
@@ -186,7 +191,7 @@ export function Carousel3D({
 
       {/* 3D Carousel */}
       <div 
-        className="relative h-[400px] sm:h-[500px] md:h-[600px] overflow-visible cursor-grab active:cursor-grabbing px-4 sm:px-8 touch-pan-y"
+        className="relative h-[400px] sm:h-[500px] md:h-[600px] overflow-hidden md:overflow-visible cursor-grab active:cursor-grabbing px-4 sm:px-8 touch-pan-y"
         style={{ perspective: '1200px' }}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}

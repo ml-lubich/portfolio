@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Carousel3D } from "@/components/ui/carousel-3d"
 import { ExternalLink, Users, Zap, Shield, GitBranch } from "lucide-react"
 import { useInView } from "react-intersection-observer"
+import { LazyReveal } from "@/components/ui/lazy-reveal"
 import Link from "next/link"
 import { animations } from "@/lib/animations"
 
@@ -150,19 +151,19 @@ export function ProjectsCarousel() {
   return (
     <section id="projects" className="py-20 px-4" ref={ref}>
       <div className="max-w-7xl mx-auto">
-        <div
-          className={`text-center mb-16 transition-all duration-1000 ${inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
-        >
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-6">
-            Featured{" "}
-            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Projects
-            </span>
-          </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-300">
-            Innovative solutions that drive impact and create value
-          </p>
-        </div>
+        <LazyReveal direction="up" duration={500}>
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-6">
+              Featured{" "}
+              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                Projects
+              </span>
+            </h2>
+            <p className="text-xl text-gray-600 dark:text-gray-300">
+              Innovative solutions that drive impact and create value
+            </p>
+          </div>
+        </LazyReveal>
 
         <Carousel3D
           items={projects}

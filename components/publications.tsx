@@ -3,7 +3,7 @@
 import { ActionButton } from "@/components/ui/action-button"
 import { ResearchCard } from "@/components/ui/research-card"
 import { ExternalLink } from "lucide-react"
-import { useInView } from "react-intersection-observer"
+import { LazyReveal } from "@/components/ui/lazy-reveal"
 
 const publications = [
   {
@@ -66,43 +66,37 @@ const publications = [
 ]
 
 export function Publications() {
-  const { ref, inView } = useInView({
-    triggerOnce: true,
-    threshold: 0.1,
-  })
-
   return (
-    <section id="publications" className="py-20 px-4" ref={ref}>
+    <section id="publications" className="py-20 px-4">
       <div className="max-w-6xl mx-auto">
-        <div
-          className={`text-center mb-16 transition-all duration-1000 ${inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
-        >
-          <h2 className="text-5xl font-bold text-gray-900 dark:text-white mb-6">
-            Research{" "}
-            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Publications
-            </span>
-          </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-300">
-            Contributing to the intersection of machine learning and environmental science
-          </p>
-        </div>
+        <LazyReveal direction="up" duration={500}>
+          <div className="text-center mb-16">
+            <h2 className="text-5xl font-bold text-gray-900 dark:text-white mb-6">
+              Research{" "}
+              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                Publications
+              </span>
+            </h2>
+            <p className="text-xl text-gray-600 dark:text-gray-300">
+              Contributing to the intersection of machine learning and environmental science
+            </p>
+          </div>
+        </LazyReveal>
 
         {/* Responsive, scalable grid with equal-height cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-6">
           {publications.map((pub, index) => (
-            <ResearchCard
-              key={index}
-              title={pub.title}
-              journal={pub.journal}
-              year={pub.year}
-              volume={pub.volume}
-              type={pub.type as "Journal Article" | "Conference Abstract"}
-              gradient={pub.gradient}
-              href={pub.href}
-              animationDelay={0}
-              inView={inView}
-            />
+            <LazyReveal key={index} direction="up" duration={400}>
+              <ResearchCard
+                title={pub.title}
+                journal={pub.journal}
+                year={pub.year}
+                volume={pub.volume}
+                type={pub.type as "Journal Article" | "Conference Abstract"}
+                gradient={pub.gradient}
+                href={pub.href}
+              />
+            </LazyReveal>
           ))}
         </div>
 
