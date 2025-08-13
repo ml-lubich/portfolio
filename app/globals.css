@@ -5,10 +5,15 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    overflow-x: hidden;
   }
 }
 
 @layer utilities {
+  /* Disable horizontal panning while allowing vertical scrolling (helps touch swipe in carousels) */
+  .touch-pan-y {
+    touch-action: pan-y;
+  }
   .animate-gentle-float {
     animation: gentleFloat 6s ease-in-out infinite;
   }
@@ -148,6 +153,8 @@
   }
   body {
     @apply bg-background text-foreground;
+    overflow-x: hidden;
+    max-width: 100vw;
   }
 }
 

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, ReactNode } from "react"
+import { useState, useEffect, useRef, ReactNode } from "react"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { animations } from "@/lib/animations"
@@ -16,17 +16,20 @@ function Card3DWrapper({
   index, 
   totalItems, 
   rotation, 
-  isActive 
+  isActive,
+  radius,
+  cardWidth,
+  cardHeight,
 }: { 
   children: ReactNode
   index: number
   totalItems: number
   rotation: number
   isActive: boolean
+  radius: number
+  cardWidth: number
+  cardHeight: number
 }) {
-  const radius = 350
-  const cardWidth = 300
-  const cardHeight = 400
   
   const angle = (index * (360 / totalItems)) + rotation
   const x = Math.sin((angle * Math.PI) / 180) * radius
@@ -64,6 +67,29 @@ export function Carousel3D({
   const [activeIndex, setActiveIndex] = useState(0)
   const [isDragging, setIsDragging] = useState(false)
   const [dragStart, setDragStart] = useState({ x: 0, rotation: 0 })
+  const [layout, setLayout] = useState({ radius: 280, cardWidth: 260, cardHeight: 360 })
+  const containerRef = useRef<HTMLDivElement | null>(null)
+
+  // Compute responsive dimensions based on container width (works for iPhone SE and up)
+  useEffect(() => {
+    const updateLayout = () => {
+      const containerWidth = containerRef.current?.clientWidth ?? (typeof window !== 'undefined' ? window.innerWidth : 360)
+      const boundedWidth = Math.max(240, Math.min(800, containerWidth))
+      const cardWidth = Math.round(Math.max(200, Math.min(300, boundedWidth * 0.75)))
+      const cardHeight = Math.round(cardWidth * 4 / 3)
+      const radius = Math.round(Math.max(160, Math.min(320, boundedWidth * 0.45)))
+      setLayout({ radius, cardWidth, cardHeight })
+    }
+    updateLayout()
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', updateLayout, { passive: true })
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', updateLayout)
+      }
+    }
+  }, [])
 
   const rotateToIndex = (index: number) => {
     const targetRotation = -(index * (360 / items.length))
@@ -81,7 +107,7 @@ export function Carousel3D({
     rotateToIndex(prevIndex)
   }
 
-  // Mouse drag controls
+  // Mouse drag controls (desktop)
   const handleMouseDown = (e: React.MouseEvent) => {
     setIsDragging(true)
     setDragStart({ x: e.clientX, rotation })
@@ -95,6 +121,25 @@ export function Carousel3D({
   }
 
   const handleMouseUp = () => {
+    setIsDragging(false)
+  }
+
+  // Touch swipe controls (mobile)
+  const handleTouchStart = (e: React.TouchEvent) => {
+    const touch = e.touches[0]
+    setIsDragging(true)
+    setDragStart({ x: touch.clientX, rotation })
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging) return
+    const touch = e.touches[0]
+    const deltaX = touch.clientX - dragStart.x
+    const deltaRotation = deltaX * 0.5
+    setRotation(dragStart.rotation + deltaRotation)
+  }
+
+  const handleTouchEnd = () => {
     setIsDragging(false)
   }
 
@@ -141,14 +186,18 @@ export function Carousel3D({
 
       {/* 3D Carousel */}
       <div 
-        className="relative h-[600px] overflow-visible cursor-grab active:cursor-grabbing px-8"
+        className="relative h-[400px] sm:h-[500px] md:h-[600px] overflow-visible cursor-grab active:cursor-grabbing px-4 sm:px-8 touch-pan-y"
         style={{ perspective: '1200px' }}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
       >
         <div
+          ref={containerRef}
           className="relative w-full h-full"
           style={{ 
             transformStyle: 'preserve-3d',
@@ -162,6 +211,9 @@ export function Carousel3D({
               totalItems={items.length}
               rotation={rotation}
               isActive={index === activeIndex}
+              radius={layout.radius}
+              cardWidth={layout.cardWidth}
+              cardHeight={layout.cardHeight}
             >
               {renderCard(item, index, index === activeIndex)}
             </Card3DWrapper>
