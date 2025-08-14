@@ -7,6 +7,7 @@ import { Carousel3D } from "@/components/ui/carousel-3d"
 import { ExternalLink, Users, Zap, Shield, GitBranch } from "lucide-react"
 import { useInView } from "react-intersection-observer"
 import { LazyReveal } from "@/components/ui/lazy-reveal"
+import { ScrollReveal } from "@/components/ui/scroll-reveal"
 import Link from "next/link"
 import { animations } from "@/lib/animations"
 
@@ -153,7 +154,7 @@ export function ProjectsCarousel() {
       <div className="max-w-7xl mx-auto">
         <LazyReveal direction="up" duration={500}>
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-6">
+            <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white mb-6">
               Featured{" "}
               <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 Projects
@@ -164,6 +165,7 @@ export function ProjectsCarousel() {
             </p>
           </div>
         </LazyReveal>
+        {/* If you want cards to lock-in on scroll down, wrap them with ScrollReveal lockOnScrollDown={true} like Publications */}
 
         <Carousel3D
           items={projects}

@@ -4,6 +4,7 @@ import { PortfolioCard, CardContent, CardHeader, CardTitle } from "@/components/
 import { CalendarDays, MapPin } from "lucide-react"
 import { useInView } from "react-intersection-observer"
 import { LazyReveal } from "@/components/ui/lazy-reveal"
+import { ScrollReveal } from "@/components/ui/scroll-reveal"
 import { TechBadge } from "@/components/ui/tech-badge"
 import { animations } from "@/lib/animations"
 
@@ -87,8 +88,8 @@ const experiences = [
 function TimelineCard({ experience, index, isLeft }: { experience: typeof experiences[0]; index: number; isLeft: boolean }) {
   const { ref, inView } = useInView({
     triggerOnce: false,
-    threshold: 0.1,
-    rootMargin: '100px 0px',
+    threshold: 0.4,
+    rootMargin: '0px 0px -20% 0px',
   })
 
   return (
@@ -103,9 +104,9 @@ function TimelineCard({ experience, index, isLeft }: { experience: typeof experi
         transitionDelay: `${index * 100}ms`
       }}
     >
-      {/* Timeline connector dot */}
-      <div className="absolute top-8 left-1/2 transform -translate-x-1/2 z-20">
-        <div className={`w-4 h-4 rounded-full bg-gradient-to-r ${experience.gradient} shadow-lg border-4 border-white dark:border-gray-900 transition-all duration-300 ${inView ? 'scale-100' : 'scale-0'}`} />
+      {/* Timeline connector dot (behind text) */}
+      <div className="absolute top-8 left-1/2 transform -translate-x-1/2 z-0">
+        <div className={`w-3 h-3 rounded-full bg-gradient-to-r ${experience.gradient} shadow border-2 border-white dark:border-gray-900 transition-all duration-300 ${inView ? 'scale-100' : 'scale-0'}`} />
       </div>
 
       {/* Card positioned left or right */}
@@ -191,19 +192,19 @@ export function ExperienceCarousel() {
 
         {/* Timeline with Zigzag Layout */}
         <div className="relative">
-          {/* Vertical Timeline Line */}
-          <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-gradient-to-b from-blue-600 via-purple-600 to-teal-600 opacity-30" />
+          {/* Vertical Timeline Line (send behind cards, non-interactive) */}
+          <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-0.5 bg-gradient-to-b from-blue-600 via-purple-600 to-teal-600 opacity-30 -z-10 pointer-events-none select-none" />
           
           {/* Timeline Cards */}
-          <div className="relative space-y-8">
+          <div className="relative space-y-8 z-10">
             {experiences.map((experience, index) => (
-              <LazyReveal key={index} direction={index % 2 === 0 ? "left" : "right"} duration={450}>
+              <ScrollReveal key={index} direction={index % 2 === 0 ? "left" : "right"} distance={90} lockOnScrollDown={true}>
                 <TimelineCard 
                   experience={experience} 
                   index={index} 
                   isLeft={index % 2 === 0}
                 />
-              </LazyReveal>
+              </ScrollReveal>
             ))}
           </div>
 

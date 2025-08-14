@@ -4,6 +4,7 @@ import { ActionButton } from "@/components/ui/action-button"
 import { ResearchCard } from "@/components/ui/research-card"
 import { ExternalLink } from "lucide-react"
 import { LazyReveal } from "@/components/ui/lazy-reveal"
+import { ScrollReveal } from "@/components/ui/scroll-reveal"
 
 const publications = [
   {
@@ -71,7 +72,7 @@ export function Publications() {
       <div className="max-w-6xl mx-auto">
         <LazyReveal direction="up" duration={500}>
           <div className="text-center mb-16">
-            <h2 className="text-5xl font-bold text-gray-900 dark:text-white mb-6">
+            <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white mb-6">
               Research{" "}
               <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 Publications
@@ -86,7 +87,7 @@ export function Publications() {
         {/* Responsive, scalable grid with equal-height cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-6">
           {publications.map((pub, index) => (
-            <LazyReveal key={index} direction="up" duration={400}>
+            <ScrollReveal key={index} direction="up" distance={32} lockOnScrollDown={true}>
               <ResearchCard
                 title={pub.title}
                 journal={pub.journal}
@@ -96,7 +97,7 @@ export function Publications() {
                 gradient={pub.gradient}
                 href={pub.href}
               />
-            </LazyReveal>
+            </ScrollReveal>
           ))}
         </div>
 

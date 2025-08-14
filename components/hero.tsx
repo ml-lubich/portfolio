@@ -8,6 +8,7 @@ import { FallingCode } from "./falling-code"
 import { ActionButton } from "@/components/ui/action-button"
 import { StatCard } from "@/components/ui/stat-card"
 import { animations } from "@/lib/animations"
+import { ScrollReveal } from "@/components/ui/scroll-reveal"
 
 export function Hero() {
   const [nameText, setNameText] = useState("")
@@ -170,7 +171,8 @@ export function Hero() {
           </div>
 
           {/* Name with typing animation */}
-          <div className="mb-4 animate-fade-in-up animation-delay-200">
+          <ScrollReveal direction="up" distance={60} lockOnScrollDown={true}>
+          <div className="mb-4">
             <h1 className="text-6xl md:text-8xl font-bold mb-2 tracking-tight">
               <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-teal-600 bg-clip-text text-transparent">
                 {nameText}
@@ -180,9 +182,11 @@ export function Hero() {
               )}
             </h1>
           </div>
+          </ScrollReveal>
 
           {/* Title with typing animation */}
-          <div className="mb-6 animate-fade-in-up animation-delay-400 h-20 flex items-center justify-center">
+          <ScrollReveal direction="up" distance={50} lockOnScrollDown={true}>
+          <div className="mb-6 h-20 flex items-center justify-center">
             <h2 className="text-2xl md:text-3xl text-gray-600 dark:text-gray-300 font-light text-center">
               {titleText}
               {nameComplete && titleText && (
@@ -190,15 +194,19 @@ export function Hero() {
               )}
             </h2>
           </div>
+          </ScrollReveal>
 
-          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed mb-8 animate-fade-in-up animation-delay-600">
+          <ScrollReveal direction="up" distance={40} lockOnScrollDown={true}>
+          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed mb-8">
             Crafting scalable solutions and innovating within cross-functional teams at industry leaders like{" "}
             <span className="text-blue-600 dark:text-blue-400 font-semibold">Apple</span> and{" "}
             <span className="text-blue-600 dark:text-blue-400 font-semibold">Walmart</span>
           </p>
+          </ScrollReveal>
         </div>
 
-        <div className="flex flex-wrap justify-center gap-4 mb-12 animate-fade-in-up animation-delay-800">
+        <ScrollReveal direction="up" distance={40} lockOnScrollDown={true}>
+        <div className="flex flex-wrap justify-center gap-4 mb-12">
           <ActionButton
             variant="gradient"
             gradient="primary"
@@ -242,14 +250,17 @@ export function Hero() {
             LinkedIn
           </ActionButton>
         </div>
+        </ScrollReveal>
 
         {/* Stats Section */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12 animate-fade-in-up animation-delay-1000">
+        <ScrollReveal direction="up" distance={60} lockOnScrollDown={true}>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
           <StatCard number="100M+" label="Users Impacted" gradient="from-blue-600 to-cyan-600" />
           <StatCard number="6" label="Research Papers" gradient="from-purple-600 to-pink-600" />
           <StatCard number="300%" label="Performance Gains" gradient="from-teal-600 to-green-600" />
           <StatCard number="5+" label="Years Experience" gradient="from-orange-600 to-red-600" />
         </div>
+        </ScrollReveal>
 
         {/* Scroll indicator */}
         <div className="animate-bounce animate-fade-in-up animation-delay-1200">

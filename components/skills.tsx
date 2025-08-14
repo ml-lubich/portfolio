@@ -4,6 +4,7 @@ import { SkillCard } from "@/components/ui/skill-card"
 import { Carousel3D } from "@/components/ui/carousel-3d"
 import { Code, Database, Cloud, Cog, Users, Lightbulb } from "lucide-react"
 import { useInView } from "react-intersection-observer"
+import { ScrollReveal } from "@/components/ui/scroll-reveal"
 
 const skillCategories = [
   {
@@ -63,19 +64,19 @@ export function Skills() {
   return (
     <section id="skills" className="py-20 px-4" ref={ref}>
       <div className="max-w-7xl mx-auto">
-        <div
-          className={`text-center mb-16 transition-all duration-1000 ${inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
-        >
-          <h2 className="text-5xl font-bold text-gray-900 dark:text-white mb-6">
-            Technical{" "}
-            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Skills
-            </span>
-          </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-300">
-            Comprehensive expertise across the full technology stack
-          </p>
-        </div>
+        <ScrollReveal direction="up" distance={60} lockOnScrollDown={true}>
+          <div className="text-center mb-16">
+            <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-white mb-6">
+              Technical{" "}
+              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                Skills
+              </span>
+            </h2>
+            <p className="text-xl text-gray-600 dark:text-gray-300">
+              Comprehensive expertise across the full technology stack
+            </p>
+          </div>
+        </ScrollReveal>
 
         <Carousel3D
           items={skillCategories}

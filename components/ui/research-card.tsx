@@ -42,14 +42,14 @@ export function ResearchCard({
         showAnimation={true}
         className="h-64 flex flex-col"
       >
-        <CardHeader>
+        <CardHeader className="pb-2">
           <div className="flex items-start gap-3">
             <IconContainer gradient={gradient}>
               <BookOpen className="h-6 w-6 text-white" />
             </IconContainer>
             <div className="flex-1">
               <CardTitle className={cn(
-                "text-lg mb-3 text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400",
+                "text-base sm:text-lg mb-3 text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400",
                 animations.allTransition
               )}>
                 {title}
@@ -73,10 +73,10 @@ export function ResearchCard({
         </CardHeader>
         <CardContent className="flex-1">
           <div>
-            <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+            <p className="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
               {journal}
             </p>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
               {volume}
             </p>
           </div>
