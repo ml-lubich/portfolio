@@ -15,6 +15,7 @@ interface ResearchCardProps {
   type: "Journal Article" | "Conference Abstract"
   gradient: string
   href: string
+  tags?: string[]
   inView?: boolean
 }
 
@@ -26,6 +27,7 @@ export function ResearchCard({
   type,
   gradient,
   href,
+  tags = [],
   inView = true
 }: ResearchCardProps) {
   return (
@@ -40,7 +42,7 @@ export function ResearchCard({
         size="full"
         inView={inView}
         showAnimation={true}
-        className="h-64 flex flex-col"
+        className="h-64 flex flex-col overflow-hidden"
       >
         <CardHeader className="pb-2">
           <div className="flex items-start gap-3">
@@ -71,14 +73,23 @@ export function ResearchCard({
             </div>
           </div>
         </CardHeader>
-        <CardContent className="flex-1">
+        <CardContent className="flex-1 overflow-hidden">
           <div>
             <p className="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
               {journal}
             </p>
-            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-3">
               {volume}
             </p>
+            {tags.length > 0 && (
+              <div className="flex flex-wrap gap-1 overflow-hidden">
+                {tags.map((tag, index) => (
+                  <TechBadge key={index} variant="secondary" className="text-xs">
+                    {tag}
+                  </TechBadge>
+                ))}
+              </div>
+            )}
           </div>
         </CardContent>
       </PortfolioCard>

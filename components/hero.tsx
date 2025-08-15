@@ -8,7 +8,7 @@ import { FallingCode } from "./falling-code"
 import { ActionButton } from "@/components/ui/action-button"
 import { StatCard } from "@/components/ui/stat-card"
 import { animations } from "@/lib/animations"
-import { ScrollReveal } from "@/components/ui/scroll-reveal"
+import { CardReveal } from "@/components/ui/unified-reveal"
 
 export function Hero() {
   const [nameText, setNameText] = useState("")
@@ -151,7 +151,7 @@ export function Hero() {
       <div className="relative z-10 text-center px-4 max-w-6xl mx-auto">
         <div className="flex flex-col items-center mb-8">
           {/* Profile Photo */}
-          <div className="relative group mb-8 mt-8 sm:mt-12 md:mt-16 animate-fade-in-up">
+          <div className="relative group mb-8 mt-16 sm:mt-20 md:mt-24">
             <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-teal-600 rounded-full blur-sm opacity-40 group-hover:opacity-60 transition-all duration-1000 animate-slow-pulse"></div>
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full opacity-20"></div>
@@ -171,103 +171,105 @@ export function Hero() {
           </div>
 
           {/* Name with typing animation */}
-          <ScrollReveal direction="up" distance={60} lockOnScrollDown={true}>
-          <div className="mb-4">
-            <h1 className="text-6xl md:text-8xl font-bold mb-2 tracking-tight">
-              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-teal-600 bg-clip-text text-transparent">
-                {nameText}
-              </span>
-              {(isTypingName || nameComplete) && (
-                <span className="animate-pulse text-blue-600 ml-1">|</span>
-              )}
-            </h1>
-          </div>
-          </ScrollReveal>
+          <CardReveal delay={100}>
+            <div className="mb-4">
+              <h1 className="text-6xl md:text-8xl font-bold mb-2 tracking-tight">
+                <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-teal-600 bg-clip-text text-transparent">
+                  {nameText}
+                </span>
+                {(isTypingName || nameComplete) && (
+                  <span className="animate-pulse text-blue-600 ml-1">|</span>
+                )}
+              </h1>
+            </div>
+          </CardReveal>
 
           {/* Title with typing animation */}
-          <ScrollReveal direction="up" distance={50} lockOnScrollDown={true}>
-          <div className="mb-6 h-20 flex items-center justify-center">
-            <h2 className="text-2xl md:text-3xl text-gray-600 dark:text-gray-300 font-light text-center">
-              {titleText}
-              {nameComplete && titleText && (
-                <span className="animate-pulse text-purple-600 ml-1">|</span>
-              )}
-            </h2>
+          <CardReveal delay={150}>
+            <div className="mb-6 h-20 flex items-center justify-center">
+              <h2 className="text-2xl md:text-3xl text-gray-600 dark:text-gray-300 font-light text-center">
+                {titleText}
+                {nameComplete && titleText && (
+                  <span className="animate-pulse text-purple-600 ml-1">|</span>
+                )}
+              </h2>
+            </div>
+          </CardReveal>
+
+          <CardReveal delay={200}>
+            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed mb-8">
+              Crafting scalable solutions and innovating within cross-functional teams at industry leaders like{" "}
+              <span className="text-blue-600 dark:text-blue-400 font-semibold">Apple</span> and{" "}
+              <span className="text-blue-600 dark:text-blue-400 font-semibold">Walmart</span>
+            </p>
+          </CardReveal>
+        </div>
+
+        <CardReveal delay={250}>
+          <div className="flex flex-wrap justify-center gap-4 mb-12">
+            <ActionButton
+              variant="gradient"
+              gradient="primary"
+              href="#contact"
+            >
+              <Mail className="mr-2 h-5 w-5" />
+              Get In Touch
+            </ActionButton>
+            <ActionButton
+              variant="gradient"
+              gradient="secondary"
+              onClick={handleDownloadResume}
+            >
+              <Download className="mr-2 h-5 w-5" />
+              Download Resume
+            </ActionButton>
+            <ActionButton
+              variant="gradient"
+              gradient="tertiary"
+              onClick={openCalendly}
+            >
+              <Calendar className="mr-2 h-5 w-5" />
+              Schedule a Call
+            </ActionButton>
+            <ActionButton
+              variant="outline"
+              href="https://github.com/ml-lubich"
+              external
+              className="hover:border-blue-500 dark:hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400"
+            >
+              <Github className="mr-2 h-5 w-5" />
+              GitHub
+            </ActionButton>
+            <ActionButton
+              variant="outline"
+              href="https://linkedin.com/in/misha-lubich"
+              external
+              className="hover:border-purple-500 dark:hover:border-purple-400 hover:text-purple-600 dark:hover:text-purple-400"
+            >
+              <Linkedin className="mr-2 h-5 w-5" />
+              LinkedIn
+            </ActionButton>
           </div>
-          </ScrollReveal>
-
-          <ScrollReveal direction="up" distance={40} lockOnScrollDown={true}>
-          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed mb-8">
-            Crafting scalable solutions and innovating within cross-functional teams at industry leaders like{" "}
-            <span className="text-blue-600 dark:text-blue-400 font-semibold">Apple</span> and{" "}
-            <span className="text-blue-600 dark:text-blue-400 font-semibold">Walmart</span>
-          </p>
-          </ScrollReveal>
-        </div>
-
-        <ScrollReveal direction="up" distance={40} lockOnScrollDown={true}>
-        <div className="flex flex-wrap justify-center gap-4 mb-12">
-          <ActionButton
-            variant="gradient"
-            gradient="primary"
-            href="#contact"
-          >
-            <Mail className="mr-2 h-5 w-5" />
-            Get In Touch
-          </ActionButton>
-          <ActionButton
-            variant="gradient"
-            gradient="secondary"
-            onClick={handleDownloadResume}
-          >
-            <Download className="mr-2 h-5 w-5" />
-            Download Resume
-          </ActionButton>
-          <ActionButton
-            variant="gradient"
-            gradient="tertiary"
-            onClick={openCalendly}
-          >
-            <Calendar className="mr-2 h-5 w-5" />
-            Schedule a Call
-          </ActionButton>
-          <ActionButton
-            variant="outline"
-            href="https://github.com/ml-lubich"
-            external
-            className="hover:border-blue-500 dark:hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400"
-          >
-            <Github className="mr-2 h-5 w-5" />
-            GitHub
-          </ActionButton>
-          <ActionButton
-            variant="outline"
-            href="https://linkedin.com/in/misha-lubich"
-            external
-            className="hover:border-purple-500 dark:hover:border-purple-400 hover:text-purple-600 dark:hover:text-purple-400"
-          >
-            <Linkedin className="mr-2 h-5 w-5" />
-            LinkedIn
-          </ActionButton>
-        </div>
-        </ScrollReveal>
+        </CardReveal>
 
         {/* Stats Section */}
-        <ScrollReveal direction="up" distance={60} lockOnScrollDown={true}>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
-          <StatCard number="100M+" label="Users Impacted" gradient="from-blue-600 to-cyan-600" />
-          <StatCard number="6" label="Research Papers" gradient="from-purple-600 to-pink-600" />
-          <StatCard number="300%" label="Performance Gains" gradient="from-teal-600 to-green-600" />
-          <StatCard number="5+" label="Years Experience" gradient="from-orange-600 to-red-600" />
-        </div>
-        </ScrollReveal>
+        <CardReveal delay={300}>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
+            <StatCard number="100M+" label="Users Impacted" gradient="from-blue-600 to-cyan-600" />
+            <StatCard number="6" label="Research Papers" gradient="from-purple-600 to-pink-600" />
+            <StatCard number="300%" label="Performance Gains" gradient="from-teal-600 to-green-600" />
+            <StatCard number="5+" label="Years Experience" gradient="from-orange-600 to-red-600" />
+          </div>
+        </CardReveal>
 
         {/* Scroll indicator */}
-        <div className="animate-bounce animate-fade-in-up animation-delay-1200">
-          <Link href="#about" className="inline-block text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
-            <ArrowDown className="h-6 w-6" />
-          </Link>
-        </div>
+        <CardReveal delay={400}>
+          <div className="animate-bounce">
+            <Link href="#about" className="inline-block text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+              <ArrowDown className="h-6 w-6" />
+            </Link>
+          </div>
+        </CardReveal>
       </div>
     </section>
   )

@@ -1,10 +1,11 @@
 "use client"
 
-import { PortfolioCard, IconContainer, CardContent } from "@/components/ui/portfolio-card"
 import { GraduationCap, Award, Users, Code } from "lucide-react"
 import { useInView } from "react-intersection-observer"
-import { ScrollReveal } from "@/components/ui/scroll-reveal"
-import Image from "next/image"
+import { CardReveal } from "@/components/ui/unified-reveal"
+import { SectionWrapper } from "@/components/ui/section-wrapper"
+import { SectionHeader } from "@/components/ui/section-header"
+import { AboutCard } from "@/components/ui/about-card"
 
 export function About() {
   const { ref, inView } = useInView({
@@ -44,58 +45,38 @@ export function About() {
   ]
 
   return (
-    <section id="about" className="py-20 px-4" ref={ref}>
-      <div className="max-w-6xl mx-auto">
-        <ScrollReveal direction="up" distance={60}>
-          <div className="text-center mb-16">
-            <h2 className="text-5xl font-bold text-gray-900 dark:text-white mb-6">
-              About{" "}
-              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                Me
-              </span>
-            </h2>
-            <div className="flex justify-center mb-8">
-              <div className="text-6xl font-bold text-blue-600 dark:text-blue-400 opacity-60 hover:opacity-100 transition-opacity duration-500">
-                ML
-              </div>
-            </div>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
-              Software Engineer and AI/ML Specialist passionate about creating scalable solutions that drive innovation.
-              With experience at companies like Apple and GitHub, I blend technical expertise with research acumen to
-              build impactful systems.
-            </p>
-          </div>
-        </ScrollReveal>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {cards.map((card, index) => {
-            const IconComponent = card.icon
-            return (
-              <ScrollReveal key={index} direction={index % 2 === 0 ? 'left' : 'right'} distance={80}>
-                <PortfolioCard
-                  variant="soft"
-                  inView={inView}
-                  showAnimation={true}
-                  className="text-center p-6"
-                >
-                  <CardContent className="pt-6">
-                    <IconContainer 
-                      gradient={card.color}
-                      size="default"
-                      className="mx-auto mb-4"
-                    >
-                      <IconComponent className="h-7 w-7 text-white" strokeWidth={1.5} />
-                    </IconContainer>
-                    <h3 className="font-bold text-gray-900 dark:text-white mb-2 text-lg">{card.title}</h3>
-                    <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">{card.subtitle}</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{card.description}</p>
-                  </CardContent>
-                </PortfolioCard>
-              </ScrollReveal>
-            )
-          })}
+    <SectionWrapper id="about" delay={100} ref={ref}>
+      <SectionHeader 
+        title="About"
+        subtitle="Me"
+        description="Software Engineer and AI/ML Specialist passionate about creating scalable solutions that drive innovation. With experience at companies like Apple and GitHub, I blend technical expertise with research acumen to build impactful systems."
+        className="mb-8"
+      />
+      
+      <div className="flex justify-center mb-16">
+        <div className="text-6xl font-bold text-blue-600 dark:text-blue-400 opacity-60 hover:opacity-100 transition-opacity duration-500">
+          ML
         </div>
       </div>
-    </section>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {cards.map((card, index) => (
+          <CardReveal 
+            key={index} 
+            direction={index % 2 === 0 ? 'left' : 'right'} 
+            delay={index * 100}
+          >
+            <AboutCard
+              icon={card.icon}
+              title={card.title}
+              subtitle={card.subtitle}
+              description={card.description}
+              gradient={card.color}
+              inView={inView}
+            />
+          </CardReveal>
+        ))}
+      </div>
+    </SectionWrapper>
   )
 }

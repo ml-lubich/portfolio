@@ -4,6 +4,9 @@ import { PortfolioCard, IconContainer, CardContent, CardHeader, CardTitle } from
 import { Button } from "@/components/ui/button"
 import { Mail, Phone, MapPin, Github, Linkedin, GraduationCap, Send, FileDown, Calendar } from "lucide-react"
 import { useInView } from "react-intersection-observer"
+import { CardReveal } from "@/components/ui/unified-reveal"
+import { SectionWrapper } from "@/components/ui/section-wrapper"
+import { SectionHeader } from "@/components/ui/section-header"
 import Link from "next/link"
 import Image from "next/image"
 import { useEffect } from "react"
@@ -100,32 +103,22 @@ export function Contact() {
   ]
 
   return (
-    <section id="contact" className="py-20 px-4" ref={ref}>
-      <div className="max-w-6xl mx-auto">
-        <div
-          className={`text-center mb-16 transition-all duration-1000 ${inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
-        >
-          <h2 className="text-5xl font-bold text-gray-900 dark:text-white mb-6">
-            Let's{" "}
-            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Connect
-            </span>
-          </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-300">
-            Ready to collaborate on innovative projects and drive technical excellence
-          </p>
-        </div>
+    <SectionWrapper id="contact" delay={250} ref={ref}>
+      <SectionHeader 
+        title="Let's"
+        subtitle="Connect"
+        description="Ready to collaborate on innovative projects and drive technical excellence"
+      />
 
-        {/* Contact Methods */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-          {contactMethods.map((method, index) => {
-            const IconComponent = method.icon
-            return (
+      {/* Contact Methods */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+        {contactMethods.map((method, index) => {
+          const IconComponent = method.icon
+          return (
+            <CardReveal key={index} direction="up" delay={index * 100}>
               <PortfolioCard
-                key={index}
                 variant="default"
                 inView={inView}
-                
                 showAnimation={true}
                 className="text-center"
               >
@@ -143,7 +136,7 @@ export function Contact() {
                     <Button
                       asChild
                       variant="outline"
-                  className="w-full border-2 border-gray-300 dark:border-gray-600 bg-white/10 dark:bg-slate-800/20 backdrop-blur-sm text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-blue-600 hover:to-purple-600 hover:text-white hover:border-transparent transition-all duration-100"
+                      className="w-full border-2 border-gray-300 dark:border-gray-600 bg-white/10 dark:bg-slate-800/20 backdrop-blur-sm text-gray-700 dark:text-gray-300 hover:bg-gradient-to-r hover:from-blue-600 hover:to-purple-600 hover:text-white hover:border-transparent transition-all duration-100"
                     >
                       <Link href={method.href}>{method.value}</Link>
                     </Button>
@@ -152,15 +145,15 @@ export function Contact() {
                   )}
                 </CardContent>
               </PortfolioCard>
-            )
-          })}
-        </div>
+            </CardReveal>
+          )
+        })}
+      </div>
 
-        {/* Calendly Booking Section */}
+      {/* Calendly Booking Section */}
+      <CardReveal delay={400}>
         <div className="mb-16">
-          <div
-            className={`text-center mb-8 transition-all duration-1000 ${inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
-          >
+          <div className="text-center mb-8">
             <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
               Schedule a{" "}
               <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
@@ -172,19 +165,17 @@ export function Contact() {
             </p>
           </div>
           
-          <div
-            className={`transition-all duration-1000 ${inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
-          >
-            {/* Calendly inline widget */}
-            <div 
-              className="calendly-inline-widget" 
-              data-url="https://calendly.com/michaelle-lubich/" 
-              style={{ minWidth: '320px', height: '700px' }}
-            ></div>
-          </div>
+          {/* Calendly inline widget */}
+          <div 
+            className="calendly-inline-widget" 
+            data-url="https://calendly.com/michaelle-lubich/" 
+            style={{ minWidth: '320px', height: '700px' }}
+          ></div>
         </div>
+      </CardReveal>
 
-        {/* Social Links */}
+      {/* Social Links */}
+      <CardReveal delay={500}>
         <div className="text-center">
           <p className="text-gray-600 dark:text-gray-300 mb-8 text-lg">
             Or find me on these platforms
@@ -240,7 +231,7 @@ export function Contact() {
             })}
           </div>
         </div>
-      </div>
-    </section>
+      </CardReveal>
+    </SectionWrapper>
   )
 }
