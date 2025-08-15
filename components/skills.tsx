@@ -6,7 +6,7 @@ import { useInView } from "react-intersection-observer"
 import { CardReveal } from "@/components/ui/unified-reveal"
 import { SectionWrapper } from "@/components/ui/section-wrapper"
 import { SectionHeader } from "@/components/ui/section-header"
-import { skillCategories } from "@/lib/data"
+import { skillCategories } from "@/lib/data/skills"
 
 export function Skills() {
   const { ref, inView } = useInView({

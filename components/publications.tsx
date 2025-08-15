@@ -6,7 +6,7 @@ import { ExternalLink } from "lucide-react"
 import { CardReveal } from "@/components/ui/unified-reveal"
 import { SectionWrapper } from "@/components/ui/section-wrapper"
 import { SectionHeader } from "@/components/ui/section-header"
-import { publications } from "@/lib/data"
+import { publications } from "@/lib/data/publications"
 
 export function Publications() {
   return (

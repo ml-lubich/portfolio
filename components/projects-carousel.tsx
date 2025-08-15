@@ -12,7 +12,7 @@ import { SectionWrapper } from "@/components/ui/section-wrapper"
 import { SectionHeader } from "@/components/ui/section-header"
 import Link from "next/link"
 import { animations } from "@/lib/animations"
-import { projects, type Project } from "@/lib/data"
+import { projects, type Project } from "@/lib/data/projects"
 
 // Memoized ProjectCard to prevent unnecessary re-renders
 const ProjectCard = memo(function ProjectCard({ project, isActive }: { project: Project; isActive: boolean }) {
