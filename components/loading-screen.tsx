@@ -75,4 +75,4 @@ export function LoadingScreen({ isLoading, onLoadingComplete }: LoadingScreenPro
       </div>
     </div>
   )
-} 
+}

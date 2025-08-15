@@ -182,4 +182,4 @@ PortfolioCard.displayName = "PortfolioCard"
 IconContainer.displayName = "IconContainer"
 
 // Export card components locally
-export { CardContent, CardHeader, CardTitle } 
+export { CardContent, CardHeader, CardTitle }

@@ -196,4 +196,3 @@ export function usePerformanceMonitor() {
     markEnd: performanceMonitor.markEnd.bind(performanceMonitor)
   }
 }
-

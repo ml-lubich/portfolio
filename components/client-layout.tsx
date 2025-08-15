@@ -31,4 +31,4 @@ export function ClientLayout({ children }: ClientLayoutProps) {
       </div>
     </>
   )
-} 
+}
