@@ -42,16 +42,16 @@ export function ResearchCard({
         size="full"
         inView={inView}
         showAnimation={true}
-        className="h-80 flex flex-col"
+        className="h-80 flex flex-col overflow-hidden"
       >
         <CardHeader className="pb-2">
           <div className="flex items-start gap-3">
             <IconContainer gradient={gradient}>
               <BookOpen className="h-6 w-6 text-white" />
             </IconContainer>
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               <CardTitle className={cn(
-                "text-base sm:text-lg mb-3 text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400",
+                "text-base sm:text-lg mb-3 text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 line-clamp-3",
                 animations.allTransition
               )}>
                 {title}
@@ -73,21 +73,28 @@ export function ResearchCard({
             </div>
           </div>
         </CardHeader>
-        <CardContent className="flex-1 pb-4">
+        <CardContent className="flex-1 pb-4 overflow-hidden">
           <div className="h-full flex flex-col">
-            <p className="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+            <p className="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 truncate">
               {journal}
             </p>
-            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-3">
+            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-3 truncate">
               {volume}
             </p>
             {tags.length > 0 && (
-              <div className="flex flex-wrap gap-1">
-                {tags.map((tag, index) => (
-                  <TechBadge key={index} variant="secondary" className="text-xs">
-                    {tag}
-                  </TechBadge>
-                ))}
+              <div className="flex-1 min-h-0 overflow-hidden">
+                <div className="flex flex-wrap gap-1 max-h-20 overflow-hidden">
+                  {tags.slice(0, 6).map((tag, index) => (
+                    <TechBadge key={index} variant="secondary" className="text-xs flex-shrink-0">
+                      {tag}
+                    </TechBadge>
+                  ))}
+                  {tags.length > 6 && (
+                    <TechBadge variant="outline" className="text-xs flex-shrink-0">
+                      +{tags.length - 6}
+                    </TechBadge>
+                  )}
+                </div>
               </div>
             )}
           </div>
