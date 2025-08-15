@@ -36,6 +36,9 @@ export function UnifiedReveal({
   const [hasAnimated, setHasAnimated] = useState(false)
   const [scrollDirection, setScrollDirection] = useState<"up" | "down">("down")
   const lastScrollY = useRef(0)
+  const [isHovering, setIsHovering] = useState(false)
+  const lastScrollTimeRef = useRef(Date.now())
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   
   const { ref, inView } = useInView({
     threshold,
@@ -43,15 +46,34 @@ export function UnifiedReveal({
     triggerOnce: false,
   })
 
-  // Memoized scroll handler for better performance
+  // Memoized scroll handler for better performance with hover protection
   const handleScroll = useCallback(() => {
     const currentScrollY = window.scrollY
-    if (currentScrollY > lastScrollY.current) {
-      setScrollDirection("down")
-    } else if (currentScrollY < lastScrollY.current) {
-      setScrollDirection("up")
+    const now = Date.now()
+    
+    // Update last scroll time to track actual scrolling
+    lastScrollTimeRef.current = now
+    
+    // Only update direction if there's meaningful movement (> 5px)
+    if (Math.abs(currentScrollY - lastScrollY.current) > 5) {
+      if (currentScrollY > lastScrollY.current) {
+        setScrollDirection("down")
+      } else if (currentScrollY < lastScrollY.current) {
+        setScrollDirection("up")
+      }
     }
+    
     lastScrollY.current = currentScrollY
+    
+    // Clear any existing timeout
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current)
+    }
+    
+    // Set a timeout to stabilize after scrolling stops
+    scrollTimeoutRef.current = setTimeout(() => {
+      // Final stabilization after scroll stops
+    }, 100)
   }, [])
 
   // Track scroll direction with throttling
@@ -69,6 +91,10 @@ export function UnifiedReveal({
   }, [handleScroll])
 
   useEffect(() => {
+    // Check if we're in a hover-induced change (no recent scrolling)
+    const timeSinceLastScroll = Date.now() - lastScrollTimeRef.current
+    const isHoverInduced = timeSinceLastScroll > 200 // 200ms since last scroll
+    
     if (bidirectional) {
       // Bidirectional: fade in when scrolling into view, fade out when scrolling out of view
       if (inView) {
@@ -77,8 +103,10 @@ export function UnifiedReveal({
         }, delay)
         return () => clearTimeout(timer)
       } else {
-        // Immediately hide when out of view (with animation)
-        setIsVisible(false)
+        // Don't hide if it's hover-induced or actively hovering and already visible
+        if (!isHoverInduced && !isHovering) {
+          setIsVisible(false)
+        }
       }
     } else {
       // Original behavior: triggerOnce logic
@@ -90,11 +118,11 @@ export function UnifiedReveal({
           }
         }, delay)
         return () => clearTimeout(timer)
-      } else if (!inView && !triggerOnce && !hasAnimated) {
+      } else if (!inView && !triggerOnce && !hasAnimated && !isHoverInduced && !isHovering) {
         setIsVisible(false)
       }
     }
-  }, [inView, delay, triggerOnce, hasAnimated, bidirectional])
+  }, [inView, delay, triggerOnce, hasAnimated, bidirectional, isHovering])
 
   // Memoized transform calculation
   const getTransform = useMemo(() => {
@@ -138,6 +166,15 @@ export function UnifiedReveal({
     }
   }, [isVisible, bidirectional, scrollDirection, direction, distance, scaleFrom])
 
+  // Mouse event handlers to prevent fade during hover
+  const handleMouseEnter = () => {
+    setIsHovering(true)
+  }
+
+  const handleMouseLeave = () => {
+    setIsHovering(false)
+  }
+
   return (
     <div
       ref={ref}
@@ -148,6 +185,8 @@ export function UnifiedReveal({
         transitionDuration: `${duration}ms`,
         transitionTimingFunction: "cubic-bezier(0.25, 0.46, 0.45, 0.94)"
       }}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       {children}
     </div>

@@ -9,7 +9,7 @@ import { SectionWrapper } from "@/components/ui/section-wrapper"
 import { SectionHeader } from "@/components/ui/section-header"
 import { TechBadge } from "@/components/ui/tech-badge"
 import { animations } from "@/lib/animations"
-import { experiences, type Experience } from "@/lib/data"
+import { experiences, type Experience } from "@/lib/data/experiences"
 
 // Memoized TimelineCard to prevent unnecessary re-renders
 const TimelineCard = memo(function TimelineCard({ experience, index, isLeft }: { experience: Experience; index: number; isLeft: boolean }) {
