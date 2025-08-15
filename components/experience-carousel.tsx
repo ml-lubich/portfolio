@@ -1,5 +1,6 @@
 "use client"
 
+import { memo } from "react"
 import { PortfolioCard, CardContent, CardHeader, CardTitle } from "@/components/ui/portfolio-card"
 import { CalendarDays, MapPin } from "lucide-react"
 import { useInView } from "react-intersection-observer"
@@ -10,7 +11,8 @@ import { TechBadge } from "@/components/ui/tech-badge"
 import { animations } from "@/lib/animations"
 import { experiences, type Experience } from "@/lib/data"
 
-function TimelineCard({ experience, index, isLeft }: { experience: Experience; index: number; isLeft: boolean }) {
+// Memoized TimelineCard to prevent unnecessary re-renders
+const TimelineCard = memo(function TimelineCard({ experience, index, isLeft }: { experience: Experience; index: number; isLeft: boolean }) {
   return (
     <div className="relative">
       {/* Timeline connector dot (behind text) */}
@@ -74,7 +76,7 @@ function TimelineCard({ experience, index, isLeft }: { experience: Experience; i
       </div>
     </div>
   )
-}
+})
 
 export function ExperienceCarousel() {
   const { ref, inView } = useInView({

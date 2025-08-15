@@ -42,7 +42,7 @@ export function ResearchCard({
         size="full"
         inView={inView}
         showAnimation={true}
-        className="h-64 flex flex-col overflow-hidden"
+        className="h-80 flex flex-col"
       >
         <CardHeader className="pb-2">
           <div className="flex items-start gap-3">
@@ -73,8 +73,8 @@ export function ResearchCard({
             </div>
           </div>
         </CardHeader>
-        <CardContent className="flex-1 overflow-hidden">
-          <div>
+        <CardContent className="flex-1 pb-4">
+          <div className="h-full flex flex-col">
             <p className="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
               {journal}
             </p>
@@ -82,7 +82,7 @@ export function ResearchCard({
               {volume}
             </p>
             {tags.length > 0 && (
-              <div className="flex flex-wrap gap-1 overflow-hidden">
+              <div className="flex flex-wrap gap-1">
                 {tags.map((tag, index) => (
                   <TechBadge key={index} variant="secondary" className="text-xs">
                     {tag}

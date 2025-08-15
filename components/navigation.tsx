@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import { Moon, Sun, Menu, X, Download } from "lucide-react"
 import { useTheme } from "next-themes"
@@ -14,64 +14,68 @@ export function Navigation() {
   const [activeSection, setActiveSection] = useState("")
   const { theme, setTheme } = useTheme()
 
-  // Proper download handler
-  const handleDownloadResume = () => {
+  // Memoized download handler
+  const handleDownloadResume = useCallback(() => {
     const link = document.createElement('a')
     link.href = '/lubich_michaelle_swe.pdf'
     link.download = 'Misha_Lubich_Resume.pdf'
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
-  }
+  }, [])
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50)
+  // Memoized scroll handler for better performance
+  const handleScroll = useCallback(() => {
+    setIsScrolled(window.scrollY > 50)
+    
+    // Improved scroll spy functionality
+    const sections = ["about", "experience", "projects", "skills", "publications", "contact"]
+    let currentSection = ""
+    
+    // Check each section to find which one is currently in view
+    for (let i = sections.length - 1; i >= 0; i--) {
+      const sectionId = sections[i]
+      const element = document.getElementById(sectionId)
       
-      // Improved scroll spy functionality
-      const sections = ["about", "experience", "projects", "skills", "publications", "contact"]
-      const scrollPosition = window.scrollY + window.innerHeight / 3 // Better detection point
-      
-      let currentSection = ""
-      
-      // Check each section to find which one is currently in view
-      for (let i = sections.length - 1; i >= 0; i--) {
-        const sectionId = sections[i]
-        const element = document.getElementById(sectionId)
+      if (element) {
+        const rect = element.getBoundingClientRect()
+        const elementTop = window.scrollY + rect.top
         
-        if (element) {
-          const rect = element.getBoundingClientRect()
-          const elementTop = window.scrollY + rect.top
-          
-          // Consider a section active if we've scrolled past its midpoint
-          if (window.scrollY >= elementTop - window.innerHeight / 3) {
-            currentSection = sectionId
-            break
-          }
+        // Consider a section active if we've scrolled past its midpoint
+        if (window.scrollY >= elementTop - window.innerHeight / 3) {
+          currentSection = sectionId
+          break
         }
       }
-      
-      // Set hero as active when at top
-      if (window.scrollY < 200) {
-        currentSection = ""
-      }
-      
-      setActiveSection(currentSection)
+    }
+    
+    // Set hero as active when at top
+    if (window.scrollY < 200) {
+      currentSection = ""
+    }
+    
+    setActiveSection(currentSection)
+  }, [])
+
+  useEffect(() => {
+    const throttledHandleScroll = () => {
+      requestAnimationFrame(handleScroll)
     }
     
     handleScroll() // Initial check
-    window.addEventListener("scroll", handleScroll, { passive: true })
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
+    window.addEventListener("scroll", throttledHandleScroll, { passive: true })
+    return () => window.removeEventListener("scroll", throttledHandleScroll)
+  }, [handleScroll])
 
-  const navItems = [
+  // Memoized navigation items to prevent recreation
+  const navItems = useMemo(() => [
     { href: "#about", label: "About", id: "about" },
     { href: "#experience", label: "Experience", id: "experience" },
     { href: "#projects", label: "Projects", id: "projects" },
     { href: "#skills", label: "Skills", id: "skills" },
     { href: "#publications", label: "Publications", id: "publications" },
     { href: "#contact", label: "Contact", id: "contact" },
-  ]
+  ], [])
 
   return (
     <nav
@@ -171,6 +175,7 @@ export function Navigation() {
               ))}
               {/* Mobile Resume Button */}
               <button
+                type="button"
                 onClick={() => {
                   handleDownloadResume()
                   setIsMobileMenuOpen(false)

@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useMemo, useRef, useState } from "react"
+import React, { useEffect, useMemo, useRef, useState, useCallback } from "react"
 import { useInView } from "react-intersection-observer"
 
 type Direction = "up" | "down" | "left" | "right" | "scale"
@@ -43,21 +43,30 @@ export function UnifiedReveal({
     triggerOnce: false,
   })
 
-  // Track scroll direction
+  // Memoized scroll handler for better performance
+  const handleScroll = useCallback(() => {
+    const currentScrollY = window.scrollY
+    if (currentScrollY > lastScrollY.current) {
+      setScrollDirection("down")
+    } else if (currentScrollY < lastScrollY.current) {
+      setScrollDirection("up")
+    }
+    lastScrollY.current = currentScrollY
+  }, [])
+
+  // Track scroll direction with throttling
   useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY
-      if (currentScrollY > lastScrollY.current) {
-        setScrollDirection("down")
-      } else if (currentScrollY < lastScrollY.current) {
-        setScrollDirection("up")
-      }
-      lastScrollY.current = currentScrollY
+    let rafId: number
+    const throttledHandleScroll = () => {
+      rafId = requestAnimationFrame(handleScroll)
     }
 
-    window.addEventListener("scroll", handleScroll, { passive: true })
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
+    window.addEventListener("scroll", throttledHandleScroll, { passive: true })
+    return () => {
+      window.removeEventListener("scroll", throttledHandleScroll)
+      if (rafId) cancelAnimationFrame(rafId)
+    }
+  }, [handleScroll])
 
   useEffect(() => {
     if (bidirectional) {
@@ -87,7 +96,8 @@ export function UnifiedReveal({
     }
   }, [inView, delay, triggerOnce, hasAnimated, bidirectional])
 
-  const getTransform = () => {
+  // Memoized transform calculation
+  const getTransform = useMemo(() => {
     if (isVisible) {
       return "translateX(0) translateY(0) scale(1)"
     }
@@ -126,7 +136,7 @@ export function UnifiedReveal({
           return `translateY(${distance}px) scale(${scaleFrom})`
       }
     }
-  }
+  }, [isVisible, bidirectional, scrollDirection, direction, distance, scaleFrom])
 
   return (
     <div
@@ -134,7 +144,7 @@ export function UnifiedReveal({
       className={`transition-all ease-out will-change-transform will-change-opacity ${className}`}
       style={{
         opacity: isVisible ? 1 : 0,
-        transform: getTransform(),
+        transform: getTransform,
         transitionDuration: `${duration}ms`,
         transitionTimingFunction: "cubic-bezier(0.25, 0.46, 0.45, 0.94)"
       }}

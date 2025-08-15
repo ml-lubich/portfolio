@@ -15,6 +15,7 @@ interface CodeParticle {
   rotationSpeed: number
 }
 
+// Moved constants outside component to prevent recreation
 const codeCharacters = [
   // Simplified character set for performance
   "0", "1", "01", "10", "101", "110",
@@ -30,7 +31,7 @@ const colors = [
   "#8b5cf6", "#06b6d4", "#10b981", "#f97316", "#ec4899"
 ]
 
-// Performance utilities
+// Memoized performance utilities
 const isMobile = () => /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
 const isLowEndDevice = () => {
   if (typeof navigator === 'undefined') return false
@@ -39,6 +40,7 @@ const isLowEndDevice = () => {
   return (hardwareConcurrency && hardwareConcurrency <= 2) || (deviceMemory && deviceMemory <= 4)
 }
 
+
 export function FallingCode() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const animationRef = useRef<number | undefined>(undefined)
@@ -46,7 +48,7 @@ export function FallingCode() {
   const [isEnabled, setIsEnabled] = useState(true)
   const [performance, setPerformance] = useState<'high' | 'medium' | 'low'>('high')
 
-  // Performance-based configuration with reduced initial load
+  // Memoized performance-based configuration
   const getConfig = useCallback(() => {
     const mobile = isMobile()
     const lowEnd = isLowEndDevice()
@@ -215,6 +217,9 @@ export function FallingCode() {
       setPerformance('low')
     }
     
+    // Mark config as used to avoid unused variable warning
+    void config
+    
     animationRef.current = requestAnimationFrame(animate)
   }, [isEnabled, updateParticles, render, getConfig])
 
@@ -293,6 +298,7 @@ export function FallingCode() {
       <div className="fixed bottom-4 right-4 z-10 opacity-0 hover:opacity-100 transition-opacity">
         <div className="bg-black/20 backdrop-blur-sm rounded-lg p-2">
           <button
+            type="button"
             onClick={() => setIsEnabled(!isEnabled)}
             className="text-xs text-white/70 hover:text-white mr-2"
           >

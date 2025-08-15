@@ -120,7 +120,7 @@ export function Contact() {
                 variant="default"
                 inView={inView}
                 showAnimation={true}
-                className="text-center"
+                className="text-center h-64 flex flex-col"
               >
                 <CardHeader>
                   <IconContainer 
@@ -131,7 +131,7 @@ export function Contact() {
                   </IconContainer>
                   <CardTitle className="text-lg text-gray-900 dark:text-white">{method.title}</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="flex-1 flex items-center justify-center">
                   {method.href !== "#" ? (
                     <Button
                       asChild

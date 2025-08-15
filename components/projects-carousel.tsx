@@ -1,5 +1,6 @@
 "use client"
 
+import { memo, useCallback } from "react"
 import { PortfolioCard, IconContainer, CardContent, CardHeader, CardTitle } from "@/components/ui/portfolio-card"
 import { TechBadge } from "@/components/ui/tech-badge"
 import { Button } from "@/components/ui/button"
@@ -13,7 +14,8 @@ import Link from "next/link"
 import { animations } from "@/lib/animations"
 import { projects, type Project } from "@/lib/data"
 
-function ProjectCard({ project, isActive }: { project: Project; isActive: boolean }) {
+// Memoized ProjectCard to prevent unnecessary re-renders
+const ProjectCard = memo(function ProjectCard({ project, isActive }: { project: Project; isActive: boolean }) {
   const IconComponent = project.icon
 
   return (
@@ -72,7 +74,7 @@ function ProjectCard({ project, isActive }: { project: Project; isActive: boolea
       </CardContent>
     </PortfolioCard>
   )
-}
+})
 
 export function ProjectsCarousel() {
   const { ref, inView } = useInView({
@@ -80,9 +82,10 @@ export function ProjectsCarousel() {
     threshold: 0.1,
   })
 
-  const renderProjectCard = (project: Project, index: number, isActive: boolean) => (
+  // Memoized render function for better performance
+  const renderProjectCard = useCallback((project: Project, index: number, isActive: boolean) => (
     <ProjectCard project={project} isActive={isActive} />
-  )
+  ), [])
 
   return (
     <SectionWrapper id="projects" maxWidth="7xl" delay={175} ref={ref}>

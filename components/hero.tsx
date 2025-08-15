@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback, useMemo } from "react"
 import { Github, Linkedin, Mail, ArrowDown, Calendar, Download } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
@@ -17,8 +17,8 @@ export function Hero() {
   const [currentTitleIndex, setCurrentTitleIndex] = useState(0)
   const [isTypingName, setIsTypingName] = useState(false)
 
-  // Function to open Calendly in a smaller popup window
-  const openCalendly = () => {
+  // Memoized function to open Calendly in a smaller popup window
+  const openCalendly = useCallback(() => {
     const width = 800
     const height = 600
     const left = (window.screen.width - width) / 2
@@ -29,31 +29,34 @@ export function Hero() {
       "calendly",
       `width=${width},height=${height},left=${left},top=${top},scrollbars=yes,resizable=yes`
     )
-  }
+  }, [])
 
-  // Proper download handler
-  const handleDownloadResume = () => {
+  // Memoized download handler
+  const handleDownloadResume = useCallback(() => {
     const link = document.createElement('a')
     link.href = '/lubich_michaelle_swe.pdf'
     link.download = 'Misha_Lubich_Resume.pdf'
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
-  }
+  }, [])
 
-  const fullName = "misha lubich"
-  const titles = [
-    "Software Engineer & Technical Leader",
-    "Full-Stack Developer",
-    "AI/ML Research Engineer", 
-    "Ex-Apple Software Engineer",
-    "Ex-Walmart Tech Innovator",
-    "React & Next.js Specialist",
-    "Cloud Architecture Expert",
-    "Published Research Author",
-    "Performance Optimization Expert",
-    "Team Innovation Leader"
-  ]
+  // Memoized constants to prevent recreation on every render
+  const { fullName, titles } = useMemo(() => ({
+    fullName: "misha lubich",
+    titles: [
+      "Software Engineer & Technical Leader",
+      "Full-Stack Developer",
+      "AI/ML Research Engineer", 
+      "Ex-Apple Software Engineer",
+      "Ex-Walmart Tech Innovator",
+      "React & Next.js Specialist",
+      "Cloud Architecture Expert",
+      "Published Research Author",
+      "Performance Optimization Expert",
+      "Team Innovation Leader"
+    ]
+  }), [])
 
   useEffect(() => {
     let timeout: NodeJS.Timeout
@@ -151,7 +154,7 @@ export function Hero() {
       <div className="relative z-10 text-center px-4 max-w-6xl mx-auto">
         <div className="flex flex-col items-center mb-8">
           {/* Profile Photo */}
-          <div className="relative group mb-8 mt-16 sm:mt-20 md:mt-24">
+          <div className="relative group mb-8 mt-24 sm:mt-28 md:mt-32">
             <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-teal-600 rounded-full blur-sm opacity-40 group-hover:opacity-60 transition-all duration-1000 animate-slow-pulse"></div>
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full opacity-20"></div>

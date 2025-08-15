@@ -1,5 +1,6 @@
 "use client"
 
+import { useMemo } from "react"
 import { GraduationCap, Award, Users, Code } from "lucide-react"
 import { useInView } from "react-intersection-observer"
 import { CardReveal } from "@/components/ui/unified-reveal"
@@ -13,7 +14,8 @@ export function About() {
     threshold: 0.1,
   })
 
-  const cards = [
+  // Memoized cards data to prevent recreation on re-renders
+  const cards = useMemo(() => [
     {
       icon: GraduationCap,
       title: "Education",
@@ -42,7 +44,7 @@ export function About() {
       description: "Community Impact",
       color: "from-orange-500 to-red-500",
     },
-  ]
+  ], [])
 
   return (
     <SectionWrapper id="about" delay={100} ref={ref}>
