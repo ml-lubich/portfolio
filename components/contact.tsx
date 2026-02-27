@@ -1,12 +1,20 @@
+"use client"
+
+import dynamic from "next/dynamic"
 import { Mail, Phone, MapPin, Calendar, Linkedin, Github, GraduationCap, FileText } from "lucide-react"
 import { AnimatedSection } from "./animated-section"
+
+const ParticleField = dynamic(
+  () => import("./scene-backgrounds").then((mod) => mod.ParticleField),
+  { ssr: false }
+)
 
 const contactInfo = [
   {
     icon: Mail,
     label: "Email",
-    value: "michaelle.lubich@gmail.com",
-    href: "mailto:michaelle.lubich@gmail.com",
+    value: "michaelle.lubich@outlook.com",
+    href: "mailto:michaelle.lubich@outlook.com",
   },
   {
     icon: Phone,
@@ -23,22 +31,27 @@ const contactInfo = [
 ]
 
 const socialLinks = [
-  { icon: Calendar, label: "Schedule a Call", href: "#" },
-  { icon: Linkedin, label: "LinkedIn", href: "https://linkedin.com" },
-  { icon: Github, label: "GitHub", href: "https://github.com" },
-  { icon: GraduationCap, label: "Google Scholar", href: "https://scholar.google.com" },
+  { icon: Calendar, label: "Schedule a Call", href: "https://calendly.com/michaelle-lubich" },
+  { icon: Linkedin, label: "LinkedIn", href: "https://www.linkedin.com/in/misha-lubich/" },
+  { icon: Github, label: "GitHub", href: "https://github.com/ml-lubich" },
+  { icon: GraduationCap, label: "Google Scholar", href: "https://scholar.google.com/citations?hl=en&user=Be6ZA78AAAAJ" },
 ]
 
 export function Contact() {
   return (
-    <AnimatedSection id="contact" className="py-24 sm:py-32">
-      <div className="mx-auto max-w-4xl px-6">
+    <AnimatedSection id="contact" className="relative py-14 sm:py-20 overflow-hidden">
+      {/* 3D particle field background */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-15" aria-hidden="true">
+        <ParticleField color="#a855f7" speed={0.08} />
+      </div>
+
+      <div className="relative mx-auto max-w-4xl px-6">
         {/* Section header */}
-        <div className="mb-16 text-center">
+        <div className="mb-10 text-center">
           <span className="font-mono text-xs uppercase tracking-widest text-primary">
             {"Let's Connect"}
           </span>
-          <h2 className="mt-4 text-3xl font-bold text-foreground sm:text-4xl text-balance">
+          <h2 className="mt-4 font-display text-3xl font-light text-foreground sm:text-4xl text-balance">
             Ready to collaborate on{" "}
             <span className="gradient-text">innovative projects</span>
           </h2>

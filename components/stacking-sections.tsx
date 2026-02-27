@@ -65,13 +65,15 @@ export function StackingSections({
       }
 
       // ── Visual transforms ──────────────────────────────────────────
-      const scale = 1 - coverProgress * 0.05          // 1 → 0.95
-      const brightness = 1 - coverProgress * 0.15      // 1 → 0.85
-      const borderRadius = 16 + coverProgress * 16     // 16px → 32px
+      const scale = 1 - coverProgress * 0.04          // 1 → 0.96
+      const brightness = 1 - coverProgress * 0.12      // 1 → 0.88
+      const borderRadius = 20 + coverProgress * 12     // 20px → 32px
+      const shadowOpacity = coverProgress * 0.3        // 0 → 0.3
 
       inner.style.transform = `scale(${scale})`
       inner.style.filter = `brightness(${brightness})`
       inner.style.borderRadius = `${borderRadius}px`
+      inner.style.boxShadow = `0 ${8 + coverProgress * 16}px ${24 + coverProgress * 40}px rgba(0,0,0,${0.08 + shadowOpacity})`
     })
   }, [])
 
@@ -94,7 +96,7 @@ export function StackingSections({
   const items = Children.toArray(children)
 
   return (
-    <div ref={wrapperRef}>
+    <div ref={wrapperRef} className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
       {items.map((child, i) => (
         <div
           key={i}
@@ -107,8 +109,11 @@ export function StackingSections({
         >
           <div
             data-page-inner
-            className="bg-background ring-1 ring-border/40 shadow-2xl shadow-black/[0.08] will-change-transform"
-            style={{ borderRadius: "16px" }}
+            className="overflow-hidden bg-background ring-1 ring-border/30 will-change-transform transition-[border-radius,transform,filter,box-shadow] duration-300 ease-out"
+            style={{
+              borderRadius: "20px",
+              boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
+            }}
           >
             {child}
           </div>

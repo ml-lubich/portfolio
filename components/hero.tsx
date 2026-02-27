@@ -2,7 +2,9 @@
 
 import { useEffect, useRef, useState } from "react"
 import dynamic from "next/dynamic"
-import { ArrowDown, Github, Linkedin, Mail, Phone, Sparkles } from "lucide-react"
+import { ArrowDown, Github, GraduationCap, Linkedin, Mail, Phone, Sparkles } from "lucide-react"
+import { AnimatedCounter } from "./animated-counter"
+import { AnimatedName } from "./animated-name"
 
 const Brain3D = dynamic(
   () => import("./brain-3d").then((mod) => mod.Brain3D),
@@ -17,11 +19,12 @@ const stats = [
 ]
 
 const roles = [
-  "AI Engineer",
-  "ML Specialist",
-  "Software Architect",
-  "Research Engineer",
-  "Tech Lead",
+  "Senior Software Engineer",
+  "AI & Machine Learning Engineer",
+  "ML Systems Architect",
+  "Full-Stack Software Architect",
+  "Applied AI Research Engineer",
+  "Engineering Lead",
   "Vibe Coder",
   "Vibe Cleanup Specialist",
 ]
@@ -29,14 +32,27 @@ const roles = [
 export function Hero() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [roleIndex, setRoleIndex] = useState(0)
+  const [prevRoleIndex, setPrevRoleIndex] = useState(-1)
+  const [isTransitioning, setIsTransitioning] = useState(false)
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
+  const transitionTimeout = useRef<ReturnType<typeof setTimeout>>(undefined)
 
-  // Role switcher — no typing, no layout shift. Just a clean fade/swap.
+  // Role switcher — smooth Apple-style slide with direction tracking
   useEffect(() => {
     const interval = setInterval(() => {
-      setRoleIndex((prev) => (prev + 1) % roles.length)
-    }, 2500)
-    return () => clearInterval(interval)
+      setRoleIndex((prev) => {
+        setPrevRoleIndex(prev)
+        setIsTransitioning(true)
+        // Clear any pending transition reset
+        if (transitionTimeout.current) clearTimeout(transitionTimeout.current)
+        transitionTimeout.current = setTimeout(() => setIsTransitioning(false), 1000)
+        return (prev + 1) % roles.length
+      })
+    }, 4500)
+    return () => {
+      clearInterval(interval)
+      if (transitionTimeout.current) clearTimeout(transitionTimeout.current)
+    }
   }, [])
 
   // Mouse parallax effect
@@ -74,12 +90,12 @@ export function Hero() {
     resize()
     window.addEventListener("resize", resize)
 
-    for (let i = 0; i < 60; i++) {
+    for (let i = 0; i < 35; i++) {
       particles.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.3,
-        vy: (Math.random() - 0.5) * 0.3,
+        vx: (Math.random() - 0.5) * 0.2,
+        vy: (Math.random() - 0.5) * 0.2,
         size: Math.random() * 2 + 0.5,
         opacity: Math.random() * 0.4 + 0.1,
       })
@@ -123,7 +139,7 @@ export function Hero() {
   }, [])
 
   return (
-    <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden pb-16 pt-24">
+    <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden pb-16 pt-24 [clip-path:inset(0)]">
       {/* Particle canvas */}
       <canvas
         ref={canvasRef}
@@ -145,11 +161,20 @@ export function Hero() {
 
       {/* 3D Brain — fixed centered background within hero */}
       <div
-        className="pointer-events-none absolute inset-0 z-[1]"
+        className="pointer-events-none absolute inset-x-0 top-0 h-screen z-[1]"
         aria-hidden="true"
       >
-        <Brain3D className="h-full w-full" />
+        <Brain3D className="h-full w-full pointer-events-auto" />
       </div>
+
+      {/* Vignette — darkens center behind text for readability */}
+      <div
+        className="pointer-events-none absolute inset-0 z-[2]"
+        aria-hidden="true"
+        style={{
+          background: "radial-gradient(ellipse 60% 50% at 50% 45%, rgba(10,12,20,0.55) 0%, transparent 100%)",
+        }}
+      />
 
       {/* Content */}
       <div className="relative z-10 mx-auto w-full max-w-6xl px-4 text-center sm:px-6">
@@ -167,25 +192,58 @@ export function Hero() {
 
         {/* Heading — fixed height role line so nothing shifts */}
         <h1
-          className="animate-fade-in-up text-3xl font-bold tracking-tight text-foreground sm:text-5xl md:text-6xl lg:text-7xl"
-          style={{ animationDelay: "0.2s", opacity: 0, lineHeight: 1.15 }}
+          className="animate-fade-in-up font-display tracking-tight text-foreground"
+          style={{ animationDelay: "0.4s", opacity: 0, lineHeight: 1.1 }}
         >
-          <span className="block text-balance">Misha Lubich</span>
+          <span className="block text-balance text-4xl font-semibold sm:text-5xl md:text-6xl lg:text-7xl">
+            <AnimatedName name="Misha Lubich" trigger="mount" delay={800} duration={1400} />
+          </span>
           {/* Fixed-height container — tall enough for descenders (g, y, p) and long roles */}
-          <span className="relative mt-3 block h-[2.8rem] sm:h-[3.2rem] md:h-[4rem] lg:h-[5rem]">
-            {roles.map((role, i) => (
-              <span
-                key={role}
-                className="absolute inset-x-0 top-0 flex items-start justify-center transition-all duration-700"
-                style={{
-                  opacity: i === roleIndex ? 1 : 0,
-                  transform: i === roleIndex ? "translateY(0)" : i < roleIndex ? "translateY(-40px)" : "translateY(40px)",
-                }}
-                aria-hidden={i !== roleIndex}
-              >
-                <span className="gradient-text whitespace-nowrap">{role}</span>
-              </span>
-            ))}
+          <span className="relative mt-3 block h-[2.4rem] sm:h-[3rem] md:h-[3.6rem] lg:h-[4.5rem] overflow-hidden">
+            {roles.map((role, i) => {
+              const isActive = i === roleIndex
+              const isLeaving = i === prevRoleIndex && isTransitioning
+
+              // Active role: slide in from below
+              // Leaving role: slide up and out
+              // All others: hidden below (ready to enter)
+              let translateY = "60px" // default: parked below
+              let opacity = 0
+              let blur = "blur(8px)"
+              let scale = "scale(0.96)"
+
+              if (isActive) {
+                translateY = "0px"
+                opacity = 1
+                blur = "blur(0px)"
+                scale = "scale(1)"
+              } else if (isLeaving) {
+                translateY = "-50px"
+                opacity = 0
+                blur = "blur(6px)"
+                scale = "scale(0.97)"
+              }
+
+              return (
+                <span
+                  key={role}
+                  className="absolute inset-x-0 top-0 flex items-start justify-center"
+                  style={{
+                    opacity,
+                    transform: `translateY(${translateY}) ${scale}`,
+                    filter: blur,
+                    transition: isActive || isLeaving
+                      ? "opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), filter 0.8s cubic-bezier(0.16, 1, 0.3, 1)"
+                      : "none",
+                  }}
+                  aria-hidden={!isActive}
+                >
+                  <span className="gradient-text whitespace-nowrap text-3xl font-light sm:text-4xl md:text-5xl lg:text-6xl">
+                    {role}
+                  </span>
+                </span>
+              )
+            })}
             {/* Screen-reader only — always readable */}
             <span className="sr-only">{roles[roleIndex]}</span>
           </span>
@@ -194,20 +252,20 @@ export function Hero() {
         {/* Subtitle */}
         <p
           className="mx-auto mt-10 max-w-3xl animate-fade-in-up text-base leading-relaxed text-muted-foreground sm:text-lg md:text-xl"
-          style={{ animationDelay: "0.4s", opacity: 0 }}
+          style={{ animationDelay: "0.8s", opacity: 0 }}
         >
-          Architecting scalable{" "}
-          <span className="font-semibold text-foreground">AI/ML systems</span> that power
-          next-generation applications. From research to production, I build intelligent solutions at{" "}
-          <span className="font-semibold text-foreground">Apple</span>,{" "}
-          <span className="font-semibold text-foreground">Walmart</span>, and{" "}
-          <span className="font-semibold text-foreground">Lawrence Berkeley Lab</span>.
+          Senior Software Engineer specializing in{" "}
+          <span className="font-semibold text-foreground">AI-driven, cloud-native applications</span>. Led the design and deployment of a production AI
+          platform with multi-agent orchestration at{" "}
+          <span className="font-semibold text-foreground">Braintrust Data</span>,{" "}
+          <span className="font-semibold text-foreground">Apple</span>, and{" "}
+          <span className="font-semibold text-foreground">Walmart</span>.
         </p>
 
         {/* CTAs */}
         <div
           className="mt-10 flex animate-fade-in-up flex-wrap items-center justify-center gap-3 sm:gap-4"
-          style={{ animationDelay: "0.6s", opacity: 0 }}
+          style={{ animationDelay: "1.2s", opacity: 0 }}
         >
           <a
             href="#contact"
@@ -227,7 +285,9 @@ export function Hero() {
             View AI Expertise
           </a>
           <a
-            href="tel:+1234567890"
+            href="https://calendly.com/michaelle-lubich"
+            target="_blank"
+            rel="noopener noreferrer"
             className="rounded-xl border border-border bg-secondary/50 px-6 py-3 text-sm font-medium text-foreground backdrop-blur-sm transition-all hover:border-primary/30 hover:bg-secondary hover-lift sm:px-8 sm:py-3.5"
           >
             <Phone className="mr-2 inline-block h-4 w-4" />
@@ -238,10 +298,10 @@ export function Hero() {
         {/* Social links */}
         <div
           className="mt-6 flex animate-fade-in-up items-center justify-center gap-3"
-          style={{ animationDelay: "0.8s", opacity: 0 }}
+          style={{ animationDelay: "1.5s", opacity: 0 }}
         >
           <a
-            href="https://github.com/mishalubich"
+            href="https://github.com/ml-lubich"
             target="_blank"
             rel="noopener noreferrer"
             className="group rounded-lg border border-border bg-secondary/30 p-2.5 text-muted-foreground backdrop-blur-sm transition-all hover:border-primary/30 hover:bg-secondary hover:text-foreground magnetic"
@@ -250,7 +310,7 @@ export function Hero() {
             <Github className="h-5 w-5 transition-transform group-hover:scale-110" />
           </a>
           <a
-            href="https://linkedin.com/in/mishalubich"
+            href="https://www.linkedin.com/in/misha-lubich/"
             target="_blank"
             rel="noopener noreferrer"
             className="group rounded-lg border border-border bg-secondary/30 p-2.5 text-muted-foreground backdrop-blur-sm transition-all hover:border-primary/30 hover:bg-secondary hover:text-foreground magnetic"
@@ -258,27 +318,45 @@ export function Hero() {
           >
             <Linkedin className="h-5 w-5 transition-transform group-hover:scale-110" />
           </a>
+          <a
+            href="https://scholar.google.com/citations?hl=en&user=Be6ZA78AAAAJ"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group rounded-lg border border-border bg-secondary/30 p-2.5 text-muted-foreground backdrop-blur-sm transition-all hover:border-primary/30 hover:bg-secondary hover:text-foreground magnetic"
+            aria-label="Google Scholar"
+          >
+            <GraduationCap className="h-5 w-5 transition-transform group-hover:scale-110" />
+          </a>
         </div>
 
         {/* Stats — fully visible, not cut off */}
         <div
           className="mx-auto mt-14 grid w-full max-w-4xl animate-fade-in-up grid-cols-2 gap-4 sm:gap-5 lg:grid-cols-4"
-          style={{ animationDelay: "1s", opacity: 0 }}
+          style={{ animationDelay: "1.8s", opacity: 0 }}
         >
-          {stats.map((stat) => (
+          {stats.map((stat, i) => (
             <div
               key={stat.label}
-              className="group relative overflow-hidden rounded-2xl border border-border bg-card/50 p-5 backdrop-blur-sm transition-all hover:border-primary/30 hover-lift spotlight"
+              className="group relative overflow-hidden rounded-2xl border border-white/[0.08] bg-card/40 p-5 backdrop-blur-xl transition-all duration-500 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/15 hover-lift spotlight glass-card-3d"
+              style={{ animationDelay: `${1.8 + i * 0.12}s` }}
             >
+              {/* Translucent gradient overlay */}
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/[0.04] via-transparent to-accent/[0.04] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+              {/* Top edge light reflection */}
+              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
               <div className="relative z-10">
-                <div className="text-2xl font-bold gradient-text sm:text-3xl lg:text-4xl">
-                  {stat.value}
-                </div>
+                <AnimatedCounter
+                  value={stat.value}
+                  duration={2200}
+                  className="text-2xl font-display font-light gradient-text sm:text-3xl lg:text-4xl"
+                />
                 <div className="mt-2 text-xs font-medium text-muted-foreground sm:text-sm">
                   {stat.label}
                 </div>
               </div>
-              <div className="absolute -bottom-6 -right-6 h-24 w-24 rounded-full bg-primary/5 blur-2xl transition-transform group-hover:scale-150" />
+              {/* Animated radial glow */}
+              <div className="absolute -bottom-6 -right-6 h-24 w-24 rounded-full bg-primary/5 blur-2xl transition-all duration-700 group-hover:scale-150 group-hover:bg-primary/10" />
+              <div className="absolute -top-10 -left-10 h-20 w-20 rounded-full bg-accent/5 blur-2xl opacity-0 transition-all duration-700 group-hover:opacity-100 group-hover:scale-150" />
             </div>
           ))}
         </div>
@@ -287,7 +365,7 @@ export function Hero() {
       {/* Scroll indicator */}
       <div
         className="absolute bottom-6 left-1/2 -translate-x-1/2 animate-fade-in"
-        style={{ animationDelay: "1.5s", opacity: 0 }}
+        style={{ animationDelay: "2.6s", opacity: 0 }}
       >
         <a
           href="#ai-expertise"

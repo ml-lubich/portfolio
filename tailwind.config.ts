@@ -68,8 +68,11 @@ const config: Config = {
         sm: 'calc(var(--radius) - 4px)',
       },
       fontFamily: {
-        sans: ['var(--font-inter)'],
-        mono: ['var(--font-jetbrains)'],
+        sans: ['var(--font-geist-sans)', 'system-ui', 'sans-serif'],
+        display: ['var(--font-geist-sans)', 'system-ui', 'sans-serif'],
+        mono: ['var(--font-geist-mono)', 'var(--font-jetbrains)', 'monospace'],
+        italiana: ['var(--font-italiana)', 'serif'],
+        cormorant: ['var(--font-cormorant)', 'Georgia', 'serif'],
       },
       keyframes: {
         'accordion-down': {
@@ -81,7 +84,7 @@ const config: Config = {
           to: { height: '0' },
         },
         'fade-in-up': {
-          '0%': { opacity: '0', transform: 'translateY(30px)' },
+          '0%': { opacity: '0', transform: 'translateY(24px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
         'fade-in': {
@@ -89,7 +92,7 @@ const config: Config = {
           '100%': { opacity: '1' },
         },
         'slide-in-left': {
-          '0%': { opacity: '0', transform: 'translateX(-30px)' },
+          '0%': { opacity: '0', transform: 'translateX(-20px)' },
           '100%': { opacity: '1', transform: 'translateX(0)' },
         },
         'float': {
@@ -109,11 +112,11 @@ const config: Config = {
           '100%': { opacity: '1', transform: 'scale(1)' },
         },
         'slide-in-right': {
-          '0%': { opacity: '0', transform: 'translateX(30px)' },
+          '0%': { opacity: '0', transform: 'translateX(20px)' },
           '100%': { opacity: '1', transform: 'translateX(0)' },
         },
         'slide-up': {
-          '0%': { opacity: '0', transform: 'translateY(20px)' },
+          '0%': { opacity: '0', transform: 'translateY(14px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
         'spin-slow': {
@@ -121,30 +124,40 @@ const config: Config = {
           '100%': { transform: 'rotate(360deg)' },
         },
         'glow-pulse': {
-          '0%, 100%': { 
+          '0%, 100%': {
             boxShadow: '0 0 20px hsla(217, 91%, 60%, 0.15)',
             opacity: '1'
           },
-          '50%': { 
+          '50%': {
             boxShadow: '0 0 40px hsla(217, 91%, 60%, 0.3)',
             opacity: '0.9'
           },
         },
+        'terminal-blink': {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0' },
+        },
+        'logo-scroll': {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-16.667%)' },
+        },
       },
       animation: {
-        'accordion-down': 'accordion-down 0.2s ease-out',
-        'accordion-up': 'accordion-up 0.2s ease-out',
-        'fade-in-up': 'fade-in-up 0.8s ease-out forwards',
-        'fade-in': 'fade-in 0.6s ease-out forwards',
-        'slide-in-left': 'slide-in-left 0.8s ease-out forwards',
-        'slide-in-right': 'slide-in-right 0.8s ease-out forwards',
-        'slide-up': 'slide-up 0.6s ease-out forwards',
-        'scale-in': 'scale-in 0.5s ease-out forwards',
-        'float': 'float 6s ease-in-out infinite',
-        'pulse-glow': 'pulse-glow 3s ease-in-out infinite',
-        'glow-pulse': 'glow-pulse 2s ease-in-out infinite',
-        'counter': 'counter 0.5s ease-out forwards',
-        'spin-slow': 'spin-slow 20s linear infinite',
+        'accordion-down': 'accordion-down 0.3s ease-out',
+        'accordion-up': 'accordion-up 0.3s ease-out',
+        'fade-in-up': 'fade-in-up 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'fade-in': 'fade-in 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'slide-in-left': 'slide-in-left 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'slide-in-right': 'slide-in-right 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'slide-up': 'slide-up 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'scale-in': 'scale-in 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'float': 'float 12s ease-in-out infinite',
+        'pulse-glow': 'pulse-glow 6s ease-in-out infinite',
+        'glow-pulse': 'glow-pulse 4.5s ease-in-out infinite',
+        'counter': 'counter 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'spin-slow': 'spin-slow 40s linear infinite',
+        'terminal-blink': 'terminal-blink 1s step-end infinite',
+        'logo-scroll': 'logo-scroll 25s linear infinite',
       },
     },
   },
