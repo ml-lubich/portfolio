@@ -45,16 +45,22 @@
 /* Smooth scrolling — native fallback (overridden by JS woosh) */
 html {
   scroll-behavior: smooth;
-  overflow-x: hidden;    /* fallback for older browsers */
-  overflow-x: clip;      /* modern: clips without creating scroll container */
-  overscroll-behavior-x: none;  /* prevent horizontal rubber-band / momentum */
+  overflow-x: hidden;
+  /* fallback for older browsers */
+  overflow-x: clip;
+  /* modern: clips without creating scroll container */
+  overscroll-behavior-x: none;
+  /* prevent horizontal rubber-band / momentum */
 }
 
 body {
-  overflow-x: clip;      /* clips horizontal bleed without creating scroll container */
+  overflow-x: clip;
+  /* clips horizontal bleed without creating scroll container */
   overscroll-behavior-x: none;
-  width: 100%;           /* prevent body from ever expanding beyond viewport */
-  max-width: 100%;       /* hard cap on body width */
+  width: 100%;
+  /* prevent body from ever expanding beyond viewport */
+  max-width: 100%;
+  /* hard cap on body width */
 }
 
 /* ── Scroll-snap anchor system ────────────────────────────────── */
@@ -231,9 +237,11 @@ section[data-no-snap] {
     transform: translateX(-100%);
     opacity: 0;
   }
+
   50% {
     opacity: 1;
   }
+
   100% {
     transform: translateX(100%);
     opacity: 0;

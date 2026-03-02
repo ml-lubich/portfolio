@@ -43,9 +43,9 @@ function ResponsiveCamera() {
   React.useEffect(() => {
     const update = () => {
       const { z, fov } = getResponsiveCam()
-      ;(camera as THREE.PerspectiveCamera).fov = fov
+        ; (camera as THREE.PerspectiveCamera).fov = fov
       camera.position.z = z
-      ;(camera as THREE.PerspectiveCamera).updateProjectionMatrix()
+        ; (camera as THREE.PerspectiveCamera).updateProjectionMatrix()
     }
     update()
     window.addEventListener("resize", update)

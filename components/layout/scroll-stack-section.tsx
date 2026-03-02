@@ -1,7 +1,7 @@
 "use client"
 
 import type { ReactNode } from "react"
-import { ScrollStackCards } from "./scroll-stack-cards"
+import { ScrollStackCards } from "../cards"
 import { SectionHeader } from "./section-header"
 
 /* ──────────────────────────────────────────────────────────────────────

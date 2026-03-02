@@ -1,6 +1,5 @@
 export { SectionHeader } from "./section-header"
 export { ScrollStackSection } from "./scroll-stack-section"
-export { ScrollStackCards } from "./scroll-stack-cards"
 export { DetailPanel, type DetailPanelData } from "./detail-panel"
 export type { ArchitectureNode } from "./detail-panel"
 export { LazySection } from "./lazy-section"
