@@ -17,6 +17,8 @@ interface ScrollStackCard {
 interface ScrollStackCardsProps {
   cards: ScrollStackCard[]
   className?: string
+  /** Optional header content rendered inside the sticky frame above the cards */
+  header?: ReactNode
   /** Distance from top of viewport where cards stick (px). Default: 80 */
   stickyTop?: number
   /** Extra vertical offset per card so you see the stack peek (px). Default: 20 */
@@ -67,6 +69,7 @@ const DRAG_DEAD_ZONE = 4
 export function ScrollStackCards({
   cards,
   className = "",
+  header,
   stickyTop = 80,
   stackOffset = 20,
   scrollPerCard = 50,
@@ -76,6 +79,7 @@ export function ScrollStackCards({
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
   const glowRefs = useRef<(HTMLDivElement | null)[]>([])
   const scanRefs = useRef<(HTMLDivElement | null)[]>([])
+  const shineRefs = useRef<(HTMLDivElement | null)[]>([])
   const rafId = useRef<number>(0)
   const hoveredIndex = useRef<number | null>(null)
 
@@ -183,6 +187,10 @@ export function ScrollStackCards({
       if (scan) {
         scan.style.opacity = enterProgress > 0.5 ? "1" : "0"
       }
+
+      // Clear shine when scroll-driven
+      const shine = shineRefs.current[i]
+      if (shine) shine.style.opacity = "0"
     })
   }, [cards.length, perspective])
 
@@ -344,8 +352,8 @@ export function ScrollStackCards({
     const rect = el.getBoundingClientRect()
     const x = (e.clientX - rect.left) / rect.width
     const y = (e.clientY - rect.top) / rect.height
-    const tiltX = (0.5 - y) * 8
-    const tiltY = (x - 0.5) * 8
+    const tiltX = (0.5 - y) * 12
+    const tiltY = (x - 0.5) * 12
 
     el.style.transform = `perspective(${perspective}px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) translateZ(30px) scale(1.02)`
     el.style.filter = "brightness(1.05)"
@@ -357,6 +365,17 @@ export function ScrollStackCards({
     if (glow) {
       glow.style.opacity = "0.7"
       glow.style.background = `radial-gradient(circle at ${x * 100}% ${y * 100}%, hsla(217,91%,60%,0.25), transparent 60%)`
+    }
+
+    // Glass shine — specular highlight that tracks the cursor
+    const shine = shineRefs.current[index]
+    if (shine) {
+      const angle = Math.atan2(y - 0.5, x - 0.5) * (180 / Math.PI) + 90
+      shine.style.opacity = "1"
+      shine.style.background = [
+        `linear-gradient(${angle}deg, transparent 0%, hsla(0,0%,100%,0.01) 20%, hsla(0,0%,100%,0.12) 45%, hsla(0,0%,100%,0.01) 70%, transparent 100%)`,
+        `radial-gradient(ellipse at ${x * 100}% ${y * 100}%, hsla(0,0%,100%,0.15), transparent 50%)`
+      ].join(", ")
     }
   }, [perspective, onPointerMove])
 
@@ -378,6 +397,9 @@ export function ScrollStackCards({
 
     const glow = glowRefs.current[index]
     if (glow) glow.style.opacity = "0"
+
+    const shine = shineRefs.current[index]
+    if (shine) shine.style.opacity = "0"
 
     cancelAnimationFrame(rafId.current)
     rafId.current = requestAnimationFrame(updateCards)
@@ -459,14 +481,36 @@ export function ScrollStackCards({
   return (
     <div
       ref={containerRef}
-      className={className}
+      className={className || undefined}
       style={{ height: runwayHeight, position: "relative" }}
     >
+      {/* ── Per-card snap anchors ── */}
+      {/* Invisible markers at each card transition point so the browser's    */}
+      {/* scroll-snapping locks to each card step-by-step.                    */}
+      {cards.map((card, i) => (
+        <div
+          key={`snap-${card.id}`}
+          data-card-snap
+          aria-hidden="true"
+          style={{
+            position: "absolute",
+            top: `${i * scrollPerCard}vh`,
+            left: 0,
+            width: "1px",
+            height: "1px",
+            pointerEvents: "none",
+          }}
+        />
+      ))}
+
       {/* Sticky frame: pins at stickyTop while scrolling through the runway */}
       <div
         className="sticky mx-auto"
         style={{ top: `${stickyTop}px`, maxWidth: "100%" }}
       >
+        {/* Optional header anchored inside the sticky frame */}
+        {header}
+
         {/* Grid overlay: every card occupies the same cell; tallest one sizes the grid */}
         <div
           style={{
@@ -512,6 +556,18 @@ export function ScrollStackCards({
                   opacity: 0,
                   background: "radial-gradient(circle at 50% 50%, hsla(217,91%,60%,0.2), transparent 60%)",
                   mixBlendMode: "screen",
+                }}
+              />
+
+              {/* ── Glass shine overlay (specular highlight follows cursor) ── */}
+              <div
+                ref={(el) => { shineRefs.current[i] = el }}
+                className="pointer-events-none absolute inset-0 z-10"
+                style={{
+                  opacity: 0,
+                  transition: "opacity 0.4s ease-out, background 0.15s ease-out",
+                  borderRadius: "inherit",
+                  mixBlendMode: "overlay",
                 }}
               />
 

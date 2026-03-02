@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState, useCallback } from "react"
 import { AnimatedSection } from "./animated-section"
+import { AnimatedText } from "./animated-text"
 import { Terminal, Clock, Zap, ChevronRight, Activity, Play } from "lucide-react"
 
 /* ══════════════════════════════════════════════════════════════
@@ -498,10 +499,10 @@ export function LiveTerminal() {
                         <span className="text-sm text-primary font-medium tracking-wide">Live Terminal</span>
                     </div>
                     <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-foreground via-foreground to-muted-foreground bg-clip-text text-transparent mb-2">
-                        A Day in My Life
+                        <AnimatedText text="A Day in My Life" variant="blur-slide" stagger={70} duration={800} />
                     </h2>
                     <p className="text-muted-foreground max-w-xl mx-auto text-sm sm:text-base">
-                        Building AI agents, deploying models, shipping production systems — live.
+                        <AnimatedText text="Building AI agents, deploying models, shipping production systems — live." variant="fade-up" delay={300} stagger={25} duration={600} />
                     </p>
                 </AnimatedSection>
 

@@ -1,21 +1,16 @@
 "use client"
 
-import { useState } from "react"
 import dynamic from "next/dynamic"
 import { AnimatedSection } from "./animated-section"
 import { AnimatedCounter } from "./animated-counter"
 import { AnimatedBars } from "./animated-bars"
 import { ScrollMiniBar } from "./scroll-mini-bar"
+import { SectionHeader } from "./section-header"
 const TerminalReveal = dynamic(
   () => import("./terminal-reveal").then((mod) => mod.TerminalReveal),
   { ssr: false }
 )
-import { Brain, Code2, Database, Zap, Target, Sparkles, TrendingUp, Shield, ChevronDown } from "lucide-react"
-
-const Brain3D = dynamic(
-  () => import("./brain-3d").then((mod) => mod.Brain3D),
-  { ssr: false }
-)
+import { Brain, Code2, Database, Zap, Target, Sparkles, TrendingUp, Shield } from "lucide-react"
 
 const aiDomains = [
   {
@@ -80,20 +75,6 @@ const techBars = [
 ]
 
 export function AIExpertise() {
-  const [expandedCards, setExpandedCards] = useState<Set<number>>(new Set([0]))
-
-  const toggleCard = (index: number) => {
-    setExpandedCards((prev) => {
-      const next = new Set(prev)
-      if (next.has(index)) {
-        next.delete(index)
-      } else {
-        next.add(index)
-      }
-      return next
-    })
-  }
-
   return (
     <AnimatedSection id="ai-expertise" className="relative py-14 sm:py-20 overflow-hidden">
       {/* Background effects */}
@@ -102,27 +83,15 @@ export function AIExpertise() {
       <div className="absolute bottom-20 left-10 h-96 w-96 rounded-full bg-accent/8 blur-3xl translucent-glow" style={{ animationDelay: "2.5s" }} aria-hidden="true" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[600px] w-[600px] rounded-full bg-primary/[0.03] blur-[100px] translucent-glow" style={{ animationDelay: "1.2s" }} aria-hidden="true" />
 
-      {/* 3D Floating Brain — background */}
-      <div className="absolute inset-0 flex items-center justify-center opacity-25 sm:opacity-30" aria-hidden="true">
-        <Brain3D className="h-full w-full max-h-[700px] max-w-[700px]" />
-      </div>
+
 
       <div className="relative mx-auto max-w-7xl px-6">
-        {/* Section header */}
-        <div className="mb-10 text-center">
-          <span className="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-primary">
-            <Brain className="h-4 w-4" />
-            AI/ML Expertise
-          </span>
-          <h2 className="mt-4 font-display text-3xl font-light text-foreground sm:text-5xl text-balance">
-            Building the future with{" "}
-            <span className="gradient-text">Artificial Intelligence</span>
-          </h2>
-          <p className="mx-auto mt-6 max-w-3xl text-base leading-relaxed text-muted-foreground">
-            Deep expertise in machine learning, deep learning, and AI systems engineering.
-            From research to production, I architect scalable AI solutions that drive real-world impact.
-          </p>
-        </div>
+        <SectionHeader
+          icon={<Brain className="h-4 w-4" />}
+          label="AI/ML Expertise"
+          title={<>Building the future with{" "}<span className="gradient-text">Artificial Intelligence</span></>}
+          subtitle="Deep expertise in machine learning, deep learning, and AI systems engineering. From research to production, I architect scalable AI solutions that drive real-world impact."
+        />
 
         {/* Terminal summary */}
         <div className="mx-auto mb-10 max-w-3xl">
@@ -148,9 +117,9 @@ export function AIExpertise() {
         <div className="mb-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {metrics.map((metric, i) => (
             <AnimatedSection key={metric.label} delay={i * 100}>
-              <div className="group relative overflow-hidden rounded-2xl border border-white/[0.08] bg-card/60 p-6 backdrop-blur-xl transition-all duration-500 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/15 glass-card-3d spotlight">
+              <div className="group relative overflow-hidden rounded-2xl border border-white/[0.04] bg-card/30 p-6 backdrop-blur-xl transition-all duration-500 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/15 glass-card-3d spotlight">
                 {/* Top edge light */}
-                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/8 to-transparent" />
                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/[0.03] via-transparent to-accent/[0.03] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
                 <metric.icon className={`relative mb-3 h-8 w-8 ${metric.color} transition-transform duration-500 group-hover:scale-110 group-hover:drop-shadow-[0_0_8px_currentColor]`} />
                 <AnimatedCounter
@@ -168,86 +137,62 @@ export function AIExpertise() {
 
         {/* Proficiency bars */}
         <AnimatedSection delay={200}>
-          <div className="mb-16 rounded-2xl border border-white/[0.08] bg-card/50 p-8 backdrop-blur-xl frosted-panel">
+          <div className="mb-16 rounded-2xl border border-white/[0.04] bg-card/25 p-8 backdrop-blur-xl frosted-panel">
             <h3 className="mb-6 text-lg font-bold text-foreground">Core Proficiency</h3>
             <AnimatedBars bars={techBars} duration={1600} stagger={150} />
           </div>
         </AnimatedSection>
 
-        {/* AI Domains - Expandable cards */}
-        <div className="grid gap-6 lg:grid-cols-2">
-          {aiDomains.map((domain, i) => {
-            const isExpanded = expandedCards.has(i)
-            return (
+        {/* AI Domains — Step-by-step cards */}
+        <div className="relative">
+          {/* Vertical connector line (visible on lg) */}
+          <div className="absolute left-1/2 top-0 bottom-0 hidden w-px -translate-x-1/2 bg-gradient-to-b from-primary/30 via-accent/20 to-transparent lg:block" aria-hidden="true" />
+
+          <div className="grid gap-8 lg:grid-cols-2">
+            {aiDomains.map((domain, i) => (
               <AnimatedSection key={domain.title} delay={i * 150}>
-                <div
-                  className={`group relative h-full overflow-hidden rounded-2xl border transition-all duration-500 ${isExpanded
-                    ? "border-primary/40 bg-card/80 glow-blue"
-                    : "border-border bg-card hover:border-primary/20"
-                    }`}
-                >
+                <div className="group relative h-full overflow-hidden rounded-2xl border border-border bg-card/80 backdrop-blur-xl transition-all duration-500 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/10">
                   {/* Gradient top accent */}
                   <div className={`h-1 w-full bg-gradient-to-r ${domain.gradient}`} />
 
-                  {/* Clickable header */}
-                  <button
-                    className="w-full cursor-pointer p-8 pb-6 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-t-2xl"
-                    onClick={() => toggleCard(i)}
-                    aria-expanded={isExpanded}
-                    aria-controls={`ai-domain-details-${i}`}
-                  >
+                  <div className="p-8">
+                    {/* Step number + icon header */}
                     <div className="flex items-start gap-4">
-                      <div className={`rounded-xl bg-gradient-to-br ${domain.gradient} p-3 transition-transform duration-300 ${isExpanded ? "scale-110" : "group-hover:scale-105"}`}>
-                        <domain.icon className="h-6 w-6 text-white" />
+                      <div className="relative">
+                        <div className={`rounded-xl bg-gradient-to-br ${domain.gradient} p-3 transition-transform duration-300 group-hover:scale-110`}>
+                          <domain.icon className="h-6 w-6 text-white" />
+                        </div>
+                        {/* Step number badge */}
+                        <div className={`absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br ${domain.gradient} text-[11px] font-bold text-white ring-2 ring-background`}>
+                          {i + 1}
+                        </div>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-3">
-                          <h3 className="text-xl font-display font-medium text-foreground">{domain.title}</h3>
-                          <ChevronDown
-                            className={`h-5 w-5 shrink-0 text-muted-foreground transition-transform duration-300 ${isExpanded ? "rotate-180 text-primary" : "group-hover:text-foreground"}`}
-                          />
-                        </div>
+                        <h3 className="text-xl font-display font-medium text-foreground">{domain.title}</h3>
                         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                           {domain.description}
                         </p>
-                        {!isExpanded && (
-                          <span className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-primary/70 transition-colors group-hover:text-primary">
-                            <ChevronDown className="h-3 w-3" />
-                            Click to see details
-                          </span>
-                        )}
                       </div>
                     </div>
-                  </button>
 
-                  {/* Expandable details */}
-                  <div
-                    id={`ai-domain-details-${i}`}
-                    className={`grid transition-all duration-500 ease-in-out ${isExpanded
-                      ? "grid-rows-[1fr] opacity-100"
-                      : "grid-rows-[0fr] opacity-0"
-                      }`}
-                  >
-                    <div className="overflow-hidden">
-                      <div className="space-y-3 px-8 pb-8">
-                        <div className="mb-4 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-                        {domain.details.map((detail, idx) => (
-                          <div
-                            key={idx}
-                            className={`flex items-start gap-3 rounded-lg border border-border/50 bg-secondary/30 p-3 transition-all duration-300 ${isExpanded ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}
-                            style={{ transitionDelay: isExpanded ? `${idx * 80}ms` : "0ms" }}
-                          >
-                            <div className={`mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-gradient-to-r ${domain.gradient}`} />
-                            <p className="text-sm text-foreground">{detail}</p>
-                          </div>
-                        ))}
-                      </div>
+                    {/* Details — always visible */}
+                    <div className="mt-6 space-y-3">
+                      <div className="h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+                      {domain.details.map((detail, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-start gap-3 rounded-lg border border-border/50 bg-secondary/15 p-3 transition-colors duration-300 hover:border-primary/20 hover:bg-secondary/25"
+                        >
+                          <div className={`mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-gradient-to-r ${domain.gradient}`} />
+                          <p className="text-sm text-foreground">{detail}</p>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
               </AnimatedSection>
-            )
-          })}
+            ))}
+          </div>
         </div>
 
         {/* Bottom CTA */}

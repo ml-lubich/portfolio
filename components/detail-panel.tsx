@@ -88,8 +88,8 @@ export function DetailPanel({ data, isOpen, onClose }: DetailPanelProps) {
       {/* Panel */}
       <div
         ref={panelRef}
-        className={`fixed right-0 top-0 z-50 h-full w-full overflow-y-auto border-l border-border/30 bg-background/95 backdrop-blur-2xl transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] sm:w-[540px] lg:w-[600px] ${
-          isOpen ? "translate-x-0" : "translate-x-full"
+        className={`fixed right-0 top-0 z-50 h-full w-full overflow-y-auto border-l border-border/30 bg-background/95 backdrop-blur-2xl transition-[transform,visibility] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] sm:w-[540px] lg:w-[600px] ${
+          isOpen ? "translate-x-0 visible" : "translate-x-full invisible"
         }`}
         role="dialog"
         aria-modal="true"

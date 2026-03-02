@@ -12,16 +12,16 @@
     --popover-foreground: 210 20% 95%;
     --primary: 217 91% 60%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 220 15% 12%;
+    --secondary: 220 15% 7%;
     --secondary-foreground: 210 20% 85%;
-    --muted: 220 15% 10%;
+    --muted: 220 15% 6%;
     --muted-foreground: 215 15% 55%;
     --accent: 265 80% 65%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 220 15% 14%;
-    --input: 220 15% 14%;
+    --border: 220 15% 9%;
+    --input: 220 15% 9%;
     --ring: 217 91% 60%;
     --chart-1: 217 91% 60%;
     --chart-2: 265 80% 65%;
@@ -45,19 +45,46 @@
 /* Smooth scrolling — native fallback (overridden by JS woosh) */
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;    /* fallback for older browsers */
+  overflow-x: clip;      /* modern: clips without creating scroll container */
+  overscroll-behavior-x: none;  /* prevent horizontal rubber-band / momentum */
+}
+
+body {
+  overflow-x: hidden;    /* fallback */
+  overflow-x: clip;      /* belt-and-suspenders: clip any horizontal bleed */
+  overscroll-behavior-x: none;
+  width: 100%;           /* prevent body from ever expanding beyond viewport */
+  max-width: 100%;       /* hard cap on body width */
 }
 
 /* ── Scroll-snap anchor system ────────────────────────────────── */
-/* Proximity-based: snaps when close to an anchor, free flow otherwise */
+/* Mandatory snapping: locks to each section step-by-step */
 html {
-  scroll-snap-type: y proximity;
+  scroll-snap-type: y mandatory;
+  scroll-padding-top: 80px;
+  /* offset for fixed nav */
 }
 
 /* Each major section is a snap target */
 section[id],
 [data-snap] {
   scroll-snap-align: start;
-  scroll-margin-top: 80px; /* offset for fixed nav */
+  scroll-snap-stop: normal;
+  scroll-margin-top: 80px;
+  /* offset for fixed nav */
+}
+
+/* Short / decorative bands that should NOT be snap targets */
+section[id="partners"] {
+  scroll-snap-align: none;
+  scroll-snap-stop: normal;
+}
+
+/* Snap markers inside stacking-card runways */
+[data-card-snap] {
+  scroll-snap-align: start;
+  scroll-margin-top: 80px;
 }
 
 /* Custom scrollbar */
@@ -70,7 +97,7 @@ section[id],
 }
 
 ::-webkit-scrollbar-thumb {
-  background: hsl(220 15% 20%);
+  background: hsl(220 15% 12%);
   border-radius: 3px;
 }
 
@@ -98,11 +125,11 @@ section[id],
 
 /* ── Navigation glass ─────────────────────────────────────────── */
 .nav-glass {
-  background: hsla(220, 20%, 6%, 0.7);
+  background: hsla(220, 20%, 4%, 0.85);
   backdrop-filter: blur(24px) saturate(1.6);
   -webkit-backdrop-filter: blur(24px) saturate(1.6);
-  border-bottom: 1px solid hsla(220, 15%, 20%, 0.15);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 8px 32px rgba(0, 0, 0, 0.12);
+  border-bottom: 1px solid hsla(220, 15%, 14%, 0.12);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4), 0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
 @keyframes nav-pill-in {
@@ -110,28 +137,30 @@ section[id],
     opacity: 0;
     transform: scale(0.85);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
   }
 }
+
 .animate-nav-pill-in {
   animation: nav-pill-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* Glass morphism */
 .glass {
-  background: hsla(220, 20%, 8%, 0.6);
+  background: hsla(220, 20%, 4%, 0.75);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid hsla(220, 15%, 20%, 0.3);
+  border: 1px solid hsla(220, 15%, 14%, 0.2);
 }
 
 /* Grid background pattern */
 .grid-bg {
   background-image:
-    linear-gradient(hsla(220, 15%, 20%, 0.1) 1px, transparent 1px),
-    linear-gradient(90deg, hsla(220, 15%, 20%, 0.1) 1px, transparent 1px);
+    linear-gradient(hsla(220, 15%, 12%, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, hsla(220, 15%, 12%, 0.08) 1px, transparent 1px);
   background-size: 60px 60px;
 }
 
@@ -190,6 +219,20 @@ section[id],
   }
 }
 
+@keyframes shimmer-sweep {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
 .shimmer {
   background: linear-gradient(90deg,
       transparent 0%,
@@ -211,18 +254,14 @@ section[id],
 /* ── Glass Stack Card effect (used inside ScrollStackCards) ── */
 .glass-stack-card {
   box-shadow:
-    0 4px 24px -4px hsla(0, 0%, 0%, 0.25),
-    0 0 0 1px hsla(0, 0%, 100%, 0.04),
-    inset 0 1px 0 0 hsla(0, 0%, 100%, 0.06),
-    inset 0 -1px 0 0 hsla(0, 0%, 0%, 0.1);
+    0 4px 24px -4px hsla(0, 0%, 0%, 0.4),
+    0 0 0 1px hsla(220, 15%, 12%, 0.15);
 }
 
 .glass-stack-card:hover {
   box-shadow:
-    0 8px 40px -8px hsla(217, 91%, 60%, 0.15),
-    0 0 0 1px hsla(217, 91%, 60%, 0.1),
-    inset 0 1px 0 0 hsla(0, 0%, 100%, 0.08),
-    inset 0 -1px 0 0 hsla(0, 0%, 0%, 0.1);
+    0 8px 40px -8px hsla(217, 91%, 60%, 0.12),
+    0 0 0 1px hsla(217, 91%, 60%, 0.12);
 }
 
 /* ── 3D Glass Card effect ── */
@@ -241,10 +280,13 @@ section[id],
 
 /* ── Translucent glow pulse ── */
 @keyframes translucent-pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 0.4;
     filter: blur(40px);
   }
+
   50% {
     opacity: 0.7;
     filter: blur(50px);
@@ -255,15 +297,41 @@ section[id],
   animation: translucent-pulse 5s ease-in-out infinite;
 }
 
+/* ── Skill tag shine sweep ── */
+@keyframes skill-shine-sweep {
+  0% {
+    background-position: -200% center;
+  }
+
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.skill-tag-shine {
+  background-image: linear-gradient(110deg,
+      transparent 20%,
+      hsla(217, 91%, 60%, 0.15) 40%,
+      hsla(217, 91%, 60%, 0.3) 50%,
+      hsla(217, 91%, 60%, 0.15) 60%,
+      transparent 80%);
+  background-size: 200% 100%;
+  animation: skill-shine-sweep 1.8s ease-in-out infinite;
+  box-shadow:
+    0 0 12px -2px hsla(217, 91%, 60%, 0.3),
+    0 0 24px -4px hsla(217, 91%, 60%, 0.15),
+    inset 0 1px 0 0 hsla(0, 0%, 100%, 0.1);
+}
+
 /* ── Frosted glass panel ── */
 .frosted-panel {
-  background: hsla(220, 20%, 8%, 0.4);
+  background: hsla(220, 20%, 4%, 0.6);
   backdrop-filter: blur(24px) saturate(1.3);
   -webkit-backdrop-filter: blur(24px) saturate(1.3);
-  border: 1px solid hsla(220, 15%, 25%, 0.15);
+  border: 1px solid hsla(220, 15%, 14%, 0.1);
   box-shadow:
-    0 8px 32px -8px hsla(0, 0%, 0%, 0.3),
-    inset 0 1px 0 0 hsla(0, 0%, 100%, 0.04);
+    0 8px 32px -8px hsla(0, 0%, 0%, 0.4),
+    inset 0 1px 0 0 hsla(0, 0%, 100%, 0.02);
 }
 
 /* ── Depth shadow layers (3D pop) ── */
@@ -354,6 +422,135 @@ section[id],
   transform: translateX(0);
   opacity: 1;
   filter: blur(0px);
+}
+
+/* ── AnimatedText — Anthropic-style word/letter reveals ─────── */
+.animated-text-root {
+  display: inline;
+}
+
+.animated-text-space {
+  display: inline;
+  white-space: pre;
+}
+
+/* ─ Shared base for all word variants ─ */
+.animated-text-word {
+  display: inline-block;
+  will-change: transform, opacity, filter;
+}
+
+/* ── blur-slide: Signature Anthropic blur + vertical slide ───── */
+.at-blur-slide {
+  opacity: 0;
+  filter: blur(8px);
+  transform: translateY(12px);
+  transition:
+    opacity var(--at-duration, 700ms) cubic-bezier(0.16, 1, 0.3, 1) var(--at-delay, 0ms),
+    filter var(--at-duration, 700ms) cubic-bezier(0.16, 1, 0.3, 1) var(--at-delay, 0ms),
+    transform var(--at-duration, 700ms) cubic-bezier(0.16, 1, 0.3, 1) var(--at-delay, 0ms);
+}
+
+.at-blur-slide[data-visible="true"] {
+  opacity: 1;
+  filter: blur(0px);
+  transform: translateY(0);
+}
+
+/* ── fade-up: Classic opacity + rise ─────────────────────────── */
+.at-fade-up {
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity var(--at-duration, 700ms) cubic-bezier(0.16, 1, 0.3, 1) var(--at-delay, 0ms),
+    transform var(--at-duration, 700ms) cubic-bezier(0.16, 1, 0.3, 1) var(--at-delay, 0ms);
+}
+
+.at-fade-up[data-visible="true"] {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── letter-rise: Per-character rise ─────────────────────────── */
+.at-letter-rise {
+  opacity: 0;
+  transform: translateY(100%) rotateX(45deg);
+  transition:
+    opacity var(--at-duration, 600ms) cubic-bezier(0.16, 1, 0.3, 1) var(--at-delay, 0ms),
+    transform var(--at-duration, 600ms) cubic-bezier(0.16, 1, 0.3, 1) var(--at-delay, 0ms);
+}
+
+.at-letter-rise[data-visible="true"] {
+  opacity: 1;
+  transform: translateY(0) rotateX(0deg);
+}
+
+/* ── gradient-fill: Words appear with gradient sweep ─────────── */
+.at-gradient-fill {
+  opacity: 0;
+  filter: blur(4px);
+  transform: translateY(8px) scale(0.97);
+  transition:
+    opacity var(--at-duration, 700ms) cubic-bezier(0.16, 1, 0.3, 1) var(--at-delay, 0ms),
+    filter var(--at-duration, 700ms) cubic-bezier(0.16, 1, 0.3, 1) var(--at-delay, 0ms),
+    transform var(--at-duration, 700ms) cubic-bezier(0.16, 1, 0.3, 1) var(--at-delay, 0ms);
+}
+
+.at-gradient-fill[data-visible="true"] {
+  opacity: 1;
+  filter: blur(0px);
+  transform: translateY(0) scale(1);
+}
+
+/* ── AnimatedLetters — Per-character animation ───────────────── */
+.animated-letters-root {
+  display: inline;
+  overflow: hidden;
+}
+
+.animated-letter {
+  display: inline-block;
+  opacity: 0;
+  filter: blur(6px);
+  transform: translateY(40%) scale(0.8);
+  transition:
+    opacity var(--al-duration, 600ms) cubic-bezier(0.22, 1, 0.36, 1) var(--al-delay, 0ms),
+    filter var(--al-duration, 600ms) cubic-bezier(0.22, 1, 0.36, 1) var(--al-delay, 0ms),
+    transform var(--al-duration, 600ms) cubic-bezier(0.22, 1, 0.36, 1) var(--al-delay, 0ms);
+  will-change: transform, opacity, filter;
+}
+
+.animated-letter[data-visible="true"] {
+  opacity: 1;
+  filter: blur(0px);
+  transform: translateY(0) scale(1);
+}
+
+/* ── Gradient text shimmer effect for animated sections ──────── */
+@keyframes gradient-shimmer {
+  0% {
+    background-position: 200% center;
+  }
+
+  100% {
+    background-position: -200% center;
+  }
+}
+
+.gradient-text-animated {
+  background: linear-gradient(90deg,
+      hsl(217 91% 60%) 0%,
+      hsl(265 80% 65%) 25%,
+      hsl(217 91% 70%) 50%,
+      hsl(265 80% 65%) 75%,
+      hsl(217 91% 60%) 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+  animation: gradient-shimmer 4s ease-in-out infinite;
+  animation-delay: 1s;
 }
 
 /* Glitch effect */
@@ -578,10 +775,10 @@ section[id],
 /* ──────────────────────────────────────────── */
 .blog-glass-card {
   position: relative;
-  background: hsla(220, 20%, 6%, 0.5);
+  background: hsla(220, 20%, 4%, 0.65);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid hsla(220, 15%, 25%, 0.12);
+  border: 1px solid hsla(220, 15%, 14%, 0.08);
   will-change: transform;
 }
 
@@ -629,6 +826,7 @@ section[id],
     opacity: 0;
     transform: translateY(16px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -641,14 +839,37 @@ section[id],
   animation-delay: inherit;
 }
 
-.panel-stagger:nth-child(1) { animation-delay: 100ms; }
-.panel-stagger:nth-child(2) { animation-delay: 180ms; }
-.panel-stagger:nth-child(3) { animation-delay: 260ms; }
-.panel-stagger:nth-child(4) { animation-delay: 340ms; }
-.panel-stagger:nth-child(5) { animation-delay: 420ms; }
-.panel-stagger:nth-child(6) { animation-delay: 500ms; }
-.panel-stagger:nth-child(7) { animation-delay: 580ms; }
-.panel-stagger:nth-child(8) { animation-delay: 660ms; }
+.panel-stagger:nth-child(1) {
+  animation-delay: 100ms;
+}
+
+.panel-stagger:nth-child(2) {
+  animation-delay: 180ms;
+}
+
+.panel-stagger:nth-child(3) {
+  animation-delay: 260ms;
+}
+
+.panel-stagger:nth-child(4) {
+  animation-delay: 340ms;
+}
+
+.panel-stagger:nth-child(5) {
+  animation-delay: 420ms;
+}
+
+.panel-stagger:nth-child(6) {
+  animation-delay: 500ms;
+}
+
+.panel-stagger:nth-child(7) {
+  animation-delay: 580ms;
+}
+
+.panel-stagger:nth-child(8) {
+  animation-delay: 660ms;
+}
 
 /* ──────────────────────────────────────────── */
 /*  Architecture diagram animations            */
@@ -658,6 +879,7 @@ section[id],
     stroke-dashoffset: 200;
     opacity: 0;
   }
+
   to {
     stroke-dashoffset: 0;
     opacity: 1;
@@ -669,6 +891,7 @@ section[id],
     opacity: 0;
     transform: scale(0.6);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -676,18 +899,26 @@ section[id],
 }
 
 @keyframes diagram-ring-pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 0.2;
     r: inherit;
   }
+
   50% {
     opacity: 0.5;
   }
 }
 
 @keyframes diagram-particle-flow {
-  from { opacity: 0; }
-  to { opacity: 0.8; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 0.8;
+  }
 }
 
 .diagram-edge {

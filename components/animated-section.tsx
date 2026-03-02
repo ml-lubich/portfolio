@@ -84,9 +84,8 @@ export function AnimatedSection({
       className={`will-change-transform ${className}`}
       style={{
         opacity: isVisible ? 1 : 0,
-        transform: `perspective(1200px) translateY(${
-          isVisible ? parallaxY : 32
-        }px) rotateX(${rotateX}deg) scale(${scaleVal})`,
+        transform: `perspective(1200px) translateY(${isVisible ? parallaxY : 32
+          }px) rotateX(${rotateX}deg) scale(${scaleVal})`,
         transformOrigin: "center bottom",
         transition: isVisible
           ? "opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1)"

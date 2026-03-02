@@ -122,7 +122,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="font-sans antialiased font-light">
+      <body className="font-sans antialiased font-light overflow-x-hidden">
         {/* Skip to main content — accessibility */}
         <a
           href="#main-content"

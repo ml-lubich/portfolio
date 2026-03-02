@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react"
 import { Sparkles, ChevronRight, ArrowRight } from "lucide-react"
 import { DetailPanel, type DetailPanelData } from "./detail-panel"
-import { ScrollStackCards } from "./scroll-stack-cards"
+import { ScrollStackSection } from "./scroll-stack-section"
 
 const projects: {
   id: string
@@ -253,41 +253,31 @@ export function Projects() {
   const isOpen = selected !== null
 
   return (
-    <section id="projects" className="relative py-14 sm:py-20 overflow-hidden">
-      {/* Background FX */}
-      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-        <div className="absolute left-1/4 top-20 h-[500px] w-[500px] rounded-full bg-accent/5 blur-[120px]" />
-        <div className="absolute right-1/4 bottom-20 h-[400px] w-[400px] rounded-full bg-primary/5 blur-[100px]" />
-      </div>
-
-      <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
-        {/* Section header */}
-        <div className="mb-12 text-center">
-          <span className="inline-block font-mono text-xs uppercase tracking-[0.25em] text-primary">
-            Featured Projects
-          </span>
-          <h2 className="mt-4 font-display text-3xl font-light text-foreground sm:text-4xl lg:text-5xl text-balance">
-            Innovative solutions that{" "}
-            <span className="gradient-text">drive real-world impact</span>
-          </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground">
-            Click any project to explore architecture, tech stack, and animated system diagrams.
-          </p>
-        </div>
-
-        {/* Stacking glass cards with 3D scroll effect */}
-        <ScrollStackCards
-          cards={projects.map((project) => ({
+    <ScrollStackSection
+      id="projects"
+      label="Featured Projects"
+      title={<>Innovative solutions that{" "}<span className="gradient-text">drive real-world impact</span></>}
+      subtitle="Click any project to explore architecture, tech stack, and animated system diagrams."
+      className="overflow-clip"
+      bgEffects={
+        <>
+          <div className="absolute left-1/4 top-20 h-[500px] w-[500px] rounded-full bg-accent/5 blur-[120px]" />
+          <div className="absolute right-1/4 bottom-20 h-[400px] w-[400px] rounded-full bg-primary/5 blur-[100px]" />
+        </>
+      }
+      stickyTop={90}
+      stackOffset={16}
+      scrollPerCard={55}
+      perspective={1200}
+      cards={projects.map((project) => ({
             id: project.id,
             children: (
               <button
                 onClick={() => handleSelect(project.id)}
-                className={`glass-stack-card group relative w-full overflow-hidden rounded-2xl border text-left transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-                  selectedId === project.id
-                    ? "border-primary/40 bg-white/[0.08] dark:bg-white/[0.06] shadow-[0_0_40px_-8px] shadow-primary/20"
-                    : "border-white/[0.08] bg-white/[0.04] dark:bg-white/[0.03] hover:border-white/[0.15] hover:bg-white/[0.07]"
-                }`}
-                style={{ backdropFilter: "blur(20px) saturate(1.4)", WebkitBackdropFilter: "blur(20px) saturate(1.4)" }}
+                className={`glass-stack-card group relative w-full overflow-hidden rounded-2xl border text-left transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${selectedId === project.id
+                    ? "border-primary/40 bg-card shadow-[0_0_40px_-8px] shadow-primary/20"
+                    : "border-border/40 bg-card hover:border-primary/30"
+                  }`}
               >
                 {/* Top gradient accent strip */}
                 <div className={`h-1 w-full bg-gradient-to-r ${project.gradient} ${selectedId === project.id ? "opacity-100" : "opacity-60 group-hover:opacity-90"} transition-opacity duration-500`} />
@@ -327,7 +317,7 @@ export function Projects() {
                     </div>
 
                     {/* Explore CTA */}
-                    <div className="hidden shrink-0 items-center gap-1.5 self-start rounded-lg border border-white/[0.08] bg-white/[0.04] px-3.5 py-2 text-xs font-medium text-muted-foreground/70 opacity-0 backdrop-blur-sm transition-all duration-300 group-hover:opacity-100 group-hover:text-primary sm:flex">
+                    <div className="hidden shrink-0 items-center gap-1.5 self-start rounded-lg border border-border/50 bg-secondary px-3.5 py-2 text-xs font-medium text-muted-foreground/70 opacity-0 transition-all duration-300 group-hover:opacity-100 group-hover:text-primary sm:flex">
                       <span>Explore</span>
                       <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
                     </div>
@@ -354,7 +344,7 @@ export function Projects() {
                   {project.detail.metrics && (
                     <div className="mt-5 flex gap-4">
                       {project.detail.metrics.map((m) => (
-                        <div key={m.label} className="rounded-lg border border-white/[0.06] bg-white/[0.03] px-3 py-2">
+                        <div key={m.label} className="rounded-lg border border-border/50 bg-secondary px-3 py-2">
                           <p className="text-xs text-muted-foreground/50">{m.label}</p>
                           <p className="mt-0.5 text-sm font-bold text-primary">{m.value}</p>
                         </div>
@@ -367,7 +357,7 @@ export function Projects() {
                     {project.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="rounded-full border border-white/[0.06] bg-white/[0.04] px-3 py-1 font-mono text-[10px] text-muted-foreground/60 transition-colors group-hover:border-white/[0.12] group-hover:text-muted-foreground/80"
+                        className="rounded-full border border-border/50 bg-secondary px-3 py-1 font-mono text-[10px] text-muted-foreground/60 transition-colors group-hover:border-primary/30 group-hover:text-muted-foreground/80"
                       >
                         {tag}
                       </span>
@@ -380,19 +370,13 @@ export function Projects() {
               </button>
             ),
           }))}
-          stickyTop={90}
-          stackOffset={16}
-          scrollPerCard={55}
-          perspective={1200}
-        />
-      </div>
-
+    >
       {/* Detail panel */}
       <DetailPanel
         data={selected?.detail ?? null}
         isOpen={isOpen}
         onClose={handleClose}
       />
-    </section>
+    </ScrollStackSection>
   )
 }

@@ -1,9 +1,12 @@
 "use client"
 
+import { useState } from "react"
 import dynamic from "next/dynamic"
 import { AnimatedSection } from "./animated-section"
 import { AnimatedBars } from "./animated-bars"
 import { getSkillIcon } from "./skill-icons"
+import { CodeParticles } from "./code-particles"
+import { SectionHeader } from "./section-header"
 
 const ParticleField = dynamic(
   () => import("./scene-backgrounds").then((mod) => mod.ParticleField),
@@ -48,6 +51,39 @@ const proficiencyBars = [
   { label: "Rust / Go / C++", value: 72, display: "Proficient", gradient: "from-accent to-primary" },
 ]
 
+function SkillTag({ item, idx }: { item: string; idx: number }) {
+  const [hovered, setHovered] = useState(false)
+  const icon = getSkillIcon(item)
+
+  return (
+    <span
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className={`group/tag relative inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 font-mono text-xs transition-all duration-300 animate-slide-up cursor-default
+        ${hovered
+          ? "border-primary/60 bg-primary/10 text-foreground shadow-lg shadow-primary/20 scale-110 skill-tag-shine"
+          : "border-border bg-secondary/50 text-muted-foreground hover:scale-105 hover:border-primary/40 hover:bg-secondary hover:text-foreground hover:shadow-md hover:shadow-primary/10"
+        }`}
+      style={{ animationDelay: `${idx * 50}ms`, opacity: 0 }}
+    >
+      {icon && (
+        <span className={`transition-opacity ${hovered ? "opacity-100" : "opacity-60 group-hover/tag:opacity-100"}`}>
+          {icon}
+        </span>
+      )}
+      {item}
+
+      {/* Glow ring */}
+      {hovered && (
+        <span className="pointer-events-none absolute inset-0 rounded-lg ring-1 ring-primary/40 animate-pulse" />
+      )}
+
+      {/* Code particles */}
+      <CodeParticles skill={item} isHovered={hovered} />
+    </span>
+  )
+}
+
 export function Skills() {
   return (
     <AnimatedSection id="skills" className="relative py-14 sm:py-20 overflow-hidden">
@@ -63,24 +99,15 @@ export function Skills() {
       </div>
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
-        {/* Section header */}
-        <div className="mb-10 text-center">
-          <span className="inline-block font-mono text-xs uppercase tracking-widest text-primary animate-fade-in">
-            Technical Skills
-          </span>
-          <h2 className="mt-4 font-display text-3xl font-light text-foreground sm:text-4xl lg:text-5xl text-balance animate-fade-in-up" style={{ animationDelay: "0.1s", opacity: 0 }}>
-            Comprehensive expertise across the{" "}
-            <span className="gradient-text">full technology stack</span>
-          </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground animate-fade-in-up" style={{ animationDelay: "0.2s", opacity: 0 }}>
-            Deep proficiency in modern AI/ML frameworks, cloud infrastructure, and full-stack development
-            with a focus on building production-grade scalable systems.
-          </p>
-        </div>
+        <SectionHeader
+          label="Technical Skills"
+          title={<>Comprehensive expertise across the{" "}<span className="gradient-text">full technology stack</span></>}
+          subtitle="Deep proficiency in modern AI/ML frameworks, cloud infrastructure, and full-stack development with a focus on building production-grade scalable systems."
+        />
 
         {/* Proficiency bars */}
         <AnimatedSection delay={100}>
-          <div className="mb-12 rounded-2xl border border-white/[0.08] bg-card/50 p-8 backdrop-blur-xl frosted-panel">
+          <div className="mb-12 rounded-2xl border border-white/[0.04] bg-card/25 p-8 backdrop-blur-xl frosted-panel">
             <h3 className="mb-6 text-lg font-bold text-foreground">Overall Proficiency</h3>
             <AnimatedBars bars={proficiencyBars} duration={1600} stagger={120} />
           </div>
@@ -90,9 +117,9 @@ export function Skills() {
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {skillCategories.map((cat, i) => (
             <AnimatedSection key={cat.category} delay={i * 80}>
-              <div className="group relative h-full overflow-hidden rounded-2xl border border-white/[0.08] bg-card/50 backdrop-blur-xl p-6 transition-all duration-500 hover:border-primary/40 hover:bg-card/80 glass-card-3d">
+              <div className="group relative h-full overflow-hidden rounded-2xl border border-white/[0.04] bg-card/25 backdrop-blur-xl p-6 transition-all duration-500 hover:border-primary/40 hover:bg-card/50 glass-card-3d">
                 {/* Top edge reflection */}
-                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/8 to-transparent" />
                 {/* Gradient overlay on hover */}
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/0 via-accent/0 to-primary/0 opacity-0 transition-opacity duration-500 group-hover:from-primary/5 group-hover:via-accent/5 group-hover:to-primary/5 group-hover:opacity-100" />
 
@@ -104,19 +131,9 @@ export function Skills() {
                     {cat.category}
                   </h3>
                   <div className="flex flex-wrap gap-2">
-                    {cat.items.map((item, idx) => {
-                      const icon = getSkillIcon(item)
-                      return (
-                        <span
-                          key={item}
-                          className="group/tag inline-flex items-center gap-1.5 rounded-lg border border-border bg-secondary/50 px-3 py-1.5 font-mono text-xs text-muted-foreground transition-all duration-300 hover:scale-105 hover:border-primary/40 hover:bg-secondary hover:text-foreground hover:shadow-md hover:shadow-primary/10 animate-slide-up"
-                          style={{ animationDelay: `${idx * 50}ms`, opacity: 0 }}
-                        >
-                          {icon && <span className="opacity-60 group-hover/tag:opacity-100 transition-opacity">{icon}</span>}
-                          {item}
-                        </span>
-                      )
-                    })}
+                    {cat.items.map((item, idx) => (
+                      <SkillTag key={item} item={item} idx={idx} />
+                    ))}
                   </div>
                 </div>
 

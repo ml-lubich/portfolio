@@ -4,7 +4,6 @@ import { useRef, useCallback, useEffect, useState } from "react"
 import {
     SiApple,
     SiHonda,
-    SiWalmart,
 } from "react-icons/si"
 import { GraduationCap, FlaskConical, Brain } from "lucide-react"
 
@@ -14,6 +13,24 @@ import { GraduationCap, FlaskConical, Brain } from "lucide-react"
  *  Placed directly below the Hero section.
  * ────────────────────────────────────────────────────────────────────── */
 
+/** Walmart Spark — the 6-pointed starburst mark */
+function WalmartSpark({ className }: { className?: string }) {
+    return (
+        <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+            {[0, 60, 120, 180, 240, 300].map((angle) => (
+                <ellipse
+                    key={angle}
+                    cx="12"
+                    cy="4.5"
+                    rx="1.8"
+                    ry="4"
+                    transform={`rotate(${angle} 12 12)`}
+                />
+            ))}
+        </svg>
+    )
+}
+
 interface Logo {
     name: string
     icon: React.ReactNode
@@ -22,7 +39,7 @@ interface Logo {
 const LOGOS: Logo[] = [
     { name: "Braintrust Data", icon: <Brain className="h-7 w-7 sm:h-8 sm:w-8" /> },
     { name: "Apple", icon: <SiApple className="h-7 w-7 sm:h-8 sm:w-8" /> },
-    { name: "Walmart", icon: <SiWalmart className="h-7 w-7 sm:h-8 sm:w-8" /> },
+    { name: "Walmart", icon: <WalmartSpark className="h-7 w-7 sm:h-8 sm:w-8" /> },
     { name: "Lawrence Berkeley Lab", icon: <FlaskConical className="h-7 w-7 sm:h-8 sm:w-8" /> },
     { name: "Honda Innovations", icon: <SiHonda className="h-7 w-7 sm:h-8 sm:w-8" /> },
     { name: "UC Berkeley", icon: <GraduationCap className="h-7 w-7 sm:h-8 sm:w-8" /> },
@@ -33,7 +50,7 @@ const AUTO_SPEED = 40
 
 function LogoItem({ logo }: { logo: Logo }) {
     return (
-        <div className="flex flex-shrink-0 items-center gap-2.5 px-6 sm:px-8 text-muted-foreground/40 transition-colors duration-300 hover:text-muted-foreground/70 select-none">
+        <div className="flex flex-shrink-0 items-center gap-2.5 px-6 sm:px-8 text-muted-foreground/50 transition-colors duration-300 hover:text-muted-foreground/90 select-none">
             {logo.icon}
             <span className="whitespace-nowrap text-xs font-medium tracking-wide uppercase sm:text-sm">
                 {logo.name}
@@ -142,17 +159,18 @@ export function LogoScroll() {
 
     return (
         <section
-            className="relative w-full overflow-hidden border-b border-border/40 bg-background/80 backdrop-blur-sm py-6 sm:py-8"
+            id="partners"
+            className="relative w-full overflow-hidden border-b border-border/40 bg-background/40 backdrop-blur-sm py-6 sm:py-8"
             aria-label="Companies and institutions"
         >
             {/* Heading */}
             <p className="mb-5 text-center text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground/50 sm:text-sm">
-                Where I&apos;ve worked
+                Trusted & partnered with:
             </p>
 
             {/* Fade edges */}
-            <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-background to-transparent sm:w-32" />
-            <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-background to-transparent sm:w-32" />
+            <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-background/60 to-transparent sm:w-32" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-background/60 to-transparent sm:w-32" />
 
             {/* Draggable scrolling track */}
             <div

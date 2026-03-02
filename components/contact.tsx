@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic"
 import { Mail, Phone, MapPin, Calendar, Linkedin, Github, GraduationCap, FileText } from "lucide-react"
 import { AnimatedSection } from "./animated-section"
+import { SectionHeader } from "./section-header"
 
 const ParticleField = dynamic(
   () => import("./scene-backgrounds").then((mod) => mod.ParticleField),
@@ -46,19 +47,11 @@ export function Contact() {
       </div>
 
       <div className="relative mx-auto max-w-4xl px-6">
-        {/* Section header */}
-        <div className="mb-10 text-center">
-          <span className="font-mono text-xs uppercase tracking-widest text-primary">
-            {"Let's Connect"}
-          </span>
-          <h2 className="mt-4 font-display text-3xl font-light text-foreground sm:text-4xl text-balance">
-            Ready to collaborate on{" "}
-            <span className="gradient-text">innovative projects</span>
-          </h2>
-          <p className="mx-auto mt-4 max-w-lg text-base text-muted-foreground">
-            {"Ready to collaborate on innovative projects and drive technical excellence"}
-          </p>
-        </div>
+        <SectionHeader
+          label="Let's Connect"
+          title={<>Ready to collaborate on{" "}<span className="gradient-text">innovative projects</span></>}
+          subtitle="Ready to collaborate on innovative projects and drive technical excellence"
+        />
 
         <div className="grid gap-6 sm:grid-cols-2">
           {/* Contact info */}

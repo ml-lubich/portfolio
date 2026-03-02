@@ -12,13 +12,14 @@ const About = dynamic(() => import("@/components/about").then(m => m.About))
 const Journey = dynamic(() => import("@/components/journey").then(m => m.Journey))
 const Projects = dynamic(() => import("@/components/projects").then(m => m.Projects))
 const Skills = dynamic(() => import("@/components/skills").then(m => m.Skills))
+const GitHubStats = dynamic(() => import("@/components/github-stats").then(m => m.GitHubStats))
 const Publications = dynamic(() => import("@/components/publications").then(m => m.Publications))
 const Contact = dynamic(() => import("@/components/contact").then(m => m.Contact))
 const Footer = dynamic(() => import("@/components/footer").then(m => m.Footer))
 
 export default function Home() {
   return (
-    <main id="main-content" className="relative min-h-screen bg-background" role="main">
+    <main id="main-content" className="relative min-h-screen max-w-full overflow-x-clip bg-background" role="main">
       <Navigation />
       <Hero />
       <LogoScroll />
@@ -43,6 +44,9 @@ export default function Home() {
       </LazySection>
       <LazySection>
         <Skills />
+      </LazySection>
+      <LazySection>
+        <GitHubStats />
       </LazySection>
       <LazySection>
         <Publications />

@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react"
 import { BookOpen, ExternalLink, X, ChevronRight, Beaker, BarChart3, Brain, Lightbulb, Target } from "lucide-react"
 import { AnimatedSection } from "./animated-section"
-import { ScrollStackCards } from "./scroll-stack-cards"
+import { ScrollStackSection } from "./scroll-stack-section"
 
 
 /* ── Paper data with links and research insights ─────────────────────── */
@@ -231,7 +231,7 @@ function InsightPanel({
         role="dialog"
         aria-modal="true"
         aria-label={`Research insights: ${paper.title}`}
-        className={`fixed right-0 top-0 z-50 flex h-full w-full max-w-lg flex-col overflow-y-auto border-l border-border bg-card/95 backdrop-blur-xl shadow-2xl transition-transform duration-350 ease-out ${visible ? "translate-x-0" : "translate-x-full"}`}
+        className={`fixed right-0 top-0 z-50 flex h-full w-full max-w-lg flex-col overflow-y-auto border-l border-border bg-card/95 backdrop-blur-xl shadow-2xl transition-[transform,visibility] duration-350 ease-out ${visible ? "translate-x-0 visible" : "translate-x-full invisible"}`}
       >
         {/* Header */}
         <div className="sticky top-0 z-10 border-b border-border bg-card/90 backdrop-blur-md p-5">
@@ -370,32 +370,23 @@ export function Publications() {
   }, [])
 
   return (
-    <section id="research" className="relative py-14 sm:py-20">
-      {/* Background gradient blobs */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-        <div className="absolute left-1/3 top-20 h-[500px] w-[500px] rounded-full bg-primary/5 blur-[120px]" />
-        <div className="absolute right-1/3 bottom-20 h-[400px] w-[400px] rounded-full bg-accent/5 blur-[100px]" />
-      </div>
-
-      <div className="relative mx-auto max-w-5xl px-4 sm:px-6">
-        {/* Section header */}
-        <AnimatedSection className="mb-12 text-center">
-          <span className="inline-block font-mono text-xs uppercase tracking-[0.25em] text-primary">
-            Research Publications
-          </span>
-          <h2 className="mt-4 font-display text-3xl font-light text-foreground sm:text-4xl lg:text-5xl text-balance">
-            Contributing to{" "}
-            <span className="gradient-text">ML &amp; environmental science</span>
-          </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground">
-            6 peer-reviewed publications in machine learning for hydrology and
-            environmental science. Click any paper to explore the research.
-          </p>
-        </AnimatedSection>
-
-        {/* Publication stacking cards */}
-        <ScrollStackCards
-          cards={papers.map((paper, i) => {
+    <ScrollStackSection
+      id="research"
+      label="Research Publications"
+      title={<>Contributing to{" "}<span className="gradient-text">ML &amp; environmental science</span></>}
+      subtitle="6 peer-reviewed publications in machine learning for hydrology and environmental science. Click any paper to explore the research."
+      maxWidth="max-w-5xl"
+      bgEffects={
+        <>
+          <div className="absolute left-1/3 top-20 h-[500px] w-[500px] rounded-full bg-primary/5 blur-[120px]" />
+          <div className="absolute right-1/3 bottom-20 h-[400px] w-[400px] rounded-full bg-accent/5 blur-[100px]" />
+        </>
+      }
+      stickyTop={90}
+      stackOffset={12}
+      scrollPerCard={42}
+      perspective={1200}
+      cards={papers.map((paper, i) => {
             const gradient = gradients[i % gradients.length]
             const accent = accents[i % accents.length]
             const number = String(i + 1).padStart(2, "0")
@@ -469,13 +460,9 @@ export function Publications() {
               ),
             }
           })}
-          stickyTop={90}
-          stackOffset={12}
-          scrollPerCard={42}
-          perspective={1200}
-        />
-
-        {/* Google Scholar link */}
+    >
+      {/* Google Scholar link */}
+      <div className="relative mx-auto max-w-5xl px-4 sm:px-6">
         <AnimatedSection delay={600} className="mt-10 text-center">
           <a
             href="https://scholar.google.com/citations?hl=en&user=Be6ZA78AAAAJ"
@@ -491,6 +478,6 @@ export function Publications() {
 
       {/* ★ Animated insight panel */}
       <InsightPanel paper={selectedPaper} onClose={handleClose} />
-    </section>
+    </ScrollStackSection>
   )
 }

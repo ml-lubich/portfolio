@@ -4,6 +4,7 @@ import { GraduationCap, BookOpen, Users, Code2, Award, Briefcase } from "lucide-
 import dynamic from "next/dynamic"
 import { AnimatedSection } from "./animated-section"
 import { AnimatedCounter } from "./animated-counter"
+import { SectionHeader } from "./section-header"
 
 const TerminalReveal = dynamic(
   () => import("./terminal-reveal").then((mod) => mod.TerminalReveal),
@@ -83,21 +84,11 @@ export function About() {
       </div>
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
-        {/* Section header */}
-        <div className="mb-10 text-center">
-          <span className="inline-block font-mono text-xs uppercase tracking-widest text-primary animate-fade-in">
-            About Me
-          </span>
-          <h2 className="mt-4 font-display text-3xl font-light text-foreground sm:text-4xl lg:text-5xl text-balance animate-fade-in-up" style={{ animationDelay: "0.1s", opacity: 0 }}>
-            Building at the intersection of{" "}
-            <span className="gradient-text">AI and Engineering</span>
-          </h2>
-          <p className="mx-auto mt-6 max-w-3xl text-base leading-relaxed text-muted-foreground sm:text-lg animate-fade-in-up" style={{ animationDelay: "0.2s", opacity: 0 }}>
-            Senior Software Engineer specializing in AI-driven, cloud-native applications.
-            Led the design and deployment of a production AI platform with multi-agent orchestration
-            and RAG pipelines, achieving sub-second latency for millions of users.
-          </p>
-        </div>
+        <SectionHeader
+          label="About Me"
+          title={<>Building at the intersection of{" "}<span className="gradient-text">AI and Engineering</span></>}
+          subtitle="Senior Software Engineer specializing in AI-driven, cloud-native applications. Led the design and deployment of a production AI platform with multi-agent orchestration and RAG pipelines, achieving sub-second latency for millions of users."
+        />
 
         {/* Bio — terminal style */}
         <div className="mx-auto mb-10 max-w-4xl">
@@ -121,9 +112,9 @@ export function About() {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {highlights.map((item, i) => (
             <AnimatedSection key={item.title} delay={i * 80}>
-              <div className="group relative h-full overflow-hidden rounded-2xl border border-white/[0.08] bg-card/50 backdrop-blur-xl transition-all duration-500 hover:border-primary/40 hover:bg-card/80 glass-card-3d">
+              <div className="group relative h-full overflow-hidden rounded-2xl border border-white/[0.04] bg-card/25 backdrop-blur-xl transition-all duration-500 hover:border-primary/40 hover:bg-card/50 glass-card-3d">
                 {/* Top edge reflection */}
-                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/8 to-transparent" />
                 {/* Gradient background on hover */}
                 <div className={`absolute inset-0 bg-gradient-to-br ${item.gradient} opacity-0 transition-opacity duration-500 group-hover:opacity-100`} />
 

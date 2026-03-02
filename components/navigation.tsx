@@ -4,6 +4,27 @@ import { useState, useEffect, useRef, useCallback, useMemo } from "react"
 import { Menu, X, ChevronUp } from "lucide-react"
 import { AnimatedName } from "./animated-name"
 
+/* ── Anthropic-style expanding text (character wave on hover) ── */
+function ExpandingText({ text, className }: { text: string; className?: string }) {
+  const chars = text.split("")
+  return (
+    <span className={`inline-flex ${className ?? ""}`} aria-label={text}>
+      {chars.map((char, i) => (
+        <span
+          key={`${char}-${i}`}
+          className="inline-block transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover/link:translate-y-[-1px] group-hover/link:scale-[1.08]"
+          style={{
+            transitionDelay: `${i * 25}ms`,
+            ...(char === " " ? { width: "0.25em" } : {}),
+          }}
+        >
+          {char === " " ? "\u00A0" : char}
+        </span>
+      ))}
+    </span>
+  )
+}
+
 /* ── Navigation links ─────────────────────────────────────────── */
 const navLinks = [
   { label: "AI Expertise", href: "#ai-expertise" },
@@ -77,33 +98,50 @@ function useActiveSection(sectionIds: string[]) {
   const [activeId, setActiveId] = useState("")
 
   useEffect(() => {
-    const observers: IntersectionObserver[] = []
     const visibleRatios = new Map<string, number>()
+    const observerMap = new Map<string, IntersectionObserver>()
 
-    sectionIds.forEach((id) => {
+    function updateBest() {
+      let best = ""
+      let bestRatio = 0
+      visibleRatios.forEach((ratio, sId) => {
+        if (ratio > bestRatio) {
+          bestRatio = ratio
+          best = sId
+        }
+      })
+      if (best) setActiveId(best)
+    }
+
+    function observeSection(id: string) {
+      if (observerMap.has(id)) return
       const el = document.getElementById(id)
       if (!el) return
 
       const observer = new IntersectionObserver(
         ([entry]) => {
           visibleRatios.set(id, entry.intersectionRatio)
-          let best = ""
-          let bestRatio = 0
-          visibleRatios.forEach((ratio, sId) => {
-            if (ratio > bestRatio) {
-              bestRatio = ratio
-              best = sId
-            }
-          })
-          if (best) setActiveId(best)
+          updateBest()
         },
         { threshold: [0, 0.1, 0.2, 0.3, 0.5, 0.7, 1] },
       )
       observer.observe(el)
-      observers.push(observer)
-    })
+      observerMap.set(id, observer)
+    }
 
-    return () => observers.forEach((o) => o.disconnect())
+    // Observe sections that already exist
+    sectionIds.forEach(observeSection)
+
+    // Watch for lazily-rendered sections appearing in the DOM
+    const mutation = new MutationObserver(() => {
+      sectionIds.forEach(observeSection)
+    })
+    mutation.observe(document.body, { childList: true, subtree: true })
+
+    return () => {
+      mutation.disconnect()
+      observerMap.forEach((o) => o.disconnect())
+    }
   }, [sectionIds])
 
   return activeId
@@ -254,7 +292,7 @@ export function Navigation() {
                   href={link.href}
                   onClick={(e) => handleLinkClick(e, link.href)}
                   className={[
-                    "relative rounded-full px-3.5 py-1.5 text-[13px] tracking-wide transition-all duration-300",
+                    "group/link relative rounded-full px-3.5 py-1.5 text-[13px] tracking-wide transition-all duration-300",
                     isActive
                       ? "text-foreground font-medium"
                       : "text-muted-foreground hover:text-foreground",
@@ -263,19 +301,22 @@ export function Navigation() {
                   {/* Active pill background */}
                   {isActive && (
                     <span
-                      className="absolute inset-0 rounded-full bg-white/[0.08] border border-white/[0.06] animate-nav-pill-in"
+                      className="absolute inset-0 rounded-full bg-white/[0.04] border border-white/[0.03] animate-nav-pill-in"
                     />
                   )}
-                  <span className="relative z-10">{link.label}</span>
+                  <span className="relative z-10">
+                    <ExpandingText text={link.label} />
+                  </span>
                 </a>
               )
             })}
             <a
               href="#contact"
               onClick={(e) => handleLinkClick(e, "#contact")}
-              className="ml-3 rounded-full bg-gradient-to-r from-primary to-accent px-4 py-1.5 text-[13px] font-medium text-primary-foreground transition-all duration-300 hover:shadow-lg hover:shadow-primary/25 hover:scale-[1.03] active:scale-[0.97]"
+              aria-label="Get In Touch"
+              className="group/link ml-3 rounded-full bg-gradient-to-r from-primary to-accent px-4 py-1.5 text-[13px] font-medium text-primary-foreground transition-all duration-300 hover:shadow-lg hover:shadow-primary/25 hover:scale-[1.03] active:scale-[0.97]"
             >
-              Get In Touch
+              <ExpandingText text="Get In Touch" />
             </a>
           </div>
 
@@ -304,7 +345,7 @@ export function Navigation() {
             mobileOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0",
           ].join(" ")}
         >
-          <div className="nav-glass mx-4 mt-2 rounded-2xl p-3 border border-white/[0.06]">
+          <div className="nav-glass mx-4 mt-2 rounded-2xl p-3 border border-white/[0.03]">
             <div className="flex flex-col gap-0.5">
               {navLinks.map((link) => {
                 const isActive = activeSection === link.href.replace("#", "")
@@ -313,14 +354,15 @@ export function Navigation() {
                     key={link.href}
                     href={link.href}
                     onClick={(e) => handleLinkClick(e, link.href)}
+                    aria-label={link.label}
                     className={[
-                      "rounded-xl px-4 py-3 text-sm transition-all duration-300",
+                      "group/link rounded-xl px-4 py-3 text-sm transition-all duration-300",
                       isActive
-                        ? "text-foreground font-medium bg-white/[0.06] border-l-2 border-primary"
-                        : "text-muted-foreground hover:text-foreground hover:bg-white/[0.04]",
+                        ? "text-foreground font-medium bg-white/[0.03] border-l-2 border-primary"
+                        : "text-muted-foreground hover:text-foreground hover:bg-white/[0.02]",
                     ].join(" ")}
                   >
-                    {link.label}
+                    <ExpandingText text={link.label} />
                   </a>
                 )
               })}
@@ -343,7 +385,7 @@ export function Navigation() {
         aria-label="Back to top"
         className={[
           "fixed bottom-6 right-6 z-50 flex h-10 w-10 items-center justify-center rounded-full",
-          "nav-glass border border-white/[0.08] text-muted-foreground hover:text-foreground",
+          "nav-glass border border-white/[0.04] text-muted-foreground hover:text-foreground",
           "transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
           scrollProgress > 0.1
             ? "translate-y-0 opacity-100 scale-100"
