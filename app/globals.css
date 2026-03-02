@@ -51,17 +51,18 @@ html {
 }
 
 body {
-  overflow-x: hidden;    /* fallback */
-  overflow-x: clip;      /* belt-and-suspenders: clip any horizontal bleed */
+  overflow-x: clip;      /* clips horizontal bleed without creating scroll container */
   overscroll-behavior-x: none;
   width: 100%;           /* prevent body from ever expanding beyond viewport */
   max-width: 100%;       /* hard cap on body width */
 }
 
 /* ── Scroll-snap anchor system ────────────────────────────────── */
-/* Mandatory snapping: locks to each section step-by-step */
+/* Proximity snapping: nudges to section boundaries when close,
+   but does NOT lock the user — lets them scroll freely through
+   long stacking-card runways.                                     */
 html {
-  scroll-snap-type: y mandatory;
+  scroll-snap-type: y proximity;
   scroll-padding-top: 80px;
   /* offset for fixed nav */
 }
@@ -79,6 +80,12 @@ section[id],
 section[id="partners"] {
   scroll-snap-align: none;
   scroll-snap-stop: normal;
+}
+
+/* Sections with stacking-card runways must NOT snap —
+   the user needs to scroll smoothly through the tall runway. */
+section[data-no-snap] {
+  scroll-snap-align: none;
 }
 
 /* Snap markers inside stacking-card runways */

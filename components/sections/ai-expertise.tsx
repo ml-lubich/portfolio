@@ -1,13 +1,13 @@
 "use client"
 
 import dynamic from "next/dynamic"
-import { AnimatedSection } from "./animated-section"
-import { AnimatedCounter } from "./animated-counter"
-import { AnimatedBars } from "./animated-bars"
-import { ScrollMiniBar } from "./scroll-mini-bar"
-import { SectionHeader } from "./section-header"
+import { AnimatedSection } from "../animations/animated-section"
+import { AnimatedCounter } from "../animations/animated-counter"
+import { AnimatedBars } from "../animations/animated-bars"
+import { ScrollMiniBar } from "../layout/scroll-mini-bar"
+import { SectionHeader } from "../layout/section-header"
 const TerminalReveal = dynamic(
-  () => import("./terminal-reveal").then((mod) => mod.TerminalReveal),
+  () => import("../terminal/terminal-reveal").then((mod) => mod.TerminalReveal),
   { ssr: false }
 )
 import { Brain, Code2, Database, Zap, Target, Sparkles, TrendingUp, Shield } from "lucide-react"

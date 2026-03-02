@@ -2,17 +2,17 @@
 
 import { GraduationCap, BookOpen, Users, Code2, Award, Briefcase } from "lucide-react"
 import dynamic from "next/dynamic"
-import { AnimatedSection } from "./animated-section"
-import { AnimatedCounter } from "./animated-counter"
-import { SectionHeader } from "./section-header"
+import { AnimatedSection } from "../animations/animated-section"
+import { AnimatedCounter } from "../animations/animated-counter"
+import { SectionHeader } from "../layout/section-header"
 
 const TerminalReveal = dynamic(
-  () => import("./terminal-reveal").then((mod) => mod.TerminalReveal),
+  () => import("../terminal/terminal-reveal").then((mod) => mod.TerminalReveal),
   { ssr: false }
 )
 
 const ParticleField = dynamic(
-  () => import("./scene-backgrounds").then((mod) => mod.ParticleField),
+  () => import("../three/scene-backgrounds").then((mod) => mod.ParticleField),
   { ssr: false }
 )
 

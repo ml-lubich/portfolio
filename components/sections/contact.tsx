@@ -2,11 +2,11 @@
 
 import dynamic from "next/dynamic"
 import { Mail, Phone, MapPin, Calendar, Linkedin, Github, GraduationCap, FileText } from "lucide-react"
-import { AnimatedSection } from "./animated-section"
-import { SectionHeader } from "./section-header"
+import { AnimatedSection } from "../animations/animated-section"
+import { SectionHeader } from "../layout/section-header"
 
 const ParticleField = dynamic(
-  () => import("./scene-backgrounds").then((mod) => mod.ParticleField),
+  () => import("../three/scene-backgrounds").then((mod) => mod.ParticleField),
   { ssr: false }
 )
 

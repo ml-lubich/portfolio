@@ -1,9 +1,9 @@
 "use client"
 
 import { useEffect, useRef, useState, useCallback, useMemo } from "react"
-import { AnimatedSection } from "./animated-section"
-import { AnimatedCounter } from "./animated-counter"
-import { SectionHeader } from "./section-header"
+import { AnimatedSection } from "../animations/animated-section"
+import { AnimatedCounter } from "../animations/animated-counter"
+import { SectionHeader } from "../layout/section-header"
 import {
     GitFork,
     Star,

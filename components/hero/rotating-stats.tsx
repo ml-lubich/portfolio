@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef, useCallback } from "react"
-import { AnimatedCounter } from "../animated-counter"
+import { AnimatedCounter } from "../animations/animated-counter"
 import { statSets, STAT_ROTATE_INTERVAL, STAT_STAGGER_DELAY } from "./data"
 
 /* ── Rotating Stats with staggered card animations ────────────────── */

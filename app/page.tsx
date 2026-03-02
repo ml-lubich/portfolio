@@ -1,21 +1,20 @@
 import dynamic from "next/dynamic"
-import { Navigation } from "@/components/navigation"
+import { Navigation } from "@/components/nav"
 import { Hero } from "@/components/hero"
-import { LogoScroll } from "@/components/logo-scroll"
-import { LazySection } from "@/components/lazy-section"
-import { ProfileIntro } from "@/components/profile-intro"
+import { LogoScroll, ProfileIntro } from "@/components/sections"
+import { LazySection } from "@/components/layout"
 
 /* ── Below-fold sections: code-split & deferred ─────────────────────── */
-const LiveTerminal = dynamic(() => import("@/components/live-terminal").then(m => m.LiveTerminal))
-const AIExpertise = dynamic(() => import("@/components/ai-expertise").then(m => m.AIExpertise))
-const About = dynamic(() => import("@/components/about").then(m => m.About))
-const Journey = dynamic(() => import("@/components/journey").then(m => m.Journey))
-const Projects = dynamic(() => import("@/components/projects").then(m => m.Projects))
-const Skills = dynamic(() => import("@/components/skills").then(m => m.Skills))
-const GitHubStats = dynamic(() => import("@/components/github-stats").then(m => m.GitHubStats))
-const Publications = dynamic(() => import("@/components/publications").then(m => m.Publications))
-const Contact = dynamic(() => import("@/components/contact").then(m => m.Contact))
-const Footer = dynamic(() => import("@/components/footer").then(m => m.Footer))
+const LiveTerminal = dynamic(() => import("@/components/terminal").then(m => m.LiveTerminal))
+const AIExpertise = dynamic(() => import("@/components/sections/ai-expertise").then(m => m.AIExpertise))
+const About = dynamic(() => import("@/components/sections/about").then(m => m.About))
+const Journey = dynamic(() => import("@/components/sections/journey").then(m => m.Journey))
+const Projects = dynamic(() => import("@/components/sections/projects").then(m => m.Projects))
+const Skills = dynamic(() => import("@/components/sections/skills").then(m => m.Skills))
+const GitHubStats = dynamic(() => import("@/components/sections/github-stats").then(m => m.GitHubStats))
+const Publications = dynamic(() => import("@/components/sections/publications").then(m => m.Publications))
+const Contact = dynamic(() => import("@/components/sections/contact").then(m => m.Contact))
+const Footer = dynamic(() => import("@/components/sections/footer").then(m => m.Footer))
 
 export default function Home() {
   return (

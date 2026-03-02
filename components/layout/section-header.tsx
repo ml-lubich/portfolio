@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react"
 import { cn } from "@/lib/utils"
-import { AnimatedText } from "./animated-text"
+import { AnimatedText } from "../animations/animated-text"
 
 /* ─────────────────────────────────────────────────────────────────
  *  SectionHeader — single reusable header for every portfolio section.

@@ -2,8 +2,8 @@
 
 import { useState, useRef, useEffect } from "react"
 import { roles } from "./data"
-import { AnimatedName } from "../animated-name"
-import { AnimatedText } from "../animated-text"
+import { AnimatedName } from "../animations/animated-name"
+import { AnimatedText } from "../animations/animated-text"
 
 /* ── Role rotator with smooth slide transitions ───────────────────── */
 

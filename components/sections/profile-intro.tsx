@@ -1,8 +1,8 @@
 "use client"
 
 import Image from "next/image"
-import { AnimatedSection } from "./animated-section"
-import { AnimatedText } from "./animated-text"
+import { AnimatedSection } from "../animations/animated-section"
+import { AnimatedText } from "../animations/animated-text"
 import { useRef, useState, useCallback } from "react"
 
 export function ProfileIntro() {

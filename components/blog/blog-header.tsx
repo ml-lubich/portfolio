@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname, useSearchParams } from "next/navigation"
-import { AnimatedName } from "@/components/animated-name"
+import { AnimatedName } from "@/components/animations/animated-name"
 import { Menu, X } from "lucide-react"
 
 const blogNavLinks = [

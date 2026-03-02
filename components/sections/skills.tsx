@@ -2,14 +2,14 @@
 
 import { useState } from "react"
 import dynamic from "next/dynamic"
-import { AnimatedSection } from "./animated-section"
-import { AnimatedBars } from "./animated-bars"
+import { AnimatedSection } from "../animations/animated-section"
+import { AnimatedBars } from "../animations/animated-bars"
 import { getSkillIcon } from "./skill-icons"
-import { CodeParticles } from "./code-particles"
-import { SectionHeader } from "./section-header"
+import { CodeParticles } from "../three/code-particles"
+import { SectionHeader } from "../layout/section-header"
 
 const ParticleField = dynamic(
-  () => import("./scene-backgrounds").then((mod) => mod.ParticleField),
+  () => import("../three/scene-backgrounds").then((mod) => mod.ParticleField),
   { ssr: false }
 )
 

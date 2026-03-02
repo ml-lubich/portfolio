@@ -2,179 +2,16 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo } from "react"
 import { Menu, X, ChevronUp } from "lucide-react"
-import { AnimatedName } from "./animated-name"
-
-/* ── Anthropic-style expanding text (character wave on hover) ── */
-function ExpandingText({ text, className }: { text: string; className?: string }) {
-  const chars = text.split("")
-  return (
-    <span className={`inline-flex ${className ?? ""}`} aria-label={text}>
-      {chars.map((char, i) => (
-        <span
-          key={`${char}-${i}`}
-          className="inline-block transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover/link:translate-y-[-1px] group-hover/link:scale-[1.08]"
-          style={{
-            transitionDelay: `${i * 25}ms`,
-            ...(char === " " ? { width: "0.25em" } : {}),
-          }}
-        >
-          {char === " " ? "\u00A0" : char}
-        </span>
-      ))}
-    </span>
-  )
-}
-
-/* ── Navigation links ─────────────────────────────────────────── */
-const navLinks = [
-  { label: "AI Expertise", href: "#ai-expertise" },
-  { label: "About", href: "#about" },
-  { label: "Journey", href: "#journey" },
-  { label: "Projects", href: "#projects" },
-  { label: "Skills", href: "#skills" },
-  { label: "Research", href: "#research" },
-  { label: "Blog", href: "/blog" },
-  { label: "Contact", href: "#contact" },
-]
-
-/* ── Spring-physics "woosh" smooth scroll ─────────────────────── */
-function wooshScrollTo(targetY: number) {
-  const startY = window.scrollY
-  const distance = targetY - startY
-  if (Math.abs(distance) < 2) return
-
-  const duration = Math.min(1200, Math.max(600, Math.abs(distance) * 0.4))
-  let startTime: number | null = null
-  let rafId: number
-
-  // Custom spring-like easing — fast launch, gentle deceleration (the "woosh")
-  function springEase(t: number): number {
-    // overshoot-damped spring: quick ramp, smooth settle
-    return 1 - Math.pow(1 - t, 3) * Math.cos(t * Math.PI * 0.5)
-  }
-
-  function tick(now: number) {
-    if (!startTime) startTime = now
-    const elapsed = now - startTime
-    const progress = Math.min(elapsed / duration, 1)
-    const eased = springEase(progress)
-
-    window.scrollTo(0, startY + distance * eased)
-
-    if (progress < 1) {
-      rafId = requestAnimationFrame(tick)
-    }
-  }
-
-  // Disable native smooth-scroll temporarily so we have full control
-  document.documentElement.style.scrollBehavior = "auto"
-  rafId = requestAnimationFrame(tick)
-
-  // Re-enable after animation
-  setTimeout(() => {
-    document.documentElement.style.scrollBehavior = ""
-    cancelAnimationFrame(rafId)
-  }, duration + 50)
-}
-
-/** Scroll to an anchor href with the woosh effect */
-function navigateTo(href: string, callback?: () => void) {
-  if (href.startsWith("/")) {
-    window.location.href = href
-    return
-  }
-  const id = href.replace("#", "")
-  const el = id ? document.getElementById(id) : null
-  const targetY = el ? el.getBoundingClientRect().top + window.scrollY - 80 : 0
-
-  wooshScrollTo(targetY)
-  // Update URL hash without jumping
-  if (id) history.pushState(null, "", `#${id}`)
-  callback?.()
-}
-
-/* ── Active section tracker ───────────────────────────────────── */
-function useActiveSection(sectionIds: string[]) {
-  const [activeId, setActiveId] = useState("")
-
-  useEffect(() => {
-    const visibleRatios = new Map<string, number>()
-    const observerMap = new Map<string, IntersectionObserver>()
-
-    function updateBest() {
-      let best = ""
-      let bestRatio = 0
-      visibleRatios.forEach((ratio, sId) => {
-        if (ratio > bestRatio) {
-          bestRatio = ratio
-          best = sId
-        }
-      })
-      if (best) setActiveId(best)
-    }
-
-    function observeSection(id: string) {
-      if (observerMap.has(id)) return
-      const el = document.getElementById(id)
-      if (!el) return
-
-      const observer = new IntersectionObserver(
-        ([entry]) => {
-          visibleRatios.set(id, entry.intersectionRatio)
-          updateBest()
-        },
-        { threshold: [0, 0.1, 0.2, 0.3, 0.5, 0.7, 1] },
-      )
-      observer.observe(el)
-      observerMap.set(id, observer)
-    }
-
-    // Observe sections that already exist
-    sectionIds.forEach(observeSection)
-
-    // Watch for lazily-rendered sections appearing in the DOM
-    const mutation = new MutationObserver(() => {
-      sectionIds.forEach(observeSection)
-    })
-    mutation.observe(document.body, { childList: true, subtree: true })
-
-    return () => {
-      mutation.disconnect()
-      observerMap.forEach((o) => o.disconnect())
-    }
-  }, [sectionIds])
-
-  return activeId
-}
-
-/* ── Scroll progress (0→1) for the whole page ────────────────── */
-function useScrollProgress() {
-  const [progress, setProgress] = useState(0)
-
-  useEffect(() => {
-    let rafId: number
-    function update() {
-      const docH = document.documentElement.scrollHeight - window.innerHeight
-      setProgress(docH > 0 ? Math.min(window.scrollY / docH, 1) : 0)
-    }
-    function onScroll() {
-      cancelAnimationFrame(rafId)
-      rafId = requestAnimationFrame(update)
-    }
-    window.addEventListener("scroll", onScroll, { passive: true })
-    update()
-    return () => {
-      window.removeEventListener("scroll", onScroll)
-      cancelAnimationFrame(rafId)
-    }
-  }, [])
-
-  return progress
-}
+import { AnimatedName } from "../animations/animated-name"
+import { navLinks } from "./nav-links"
+import { wooshScrollTo, navigateTo } from "./woosh-scroll"
+import { useActiveSection, useScrollProgress } from "./use-nav-hooks"
+import { ExpandingText } from "./expanding-text"
 
 /* ══════════════════════════════════════════════════════════════════
    Navigation Component
    ══════════════════════════════════════════════════════════════════ */
+
 export function Navigation() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -198,7 +35,6 @@ export function Navigation() {
       rafId = requestAnimationFrame(() => {
         const y = window.scrollY
         setScrolled(y > 50)
-        // Hide when scrolling down past 300px, show when scrolling up
         if (y > 300 && y > lastScrollY.current + 8) {
           setHideNav(true)
         } else if (y < lastScrollY.current - 4) {
@@ -214,7 +50,7 @@ export function Navigation() {
     }
   }, [])
 
-  /* Keyboard anchor navigation (ArrowDown/ArrowUp cycle sections) */
+  /* Keyboard anchor navigation */
   const handleKeyNav = useCallback(
     (e: React.KeyboardEvent) => {
       if (!["ArrowDown", "ArrowUp"].includes(e.key)) return
@@ -239,7 +75,7 @@ export function Navigation() {
 
   return (
     <>
-      {/* ── Progress bar at very top ────────────────────────── */}
+      {/* Progress bar */}
       <div className="fixed top-0 left-0 right-0 z-[60] h-[2px]">
         <div
           className="h-full bg-gradient-to-r from-primary via-accent to-primary transition-[width] duration-150 ease-out"
@@ -247,7 +83,7 @@ export function Navigation() {
         />
       </div>
 
-      {/* ── Main nav bar ────────────────────────────────────── */}
+      {/* Main nav bar */}
       <nav
         ref={navRef}
         onKeyDown={handleKeyNav}
@@ -255,9 +91,7 @@ export function Navigation() {
           "fixed top-0 left-0 right-0 z-50",
           "transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
           hideNav ? "-translate-y-full opacity-0" : "translate-y-0 opacity-100",
-          scrolled
-            ? "nav-glass py-2.5"
-            : "bg-transparent py-5",
+          scrolled ? "nav-glass py-2.5" : "bg-transparent py-5",
         ].join(" ")}
       >
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6">
@@ -269,7 +103,6 @@ export function Navigation() {
           >
             <div className="relative flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent overflow-hidden">
               <span className="text-sm font-bold text-primary-foreground relative z-10">ML</span>
-              {/* Subtle shimmer on the logo */}
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
             </div>
             <span className="text-sm font-semibold text-foreground transition-colors group-hover:text-primary">
@@ -277,7 +110,7 @@ export function Navigation() {
             </span>
           </a>
 
-          {/* Desktop links with sliding pill indicator */}
+          {/* Desktop links */}
           <div className="hidden items-center gap-0.5 md:flex relative">
             {navLinks.map((link) => {
               const isExternal = link.href.startsWith("/")
@@ -298,11 +131,8 @@ export function Navigation() {
                       : "text-muted-foreground hover:text-foreground",
                   ].join(" ")}
                 >
-                  {/* Active pill background */}
                   {isActive && (
-                    <span
-                      className="absolute inset-0 rounded-full bg-white/[0.04] border border-white/[0.03] animate-nav-pill-in"
-                    />
+                    <span className="absolute inset-0 rounded-full bg-white/[0.04] border border-white/[0.03] animate-nav-pill-in" />
                   )}
                   <span className="relative z-10">
                     <ExpandingText text={link.label} />
@@ -338,7 +168,7 @@ export function Navigation() {
           </button>
         </div>
 
-        {/* Mobile menu — slides down with spring ease */}
+        {/* Mobile menu */}
         <div
           className={[
             "md:hidden overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
@@ -378,7 +208,7 @@ export function Navigation() {
         </div>
       </nav>
 
-      {/* ── Back to top FAB ─────────────────────────────────── */}
+      {/* Back to top FAB */}
       <button
         type="button"
         onClick={() => wooshScrollTo(0)}

@@ -78,6 +78,7 @@ export function Brain3D({ className = "" }: { className?: string }) {
           <Suspense fallback={null}>
             <BrainWireframe />
             <OrbitControls
+              makeDefault
               autoRotate
               autoRotateSpeed={0.8}
               enableZoom={false}

@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react"
-import { MermaidDiagram } from "@/components/mermaid-diagram"
+import { MermaidDiagram } from "@/components/blog/mermaid-diagram"
 
 interface BlogContentProps {
   content: string

@@ -1,4 +1,4 @@
-import { NeuralOrbDemo } from "@/components/neural-orb-demo"
+import { NeuralOrbDemo } from "@/components/three/neural-orb-demo"
 
 export default function DemoPage() {
     return (

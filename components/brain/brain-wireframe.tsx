@@ -92,7 +92,6 @@ export function BrainWireframe() {
         <mesh
           ref={hitRef}
           onPointerMove={(e) => {
-            e.stopPropagation()
             if (hitRef.current) {
               pull.uPullPoint.value.copy(
                 hitRef.current.worldToLocal(e.point.clone())

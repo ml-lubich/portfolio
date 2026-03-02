@@ -44,7 +44,7 @@ export function Hero() {
 
       {/* 3D Brain */}
       <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-screen z-[1]"
+        className="pointer-events-none absolute inset-x-0 top-0 h-screen z-[3]"
         aria-hidden="true"
       >
         <Brain3D className="h-full w-full pointer-events-auto" />

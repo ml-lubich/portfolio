@@ -2,8 +2,8 @@
 
 import { useState, useCallback } from "react"
 import { Briefcase, ChevronRight, MapPin, ArrowRight } from "lucide-react"
-import { DetailPanel, type DetailPanelData } from "./detail-panel"
-import { ScrollStackSection } from "./scroll-stack-section"
+import { DetailPanel, type DetailPanelData } from "../layout/detail-panel"
+import { ScrollStackSection } from "../layout/scroll-stack-section"
 
 const experiences: {
   id: string
