@@ -2,7 +2,8 @@
 
 import { useState, useCallback } from "react"
 import { Sparkles, ChevronRight, ArrowRight } from "lucide-react"
-import { DetailPanel, type DetailPanelData } from "../layout/detail-panel"
+import { DetailPanel } from "../detail-panel"
+import type { DetailPanelData } from "../detail-panel/types"
 import { ScrollStackSection } from "../layout/scroll-stack-section"
 
 const projects: {
@@ -270,106 +271,106 @@ export function Projects() {
       scrollPerCard={55}
       perspective={1200}
       cards={projects.map((project) => ({
-            id: project.id,
-            children: (
-              <button
-                onClick={() => handleSelect(project.id)}
-                className={`glass-stack-card group relative w-full overflow-hidden rounded-2xl border text-left transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${selectedId === project.id
-                    ? "border-primary/40 bg-card shadow-[0_0_40px_-8px] shadow-primary/20"
-                    : "border-border/40 bg-card hover:border-primary/30"
-                  }`}
-              >
-                {/* Top gradient accent strip */}
-                <div className={`h-1 w-full bg-gradient-to-r ${project.gradient} ${selectedId === project.id ? "opacity-100" : "opacity-60 group-hover:opacity-90"} transition-opacity duration-500`} />
+        id: project.id,
+        children: (
+          <button
+            onClick={() => handleSelect(project.id)}
+            className={`glass-stack-card group relative w-full overflow-hidden rounded-2xl border text-left transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${selectedId === project.id
+              ? "border-primary/40 bg-card shadow-[0_0_40px_-8px] shadow-primary/20"
+              : "border-border/40 bg-card hover:border-primary/30"
+              }`}
+          >
+            {/* Top gradient accent strip */}
+            <div className={`h-1 w-full bg-gradient-to-r ${project.gradient} ${selectedId === project.id ? "opacity-100" : "opacity-60 group-hover:opacity-90"} transition-opacity duration-500`} />
 
-                {/* Ambient glow blobs */}
-                <div
-                  className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full opacity-[0.07] blur-3xl transition-opacity duration-700 group-hover:opacity-[0.18]"
-                  style={{ background: project.accent }}
-                />
-                <div
-                  className="pointer-events-none absolute -left-16 bottom-0 h-48 w-48 rounded-full opacity-0 blur-3xl transition-opacity duration-700 group-hover:opacity-[0.08]"
-                  style={{ background: project.accent }}
-                />
+            {/* Ambient glow blobs */}
+            <div
+              className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full opacity-[0.07] blur-3xl transition-opacity duration-700 group-hover:opacity-[0.18]"
+              style={{ background: project.accent }}
+            />
+            <div
+              className="pointer-events-none absolute -left-16 bottom-0 h-48 w-48 rounded-full opacity-0 blur-3xl transition-opacity duration-700 group-hover:opacity-[0.08]"
+              style={{ background: project.accent }}
+            />
 
-                {/* Frosted noise overlay */}
-                <div className="pointer-events-none absolute inset-0 opacity-[0.015] mix-blend-overlay" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")" }} />
+            {/* Frosted noise overlay */}
+            <div className="pointer-events-none absolute inset-0 opacity-[0.015] mix-blend-overlay" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")" }} />
 
-                <div className="relative p-6 sm:p-8">
-                  {/* Top row: number + name + metric */}
-                  <div className="flex items-start gap-4 sm:gap-5">
-                    {/* Large ghost number */}
-                    <span
-                      className="hidden shrink-0 select-none font-mono text-6xl font-black leading-none tracking-tighter opacity-[0.06] sm:block"
-                      style={{ color: project.accent }}
-                    >
-                      {project.number}
-                    </span>
+            <div className="relative p-6 sm:p-8">
+              {/* Top row: number + name + metric */}
+              <div className="flex items-start gap-4 sm:gap-5">
+                {/* Large ghost number */}
+                <span
+                  className="hidden shrink-0 select-none font-mono text-6xl font-black leading-none tracking-tighter opacity-[0.06] sm:block"
+                  style={{ color: project.accent }}
+                >
+                  {project.number}
+                </span>
 
-                    <div className="min-w-0 flex-1">
-                      <h3 className="text-lg font-semibold text-foreground transition-colors group-hover:text-primary sm:text-xl">
-                        {project.name}
-                      </h3>
-                      <div className="mt-1.5 flex items-center gap-1.5">
-                        <Sparkles className="h-3.5 w-3.5 text-primary" />
-                        <span className="text-xs font-semibold text-primary">{project.metric}</span>
-                      </div>
-                    </div>
-
-                    {/* Explore CTA */}
-                    <div className="hidden shrink-0 items-center gap-1.5 self-start rounded-lg border border-border/50 bg-secondary px-3.5 py-2 text-xs font-medium text-muted-foreground/70 opacity-0 transition-all duration-300 group-hover:opacity-100 group-hover:text-primary sm:flex">
-                      <span>Explore</span>
-                      <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-                    </div>
-                  </div>
-
-                  {/* Summary */}
-                  <p className="mt-4 text-sm leading-relaxed text-muted-foreground/80 sm:text-[15px]">
-                    {project.summary}
-                  </p>
-
-                  {/* Key highlights (first 3 from detail) */}
-                  <div className="mt-4 space-y-2">
-                    {project.detail.highlights.slice(0, 3).map((h, i) => (
-                      <div key={i} className="flex items-start gap-2.5">
-                        <ArrowRight className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary/50" />
-                        <span className="text-xs leading-relaxed text-muted-foreground/60 line-clamp-1 sm:text-[13px]">
-                          {h}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Metrics row */}
-                  {project.detail.metrics && (
-                    <div className="mt-5 flex gap-4">
-                      {project.detail.metrics.map((m) => (
-                        <div key={m.label} className="rounded-lg border border-border/50 bg-secondary px-3 py-2">
-                          <p className="text-xs text-muted-foreground/50">{m.label}</p>
-                          <p className="mt-0.5 text-sm font-bold text-primary">{m.value}</p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Tags */}
-                  <div className="mt-5 flex flex-wrap gap-1.5">
-                    {project.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="rounded-full border border-border/50 bg-secondary px-3 py-1 font-mono text-[10px] text-muted-foreground/60 transition-colors group-hover:border-primary/30 group-hover:text-muted-foreground/80"
-                      >
-                        {tag}
-                      </span>
-                    ))}
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-lg font-semibold text-foreground transition-colors group-hover:text-primary sm:text-xl">
+                    {project.name}
+                  </h3>
+                  <div className="mt-1.5 flex items-center gap-1.5">
+                    <Sparkles className="h-3.5 w-3.5 text-primary" />
+                    <span className="text-xs font-semibold text-primary">{project.metric}</span>
                   </div>
                 </div>
 
-                {/* Bottom edge gradient line */}
-                <div className={`h-px w-full bg-gradient-to-r ${project.gradient} opacity-0 transition-opacity duration-500 group-hover:opacity-30`} />
-              </button>
-            ),
-          }))}
+                {/* Explore CTA */}
+                <div className="hidden shrink-0 items-center gap-1.5 self-start rounded-lg border border-border/50 bg-secondary px-3.5 py-2 text-xs font-medium text-muted-foreground/70 opacity-0 transition-all duration-300 group-hover:opacity-100 group-hover:text-primary sm:flex">
+                  <span>Explore</span>
+                  <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                </div>
+              </div>
+
+              {/* Summary */}
+              <p className="mt-4 text-sm leading-relaxed text-muted-foreground/80 sm:text-[15px]">
+                {project.summary}
+              </p>
+
+              {/* Key highlights (first 3 from detail) */}
+              <div className="mt-4 space-y-2">
+                {project.detail.highlights.slice(0, 3).map((h, i) => (
+                  <div key={i} className="flex items-start gap-2.5">
+                    <ArrowRight className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary/50" />
+                    <span className="text-xs leading-relaxed text-muted-foreground/60 line-clamp-1 sm:text-[13px]">
+                      {h}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Metrics row */}
+              {project.detail.metrics && (
+                <div className="mt-5 flex gap-4">
+                  {project.detail.metrics.map((m) => (
+                    <div key={m.label} className="rounded-lg border border-border/50 bg-secondary px-3 py-2">
+                      <p className="text-xs text-muted-foreground/50">{m.label}</p>
+                      <p className="mt-0.5 text-sm font-bold text-primary">{m.value}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Tags */}
+              <div className="mt-5 flex flex-wrap gap-1.5">
+                {project.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="rounded-full border border-border/50 bg-secondary px-3 py-1 font-mono text-[10px] text-muted-foreground/60 transition-colors group-hover:border-primary/30 group-hover:text-muted-foreground/80"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Bottom edge gradient line */}
+            <div className={`h-px w-full bg-gradient-to-r ${project.gradient} opacity-0 transition-opacity duration-500 group-hover:opacity-30`} />
+          </button>
+        ),
+      }))}
     >
       {/* Detail panel */}
       <DetailPanel

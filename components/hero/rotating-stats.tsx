@@ -144,11 +144,10 @@ export function RotatingStats() {
             onClick={() => {
               if (i !== setIndex) triggerTransition(i)
             }}
-            className={`h-1.5 rounded-full transition-all duration-500 ${
-              i === setIndex
+            className={`h-1.5 rounded-full transition-all duration-500 ${i === setIndex
                 ? "w-6 bg-primary/60"
                 : "w-1.5 bg-muted-foreground/20 hover:bg-muted-foreground/40"
-            }`}
+              }`}
             aria-label={`Show stat set ${i + 1}`}
           />
         ))}

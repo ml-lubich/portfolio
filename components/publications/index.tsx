@@ -2,8 +2,8 @@
 
 import { useState, useCallback } from "react"
 import { BookOpen, ExternalLink, ChevronRight } from "lucide-react"
-import { AnimatedSection } from "../animated-section"
-import { ScrollStackSection } from "../scroll-stack-section"
+import { AnimatedSection } from "../animations/animated-section"
+import { ScrollStackSection } from "../layout/scroll-stack-section"
 import { papers, gradients, accents } from "./data"
 import { InsightPanel } from "./insight-panel"
 

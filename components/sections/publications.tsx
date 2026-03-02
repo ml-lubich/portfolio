@@ -387,79 +387,79 @@ export function Publications() {
       scrollPerCard={42}
       perspective={1200}
       cards={papers.map((paper, i) => {
-            const gradient = gradients[i % gradients.length]
-            const accent = accents[i % accents.length]
-            const number = String(i + 1).padStart(2, "0")
+        const gradient = gradients[i % gradients.length]
+        const accent = accents[i % accents.length]
+        const number = String(i + 1).padStart(2, "0")
 
-            return {
-              id: paper.href,
-              children: (
-                <button
-                  onClick={() => setSelectedPaper(paper)}
-                  className="group relative w-full overflow-hidden rounded-2xl border border-border/60 bg-card text-left shadow-md shadow-black/10 transition-all duration-500 hover:border-primary/40"
+        return {
+          id: paper.href,
+          children: (
+            <button
+              onClick={() => setSelectedPaper(paper)}
+              className="group relative w-full overflow-hidden rounded-2xl border border-border/60 bg-card text-left shadow-md shadow-black/10 transition-all duration-500 hover:border-primary/40"
+            >
+              {/* Gradient accent strip */}
+              <div className={`h-[3px] w-full bg-gradient-to-r ${gradient}`} />
+
+              {/* Ambient glow */}
+              <div
+                className="pointer-events-none absolute -right-20 -top-20 h-60 w-60 rounded-full opacity-10 blur-3xl transition-opacity duration-700 group-hover:opacity-25"
+                style={{ background: accent }}
+              />
+
+              <div className="relative flex items-start gap-4 p-5 sm:p-6">
+                {/* Number */}
+                <span
+                  className="hidden shrink-0 font-mono text-4xl font-black tracking-tighter opacity-10 sm:block"
+                  style={{ color: accent }}
                 >
-                  {/* Gradient accent strip */}
-                  <div className={`h-[3px] w-full bg-gradient-to-r ${gradient}`} />
+                  {number}
+                </span>
 
-                  {/* Ambient glow */}
-                  <div
-                    className="pointer-events-none absolute -right-20 -top-20 h-60 w-60 rounded-full opacity-10 blur-3xl transition-opacity duration-700 group-hover:opacity-25"
-                    style={{ background: accent }}
-                  />
-
-                  <div className="relative flex items-start gap-4 p-5 sm:p-6">
-                    {/* Number */}
-                    <span
-                      className="hidden shrink-0 font-mono text-4xl font-black tracking-tighter opacity-10 sm:block"
-                      style={{ color: accent }}
-                    >
-                      {number}
+                {/* Content */}
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2 mb-2">
+                    <span className={`inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-secondary/40 px-3 py-1 text-[11px] font-semibold backdrop-blur-sm ${paper.type === "Journal Article" ? "text-primary" : "text-accent"}`}>
+                      <BookOpen className="h-3 w-3" />
+                      {paper.type}
                     </span>
-
-                    {/* Content */}
-                    <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-center gap-2 mb-2">
-                        <span className={`inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-secondary/40 px-3 py-1 text-[11px] font-semibold backdrop-blur-sm ${paper.type === "Journal Article" ? "text-primary" : "text-accent"}`}>
-                          <BookOpen className="h-3 w-3" />
-                          {paper.type}
-                        </span>
-                        <span className="text-xs text-muted-foreground">{paper.venue} · {paper.year}</span>
-                      </div>
-
-                      <h3 className="text-base font-display font-medium leading-snug text-foreground transition-colors duration-300 group-hover:text-primary sm:text-lg">
-                        {paper.title}
-                      </h3>
-
-                      <p className="mt-2 line-clamp-2 text-sm text-muted-foreground/80">
-                        {paper.summary}
-                      </p>
-
-                      {/* Tags */}
-                      <div className="mt-3 flex flex-wrap gap-1.5">
-                        {paper.tags.map((tag) => (
-                          <span
-                            key={tag}
-                            className="rounded-full border border-border/40 bg-secondary/30 px-2.5 py-0.5 font-mono text-[10px] text-muted-foreground/70"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Explore prompt */}
-                    <div className="hidden shrink-0 items-center gap-1 self-center rounded-lg border border-border/40 bg-secondary/30 px-3 py-2 text-xs text-muted-foreground opacity-0 transition-all duration-300 group-hover:opacity-100 sm:flex">
-                      <span>Explore</span>
-                      <ChevronRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
-                    </div>
+                    <span className="text-xs text-muted-foreground">{paper.venue} · {paper.year}</span>
                   </div>
 
-                  {/* Hover gradient overlay */}
-                  <div className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${gradient} opacity-0 transition-opacity duration-500 group-hover:opacity-[0.03]`} />
-                </button>
-              ),
-            }
-          })}
+                  <h3 className="text-base font-display font-medium leading-snug text-foreground transition-colors duration-300 group-hover:text-primary sm:text-lg">
+                    {paper.title}
+                  </h3>
+
+                  <p className="mt-2 line-clamp-2 text-sm text-muted-foreground/80">
+                    {paper.summary}
+                  </p>
+
+                  {/* Tags */}
+                  <div className="mt-3 flex flex-wrap gap-1.5">
+                    {paper.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="rounded-full border border-border/40 bg-secondary/30 px-2.5 py-0.5 font-mono text-[10px] text-muted-foreground/70"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Explore prompt */}
+                <div className="hidden shrink-0 items-center gap-1 self-center rounded-lg border border-border/40 bg-secondary/30 px-3 py-2 text-xs text-muted-foreground opacity-0 transition-all duration-300 group-hover:opacity-100 sm:flex">
+                  <span>Explore</span>
+                  <ChevronRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
+                </div>
+              </div>
+
+              {/* Hover gradient overlay */}
+              <div className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${gradient} opacity-0 transition-opacity duration-500 group-hover:opacity-[0.03]`} />
+            </button>
+          ),
+        }
+      })}
     >
       {/* Google Scholar link */}
       <div className="relative mx-auto max-w-5xl px-4 sm:px-6">

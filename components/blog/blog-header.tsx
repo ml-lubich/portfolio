@@ -33,9 +33,8 @@ export function BlogHeader() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        scrolled ? "glass py-3" : "bg-background/80 backdrop-blur-md py-4"
-      }`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled ? "glass py-3" : "bg-background/80 backdrop-blur-md py-4"
+        }`}
       role="banner"
     >
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6">
@@ -59,11 +58,10 @@ export function BlogHeader() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`relative rounded-lg px-3 py-2 text-sm transition-all duration-300 ${
-                  isActive
+                className={`relative rounded-lg px-3 py-2 text-sm transition-all duration-300 ${isActive
                     ? "text-primary font-medium bg-primary/10"
                     : "text-muted-foreground hover:text-foreground hover:bg-secondary"
-                }`}
+                  }`}
               >
                 {link.label}
                 {isActive && (
@@ -104,11 +102,10 @@ export function BlogHeader() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileOpen(false)}
-                  className={`rounded-lg px-4 py-3 text-sm transition-colors ${
-                    isActive
+                  className={`rounded-lg px-4 py-3 text-sm transition-colors ${isActive
                       ? "text-primary font-medium bg-primary/10 border-l-2 border-primary"
                       : "text-muted-foreground hover:text-foreground hover:bg-secondary"
-                  }`}
+                    }`}
                 >
                   {link.label}
                 </Link>
