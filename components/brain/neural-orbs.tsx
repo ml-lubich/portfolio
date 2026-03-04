@@ -47,6 +47,9 @@ export function NeuralOrbs({
     Array.from({ length: ORB_COUNT }, () => Math.random() * 100)
   )
 
+  // Accumulated elapsed time (avoids deprecated THREE.Clock)
+  const elapsedRef = useRef(0)
+
   // Set attributes imperatively
   useEffect(() => {
     if (!orbGeoRef.current) return
@@ -58,9 +61,10 @@ export function NeuralOrbs({
     )
   }, [orbGeoRef, orbPositions, orbSizes])
 
-  useFrame((state, delta) => {
+  useFrame((_state, delta) => {
+    elapsedRef.current += delta
     const colors = colorAttr.array as Float32Array
-    const t = state.clock.getElapsedTime()
+    const t = elapsedRef.current
 
     // Clear only edges used by active orbs (efficient)
     const dirtyEdges = new Set<number>()

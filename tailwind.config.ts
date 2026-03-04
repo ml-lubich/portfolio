@@ -125,11 +125,11 @@ const config: Config = {
         },
         'glow-pulse': {
           '0%, 100%': {
-            boxShadow: '0 0 20px hsla(217, 91%, 60%, 0.15)',
+            boxShadow: '0 0 20px hsl(var(--primary) / 0.15)',
             opacity: '1'
           },
           '50%': {
-            boxShadow: '0 0 40px hsla(217, 91%, 60%, 0.3)',
+            boxShadow: '0 0 40px hsl(var(--primary) / 0.3)',
             opacity: '0.9'
           },
         },

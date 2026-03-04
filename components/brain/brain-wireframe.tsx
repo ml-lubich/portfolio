@@ -6,6 +6,7 @@ import * as THREE from "three"
 import { useBrainData } from "./use-brain-data"
 import { createPullUniforms, injectPull, makeOrbMaterial } from "./materials"
 import { NeuralOrbs } from "./neural-orbs"
+import { hexNum } from "@/lib/theme"
 
 /* ── Rotating wireframe brain with neural orb effects ──────────────── */
 
@@ -22,7 +23,7 @@ export function BrainWireframe() {
   // Base wireframe material (dim blue)
   const material = React.useMemo(() => {
     const m = new THREE.LineBasicMaterial({
-      color: 0x3baaff,
+      color: hexNum.wireBase,
       transparent: true,
       opacity: 0.35,
       depthWrite: false,
@@ -34,7 +35,7 @@ export function BrainWireframe() {
   // Outer glow wireframe
   const glowMaterial = React.useMemo(() => {
     const m = new THREE.LineBasicMaterial({
-      color: 0x6dcfff,
+      color: hexNum.wireGlow,
       transparent: true,
       opacity: 0.12,
       depthWrite: false,
@@ -74,8 +75,12 @@ export function BrainWireframe() {
     return { geometry: g, colorAttr }
   }, [result])
 
-  useFrame((state, delta) => {
-    const t = state.clock.getElapsedTime()
+  // Accumulated elapsed time (avoids deprecated THREE.Clock)
+  const elapsedRef = useRef(0)
+
+  useFrame((_state, delta) => {
+    elapsedRef.current += delta
+    const t = elapsedRef.current
     orbMaterial.uniforms.uTime.value = t
     pull.uPullStrength.value +=
       (pullTarget.current - pull.uPullStrength.value) * Math.min(1, delta * 8)

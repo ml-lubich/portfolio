@@ -6,6 +6,7 @@ import { AnimatedCounter } from "../animations/animated-counter"
 import { AnimatedBars } from "../animations/animated-bars"
 import { ScrollMiniBar } from "../layout/scroll-mini-bar"
 import { SectionHeader } from "../layout/section-header"
+import { gradients as g, textColors as tc } from "@/lib/theme"
 const TerminalReveal = dynamic(
   () => import("../terminal/terminal-reveal").then((mod) => mod.TerminalReveal),
   { ssr: false }
@@ -22,7 +23,7 @@ const aiDomains = [
       "Published 6 peer-reviewed papers on ML for hydrology and environmental science",
       "Deployed models and pipelines serving 100M+ users at Apple scale",
     ],
-    gradient: "from-primary via-accent to-[hsl(180,70%,50%)]",
+    gradient: g.primaryViaAccentToCyan,
   },
   {
     icon: Sparkles,
@@ -33,7 +34,7 @@ const aiDomains = [
       "Designed self-improving agentic systems with adaptive chunking and retrieval re-ranking",
       "Implemented comprehensive LLM observability with LangSmith, Prometheus, Grafana",
     ],
-    gradient: "from-accent via-[hsl(280,75%,60%)] to-primary",
+    gradient: g.accentViaMagentaToPrimary,
   },
   {
     icon: Target,
@@ -44,7 +45,7 @@ const aiDomains = [
       "Built MCP tool server integration for context-engineered autonomous agents",
       "Designed self-correction loops and circuit-breaker alerting for guardrail violations",
     ],
-    gradient: "from-[hsl(180,70%,50%)] via-primary to-accent",
+    gradient: g.cyanViaPrimaryToAccent,
   },
   {
     icon: TrendingUp,
@@ -55,23 +56,23 @@ const aiDomains = [
       "Established automated LLM evaluation with RAGAS and DeepEval",
       "Built real-time monitoring dashboards with Prometheus, Grafana, and OpenTelemetry",
     ],
-    gradient: "from-primary via-[hsl(200,80%,55%)] to-accent",
+    gradient: g.primaryViaSkyToAccent,
   },
 ]
 
 const metrics = [
-  { icon: Zap, value: "300%", label: "Model Performance Gains", color: "text-primary", bar: 95, gradient: "from-primary to-accent" },
-  { icon: Database, value: "10M+", label: "Training Samples Processed", color: "text-accent", bar: 88, gradient: "from-accent to-[hsl(280,75%,60%)]" },
-  { icon: Shield, value: "99.9%", label: "Model Uptime SLA", color: "text-[hsl(180,70%,50%)]", bar: 99, gradient: "from-[hsl(180,70%,50%)] to-primary" },
-  { icon: Code2, value: "15+", label: "Production ML Systems", color: "text-[hsl(280,75%,60%)]", bar: 78, gradient: "from-[hsl(280,75%,60%)] to-accent" },
+  { icon: Zap, value: "300%", label: "Model Performance Gains", color: tc.primary, bar: 95, gradient: g.primaryToAccent },
+  { icon: Database, value: "10M+", label: "Training Samples Processed", color: tc.accent, bar: 88, gradient: g.magentaToAccent },
+  { icon: Shield, value: "99.9%", label: "Model Uptime SLA", color: tc.cyan, bar: 99, gradient: g.cyanToPrimary },
+  { icon: Code2, value: "15+", label: "Production ML Systems", color: tc.magenta, bar: 78, gradient: g.primaryToMagenta },
 ]
 
 const techBars = [
-  { label: "PyTorch / TensorFlow / scikit-learn", value: 95, display: "Expert", gradient: "from-primary to-accent" },
-  { label: "LLMs & RAG Systems", value: 94, display: "Expert", gradient: "from-accent to-[hsl(280,75%,60%)]" },
-  { label: "Multi-Agent Orchestration", value: 92, display: "Expert", gradient: "from-[hsl(180,70%,50%)] to-primary" },
-  { label: "MLOps & AWS", value: 90, display: "Expert", gradient: "from-[hsl(280,75%,60%)] to-accent" },
-  { label: "Guardrails & Observability", value: 88, display: "Advanced", gradient: "from-primary to-[hsl(180,70%,50%)]" },
+  { label: "PyTorch / TensorFlow / scikit-learn", value: 95, display: "Expert", gradient: g.primaryToAccent },
+  { label: "LLMs & RAG Systems", value: 94, display: "Expert", gradient: g.magentaToAccent },
+  { label: "Multi-Agent Orchestration", value: 92, display: "Expert", gradient: g.cyanToPrimary },
+  { label: "MLOps & AWS", value: 90, display: "Expert", gradient: g.primaryToMagenta },
+  { label: "Guardrails & Observability", value: 88, display: "Advanced", gradient: g.primaryToCyan },
 ]
 
 export function AIExpertise() {

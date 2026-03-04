@@ -4,6 +4,7 @@ import React, { useRef, Suspense, Component, useMemo, useEffect, useState } from
 import type { ReactNode } from "react"
 import { Canvas, useFrame } from "@react-three/fiber"
 import * as THREE from "three"
+import { hex } from "@/lib/theme"
 
 /* ── Error boundary — keeps WebGL crashes from nuking the page ───── */
 class WebGLErrorBoundary extends Component<
@@ -104,8 +105,11 @@ function FloatingShape({
     [color],
   )
 
-  useFrame((state) => {
-    const t = state.clock.getElapsedTime()
+  const elapsedRef = useRef(0)
+
+  useFrame((_state, delta) => {
+    elapsedRef.current += delta
+    const t = elapsedRef.current
     if (groupRef.current) {
       groupRef.current.rotation.x = t * speed * 0.7
       groupRef.current.rotation.y = t * speed
@@ -161,17 +165,17 @@ export interface FloatingGeometryProps {
 
 const presets: Record<string, FloatingShapeProps[]> = {
   skills: [
-    { shape: "icosahedron", color: "#3b82f6", glowColor: "#60a5fa", speed: 0.2, scale: 1.2, position: [-1.5, 0.5, 0] },
-    { shape: "octahedron", color: "#8b5cf6", glowColor: "#a78bfa", speed: 0.15, scale: 0.7, position: [1.8, -0.3, -1] },
-    { shape: "torus", color: "#06b6d4", glowColor: "#22d3ee", speed: 0.25, scale: 0.5, position: [0.5, 1.2, -0.5] },
+    { shape: "icosahedron", color: hex.primary, glowColor: hex.primaryLight, speed: 0.2, scale: 1.2, position: [-1.5, 0.5, 0] },
+    { shape: "octahedron", color: hex.accent, glowColor: hex.accentLight, speed: 0.15, scale: 0.7, position: [1.8, -0.3, -1] },
+    { shape: "torus", color: hex.cyan, glowColor: hex.cyanLight, speed: 0.25, scale: 0.5, position: [0.5, 1.2, -0.5] },
   ],
   research: [
-    { shape: "dodecahedron", color: "#3b82f6", glowColor: "#93c5fd", speed: 0.12, scale: 1.4, position: [0, 0, 0] },
-    { shape: "torusKnot", color: "#8b5cf6", glowColor: "#c4b5fd", speed: 0.08, scale: 0.5, position: [2, 1, -1] },
+    { shape: "dodecahedron", color: hex.primary, glowColor: hex.primaryPale, speed: 0.12, scale: 1.4, position: [0, 0, 0] },
+    { shape: "torusKnot", color: hex.accent, glowColor: hex.accentPale, speed: 0.08, scale: 0.5, position: [2, 1, -1] },
   ],
   contact: [
-    { shape: "torusKnot", color: "#3b82f6", glowColor: "#60a5fa", speed: 0.1, scale: 1.0, position: [0, 0, 0] },
-    { shape: "icosahedron", color: "#8b5cf6", glowColor: "#a78bfa", speed: 0.18, scale: 0.4, position: [-1.5, 1, -0.5] },
+    { shape: "torusKnot", color: hex.primary, glowColor: hex.primaryLight, speed: 0.1, scale: 1.0, position: [0, 0, 0] },
+    { shape: "icosahedron", color: hex.accent, glowColor: hex.accentLight, speed: 0.18, scale: 0.4, position: [-1.5, 1, -0.5] },
   ],
 }
 
@@ -198,8 +202,8 @@ export function FloatingGeometry({
   return (
     <WebGLErrorBoundary>
       <div ref={wrapperRef} className={`pointer-events-none w-full h-full ${className}`}>
-        {visible && (
           <Canvas
+            frameloop={visible ? "always" : "never"}
             camera={{ position: [0, 0, 4.5], fov: 45 }}
             dpr={[1, 1.5]}
             gl={{
@@ -207,16 +211,17 @@ export function FloatingGeometry({
               alpha: true,
               powerPreference: "high-performance",
             }}
-            style={{ background: "transparent" }}
+            style={{ background: "transparent", visibility: visible ? "visible" : "hidden" }}
             onCreated={({ gl }) => {
               gl.setClearColor(0x000000, 0)
+              const canvas = gl.domElement
+              canvas.addEventListener('webglcontextlost', (e) => e.preventDefault(), false)
             }}
           >
             <Suspense fallback={null}>
               <Scene shapes={shapes} />
             </Suspense>
           </Canvas>
-        )}
       </div>
     </WebGLErrorBoundary>
   )

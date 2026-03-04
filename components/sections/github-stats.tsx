@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useCallback, useMemo } from "react"
 import { AnimatedSection } from "../animations/animated-section"
 import { AnimatedCounter } from "../animations/animated-counter"
 import { SectionHeader } from "../layout/section-header"
+import { gradients as g, toHsla, hsl } from "@/lib/theme"
 import {
     GitFork,
     Star,
@@ -17,6 +18,12 @@ import {
     Flame,
     Calendar,
     TrendingUp,
+    Zap,
+    Hash,
+    BarChart3,
+    PieChart,
+    Tag,
+    Circle,
 } from "lucide-react"
 import { SiGithub } from "react-icons/si"
 
@@ -97,19 +104,19 @@ const LANG_COLORS: Record<string, string> = {
 
 /* ── Contribution heatmap level colours (brand blue) ─────────── */
 const LEVEL_COLORS = [
-    "hsla(217, 91%, 60%, 0.04)",
-    "hsla(217, 91%, 60%, 0.22)",
-    "hsla(217, 91%, 60%, 0.42)",
-    "hsla(217, 91%, 60%, 0.64)",
-    "hsla(217, 91%, 60%, 0.88)",
+    toHsla(hsl.primary, 0.04),
+    toHsla(hsl.primary, 0.22),
+    toHsla(hsl.primary, 0.42),
+    toHsla(hsl.primary, 0.64),
+    toHsla(hsl.primary, 0.88),
 ] as const
 
 const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 const DAY_LABELS = ["", "Mon", "", "Wed", "", "Fri", ""]
 
 const GITHUB_USERNAME = "ml-lubich"
-const WEEKS_TO_SHOW = 22
-const CELL = 13
+const WEEKS_TO_SHOW = 26
+const CELL = 15
 const GAP = 3
 
 /* ── Helpers ─────────────────────────────────────────────────── */
@@ -187,6 +194,90 @@ function buildContributionData(events: GitHubEvent[]) {
     return { grid, stats: { total, streak, best, avg } }
 }
 
+/* ── Extended analytics helpers ──────────────────────────────── */
+interface DayOfWeekStat { day: string; short: string; count: number; pct: number }
+interface HourStat { hour: number; label: string; count: number; pct: number }
+interface EventTypeStat { type: string; count: number; color: string; pct: number }
+interface TopicStat { name: string; count: number }
+interface RepoBubble { name: string; size: number; lang: string | null; color: string; stars: number }
+
+const DAY_NAMES_FULL = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+const DAY_NAMES_SHORT = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+const EVENT_COLORS = ["#3b82f6", "#8b5cf6", "#06b6d4", "#f59e0b", "#10b981", "#ef4444", "#ec4899", "#6366f1"]
+const EVENT_FRIENDLY: Record<string, string> = {
+    PushEvent: "Pushes",
+    CreateEvent: "Creates",
+    DeleteEvent: "Deletes",
+    WatchEvent: "Stars Given",
+    PullRequestEvent: "Pull Requests",
+    IssuesEvent: "Issues",
+    IssueCommentEvent: "Comments",
+    ForkEvent: "Forks",
+    PullRequestReviewEvent: "PR Reviews",
+    ReleaseEvent: "Releases",
+    PublicEvent: "Made Public",
+    MemberEvent: "Members",
+}
+
+function buildDayOfWeekStats(events: GitHubEvent[]): DayOfWeekStat[] {
+    const counts = [0, 0, 0, 0, 0, 0, 0]
+    for (const ev of events) {
+        const d = new Date(ev.created_at).getDay()
+        counts[d] += ev.type === "PushEvent" && Array.isArray(ev.payload?.commits) ? ev.payload!.commits!.length : 1
+    }
+    const max = Math.max(...counts, 1)
+    return counts.map((c, i) => ({ day: DAY_NAMES_FULL[i], short: DAY_NAMES_SHORT[i], count: c, pct: (c / max) * 100 }))
+}
+
+function buildHourStats(events: GitHubEvent[]): HourStat[] {
+    const counts = new Array(24).fill(0)
+    for (const ev of events) {
+        const h = new Date(ev.created_at).getHours()
+        counts[h] += ev.type === "PushEvent" && Array.isArray(ev.payload?.commits) ? ev.payload!.commits!.length : 1
+    }
+    const max = Math.max(...counts, 1)
+    return counts.map((c, i) => ({
+        hour: i,
+        label: i === 0 ? "12a" : i < 12 ? i + "a" : i === 12 ? "12p" : (i - 12) + "p",
+        count: c,
+        pct: (c / max) * 100,
+    }))
+}
+
+function buildEventTypeStats(events: GitHubEvent[]): EventTypeStat[] {
+    const typeMap: Record<string, number> = {}
+    for (const ev of events) typeMap[ev.type] = (typeMap[ev.type] || 0) + 1
+    const total = events.length || 1
+    return Object.entries(typeMap)
+        .map(([type, count], i) => ({
+            type: EVENT_FRIENDLY[type] || type.replace(/Event$/, ""),
+            count,
+            color: EVENT_COLORS[i % EVENT_COLORS.length],
+            pct: (count / total) * 100,
+        }))
+        .sort((a, b) => b.count - a.count)
+}
+
+function buildTopics(repos: GitHubRepo[]): TopicStat[] {
+    const map: Record<string, number> = {}
+    for (const repo of repos) for (const t of (repo.topics || [])) map[t] = (map[t] || 0) + 1
+    return Object.entries(map).map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count)
+}
+
+function buildRepoBubbles(repos: GitHubRepo[]): RepoBubble[] {
+    return repos
+        .filter(r => r.size > 0)
+        .sort((a, b) => b.size - a.size)
+        .slice(0, 12)
+        .map(r => ({
+            name: r.name,
+            size: r.size,
+            lang: r.language,
+            color: LANG_COLORS[r.language || ""] || "#6b7280",
+            stars: r.stargazers_count,
+        }))
+}
+
 /* ── Component ───────────────────────────────────────────────── */
 export function GitHubStats() {
     const [user, setUser] = useState<GitHubUser | null>(null)
@@ -199,6 +290,11 @@ export function GitHubStats() {
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
     const [hoveredCell, setHoveredCell] = useState<{ date: string; count: number; x: number; y: number } | null>(null)
+    const [dayOfWeek, setDayOfWeek] = useState<DayOfWeekStat[]>([])
+    const [hourStats, setHourStats] = useState<HourStat[]>([])
+    const [eventTypes, setEventTypes] = useState<EventTypeStat[]>([])
+    const [topics, setTopics] = useState<TopicStat[]>([])
+    const [repoBubbles, setRepoBubbles] = useState<RepoBubble[]>([])
     const fetchedRef = useRef(false)
 
     const fetchGitHubData = useCallback(async () => {
@@ -237,6 +333,11 @@ export function GitHubStats() {
             setLanguages(langStats)
             setTotalStars(stars)
             setTotalForks(forks)
+            setDayOfWeek(buildDayOfWeekStats(allEvents))
+            setHourStats(buildHourStats(allEvents))
+            setEventTypes(buildEventTypeStats(allEvents))
+            setTopics(buildTopics(ownRepos))
+            setRepoBubbles(buildRepoBubbles(ownRepos))
         } catch (err) { setError(err instanceof Error ? err.message : "Failed to load GitHub data") }
         finally { setLoading(false) }
     }, [])
@@ -258,7 +359,7 @@ export function GitHubStats() {
 
     if (loading) {
         return (
-            <AnimatedSection id="github" className="relative py-14 sm:py-20 overflow-hidden">
+            <AnimatedSection id="github" className="relative py-10 sm:py-14 overflow-hidden">
                 <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
                     <div className="mb-10 text-center">
                         <div className="mx-auto h-4 w-32 animate-pulse rounded bg-muted" />
@@ -275,7 +376,7 @@ export function GitHubStats() {
 
     if (error) {
         return (
-            <AnimatedSection id="github" className="relative py-14 sm:py-20 overflow-hidden">
+            <AnimatedSection id="github" className="relative py-10 sm:py-14 overflow-hidden">
                 <div className="relative mx-auto max-w-7xl px-4 sm:px-6 text-center">
                     <p className="text-muted-foreground text-sm">{error}</p>
                 </div>
@@ -287,7 +388,7 @@ export function GitHubStats() {
     const accountAge = user ? new Date().getFullYear() - new Date(user.created_at).getFullYear() : 0
 
     return (
-        <AnimatedSection id="github" className="relative py-14 sm:py-20 overflow-hidden">
+        <AnimatedSection id="github" className="relative py-10 sm:py-14 overflow-hidden">
             {/* Background orbs */}
             <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
                 <div className="absolute -right-40 top-1/3 h-[500px] w-[500px] rounded-full bg-primary/8 blur-[100px] translucent-glow" />
@@ -304,15 +405,15 @@ export function GitHubStats() {
                 />
 
                 {/* Stat cards */}
-                <div className="mb-8 grid gap-4 grid-cols-2 lg:grid-cols-4">
+                <div className="mb-5 grid gap-3 grid-cols-2 lg:grid-cols-4">
                     {[
-                        { icon: <BookOpen className="h-5 w-5" />, label: "Repositories", value: String(user?.public_repos ?? 0), gradient: "from-primary to-accent" },
-                        { icon: <Star className="h-5 w-5" />, label: "Stars Earned", value: String(totalStars), gradient: "from-accent to-[hsl(180,70%,50%)]" },
-                        { icon: <GitFork className="h-5 w-5" />, label: "Forks", value: String(totalForks), gradient: "from-[hsl(180,70%,50%)] to-primary" },
-                        { icon: <Users className="h-5 w-5" />, label: "Followers", value: String(user?.followers ?? 0), gradient: "from-primary to-[hsl(340,75%,55%)]" },
+                        { icon: <BookOpen className="h-5 w-5" />, label: "Repositories", value: String(user?.public_repos ?? 0), gradient: g.primaryToAccent },
+                        { icon: <Star className="h-5 w-5" />, label: "Stars Earned", value: String(totalStars), gradient: g.accentToCyan },
+                        { icon: <GitFork className="h-5 w-5" />, label: "Forks", value: String(totalForks), gradient: g.cyanToPrimary },
+                        { icon: <Users className="h-5 w-5" />, label: "Followers", value: String(user?.followers ?? 0), gradient: g.primaryToRose },
                     ].map((stat, i) => (
                         <AnimatedSection key={stat.label} delay={i * 80}>
-                            <div className="group relative overflow-hidden rounded-2xl border border-white/[0.03] bg-white/[0.01] backdrop-blur-2xl p-5 sm:p-6 transition-all duration-500 hover:border-primary/30 hover:bg-white/[0.025] glass-card-3d">
+                            <div className="group relative overflow-hidden rounded-2xl border border-white/[0.03] bg-white/[0.01] backdrop-blur-2xl p-4 sm:p-5 transition-all duration-500 hover:border-primary/30 hover:bg-white/[0.025] glass-card-3d">
                                 <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/5 to-transparent" />
                                 <div className={"absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r " + stat.gradient + " opacity-40"} />
                                 <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-primary/8 blur-2xl opacity-0 transition-all duration-700 group-hover:opacity-100 group-hover:scale-150" />
@@ -332,11 +433,11 @@ export function GitHubStats() {
 
                 {/* Contribution heatmap */}
                 <AnimatedSection delay={160}>
-                    <div className="relative mb-8 overflow-hidden rounded-2xl border border-white/[0.03] bg-white/[0.01] backdrop-blur-2xl p-6 sm:p-8 transition-all duration-500 hover:border-primary/20 hover:bg-white/[0.02]">
+                    <div className="relative mb-5 overflow-hidden rounded-2xl border border-white/[0.03] bg-white/[0.01] backdrop-blur-2xl px-4 py-4 sm:px-5 sm:py-5 transition-all duration-500 hover:border-primary/20 hover:bg-white/[0.02]">
                         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/5 to-transparent" />
                         <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-primary/40 via-accent/40 to-primary/40 opacity-60" />
 
-                        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+                        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                             <h3 className="flex items-center gap-2 text-lg font-bold text-foreground">
                                 <Calendar className="h-4 w-4 text-primary" />
                                 Contribution Activity
@@ -353,7 +454,7 @@ export function GitHubStats() {
                             </div>
                         </div>
 
-                        <div className="overflow-x-auto pb-2 -mx-2 px-2">
+                        <div className="overflow-x-auto pb-2 -mx-2 px-2 flex justify-center">
                             <div className="inline-flex gap-0 min-w-max">
                                 {/* Day labels */}
                                 <div className="flex flex-col mr-2" style={{ gap: GAP }}>
@@ -387,8 +488,8 @@ export function GitHubStats() {
                                                             width: CELL,
                                                             height: CELL,
                                                             backgroundColor: LEVEL_COLORS[day.level],
-                                                            border: day.level > 0 ? "1px solid hsla(217, 91%, 60%, 0.10)" : "1px solid hsla(220, 15%, 25%, 0.08)",
-                                                            boxShadow: day.level >= 3 ? "0 0 " + (day.level * 4) + "px hsla(217, 91%, 60%, " + (day.level * 0.06) + ")" : "none",
+                                                            border: day.level > 0 ? `1px solid ${toHsla(hsl.primary, 0.10)}` : `1px solid ${toHsla(hsl.border, 0.08)}`,
+                                                            boxShadow: day.level >= 3 ? `0 0 ${day.level * 4}px ${toHsla(hsl.primary, day.level * 0.06)}` : "none",
                                                         }}
                                                         onMouseEnter={(e) => {
                                                             const rect = e.currentTarget.getBoundingClientRect()
@@ -408,7 +509,7 @@ export function GitHubStats() {
                         </div>
 
                         {/* Legend + stats */}
-                        <div className="mt-5 flex flex-wrap items-center justify-between gap-4 border-t border-white/[0.02] pt-4">
+                        <div className="mt-3 flex flex-wrap items-center justify-between gap-4 border-t border-white/[0.02] pt-3">
                             <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground/50">
                                 <span>Less</span>
                                 {LEVEL_COLORS.map((color, i) => (
@@ -433,12 +534,12 @@ export function GitHubStats() {
                 </AnimatedSection>
 
                 {/* Languages + Recent repos */}
-                <div className="grid gap-5 lg:grid-cols-2">
+                <div className="grid gap-4 lg:grid-cols-2">
                     {/* Language breakdown */}
                     <AnimatedSection delay={240}>
-                        <div className="relative h-full overflow-hidden rounded-2xl border border-white/[0.03] bg-white/[0.01] backdrop-blur-2xl p-6 sm:p-8 transition-all duration-500 hover:border-primary/20 hover:bg-white/[0.02] glass-card-3d">
+                        <div className="relative h-full overflow-hidden rounded-2xl border border-white/[0.03] bg-white/[0.01] backdrop-blur-2xl p-5 sm:p-6 transition-all duration-500 hover:border-primary/20 hover:bg-white/[0.02] glass-card-3d">
                             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/6 to-transparent" />
-                            <h3 className="mb-6 flex items-center gap-2 text-lg font-bold text-foreground">
+                            <h3 className="mb-5 flex items-center gap-2 text-lg font-bold text-foreground">
                                 <GitCommit className="h-4 w-4 text-primary" />
                                 Language Distribution
                             </h3>
@@ -467,9 +568,9 @@ export function GitHubStats() {
 
                     {/* Recent repos */}
                     <AnimatedSection delay={320}>
-                        <div className="relative h-full overflow-hidden rounded-2xl border border-white/[0.03] bg-white/[0.01] backdrop-blur-2xl p-6 sm:p-8 transition-all duration-500 hover:border-primary/20 hover:bg-white/[0.02] glass-card-3d">
+                        <div className="relative h-full overflow-hidden rounded-2xl border border-white/[0.03] bg-white/[0.01] backdrop-blur-2xl p-5 sm:p-6 transition-all duration-500 hover:border-primary/20 hover:bg-white/[0.02] glass-card-3d">
                             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/6 to-transparent" />
-                            <h3 className="mb-6 flex items-center gap-2 text-lg font-bold text-foreground">
+                            <h3 className="mb-5 flex items-center gap-2 text-lg font-bold text-foreground">
                                 <Activity className="h-4 w-4 text-accent" />
                                 Recent Activity
                             </h3>
@@ -502,6 +603,286 @@ export function GitHubStats() {
                                 View all repos on GitHub
                                 <ExternalLink className="h-3 w-3" />
                             </a>
+                        </div>
+                    </AnimatedSection>
+                </div>
+
+                {/* ── Row 3: Radar + Coding Hours + Event Donut ──────── */}
+                <div className="mt-5 grid gap-4 lg:grid-cols-3">
+                    {/* 1 · Day-of-Week Radar Chart */}
+                    <AnimatedSection delay={400}>
+                        <div className="relative h-full overflow-hidden rounded-2xl border border-white/[0.03] bg-white/[0.01] backdrop-blur-2xl p-5 sm:p-6 transition-all duration-500 hover:border-primary/20 hover:bg-white/[0.02] glass-card-3d">
+                            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/6 to-transparent" />
+                            <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-primary/40 via-accent/40 to-primary/40 opacity-60" />
+                            <h3 className="mb-4 flex items-center gap-2 text-lg font-bold text-foreground">
+                                <BarChart3 className="h-4 w-4 text-primary" />
+                                Weekly Rhythm
+                            </h3>
+                            {dayOfWeek.length > 0 && (() => {
+                                const cx = 100, cy = 100, r = 78, n = 7
+                                const angleFor = (i: number) => (Math.PI * 2 * i) / n - Math.PI / 2
+                                const pt = (i: number, pct: number) => {
+                                    const a = angleFor(i)
+                                    return `${cx + (pct / 100) * r * Math.cos(a)},${cy + (pct / 100) * r * Math.sin(a)}`
+                                }
+                                return (
+                                    <div className="flex justify-center">
+                                        <svg viewBox="0 0 200 200" className="w-full max-w-[220px]">
+                                            {/* Grid rings */}
+                                            {[25, 50, 75, 100].map(p => (
+                                                <polygon key={p}
+                                                    points={Array.from({ length: n }, (_, i) => pt(i, p)).join(" ")}
+                                                    fill="none" stroke="hsla(220,15%,40%,0.08)" strokeWidth="0.5"
+                                                />
+                                            ))}
+                                            {/* Axis lines */}
+                                            {Array.from({ length: n }, (_, i) => (
+                                                <line key={i}
+                                                    x1={cx} y1={cy}
+                                                    x2={cx + r * Math.cos(angleFor(i))}
+                                                    y2={cy + r * Math.sin(angleFor(i))}
+                                                    stroke="hsla(220,15%,40%,0.06)" strokeWidth="0.5"
+                                                />
+                                            ))}
+                                            {/* Data polygon */}
+                                            <polygon
+                                                points={dayOfWeek.map((d, i) => pt(i, d.pct)).join(" ")}
+                                                fill="hsla(217, 91%, 60%, 0.12)" stroke="hsl(217, 91%, 60%)" strokeWidth="1.5"
+                                            />
+                                            {/* Data dots + labels */}
+                                            {dayOfWeek.map((d, i) => {
+                                                const a = angleFor(i)
+                                                const dx = cx + (d.pct / 100) * r * Math.cos(a)
+                                                const dy = cy + (d.pct / 100) * r * Math.sin(a)
+                                                const lx = cx + (r + 16) * Math.cos(a)
+                                                const ly = cy + (r + 16) * Math.sin(a)
+                                                return (
+                                                    <g key={i}>
+                                                        <circle cx={dx} cy={dy} r="3" fill="hsl(217, 91%, 60%)" opacity="0.9" />
+                                                        <text x={lx} y={ly} textAnchor="middle" dominantBaseline="central"
+                                                            className="fill-muted-foreground" style={{ fontSize: "8px" }}>
+                                                            {d.short}
+                                                        </text>
+                                                    </g>
+                                                )
+                                            })}
+                                        </svg>
+                                    </div>
+                                )
+                            })()}
+                            <div className="mt-3 text-center text-xs text-muted-foreground">
+                                Most active: <span className="font-semibold text-foreground">{dayOfWeek.length > 0 ? dayOfWeek.reduce((a, b) => a.count > b.count ? a : b).day : "—"}</span>
+                            </div>
+                        </div>
+                    </AnimatedSection>
+
+                    {/* 2 · Coding Hours Bar Chart */}
+                    <AnimatedSection delay={480}>
+                        <div className="relative h-full overflow-hidden rounded-2xl border border-white/[0.03] bg-white/[0.01] backdrop-blur-2xl p-5 sm:p-6 transition-all duration-500 hover:border-primary/20 hover:bg-white/[0.02] glass-card-3d">
+                            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/6 to-transparent" />
+                            <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-accent/40 via-primary/40 to-accent/40 opacity-60" />
+                            <h3 className="mb-4 flex items-center gap-2 text-lg font-bold text-foreground">
+                                <Zap className="h-4 w-4 text-accent" />
+                                Coding Hours
+                            </h3>
+                            {hourStats.length > 0 && (
+                                <div className="flex justify-center">
+                                    <svg viewBox="0 0 264 140" className="w-full">
+                                        {/* Y-axis grid */}
+                                        {[0, 25, 50, 75, 100].map(p => (
+                                            <line key={p} x1="0" y1={110 - p * 1.0} x2="264" y2={110 - p * 1.0}
+                                                stroke="hsla(220,15%,40%,0.06)" strokeWidth="0.5" />
+                                        ))}
+                                        {/* Bars */}
+                                        {hourStats.map((h, i) => {
+                                            const barW = 8, gap = 3
+                                            const x = i * (barW + gap)
+                                            const barH = Math.max(h.pct * 1.0, h.count > 0 ? 2 : 0)
+                                            const intensity = h.pct / 100
+                                            return (
+                                                <g key={i}>
+                                                    <rect
+                                                        x={x} y={110 - barH} width={barW} height={barH}
+                                                        rx="2"
+                                                        fill={`hsla(217, 91%, 60%, ${0.15 + intensity * 0.7})`}
+                                                        stroke={intensity > 0.5 ? "hsla(217, 91%, 60%, 0.4)" : "none"}
+                                                        strokeWidth="0.5"
+                                                    />
+                                                    {barH > 0 && (
+                                                        <rect x={x} y={110 - barH} width={barW} height={Math.min(barH, 3)}
+                                                            rx="2" fill={`hsla(217, 91%, 70%, ${intensity * 0.5})`} />
+                                                    )}
+                                                    {i % 3 === 0 && (
+                                                        <text x={x + barW / 2} y={125} textAnchor="middle"
+                                                            className="fill-muted-foreground" style={{ fontSize: "7px" }}>
+                                                            {h.label}
+                                                        </text>
+                                                    )}
+                                                </g>
+                                            )
+                                        })}
+                                    </svg>
+                                </div>
+                            )}
+                            <div className="mt-3 text-center text-xs text-muted-foreground">
+                                Peak hour: <span className="font-semibold text-foreground">
+                                    {hourStats.length > 0 ? (() => {
+                                        const peak = hourStats.reduce((a, b) => a.count > b.count ? a : b)
+                                        return peak.hour === 0 ? "12 AM" : peak.hour < 12 ? peak.hour + " AM" : peak.hour === 12 ? "12 PM" : (peak.hour - 12) + " PM"
+                                    })() : "—"}
+                                </span>
+                            </div>
+                        </div>
+                    </AnimatedSection>
+
+                    {/* 3 · Event Type Donut */}
+                    <AnimatedSection delay={560}>
+                        <div className="relative h-full overflow-hidden rounded-2xl border border-white/[0.03] bg-white/[0.01] backdrop-blur-2xl p-5 sm:p-6 transition-all duration-500 hover:border-primary/20 hover:bg-white/[0.02] glass-card-3d">
+                            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/6 to-transparent" />
+                            <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-[hsl(280,70%,55%)]/40 via-primary/40 to-accent/40 opacity-60" />
+                            <h3 className="mb-4 flex items-center gap-2 text-lg font-bold text-foreground">
+                                <PieChart className="h-4 w-4 text-purple-400" />
+                                Event Breakdown
+                            </h3>
+                            {eventTypes.length > 0 && (() => {
+                                const total = eventTypes.reduce((s, e) => s + e.count, 0)
+                                const cx = 80, cy = 80, R = 65, r = 42
+                                const circumference = 2 * Math.PI * ((R + r) / 2)
+                                let offset = 0
+                                return (
+                                    <div className="flex flex-col items-center gap-4">
+                                        <svg viewBox="0 0 160 160" className="w-full max-w-[180px]">
+                                            {eventTypes.map((ev, i) => {
+                                                const dashLen = (ev.count / total) * circumference
+                                                const strokeW = R - r
+                                                const radius = (R + r) / 2
+                                                const currentOffset = offset
+                                                offset += dashLen
+                                                return (
+                                                    <circle key={i}
+                                                        cx={cx} cy={cy} r={radius}
+                                                        fill="none" stroke={ev.color}
+                                                        strokeWidth={strokeW}
+                                                        strokeDasharray={`${dashLen} ${circumference - dashLen}`}
+                                                        strokeDashoffset={-currentOffset}
+                                                        opacity="0.8"
+                                                        transform={`rotate(-90 ${cx} ${cy})`}
+                                                        className="transition-all duration-700"
+                                                    />
+                                                )
+                                            })}
+                                            <text x={cx} y={cy - 6} textAnchor="middle" className="fill-foreground font-bold" style={{ fontSize: "16px" }}>
+                                                {total}
+                                            </text>
+                                            <text x={cx} y={cy + 10} textAnchor="middle" className="fill-muted-foreground" style={{ fontSize: "7px" }}>
+                                                events
+                                            </text>
+                                        </svg>
+                                        <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 w-full">
+                                            {eventTypes.slice(0, 6).map((ev, i) => (
+                                                <div key={i} className="flex items-center gap-1.5 animate-slide-up" style={{ animationDelay: i * 60 + "ms", opacity: 0 }}>
+                                                    <span className="inline-block h-2 w-2 flex-shrink-0 rounded-full" style={{ backgroundColor: ev.color }} />
+                                                    <span className="truncate text-[11px] text-muted-foreground">{ev.type}</span>
+                                                    <span className="ml-auto flex-shrink-0 font-mono text-[10px] text-foreground/60">{ev.pct.toFixed(0)}%</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )
+                            })()}
+                        </div>
+                    </AnimatedSection>
+                </div>
+
+                {/* ── Row 4: Topics Cloud + Repo Size Bubbles ─────────── */}
+                <div className="mt-5 grid gap-4 lg:grid-cols-2">
+                    {/* 4 · Repo Topics Cloud */}
+                    <AnimatedSection delay={640}>
+                        <div className="relative h-full overflow-hidden rounded-2xl border border-white/[0.03] bg-white/[0.01] backdrop-blur-2xl p-5 sm:p-6 transition-all duration-500 hover:border-primary/20 hover:bg-white/[0.02] glass-card-3d">
+                            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/6 to-transparent" />
+                            <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-primary/40 via-[hsl(180,70%,50%)]/40 to-primary/40 opacity-60" />
+                            <h3 className="mb-5 flex items-center gap-2 text-lg font-bold text-foreground">
+                                <Tag className="h-4 w-4 text-cyan-400" />
+                                Tech Topics
+                            </h3>
+                            {topics.length > 0 ? (
+                                <div className="flex flex-wrap gap-2">
+                                    {topics.map((t, i) => {
+                                        const maxCount = topics[0]?.count || 1
+                                        const scale = 0.6 + (t.count / maxCount) * 0.4
+                                        const opacity = 0.4 + (t.count / maxCount) * 0.6
+                                        return (
+                                            <span
+                                                key={t.name}
+                                                className="inline-flex items-center gap-1 rounded-full border border-white/[0.04] bg-white/[0.02] px-3 py-1.5 transition-all duration-300 hover:border-primary/30 hover:bg-primary/10 hover:scale-105 animate-slide-up cursor-default"
+                                                style={{
+                                                    fontSize: `${11 + (t.count / maxCount) * 4}px`,
+                                                    opacity,
+                                                    animationDelay: i * 40 + "ms",
+                                                }}
+                                            >
+                                                <Hash className="h-3 w-3 text-primary/50" style={{ transform: `scale(${scale})` }} />
+                                                <span className="text-muted-foreground">{t.name}</span>
+                                                {t.count > 1 && (
+                                                    <span className="ml-0.5 rounded-full bg-primary/10 px-1.5 py-0.5 font-mono text-[9px] text-primary/70">{t.count}</span>
+                                                )}
+                                            </span>
+                                        )
+                                    })}
+                                </div>
+                            ) : (
+                                <p className="text-xs text-muted-foreground">No topics tagged on public repos yet.</p>
+                            )}
+                        </div>
+                    </AnimatedSection>
+
+                    {/* 5 · Repo Size Bubbles */}
+                    <AnimatedSection delay={720}>
+                        <div className="relative h-full overflow-hidden rounded-2xl border border-white/[0.03] bg-white/[0.01] backdrop-blur-2xl p-5 sm:p-6 transition-all duration-500 hover:border-primary/20 hover:bg-white/[0.02] glass-card-3d">
+                            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/6 to-transparent" />
+                            <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-accent/40 via-[hsl(340,75%,55%)]/40 to-accent/40 opacity-60" />
+                            <h3 className="mb-5 flex items-center gap-2 text-lg font-bold text-foreground">
+                                <Circle className="h-4 w-4 text-pink-400" />
+                                Repo Sizes
+                            </h3>
+                            {repoBubbles.length > 0 && (() => {
+                                const maxSize = repoBubbles[0]?.size || 1
+                                const minR = 22, maxR = 52
+                                return (
+                                    <div className="flex flex-wrap items-center justify-center gap-3">
+                                        {repoBubbles.map((b, i) => {
+                                            const pct = b.size / maxSize
+                                            const radius = minR + pct * (maxR - minR)
+                                            const diameter = radius * 2
+                                            return (
+                                                <div
+                                                    key={b.name}
+                                                    className="group/bubble relative flex items-center justify-center rounded-full transition-all duration-500 hover:scale-110 cursor-default animate-slide-up"
+                                                    style={{
+                                                        width: diameter,
+                                                        height: diameter,
+                                                        background: `radial-gradient(circle at 35% 35%, ${b.color}30, ${b.color}10)`,
+                                                        border: `1px solid ${b.color}30`,
+                                                        boxShadow: `0 0 ${pct * 24}px ${b.color}15, inset 0 0 ${pct * 16}px ${b.color}08`,
+                                                        animationDelay: i * 60 + "ms",
+                                                        opacity: 0,
+                                                    }}
+                                                    title={`${b.name}: ${(b.size / 1024).toFixed(1)} MB${b.lang ? " · " + b.lang : ""}${b.stars > 0 ? " · ★ " + b.stars : ""}`}
+                                                >
+                                                    <span className="text-center px-1 leading-tight" style={{ fontSize: Math.max(8, 7 + pct * 4) + "px" }}>
+                                                        <span className="block truncate text-foreground/70 font-medium group-hover/bubble:text-foreground transition-colors">
+                                                            {b.name.length > 10 ? b.name.slice(0, 9) + "…" : b.name}
+                                                        </span>
+                                                        <span className="block text-muted-foreground/50 font-mono" style={{ fontSize: "7px" }}>
+                                                            {b.size > 1024 ? (b.size / 1024).toFixed(0) + " MB" : b.size + " KB"}
+                                                        </span>
+                                                    </span>
+                                                </div>
+                                            )
+                                        })}
+                                    </div>
+                                )
+                            })()}
                         </div>
                     </AnimatedSection>
                 </div>

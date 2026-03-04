@@ -10,6 +10,7 @@ import {
 import type { ScrollStackCardsProps, DragState } from "./types"
 import { SPRING, DAMPING, FLING_DECAY, DRAG_DEAD_ZONE, newDragState } from "./constants"
 import { GlowOverlay, ShineOverlay, ScanOverlay, CornerBrackets } from "./card-overlays"
+import { overlays, shadows } from "@/lib/theme"
 
 /**
  * Hen-ry.com–style sticky stacking cards with 3D transforms + drag physics.
@@ -205,7 +206,7 @@ export function ScrollStackCards({
       `scale(${dragScale})`,
     ].join(" ")
     el.style.filter = "brightness(1.1)"
-    el.style.boxShadow = `0 ${30 + Math.abs(d.dy) * 0.2}px 80px -12px rgba(0,0,0,0.45), 0 0 60px -10px rgba(100,140,255,0.15)`
+    el.style.boxShadow = shadows.cardDrag(d.dy)
     el.style.transition = "none"
     el.style.cursor = "grabbing"
 
@@ -305,13 +306,13 @@ export function ScrollStackCards({
 
     el.style.transform = `perspective(${perspective}px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) translateZ(30px) scale(1.02)`
     el.style.filter = "brightness(1.05)"
-    el.style.boxShadow = "0 30px 80px -12px rgba(0,0,0,0.4), 0 0 50px -8px rgba(100,100,255,0.12)"
+    el.style.boxShadow = shadows.cardHover
     el.style.transition = "transform 0.12s ease-out, box-shadow 0.12s ease-out, filter 0.12s ease-out"
 
     const glow = glowRefs.current[index]
     if (glow) {
       glow.style.opacity = "0.7"
-      glow.style.background = `radial-gradient(circle at ${x * 100}% ${y * 100}%, hsla(217,91%,60%,0.25), transparent 60%)`
+      glow.style.background = overlays.cardGlow(x * 100, y * 100)
     }
 
     const shine = shineRefs.current[index]
@@ -454,18 +455,23 @@ export function ScrollStackCards({
         {header}
 
         {/* Split-view container for cards + detail panel */}
-        <div className="relative">
-          {/* Card stack — shifts left when detail panel is open */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "flex-start",
+            gap: isExpanded ? "1rem" : "0",
+            transition: "gap 0.65s cubic-bezier(0.16, 1, 0.3, 1)",
+          }}
+        >
+          {/* Card stack — shrinks left when detail panel is open */}
           <div
             style={{
               display: "grid",
               gridTemplateColumns: "1fr",
               gridTemplateRows: "1fr",
-              transform: isExpanded
-                ? "translateX(-15%) scale(0.85)"
-                : "translateX(0) scale(1)",
-              transformOrigin: "left top",
-              transition: "transform 0.65s cubic-bezier(0.16, 1, 0.3, 1)",
+              width: isExpanded ? "45%" : "100%",
+              flexShrink: 0,
+              transition: "width 0.65s cubic-bezier(0.16, 1, 0.3, 1)",
             }}
           >
             {cards.map((card, i) => (
@@ -504,17 +510,19 @@ export function ScrollStackCards({
             ))}
           </div>
 
-          {/* Detail panel — slides in from right when a card is selected */}
+          {/* Detail panel — expands to the right of the card stack */}
           {detailContent && (
             <div
-              className="absolute top-0 right-0 w-[92%] sm:w-[56%] lg:w-[52%]"
               style={{
+                width: isExpanded ? "54%" : "0",
+                flexShrink: 0,
                 maxHeight: `calc(100vh - ${stickyTop + 80}px)`,
                 overflowY: isExpanded ? "auto" : "hidden",
+                overflowX: "hidden",
                 overscrollBehavior: "contain",
-                transform: isExpanded ? "translateX(0)" : "translateX(110%)",
+                scrollbarGutter: "stable",
                 opacity: isExpanded ? 1 : 0,
-                transition: "transform 0.65s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease",
+                transition: "width 0.65s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease",
                 pointerEvents: isExpanded ? "auto" : "none",
                 zIndex: cards.length + 20,
               }}

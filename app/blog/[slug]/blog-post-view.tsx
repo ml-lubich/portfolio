@@ -8,6 +8,7 @@ import type { BlogPost } from "@/lib/blog-data"
 import { getRelatedPosts, getReadingTime, AUTHOR } from "@/lib/blog-data"
 import { BlogContent } from "@/components/blog/blog-content"
 import { BlogCard } from "@/components/blog/blog-card"
+import { shadows } from "@/lib/theme"
 
 interface BlogPostViewProps {
   post: BlogPost
@@ -97,7 +98,7 @@ export function BlogPostView({ post }: BlogPostViewProps) {
             </p>
 
             <div className="mt-6 flex items-center gap-4" itemProp="author" itemScope itemType="https://schema.org/Person">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-primary to-accent shadow-[0_0_20px_hsla(217,91%,60%,0.2)]">
+              <div className={`flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-primary to-accent shadow-[${shadows.blogAvatar}]`}>
                 <span className="text-xs font-bold text-primary-foreground">ML</span>
               </div>
               <div>
@@ -174,7 +175,7 @@ export function BlogPostView({ post }: BlogPostViewProps) {
                 href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(`https://blog.mishalubich.com/${post.slug}`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-lg border border-white/[0.06] bg-white/[0.03] p-2 text-muted-foreground backdrop-blur-sm transition-all hover:border-primary/20 hover:text-foreground hover:shadow-[0_0_15px_hsla(217,91%,60%,0.1)]"
+                className={`rounded-lg border border-white/[0.06] bg-white/[0.03] p-2 text-muted-foreground backdrop-blur-sm transition-all hover:border-primary/20 hover:text-foreground hover:shadow-[${shadows.blogShare}]`}
                 aria-label="Share on Twitter"
               >
                 <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -185,7 +186,7 @@ export function BlogPostView({ post }: BlogPostViewProps) {
                 href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(`https://blog.mishalubich.com/${post.slug}`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-lg border border-white/[0.06] bg-white/[0.03] p-2 text-muted-foreground backdrop-blur-sm transition-all hover:border-primary/20 hover:text-foreground hover:shadow-[0_0_15px_hsla(217,91%,60%,0.1)]"
+                className={`rounded-lg border border-white/[0.06] bg-white/[0.03] p-2 text-muted-foreground backdrop-blur-sm transition-all hover:border-primary/20 hover:text-foreground hover:shadow-[${shadows.blogShare}]`}
                 aria-label="Share on LinkedIn"
               >
                 <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">

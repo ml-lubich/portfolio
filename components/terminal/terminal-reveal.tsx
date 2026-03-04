@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react"
 import { motion, useInView } from "framer-motion"
+import { terminalChrome } from "@/lib/theme"
 
 interface TerminalRevealProps {
     /** Lines to type out. Each item is one line in the terminal. */
@@ -89,7 +90,7 @@ export function TerminalReveal({
             transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
             className={`perspective-[1200px] ${className}`}
         >
-            <div className="relative overflow-hidden rounded-xl border border-white/[0.08] bg-[#0d1117]/80 shadow-2xl shadow-black/40 backdrop-blur-xl">
+            <div className={`relative overflow-hidden rounded-xl border border-white/[0.08] bg-[${terminalChrome.revealBg}] shadow-2xl shadow-black/40 backdrop-blur-xl`}>
                 {/* Subtle top-edge glow */}
                 <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
 
@@ -97,9 +98,9 @@ export function TerminalReveal({
                 <div className="flex items-center gap-2 border-b border-white/[0.06] px-4 py-2.5">
                     {/* Traffic lights */}
                     <span className="flex gap-1.5">
-                        <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]/90" />
-                        <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]/90" />
-                        <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]/90" />
+                        <span className={`h-2.5 w-2.5 rounded-full bg-[${terminalChrome.dotClose}]/90`} />
+                        <span className={`h-2.5 w-2.5 rounded-full bg-[${terminalChrome.dotMinimize}]/90`} />
+                        <span className={`h-2.5 w-2.5 rounded-full bg-[${terminalChrome.dotExpand}]/90`} />
                     </span>
                     <span className="ml-2 font-mono text-[11px] text-muted-foreground/60 select-none">
                         {title}

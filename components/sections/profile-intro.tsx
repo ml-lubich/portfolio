@@ -4,6 +4,7 @@ import Image from "next/image"
 import { AnimatedSection } from "../animations/animated-section"
 import { AnimatedText } from "../animations/animated-text"
 import { useRef, useState, useCallback } from "react"
+import { profileOrbs } from "@/lib/theme"
 
 export function ProfileIntro() {
     const cardRef = useRef<HTMLDivElement>(null)
@@ -61,12 +62,12 @@ export function ProfileIntro() {
                         {/* Corner glow accents */}
                         <div
                             className="pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full opacity-15 blur-3xl transition-opacity duration-500 group-hover:opacity-25"
-                            style={{ background: "radial-gradient(circle, hsl(217 91% 60% / 0.25), transparent 70%)" }}
+                            style={{ background: profileOrbs.topRight }}
                             aria-hidden="true"
                         />
                         <div
                             className="pointer-events-none absolute -bottom-16 -left-16 h-40 w-40 rounded-full opacity-10 blur-3xl transition-opacity duration-500 group-hover:opacity-20"
-                            style={{ background: "radial-gradient(circle, hsl(280 70% 55% / 0.2), transparent 70%)" }}
+                            style={{ background: profileOrbs.bottomLeft }}
                             aria-hidden="true"
                         />
 
@@ -76,7 +77,7 @@ export function ProfileIntro() {
                                 {/* Glow ring behind photo */}
                                 <div
                                     className="absolute inset-0 scale-110 rounded-full opacity-0 blur-xl transition-opacity duration-500 group-hover:opacity-20"
-                                    style={{ background: "radial-gradient(circle, hsl(217 91% 60% / 0.15), transparent 70%)" }}
+                                    style={{ background: profileOrbs.photoRing }}
                                     aria-hidden="true"
                                 />
                                 <div

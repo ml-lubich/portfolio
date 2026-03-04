@@ -1,174 +1,54 @@
 "use client"
 
 import { useState, useEffect, useCallback, useRef } from "react"
-import { BookOpen, ExternalLink, X, ChevronRight, Beaker, BarChart3, Brain, Lightbulb, Target } from "lucide-react"
+import { BookOpen, ExternalLink, X, ChevronRight, ArrowRight } from "lucide-react"
 import { AnimatedSection } from "../animations/animated-section"
 import { ScrollStackSection } from "../layout/scroll-stack-section"
+import { papers, gradients, accents } from "@/data/publications"
+import type { Paper } from "@/data/publications"
 
+/* ── Research Detail Panel (inline split-view — matches DetailPanel design) ── */
 
-/* ── Paper data with links and research insights ─────────────────────── */
-
-interface InsightStep {
-  icon: typeof Beaker
-  label: string
-  text: string
-}
-
-interface Paper {
-  title: string
-  type: "Journal Article" | "Conference Abstract"
-  year: string
-  venue: string
-  detail: string
-  href: string
-  tags: string[]
-  summary: string
-  insights: InsightStep[]
-}
-
-const papers: Paper[] = [
-  {
-    title: "Stream Temperature Predictions Using Machine Learning for River Basin Management",
-    type: "Journal Article",
-    year: "2022",
-    venue: "Water (MDPI)",
-    detail: "Volume 14, Issue 7, Pages 1032",
-    href: "https://scholar.google.com/citations?view_op=view_citation&hl=en&user=Be6ZA78AAAAJ&citation_for_view=Be6ZA78AAAAJ:qjMakFHDy7sC",
-    tags: ["Machine Learning", "Hydrology", "Stream Temperature"],
-    summary: "Applied machine learning models to predict stream water temperatures across Pacific Northwest and mid-Atlantic river basins, enabling better ecological management of freshwater systems.",
-    insights: [
-      { icon: Target, label: "Problem", text: "Water temperature is critical for aquatic ecosystems — yet monitoring stations only cover a fraction of rivers. Managers needed basin-wide predictions to protect species like salmon." },
-      { icon: Beaker, label: "Approach", text: "Trained gradient-boosted tree and random forest models on air temperature, discharge, land cover, and topography features across hundreds of USGS gauge sites in two climatically different regions." },
-      { icon: BarChart3, label: "Results", text: "Achieved high predictive accuracy (R² > 0.90) with generalizable models, demonstrating machine learning can provide reliable temperature forecasts even for ungauged streams." },
-      { icon: Lightbulb, label: "Impact", text: "Published in Water (MDPI) — findings are used by environmental agencies to prioritize habitat restoration and model climate-change impacts on freshwater biodiversity." },
-    ],
-  },
-  {
-    title: "Classical Machine Learning for Widespread Stream Temperature Predictions",
-    type: "Conference Abstract",
-    year: "2022",
-    venue: "AGU Fall Meeting",
-    detail: "Volume 2022, H12E-04",
-    href: "https://scholar.google.com/citations?view_op=view_citation&hl=en&user=Be6ZA78AAAAJ&citation_for_view=Be6ZA78AAAAJ:u5HHmVD_uO8C",
-    tags: ["Machine Learning", "Spatial Modeling"],
-    summary: "Presented a comparative study of classical ML approaches for spatial stream temperature predictions, demonstrating that simpler models can rival deep learning in environmental applications.",
-    insights: [
-      { icon: Target, label: "Problem", text: "Deep learning is popular in hydrology, but do simpler, more interpretable ML models perform just as well for regional stream temperature prediction?" },
-      { icon: Beaker, label: "Approach", text: "Benchmarked XGBoost, Random Forest, and linear regression against neural networks using identical feature sets and cross-validation across two diverse US regions." },
-      { icon: BarChart3, label: "Results", text: "Classical models matched or exceeded deep learning accuracy while requiring 10–100× less compute time and offering feature importance interpretability." },
-      { icon: Lightbulb, label: "Impact", text: "Presented at AGU Fall Meeting 2022 — influenced researchers to reconsider interpretable ML over black-box approaches for resource-constrained environmental agencies." },
-    ],
-  },
-  {
-    title: "Climate-Driven Disturbances on River Water Quality: Multiscale Effects",
-    type: "Journal Article",
-    year: "2022",
-    venue: "Frontiers in Hydrology",
-    detail: "Pages 152-01",
-    href: "https://scholar.google.com/citations?view_op=view_citation&hl=en&user=Be6ZA78AAAAJ&citation_for_view=Be6ZA78AAAAJ:d1gkVwhDpl0C",
-    tags: ["Climate Change", "Water Quality", "Environmental Science"],
-    summary: "Investigated how wildfires, droughts, and extreme precipitation events cascade through watersheds to degrade river water quality at multiple spatial and temporal scales.",
-    insights: [
-      { icon: Target, label: "Problem", text: "Climate change is intensifying wildfires, droughts, and storms — but how these disturbances propagate through river networks to impact water quality was poorly quantified." },
-      { icon: Beaker, label: "Approach", text: "Analyzed long-term water quality records alongside wildfire, drought, and storm event data using statistical and ML-based approaches to isolate multiscale cause-effect relationships." },
-      { icon: BarChart3, label: "Results", text: "Identified distinct temporal signatures: wildfires spike turbidity for months, droughts concentrate pollutants, and storm pulses flush sediment — each at different spatial scales." },
-      { icon: Lightbulb, label: "Impact", text: "Published in Frontiers in Hydrology — provides a framework for water utilities and agencies to build resilience against compounding climate-driven water quality threats." },
-    ],
-  },
-  {
-    title: "Impacts of Climate-Driven Disturbances on River Water Quality: ML & Statistical Modeling",
-    type: "Conference Abstract",
-    year: "2021",
-    venue: "AGU Fall Meeting",
-    detail: "Volume 2021, H22E-01",
-    href: "https://scholar.google.com/citations?view_op=view_citation&hl=en&user=Be6ZA78AAAAJ&citation_for_view=Be6ZA78AAAAJ:2osOgNQ5qMEC",
-    tags: ["Machine Learning", "Statistical Modeling"],
-    summary: "Presented ML and statistical methods for isolating and quantifying the impacts of wildfire, drought, and extreme precipitation on river water quality parameters.",
-    insights: [
-      { icon: Target, label: "Problem", text: "Traditional statistical methods struggle to disentangle overlapping climate disturbance effects on water quality time series — can ML help isolate individual drivers?" },
-      { icon: Beaker, label: "Approach", text: "Combined change-point detection, regime-shift analysis, and tree-based ML models to attribute water quality changes to specific disturbance types and intensities." },
-      { icon: BarChart3, label: "Results", text: "ML models successfully isolated wildfire vs. drought vs. storm effects with >85% attribution accuracy, revealing non-linear threshold behaviors." },
-      { icon: Lightbulb, label: "Impact", text: "Presented at AGU 2021 — extended the state-of-the-art in environmental event attribution and informed follow-up journal publication in Frontiers in Hydrology." },
-    ],
-  },
-  {
-    title: "Data-Model Integration for Hydrobiogeochemical Modeling with Machine Learning",
-    type: "Conference Abstract",
-    year: "2021",
-    venue: "AGU Fall Meeting",
-    detail: "Volume 2021, B15J-1551",
-    href: "https://scholar.google.com/citations?view_op=view_citation&hl=en&user=Be6ZA78AAAAJ&citation_for_view=Be6ZA78AAAAJ:9yKSN-GCB0IC",
-    tags: ["Data Integration", "Biogeochemistry"],
-    summary: "Explored hybrid approaches combining process-based hydrobiogeochemical models with ML to improve predictions of nutrient cycling and contaminant transport in watersheds.",
-    insights: [
-      { icon: Target, label: "Problem", text: "Physics-based hydrobiogeochemical models are computationally expensive and often miscalibrated — can ML be integrated to correct biases and accelerate simulation?" },
-      { icon: Beaker, label: "Approach", text: "Built hybrid pipelines where ML models learned residual errors from process-based simulations, effectively combining physical knowledge with data-driven correction." },
-      { icon: BarChart3, label: "Results", text: "Hybrid models reduced simulation error by 30–40% compared to standalone physics-based models while maintaining physical interpretability of key processes." },
-      { icon: Lightbulb, label: "Impact", text: "Presented at AGU 2021 — demonstrated a scalable framework for physics-ML integration now being adopted by DOE national lab research teams." },
-    ],
-  },
-  {
-    title: "Predicting Stream Temperature Across Spatial Scales With Low-Complexity ML",
-    type: "Conference Abstract",
-    year: "2021",
-    venue: "AGU Fall Meeting",
-    detail: "Volume 2021, H35D-1070",
-    href: "https://scholar.google.com/citations?view_op=view_citation&hl=en&user=Be6ZA78AAAAJ&citation_for_view=Be6ZA78AAAAJ:u-x6o8ySG0sC",
-    tags: ["Machine Learning", "Spatial Scales"],
-    summary: "Demonstrated that low-complexity ML models can accurately predict stream temperatures across multiple spatial scales, from individual reaches to entire river basins.",
-    insights: [
-      { icon: Target, label: "Problem", text: "Can simple, interpretable ML models (few features, minimal tuning) produce accurate stream temperature predictions that transfer across different spatial scales?" },
-      { icon: Beaker, label: "Approach", text: "Trained lightweight models (linear regression, small decision trees) using only air temperature, discharge, and elevation — tested transferability from reach to basin scale." },
-      { icon: BarChart3, label: "Results", text: "Achieved R² of 0.82–0.87 with models using just 3–5 features, proving that low-complexity approaches are viable for resource-constrained monitoring programs." },
-      { icon: Lightbulb, label: "Impact", text: "Presented at AGU 2021 — demonstrated that smaller agencies without ML expertise can deploy accurate temperature models using readily available environmental data." },
-    ],
-  },
-]
-
-const gradients = [
-  "from-primary to-accent",
-  "from-accent to-[hsl(180,70%,50%)]",
-  "from-[hsl(180,70%,50%)] to-primary",
-  "from-primary to-[hsl(280,75%,60%)]",
-  "from-[hsl(280,75%,60%)] to-accent",
-  "from-accent to-primary",
-]
-
-const accents = [
-  "hsl(217 91% 60%)",
-  "hsl(265 80% 65%)",
-  "hsl(180 70% 50%)",
-  "hsl(280 75% 60%)",
-  "hsl(265 80% 65%)",
-  "hsl(217 91% 60%)",
-]
-
-/* ── Insight Panel (animated slide-in from right) ────────────────────── */
-
-function InsightPanel({
+function ResearchDetailPanel({
   paper,
+  isOpen,
   onClose,
+  gradient,
+  accent,
 }: {
   paper: Paper | null
+  isOpen: boolean
   onClose: () => void
+  gradient: string
+  accent: string
 }) {
-  const [visible, setVisible] = useState(false)
-  const [revealedSteps, setRevealedSteps] = useState(0)
   const panelRef = useRef<HTMLDivElement>(null)
+  const [revealedSteps, setRevealedSteps] = useState(0)
 
-  // Slide in on mount
+  // Close on Escape
   useEffect(() => {
-    if (paper) {
-      requestAnimationFrame(() => setVisible(true))
-      setRevealedSteps(0)
-    } else {
-      setVisible(false)
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose()
     }
+    if (isOpen) {
+      document.addEventListener("keydown", handler)
+    }
+    return () => {
+      document.removeEventListener("keydown", handler)
+    }
+  }, [isOpen, onClose])
+
+  // Scroll panel back to top + reset reveal when data changes
+  useEffect(() => {
+    if (panelRef.current && paper) {
+      panelRef.current.scrollTop = 0
+    }
+    setRevealedSteps(0)
   }, [paper])
 
   // Step-by-step reveal animation
   useEffect(() => {
-    if (!paper || !visible) return
+    if (!paper || !isOpen) return
     const total = paper.insights.length
     if (revealedSteps >= total) return
 
@@ -177,174 +57,148 @@ function InsightPanel({
     }, revealedSteps === 0 ? 400 : 300)
 
     return () => clearTimeout(timer)
-  }, [paper, visible, revealedSteps])
-
-  // Close on Escape
-  useEffect(() => {
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose()
-    }
-    window.addEventListener("keydown", handleKey)
-    return () => window.removeEventListener("keydown", handleKey)
-  }, [onClose])
-
-  // Click outside to close
-  useEffect(() => {
-    if (!visible) return
-    const handler = (e: MouseEvent) => {
-      if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
-        onClose()
-      }
-    }
-    // Delay to avoid immediate close from the click that opened it
-    const timer = setTimeout(() => {
-      document.addEventListener("mousedown", handler)
-    }, 100)
-    return () => {
-      clearTimeout(timer)
-      document.removeEventListener("mousedown", handler)
-    }
-  }, [visible, onClose])
-
-  const handleClose = useCallback(() => {
-    setVisible(false)
-    setTimeout(onClose, 350) // Wait for animation to finish
-  }, [onClose])
+  }, [paper, isOpen, revealedSteps])
 
   if (!paper) return null
 
-  const gradient = gradients[papers.indexOf(paper)] ?? gradients[0]
-  const accent = accents[papers.indexOf(paper)] ?? accents[0]
-
   return (
-    <>
-      {/* Backdrop */}
+    <div
+      ref={panelRef}
+      className="relative w-full rounded-2xl border border-border/30 bg-background/95 backdrop-blur-2xl"
+      role="dialog"
+      aria-modal="true"
+      aria-label={paper.title}
+    >
+      {/* Gradient accent line */}
+      <div className={`absolute left-0 top-0 h-full w-[2px] bg-gradient-to-b ${gradient}`} />
+
+      {/* Ambient glow */}
       <div
-        className={`fixed inset-0 z-50 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${visible ? "opacity-100" : "opacity-0 pointer-events-none"}`}
-        onClick={handleClose}
-        aria-hidden="true"
+        className="pointer-events-none absolute -left-20 top-1/4 h-80 w-80 rounded-full opacity-10 blur-[100px]"
+        style={{ background: accent }}
+      />
+      <div
+        className="pointer-events-none absolute -right-20 bottom-1/4 h-60 w-60 rounded-full opacity-8 blur-[80px]"
+        style={{ background: accent }}
       />
 
-      {/* Panel */}
-      <div
-        ref={panelRef}
-        role="dialog"
-        aria-modal="true"
-        aria-label={`Research insights: ${paper.title}`}
-        className={`fixed right-0 top-0 z-50 flex h-full w-full max-w-lg flex-col overflow-y-auto border-l border-border bg-card/95 backdrop-blur-xl shadow-2xl transition-[transform,visibility] duration-350 ease-out ${visible ? "translate-x-0 visible" : "translate-x-full invisible"}`}
-      >
+      {/* Subtle grid pattern */}
+      <div className="pointer-events-none absolute inset-0 circuit-grid opacity-30" />
+
+      <div className="relative px-8 py-10 sm:px-10">
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="group absolute right-6 top-6 flex h-10 w-10 items-center justify-center rounded-xl border border-border/50 bg-secondary/40 backdrop-blur-sm transition-all duration-300 hover:border-primary/40 hover:bg-secondary/80 hover:scale-105"
+          aria-label="Close panel"
+        >
+          <X className="h-4 w-4 text-muted-foreground transition-colors group-hover:text-primary" />
+        </button>
+
         {/* Header */}
-        <div className="sticky top-0 z-10 border-b border-border bg-card/90 backdrop-blur-md p-5">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2 mb-2">
-                <Brain className="h-4 w-4 text-primary shrink-0" />
-                <span className="font-mono text-xs uppercase tracking-widest text-primary">
-                  Research Insights
-                </span>
-              </div>
-              <h3 className="text-base font-display font-medium leading-snug text-foreground">
-                {paper.title}
-              </h3>
-              <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                <span className="font-medium text-foreground/80">{paper.venue}</span>
-                <span className="text-border">·</span>
-                <span>{paper.year}</span>
-                <span className="text-border">·</span>
-                <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold ${paper.type === "Journal Article" ? "bg-primary/10 text-primary" : "bg-accent/10 text-accent"}`}>
-                  <BookOpen className="h-2.5 w-2.5" />
-                  {paper.type}
-                </span>
-              </div>
-            </div>
-            <button
-              onClick={handleClose}
-              className="shrink-0 rounded-lg border border-border bg-secondary/50 p-2 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
-              aria-label="Close panel"
-            >
-              <X className="h-4 w-4" />
-            </button>
+        <div className="panel-stagger pr-12">
+          <div className="flex flex-wrap items-center gap-2 mb-3">
+            <span className={`inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-secondary/40 px-3 py-1 text-[11px] font-semibold backdrop-blur-sm ${paper.type === "Journal Article" ? "text-primary" : "text-accent"}`}>
+              <BookOpen className="h-3 w-3" />
+              {paper.type}
+            </span>
+            <span className="inline-block rounded-full border border-border/60 bg-secondary/40 px-3 py-1 font-mono text-[11px] text-muted-foreground backdrop-blur-sm">
+              {paper.year}
+            </span>
+          </div>
+          <h2 className="mt-4 font-display text-2xl font-medium tracking-tight text-foreground sm:text-3xl">
+            {paper.title}
+          </h2>
+          <p className="mt-1 text-sm font-semibold uppercase tracking-wider text-primary">
+            {paper.venue}
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">{paper.detail}</p>
+        </div>
+
+        {/* Divider */}
+        <div className={`my-8 h-px bg-gradient-to-r ${gradient} opacity-20`} />
+
+        {/* Summary */}
+        <div className="panel-stagger" style={{ animationDelay: "100ms" }}>
+          <p className="text-sm leading-relaxed text-muted-foreground">{paper.summary}</p>
+        </div>
+
+        {/* Step-by-step research insights */}
+        <div className="panel-stagger mt-10" style={{ animationDelay: "200ms" }}>
+          <h3 className="mb-5 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+            Research Breakdown
+          </h3>
+
+          <div className="relative pl-8">
+            {/* Connecting line */}
+            <div
+              className="absolute left-[13px] top-2 w-[2px] bg-gradient-to-b from-primary via-accent to-primary/20 transition-all duration-700 ease-out"
+              style={{
+                height: revealedSteps > 0
+                  ? `calc(${Math.min(revealedSteps, paper.insights.length) / paper.insights.length * 100}% - 8px)`
+                  : "0%",
+              }}
+            />
+
+            {paper.insights.map((step, i) => {
+              const isRevealed = i < revealedSteps
+              const Icon = step.icon
+              return (
+                <div
+                  key={step.label}
+                  className={`relative pb-5 last:pb-0 ${isRevealed ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"}`}
+                  style={{
+                    transitionProperty: "all",
+                    transitionDuration: "500ms",
+                    transitionTimingFunction: "ease-out",
+                    transitionDelay: `${i * 100}ms`,
+                  }}
+                >
+                  {/* Node dot */}
+                  <div
+                    className={`absolute -left-8 top-0.5 flex h-7 w-7 items-center justify-center rounded-full border-2 transition-all duration-500 ${isRevealed ? "border-primary bg-primary/10 scale-100" : "border-border bg-card scale-75"}`}
+                  >
+                    <Icon className={`h-3.5 w-3.5 transition-colors duration-300 ${isRevealed ? "text-primary" : "text-muted-foreground/50"}`} />
+                  </div>
+
+                  {/* Step content */}
+                  <div className="rounded-xl border border-border/60 bg-card p-4 shadow-sm transition-all duration-300 hover:border-primary/20 hover:shadow-md">
+                    <span
+                      className="mb-1.5 inline-block font-mono text-[10px] font-bold uppercase tracking-widest"
+                      style={{ color: accent }}
+                    >
+                      {step.label}
+                    </span>
+                    <p className="text-sm leading-relaxed text-muted-foreground">
+                      {step.text}
+                    </p>
+                  </div>
+                </div>
+              )
+            })}
           </div>
         </div>
 
-        {/* Content */}
-        <div className="flex-1 p-5 space-y-6">
-          {/* Summary */}
-          <div
-            className={`rounded-xl border border-border/60 bg-secondary/30 p-4 transition-all duration-500 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
-          >
-            <p className="text-sm leading-relaxed text-muted-foreground">{paper.summary}</p>
-          </div>
-
-          {/* Step-by-step insights */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <div className={`h-px flex-1 bg-gradient-to-r ${gradient} opacity-30`} />
-              <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                Step-by-step breakdown
-              </span>
-              <div className={`h-px flex-1 bg-gradient-to-l ${gradient} opacity-30`} />
-            </div>
-
-            {/* Vertical timeline */}
-            <div className="relative pl-8">
-              {/* Connecting line */}
-              <div
-                className="absolute left-[13px] top-2 w-[2px] bg-gradient-to-b from-primary via-accent to-primary/20 transition-all duration-700 ease-out"
-                style={{
-                  height: revealedSteps > 0
-                    ? `calc(${Math.min(revealedSteps, paper.insights.length) / paper.insights.length * 100}% - 8px)`
-                    : "0%",
-                }}
-              />
-
-              {paper.insights.map((step, i) => {
-                const isRevealed = i < revealedSteps
-                const Icon = step.icon
-                return (
-                  <div
-                    key={step.label}
-                    className={`relative pb-5 last:pb-0 transition-all duration-500 ease-out ${isRevealed ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"}`}
-                    style={{ transitionDelay: `${i * 100}ms` }}
-                  >
-                    {/* Node dot */}
-                    <div
-                      className={`absolute -left-8 top-0.5 flex h-7 w-7 items-center justify-center rounded-full border-2 transition-all duration-500 ${isRevealed ? "border-primary bg-primary/10 scale-100" : "border-border bg-card scale-75"}`}
-                    >
-                      <Icon className={`h-3.5 w-3.5 transition-colors duration-300 ${isRevealed ? "text-primary" : "text-muted-foreground/50"}`} />
-                    </div>
-
-                    {/* Step content */}
-                    <div className="rounded-xl border border-border/60 bg-card p-4 shadow-sm transition-all duration-300 hover:border-primary/20 hover:shadow-md">
-                      <span
-                        className="mb-1.5 inline-block font-mono text-[10px] font-bold uppercase tracking-widest"
-                        style={{ color: accent }}
-                      >
-                        {step.label}
-                      </span>
-                      <p className="text-sm leading-relaxed text-muted-foreground">
-                        {step.text}
-                      </p>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-
-          {/* Tags */}
-          <div className="flex flex-wrap gap-2 pt-2">
-            {paper.tags.map((tag) => (
+        {/* Tags */}
+        <div className="panel-stagger mt-10" style={{ animationDelay: "400ms" }}>
+          <h3 className="mb-4 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+            Research Topics
+          </h3>
+          <div className="flex flex-wrap gap-2">
+            {paper.tags.map((tag, i) => (
               <span
                 key={tag}
-                className="rounded-full border border-border/60 bg-secondary/40 px-3 py-1 font-mono text-xs text-muted-foreground"
+                className="rounded-lg border border-border/50 bg-secondary/30 px-3 py-1.5 font-mono text-xs text-muted-foreground backdrop-blur-sm transition-all duration-300 hover:border-primary/30 hover:bg-secondary/60 hover:text-foreground"
+                style={{ animationDelay: `${i * 30}ms` }}
               >
                 {tag}
               </span>
             ))}
           </div>
+        </div>
 
-          {/* View on Google Scholar */}
+        {/* View on Google Scholar CTA */}
+        <div className="panel-stagger mt-10" style={{ animationDelay: "500ms" }}>
           <a
             href={paper.href}
             target="_blank"
@@ -356,18 +210,26 @@ function InsightPanel({
           </a>
         </div>
       </div>
-    </>
+    </div>
   )
 }
 
 /* ── Main Publications Component ─────────────────────────────────────── */
 
 export function Publications() {
-  const [selectedPaper, setSelectedPaper] = useState<Paper | null>(null)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const selected = papers.find((p) => p.id === selectedId) ?? null
 
-  const handleClose = useCallback(() => {
-    setSelectedPaper(null)
+  const handleSelect = useCallback((id: string) => {
+    setSelectedId((prev) => (prev === id ? null : id))
   }, [])
+
+  const handleClose = useCallback(() => setSelectedId(null), [])
+
+  const isOpen = selected !== null
+  const selectedIndex = selected ? papers.indexOf(selected) : 0
+  const selectedGradient = gradients[selectedIndex % gradients.length]
+  const selectedAccent = accents[selectedIndex % accents.length]
 
   return (
     <ScrollStackSection
@@ -386,76 +248,111 @@ export function Publications() {
       stackOffset={12}
       scrollPerCard={42}
       perspective={1200}
+      activeCardId={selectedId}
+      onScrollDismiss={handleClose}
+      detailContent={
+        <ResearchDetailPanel
+          paper={selected}
+          isOpen={isOpen}
+          onClose={handleClose}
+          gradient={selectedGradient}
+          accent={selectedAccent}
+        />
+      }
       cards={papers.map((paper, i) => {
         const gradient = gradients[i % gradients.length]
         const accent = accents[i % accents.length]
         const number = String(i + 1).padStart(2, "0")
 
         return {
-          id: paper.href,
+          id: paper.id,
           children: (
             <button
-              onClick={() => setSelectedPaper(paper)}
-              className="group relative w-full overflow-hidden rounded-2xl border border-border/60 bg-card text-left shadow-md shadow-black/10 transition-all duration-500 hover:border-primary/40"
+              onClick={() => handleSelect(paper.id)}
+              className={`glass-stack-card group relative w-full overflow-hidden rounded-2xl border text-left transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${selectedId === paper.id
+                ? "border-primary/40 bg-card shadow-[0_0_40px_-8px] shadow-primary/20"
+                : "border-border/40 bg-card hover:border-primary/30"
+                }`}
             >
-              {/* Gradient accent strip */}
-              <div className={`h-[3px] w-full bg-gradient-to-r ${gradient}`} />
+              {/* Top gradient accent strip */}
+              <div className={`h-1 w-full bg-gradient-to-r ${gradient} ${selectedId === paper.id ? "opacity-100" : "opacity-60 group-hover:opacity-90"} transition-opacity duration-500`} />
 
-              {/* Ambient glow */}
+              {/* Ambient glow blobs */}
               <div
-                className="pointer-events-none absolute -right-20 -top-20 h-60 w-60 rounded-full opacity-10 blur-3xl transition-opacity duration-700 group-hover:opacity-25"
+                className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full opacity-[0.07] blur-3xl transition-opacity duration-700 group-hover:opacity-[0.18]"
+                style={{ background: accent }}
+              />
+              <div
+                className="pointer-events-none absolute -left-16 bottom-0 h-48 w-48 rounded-full opacity-0 blur-3xl transition-opacity duration-700 group-hover:opacity-[0.08]"
                 style={{ background: accent }}
               />
 
-              <div className="relative flex items-start gap-4 p-5 sm:p-6">
-                {/* Number */}
-                <span
-                  className="hidden shrink-0 font-mono text-4xl font-black tracking-tighter opacity-10 sm:block"
-                  style={{ color: accent }}
-                >
-                  {number}
-                </span>
+              {/* Frosted noise overlay */}
+              <div className="pointer-events-none absolute inset-0 opacity-[0.015] mix-blend-overlay" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")" }} />
 
-                {/* Content */}
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-2 mb-2">
-                    <span className={`inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-secondary/40 px-3 py-1 text-[11px] font-semibold backdrop-blur-sm ${paper.type === "Journal Article" ? "text-primary" : "text-accent"}`}>
-                      <BookOpen className="h-3 w-3" />
-                      {paper.type}
-                    </span>
-                    <span className="text-xs text-muted-foreground">{paper.venue} · {paper.year}</span>
-                  </div>
+              <div className="relative p-6 sm:p-8">
+                {/* Top row: number + type badge + venue */}
+                <div className="flex items-start gap-4 sm:gap-5">
+                  {/* Large ghost number */}
+                  <span
+                    className="hidden shrink-0 select-none font-mono text-6xl font-black leading-none tracking-tighter opacity-[0.06] sm:block"
+                    style={{ color: accent }}
+                  >
+                    {number}
+                  </span>
 
-                  <h3 className="text-base font-display font-medium leading-snug text-foreground transition-colors duration-300 group-hover:text-primary sm:text-lg">
-                    {paper.title}
-                  </h3>
-
-                  <p className="mt-2 line-clamp-2 text-sm text-muted-foreground/80">
-                    {paper.summary}
-                  </p>
-
-                  {/* Tags */}
-                  <div className="mt-3 flex flex-wrap gap-1.5">
-                    {paper.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="rounded-full border border-border/40 bg-secondary/30 px-2.5 py-0.5 font-mono text-[10px] text-muted-foreground/70"
-                      >
-                        {tag}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2 mb-2">
+                      <span className={`inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-secondary/40 px-3 py-1 text-[11px] font-semibold backdrop-blur-sm ${paper.type === "Journal Article" ? "text-primary" : "text-accent"}`}>
+                        <BookOpen className="h-3 w-3" />
+                        {paper.type}
                       </span>
-                    ))}
-                  </div>
-                </div>
+                      <span className="text-xs text-muted-foreground">{paper.venue} · {paper.year}</span>
+                    </div>
 
-                {/* Explore prompt */}
-                <div className="hidden shrink-0 items-center gap-1 self-center rounded-lg border border-border/40 bg-secondary/30 px-3 py-2 text-xs text-muted-foreground opacity-0 transition-all duration-300 group-hover:opacity-100 sm:flex">
-                  <span>Explore</span>
-                  <ChevronRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
+                    <h3 className="text-lg font-semibold leading-snug text-foreground transition-colors group-hover:text-primary sm:text-xl">
+                      {paper.title}
+                    </h3>
+
+                    <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-muted-foreground/80 sm:text-[15px]">
+                      {paper.summary}
+                    </p>
+
+                    {/* First 2 insight labels as preview */}
+                    <div className="mt-4 space-y-2">
+                      {paper.insights.slice(0, 2).map((step, idx) => (
+                        <div key={idx} className="flex items-start gap-2.5">
+                          <ArrowRight className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary/50" />
+                          <span className="text-xs leading-relaxed text-muted-foreground/60 line-clamp-1 sm:text-[13px]">
+                            <strong className="text-muted-foreground/80">{step.label}:</strong> {step.text}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Tags */}
+                    <div className="mt-5 flex flex-wrap gap-1.5">
+                      {paper.tags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="rounded-full border border-border/50 bg-secondary px-3 py-1 font-mono text-[10px] text-muted-foreground/60 transition-colors group-hover:border-primary/30 group-hover:text-muted-foreground/80"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Explore CTA */}
+                  <div className="hidden shrink-0 items-center gap-1.5 self-start rounded-lg border border-border/50 bg-secondary px-3.5 py-2 text-xs font-medium text-muted-foreground/70 opacity-0 transition-all duration-300 group-hover:opacity-100 group-hover:text-primary sm:flex">
+                    <span>Explore</span>
+                    <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                  </div>
                 </div>
               </div>
 
-              {/* Hover gradient overlay */}
-              <div className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${gradient} opacity-0 transition-opacity duration-500 group-hover:opacity-[0.03]`} />
+              {/* Bottom edge gradient line */}
+              <div className={`h-px w-full bg-gradient-to-r ${gradient} opacity-0 transition-opacity duration-500 group-hover:opacity-30`} />
             </button>
           ),
         }
@@ -475,9 +372,6 @@ export function Publications() {
           </a>
         </AnimatedSection>
       </div>
-
-      {/* ★ Animated insight panel */}
-      <InsightPanel paper={selectedPaper} onClose={handleClose} />
     </ScrollStackSection>
   )
 }

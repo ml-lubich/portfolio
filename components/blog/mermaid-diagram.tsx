@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useEffect, useId, useRef, useState } from "react"
+import { mermaidTheme, hex } from "@/lib/theme"
 
 /* ── Mermaid initialisation (once per page) ─────────────────────────── */
 let mermaidInitialised = false
@@ -32,22 +33,22 @@ export function MermaidDiagram({ chart, className = "" }: MermaidDiagramProps) {
             theme: "dark",
             themeVariables: {
               darkMode: true,
-              background: "#0c0e1a",
-              primaryColor: "#1e3a5f",
-              primaryTextColor: "#e2e8f0",
-              primaryBorderColor: "#3b82f6",
-              lineColor: "#3b82f6",
-              secondaryColor: "#1e5f3a",
-              tertiaryColor: "#3b1e5f",
+              background: mermaidTheme.background,
+              primaryColor: mermaidTheme.primaryColor,
+              primaryTextColor: mermaidTheme.primaryTextColor,
+              primaryBorderColor: mermaidTheme.primaryBorderColor,
+              lineColor: mermaidTheme.lineColor,
+              secondaryColor: mermaidTheme.secondaryColor,
+              tertiaryColor: mermaidTheme.tertiaryColor,
               fontFamily: "var(--font-geist-sans), sans-serif",
               fontSize: "14px",
-              nodeBorder: "#3b82f6",
-              mainBkg: "#1e3a5f",
-              clusterBkg: "#0f172a",
-              clusterBorder: "#1e293b",
-              titleColor: "#e2e8f0",
-              edgeLabelBackground: "#0c0e1a",
-              nodeTextColor: "#e2e8f0",
+              nodeBorder: mermaidTheme.nodeBorder,
+              mainBkg: mermaidTheme.mainBkg,
+              clusterBkg: mermaidTheme.clusterBkg,
+              clusterBorder: mermaidTheme.clusterBorder,
+              titleColor: mermaidTheme.titleColor,
+              edgeLabelBackground: mermaidTheme.edgeLabelBackground,
+              nodeTextColor: mermaidTheme.nodeTextColor,
             },
             flowchart: {
               htmlLabels: true,
@@ -85,7 +86,7 @@ export function MermaidDiagram({ chart, className = "" }: MermaidDiagramProps) {
   return (
     <div
       ref={containerRef}
-      className={`my-8 flex justify-center overflow-x-auto rounded-xl border border-white/[0.06] bg-[#0c0e1a] p-6 ${className}`}
+      className={`my-8 flex justify-center overflow-x-auto rounded-xl border border-white/[0.06] bg-[${mermaidTheme.background}] p-6 ${className}`}
       dangerouslySetInnerHTML={{ __html: svg }}
     />
   )

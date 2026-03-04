@@ -1,5 +1,6 @@
 import * as THREE from "three"
 import type { PullUniforms } from "./types"
+import { glsl } from "@/lib/theme"
 
 /* ── Create pull-deform uniforms ──────────────────────────────────── */
 
@@ -90,7 +91,7 @@ export function makeOrbMaterial(pull?: PullUniforms) {
         float intensity = core + inner + mid + outer + fringe;
         intensity *= 0.88 + 0.12 * sin(uTime * 5.0);
 
-        vec3 color = vec3(0.2, 0.45, 0.9) * fringe
+        vec3 color = ${glsl.glowColor} * fringe
                    + vec3(0.4, 0.75, 1.0) * (outer + mid)
                    + vec3(0.8, 0.92, 1.0) * inner
                    + vec3(1.0, 1.0, 1.0)  * core;

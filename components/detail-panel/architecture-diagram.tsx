@@ -1,4 +1,5 @@
 import { diagramConfigs } from "./diagram-configs"
+import { archDiagram } from "@/lib/theme"
 
 interface DiagramProps {
   type: "pipeline" | "microservices" | "ml-pipeline" | "fullstack" | "agents" | "cicd"
@@ -10,7 +11,7 @@ export function ArchitectureDiagram({ type, accent }: DiagramProps) {
   const config = diagramConfigs[type] || diagramConfigs.pipeline
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-border/30 bg-[hsl(220,20%,5%)] p-1">
+    <div className={`relative overflow-hidden rounded-2xl border border-border/30 bg-[${archDiagram.bg}] p-1`}>
       {/* Floating grid background */}
       <div className="absolute inset-0 circuit-grid opacity-20" />
 
@@ -124,7 +125,7 @@ export function ArchitectureDiagram({ type, accent }: DiagramProps) {
                 x={node.x}
                 y={node.y + r + 3}
                 textAnchor="middle"
-                fill="hsl(210 20% 70%)"
+                fill={archDiagram.labelFill}
                 fontSize="2.8"
                 fontFamily="var(--font-geist-mono), monospace"
                 fontWeight="500"

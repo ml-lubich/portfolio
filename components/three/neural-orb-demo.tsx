@@ -3,6 +3,7 @@
 import React, { useRef, useMemo, Suspense } from "react"
 import { Canvas, useFrame } from "@react-three/fiber"
 import * as THREE from "three"
+import { hexNum, glsl } from "@/lib/theme"
 
 /* ──────────────────────────────────────────────────────────────────────
  *  NeuralOrbDemo v2 — Curved edges, big glowing orbs, energy trails.
@@ -74,7 +75,7 @@ function DemoScene() {
     // Dim base curve
     const baseMaterial = useMemo(
         () => new THREE.LineBasicMaterial({
-            color: 0x2a6fbf, transparent: true, opacity: 0.18, depthWrite: false,
+            color: hexNum.neuralBlue, transparent: true, opacity: 0.18, depthWrite: false,
         }),
         []
     )
@@ -131,7 +132,7 @@ function DemoScene() {
           intensity *= 0.88 + 0.12 * sin(uTime * 5.0);
 
           // White center → sky blue → deep blue at edges
-          vec3 color = vec3(0.2, 0.45, 0.9) * fringe
+          vec3 color = ${glsl.glowColor} * fringe
                      + vec3(0.4, 0.75, 1.0) * (outer + mid)
                      + vec3(0.8, 0.92, 1.0) * inner
                      + vec3(1.0, 1.0, 1.0)  * core;
@@ -156,8 +157,11 @@ function DemoScene() {
     }
 
     // ── Animate ────────────────────────────────────────────────────────
-    useFrame((state, delta) => {
-        const t = state.clock.getElapsedTime()
+    const elapsedRef = useRef(0)
+
+    useFrame((_state, delta) => {
+        elapsedRef.current += delta
+        const t = elapsedRef.current
         const colors = colorAttr.array as Float32Array
 
         for (let c = 0; c < CURVE_COUNT; c++) {
@@ -261,7 +265,11 @@ export function NeuralOrbDemo({ className = "" }: { className?: string }) {
                 dpr={[1, 1.5]}
                 gl={{ antialias: true, alpha: true }}
                 style={{ background: "transparent" }}
-                onCreated={({ gl }) => gl.setClearColor(0x080810, 1)}
+                onCreated={({ gl }) => {
+                    gl.setClearColor(hexNum.background, 1)
+                    const canvas = gl.domElement
+                    canvas.addEventListener('webglcontextlost', (e) => e.preventDefault(), false)
+                }}
             >
                 <Suspense fallback={null}>
                     <DemoScene />

@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+import { shadows } from "@/lib/theme"
 
 /* ── Code snippets per skill (shown as flying particles) ── */
 const codeSnippetMap: Record<string, string[]> = {
@@ -169,7 +170,7 @@ export function CodeParticles({ skill, isHovered }: CodeParticlesProps) {
                         ease: "easeOut",
                     }}
                     className="pointer-events-none absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap font-mono text-[10px] font-medium text-primary/80 select-none"
-                    style={{ textShadow: "0 0 6px hsla(217,91%,60%,0.4)" }}
+                    style={{ textShadow: shadows.textGlow }}
                 >
                     {p.text}
                 </motion.span>

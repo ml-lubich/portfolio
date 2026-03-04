@@ -87,9 +87,9 @@ export function AnimatedSection({
         transform: `perspective(1200px) translateY(${isVisible ? parallaxY : 32
           }px) rotateX(${rotateX}deg) scale(${scaleVal})`,
         transformOrigin: "center bottom",
-        transition: isVisible
-          ? "opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1)"
-          : "none",
+        transitionProperty: isVisible ? "opacity, transform" : "none",
+        transitionDuration: isVisible ? "1s, 1.2s" : "0s",
+        transitionTimingFunction: isVisible ? "cubic-bezier(0.16, 1, 0.3, 1)" : "ease",
         transitionDelay: isVisible ? `${delay}ms` : "0ms",
       }}
     >

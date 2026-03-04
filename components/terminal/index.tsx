@@ -7,6 +7,7 @@ import { Terminal, Clock, Zap, Activity, Play } from "lucide-react"
 import { sessions } from "./session-data"
 import { highlight } from "./syntax-highlight"
 import type { DisplayLine } from "./types"
+import { terminalChrome } from "@/lib/theme"
 
 const S = sessions
 
@@ -231,14 +232,14 @@ export function LiveTerminal() {
         </div>
 
         {/* Terminal window */}
-        <div className="rounded-xl border border-border bg-[hsl(220,20%,5%)] shadow-2xl shadow-black/30 overflow-hidden">
+        <div className={`rounded-xl border border-border bg-[${terminalChrome.bg}] shadow-2xl shadow-black/30 overflow-hidden`}>
           {/* Title bar */}
-          <div className="flex items-center justify-between px-4 py-2.5 bg-[hsl(220,20%,7%)] border-b border-border">
+          <div className={`flex items-center justify-between px-4 py-2.5 bg-[${terminalChrome.headerBg}] border-b border-border`}>
             <div className="flex items-center gap-2">
               <div className="flex gap-1.5">
-                <div className="w-3 h-3 rounded-full bg-[#ff5f57]" />
-                <div className="w-3 h-3 rounded-full bg-[#febc2e]" />
-                <div className="w-3 h-3 rounded-full bg-[#28c840]" />
+                <div className={`w-3 h-3 rounded-full bg-[${terminalChrome.dotClose}]`} />
+                <div className={`w-3 h-3 rounded-full bg-[${terminalChrome.dotMinimize}]`} />
+                <div className={`w-3 h-3 rounded-full bg-[${terminalChrome.dotExpand}]`} />
               </div>
               <span className="ml-3 text-xs text-muted-foreground/50 font-mono truncate max-w-[280px]">
                 misha@dev ~ {cur?.label}
@@ -287,7 +288,7 @@ export function LiveTerminal() {
           </div>
 
           {/* Footer */}
-          <div className="px-4 py-1 bg-[hsl(220,20%,6%)] border-t border-border/30 flex items-center justify-between text-[10px] font-mono text-muted-foreground/25">
+          <div className={`px-4 py-1 bg-[${terminalChrome.footerBg}] border-t border-border/30 flex items-center justify-between text-[10px] font-mono text-muted-foreground/25`}>
             <span>SESSION {activeSession + 1}/{S.length}</span>
             <span>zsh — 80×24</span>
           </div>

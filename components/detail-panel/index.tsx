@@ -40,8 +40,7 @@ export function DetailPanel({ data, isOpen, onClose }: DetailPanelProps) {
   return (
       <div
         ref={panelRef}
-        className="h-full w-full overflow-y-auto overscroll-contain rounded-2xl border border-border/30 bg-background/95 backdrop-blur-2xl"
-        style={{ scrollbarGutter: "stable" }}
+        className="relative w-full rounded-2xl border border-border/30 bg-background/95 backdrop-blur-2xl"
         role="dialog"
         aria-modal="true"
         aria-label={data.title}

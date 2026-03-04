@@ -72,6 +72,8 @@ export function Brain3D({ className = "" }: { className?: string }) {
           style={{ background: "transparent" }}
           onCreated={({ gl }) => {
             gl.setClearColor(0x000000, 0)
+            const canvas = gl.domElement
+            canvas.addEventListener('webglcontextlost', (e) => e.preventDefault(), false)
           }}
         >
           <ResponsiveCamera />

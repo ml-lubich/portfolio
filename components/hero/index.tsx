@@ -6,6 +6,7 @@ import { ArrowDown } from "lucide-react"
 import { ParticleCanvas } from "./particle-canvas"
 import { RoleRotator, HeroSubtitle } from "./role-rotator"
 import { HeroCTAs, SocialLinks } from "./hero-actions"
+import { heroOverlay } from "@/lib/theme"
 import { RotatingStats } from "./rotating-stats"
 
 const Brain3D = dynamic(
@@ -55,7 +56,7 @@ export function Hero() {
         className="pointer-events-none absolute inset-0 z-[2]"
         aria-hidden="true"
         style={{
-          background: "radial-gradient(ellipse 60% 50% at 50% 45%, rgba(10,12,20,0.55) 0%, transparent 100%)",
+          background: heroOverlay,
         }}
       />
 

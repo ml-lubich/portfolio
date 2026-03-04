@@ -163,8 +163,13 @@ export function InsightPanel({
                 return (
                   <div
                     key={step.label}
-                    className={`relative pb-5 last:pb-0 transition-all duration-500 ease-out ${isRevealed ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"}`}
-                    style={{ transitionDelay: `${i * 100}ms` }}
+                    className={`relative pb-5 last:pb-0 ${isRevealed ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"}`}
+                    style={{
+                      transitionProperty: "all",
+                      transitionDuration: "500ms",
+                      transitionTimingFunction: "ease-out",
+                      transitionDelay: `${i * 100}ms`,
+                    }}
                   >
                     <div
                       className={`absolute -left-8 top-0.5 flex h-7 w-7 items-center justify-center rounded-full border-2 transition-all duration-500 ${isRevealed ? "border-primary bg-primary/10 scale-100" : "border-border bg-card scale-75"}`}

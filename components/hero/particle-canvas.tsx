@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef } from "react"
+import { particleFill, particleStroke } from "@/lib/theme"
 
 /* ── Animated particle canvas background ──────────────────────────── */
 
@@ -46,7 +47,7 @@ export function ParticleCanvas() {
 
         ctx.beginPath()
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
-        ctx.fillStyle = `hsla(217, 91%, 60%, ${p.opacity})`
+        ctx.fillStyle = particleFill(p.opacity)
         ctx.fill()
 
         for (let j = i + 1; j < particles.length; j++) {
@@ -57,7 +58,7 @@ export function ParticleCanvas() {
             ctx.beginPath()
             ctx.moveTo(p.x, p.y)
             ctx.lineTo(particles[j].x, particles[j].y)
-            ctx.strokeStyle = `hsla(217, 91%, 60%, ${0.06 * (1 - dist / 150)})`
+            ctx.strokeStyle = particleStroke(0.06 * (1 - dist / 150))
             ctx.lineWidth = 0.5
             ctx.stroke()
           }

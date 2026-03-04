@@ -1,6 +1,7 @@
 import React, { Suspense } from "react"
 import type { Metadata } from "next"
 import { BlogHeader } from "@/components/blog/blog-header"
+import { shadows } from "@/lib/theme"
 
 export const metadata: Metadata = {
   title: "Blog | Misha Lubich — AI Engineering Perspectives",
@@ -25,7 +26,7 @@ export default function BlogLayout({
         <div className="mx-auto max-w-6xl px-6">
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
             <div className="flex items-center gap-2">
-              <div className="flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-br from-primary to-accent shadow-[0_0_12px_hsla(217,91%,60%,0.2)]">
+              <div className={`flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-br from-primary to-accent shadow-[${shadows.blogAvatar.replace('20px', '12px')}]`}>
                 <span className="text-xs font-bold text-primary-foreground">ML</span>
               </div>
               <span className="text-xs text-muted-foreground">blog.mishalubich.com</span>

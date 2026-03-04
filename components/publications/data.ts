@@ -1,4 +1,5 @@
 import { Beaker, BarChart3, Target, Lightbulb } from "lucide-react"
+import { gradientCycle, accentCycle } from "@/lib/theme"
 
 /* ── Types ─────────────────────────────────────────────────────────── */
 export interface InsightStep {
@@ -119,21 +120,7 @@ export const papers: Paper[] = [
   },
 ]
 
-/* ── Styling arrays ─────────────────────────────────────────────────── */
-export const gradients = [
-  "from-primary to-accent",
-  "from-accent to-[hsl(180,70%,50%)]",
-  "from-[hsl(180,70%,50%)] to-primary",
-  "from-primary to-[hsl(280,75%,60%)]",
-  "from-[hsl(280,75%,60%)] to-accent",
-  "from-accent to-primary",
-]
+/* ── Styling arrays (sourced from centralized theme) ─────────────── */
+export const gradients = [...gradientCycle]
 
-export const accents = [
-  "hsl(217 91% 60%)",
-  "hsl(265 80% 65%)",
-  "hsl(180 70% 50%)",
-  "hsl(280 75% 60%)",
-  "hsl(265 80% 65%)",
-  "hsl(217 91% 60%)",
-]
+export const accents = [...accentCycle]

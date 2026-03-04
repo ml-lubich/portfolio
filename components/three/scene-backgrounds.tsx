@@ -4,6 +4,7 @@ import React, { useRef, Suspense, Component, useMemo, useEffect, useState } from
 import type { ReactNode } from "react"
 import { Canvas, useFrame } from "@react-three/fiber"
 import * as THREE from "three"
+import { hex } from "@/lib/theme"
 
 /* ══════════════════════════════════════════════════════════════════════
  *  Reusable 3D background animations for portfolio sections.
@@ -67,8 +68,8 @@ function SceneCanvas({
   return (
     <SceneBoundary>
       <div ref={wrapperRef} className={`pointer-events-none absolute inset-0 ${className}`}>
-        {visible && (
           <Canvas
+            frameloop={visible ? "always" : "never"}
             camera={camera ?? { position: [0, 0, 5], fov: 45 }}
             dpr={[1, 1.5]}
             gl={{
@@ -76,12 +77,15 @@ function SceneCanvas({
               alpha: true,
               powerPreference: "high-performance",
             }}
-            style={{ background: "transparent" }}
-            onCreated={({ gl }) => gl.setClearColor(0x000000, 0)}
+            style={{ background: "transparent", visibility: visible ? "visible" : "hidden" }}
+            onCreated={({ gl }) => {
+              gl.setClearColor(0x000000, 0)
+              const canvas = gl.domElement
+              canvas.addEventListener('webglcontextlost', (e) => e.preventDefault(), false)
+            }}
           >
             <Suspense fallback={null}>{children}</Suspense>
           </Canvas>
-        )}
       </div>
     </SceneBoundary>
   )
@@ -96,7 +100,7 @@ const PARTICLE_COUNT = 60
 const CONNECTION_DIST = 1.8
 
 function ParticleFieldScene({
-  color = "#3b82f6",
+  color = hex.primary,
   speed = 0.15,
 }: {
   color?: string
@@ -225,7 +229,7 @@ function ParticleFieldScene({
 
 export function ParticleField({
   className = "",
-  color = "#3b82f6",
+  color = hex.primary,
   speed = 0.15,
 }: {
   className?: string
@@ -245,8 +249,8 @@ export function ParticleField({
  * ══════════════════════════════════════════════════════════════════════ */
 
 function GridWaveScene({
-  color = "#3b82f6",
-  accentColor = "#8b5cf6",
+  color = hex.primary,
+  accentColor = hex.accent,
 }: {
   color?: string
   accentColor?: string
@@ -282,8 +286,11 @@ function GridWaveScene({
     [],
   )
 
-  useFrame((state) => {
-    const t = state.clock.getElapsedTime()
+  const elapsedRef = useRef(0)
+
+  useFrame((_state, delta) => {
+    elapsedRef.current += delta
+    const t = elapsedRef.current
     const pos = geometry.attributes.position as THREE.BufferAttribute
     const colors = colorAttr.array as Float32Array
     const count = pos.count
@@ -319,8 +326,8 @@ function GridWaveScene({
 
 export function GridWave({
   className = "",
-  color = "#3b82f6",
-  accentColor = "#8b5cf6",
+  color = hex.primary,
+  accentColor = hex.accent,
 }: {
   className?: string
   color?: string

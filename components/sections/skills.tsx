@@ -1,65 +1,32 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useCallback } from "react"
 import dynamic from "next/dynamic"
 import { AnimatedSection } from "../animations/animated-section"
 import { AnimatedBars } from "../animations/animated-bars"
 import { getSkillIcon } from "./skill-icons"
 import { CodeParticles } from "../three/code-particles"
 import { SectionHeader } from "../layout/section-header"
+import { skillCategories, proficiencyBars } from "@/data/skills"
+import { hex } from "@/lib/theme"
+import { SkillDetailModal } from "./skill-detail-modal"
 
 const ParticleField = dynamic(
   () => import("../three/scene-backgrounds").then((mod) => mod.ParticleField),
   { ssr: false }
 )
 
-
-
-const skillCategories = [
-  {
-    category: "Languages",
-    items: ["Java", "Python", "JavaScript", "TypeScript", "Go", "Rust", "C++", "SQL", "YAML"],
-  },
-  {
-    category: "AI/ML Engineering",
-    items: ["LLM APIs", "Agentic Workflows", "RAG Architectures", "Multi-Agent Orchestration", "MCP Tool Servers", "Vector Databases", "Fine-tuning", "Prompt Engineering", "Guardrails & Safety", "LLM Observability", "PyTorch", "TensorFlow", "scikit-learn"],
-  },
-  {
-    category: "Frameworks & Frontend",
-    items: ["Spring Boot", "Spring Cloud", "Spring Security", "Hibernate", "React", "Angular", "Next.js", "FastAPI", "Tailwind CSS", "Material UI"],
-  },
-  {
-    category: "Cloud & DevOps",
-    items: ["AWS", "GCP", "Azure", "Kubernetes", "Docker", "Terraform", "GitHub Actions", "Jenkins", "Vercel", "Azure DevOps"],
-  },
-  {
-    category: "Databases & Messaging",
-    items: ["PostgreSQL", "MySQL", "MongoDB", "Redis", "Oracle", "DynamoDB", "Pinecone", "Apache Kafka", "RabbitMQ"],
-  },
-  {
-    category: "Methodologies & Testing",
-    items: ["Agile/Scrum", "TDD", "Domain-Driven Design", "MLOps", "CI/CD", "JUnit", "Jest", "Selenium", "SonarQube"],
-  },
-]
-
-const proficiencyBars = [
-  { label: "Python", value: 97, display: "Expert", gradient: "from-primary to-accent" },
-  { label: "Java / Spring Boot", value: 93, display: "Expert", gradient: "from-accent to-[hsl(280,75%,60%)]" },
-  { label: "TypeScript / JavaScript", value: 93, display: "Expert", gradient: "from-[hsl(180,70%,50%)] to-primary" },
-  { label: "AI/ML & LLM Systems", value: 95, display: "Expert", gradient: "from-[hsl(280,75%,60%)] to-accent" },
-  { label: "Cloud & Infrastructure", value: 90, display: "Expert", gradient: "from-primary to-[hsl(180,70%,50%)]" },
-  { label: "Rust / Go / C++", value: 72, display: "Proficient", gradient: "from-accent to-primary" },
-]
-
-function SkillTag({ item, idx }: { item: string; idx: number }) {
+function SkillTag({ item, idx, onSelect }: { item: string; idx: number; onSelect: (skill: string) => void }) {
   const [hovered, setHovered] = useState(false)
   const icon = getSkillIcon(item)
 
   return (
-    <span
+    <button
+      type="button"
+      onClick={() => onSelect(item)}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className={`group/tag relative inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 font-mono text-xs transition-all duration-300 animate-slide-up cursor-default
+      className={`group/tag relative inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 font-mono text-xs transition-all duration-300 animate-slide-up cursor-pointer
         ${hovered
           ? "border-primary/60 bg-primary/10 text-foreground shadow-lg shadow-primary/20 scale-110 skill-tag-shine"
           : "border-border bg-secondary/50 text-muted-foreground hover:scale-105 hover:border-primary/40 hover:bg-secondary hover:text-foreground hover:shadow-md hover:shadow-primary/10"
@@ -80,11 +47,19 @@ function SkillTag({ item, idx }: { item: string; idx: number }) {
 
       {/* Code particles */}
       <CodeParticles skill={item} isHovered={hovered} />
-    </span>
+    </button>
   )
 }
 
 export function Skills() {
+  const [selectedSkill, setSelectedSkill] = useState<string | null>(null)
+  const [modalOpen, setModalOpen] = useState(false)
+
+  const handleSelectSkill = useCallback((skill: string) => {
+    setSelectedSkill(skill)
+    setModalOpen(true)
+  }, [])
+
   return (
     <AnimatedSection id="skills" className="relative py-14 sm:py-20 overflow-hidden">
       {/* Animated background elements */}
@@ -95,7 +70,7 @@ export function Skills() {
 
       {/* 3D particle field background */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-15" aria-hidden="true">
-        <ParticleField color="#3b82f6" speed={0.1} />
+        <ParticleField color={hex.primary} speed={0.1} />
       </div>
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
@@ -132,7 +107,7 @@ export function Skills() {
                   </h3>
                   <div className="flex flex-wrap gap-2">
                     {cat.items.map((item, idx) => (
-                      <SkillTag key={item} item={item} idx={idx} />
+                      <SkillTag key={item} item={item} idx={idx} onSelect={handleSelectSkill} />
                     ))}
                   </div>
                 </div>
@@ -144,6 +119,16 @@ export function Skills() {
           ))}
         </div>
       </div>
+
+      {/* Skill detail modal — shows linked experiences/projects/publications */}
+      <SkillDetailModal
+        skill={selectedSkill}
+        open={modalOpen}
+        onOpenChange={(open) => {
+          setModalOpen(open)
+          if (!open) setSelectedSkill(null)
+        }}
+      />
     </AnimatedSection>
   )
 }

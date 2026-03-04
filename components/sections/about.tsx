@@ -5,6 +5,7 @@ import dynamic from "next/dynamic"
 import { AnimatedSection } from "../animations/animated-section"
 import { AnimatedCounter } from "../animations/animated-counter"
 import { SectionHeader } from "../layout/section-header"
+import { lightGradients as lg, hex } from "@/lib/theme"
 
 const TerminalReveal = dynamic(
   () => import("../terminal/terminal-reveal").then((mod) => mod.TerminalReveal),
@@ -25,7 +26,7 @@ const highlights = [
     subtitleNum: "",
     subtitleText: "UC Berkeley",
     detail: "B.A. Computer Science",
-    gradient: "from-primary/10 to-accent/10",
+    gradient: lg.primaryToAccent,
   },
   {
     icon: Briefcase,
@@ -33,7 +34,7 @@ const highlights = [
     subtitleNum: "",
     subtitleText: "Braintrust, Apple, Walmart",
     detail: "Fortune 500 + AI Startups",
-    gradient: "from-accent/10 to-[hsl(180,70%,50%)]/10",
+    gradient: lg.accentToCyan,
   },
   {
     icon: BookOpen,
@@ -41,7 +42,7 @@ const highlights = [
     subtitleNum: "6",
     subtitleText: " Research Papers",
     detail: "Machine Learning & Hydrology",
-    gradient: "from-[hsl(180,70%,50%)]/10 to-primary/10",
+    gradient: lg.cyanToPrimary,
   },
   {
     icon: Award,
@@ -49,7 +50,7 @@ const highlights = [
     subtitleNum: "100M+",
     subtitleText: " Users Reached",
     detail: "Industry Impact",
-    gradient: "from-primary/10 to-[hsl(280,75%,60%)]/10",
+    gradient: lg.primaryToMagenta,
   },
   {
     icon: Users,
@@ -57,7 +58,7 @@ const highlights = [
     subtitleNum: "",
     subtitleText: "Team Lead & Mentor",
     detail: "Cross-functional Teams",
-    gradient: "from-accent/10 to-primary/10",
+    gradient: lg.accentToPrimary,
   },
   {
     icon: Code2,
@@ -65,7 +66,7 @@ const highlights = [
     subtitleNum: "",
     subtitleText: "LangChain, CrewAI, Spring",
     detail: "Community Driven",
-    gradient: "from-[hsl(280,75%,60%)]/10 to-accent/10",
+    gradient: lg.magentaToAccent,
   },
 ]
 
@@ -80,7 +81,7 @@ export function About() {
 
       {/* 3D particle network background */}
       <div className="pointer-events-none absolute inset-0 opacity-20" aria-hidden="true">
-        <ParticleField color="#3b82f6" speed={0.12} />
+        <ParticleField color={hex.primary} speed={0.12} />
       </div>
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6">

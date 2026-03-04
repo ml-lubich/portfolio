@@ -9,8 +9,11 @@ export function ExpandingText({ text, className }: { text: string; className?: s
       {chars.map((char, i) => (
         <span
           key={`${char}-${i}`}
-          className="inline-block transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover/link:translate-y-[-1px] group-hover/link:scale-[1.08]"
+          className="inline-block group-hover/link:translate-y-[-1px] group-hover/link:scale-[1.08]"
           style={{
+            transitionProperty: "all",
+            transitionDuration: "300ms",
+            transitionTimingFunction: "cubic-bezier(0.16,1,0.3,1)",
             transitionDelay: `${i * 25}ms`,
             ...(char === " " ? { width: "0.25em" } : {}),
           }}

@@ -1,4 +1,5 @@
 import { forwardRef } from "react"
+import { overlays } from "@/lib/theme"
 
 /* ── Holographic edge glow ── */
 export const GlowOverlay = forwardRef<HTMLDivElement>(function GlowOverlay(_props, ref) {
@@ -8,7 +9,7 @@ export const GlowOverlay = forwardRef<HTMLDivElement>(function GlowOverlay(_prop
       className="pointer-events-none absolute inset-0 z-10 transition-opacity duration-300"
       style={{
         opacity: 0,
-        background: "radial-gradient(circle at 50% 50%, hsla(217,91%,60%,0.2), transparent 60%)",
+        background: overlays.glowRadial,
         mixBlendMode: "screen",
       }}
     />
@@ -40,7 +41,7 @@ export const ScanOverlay = forwardRef<HTMLDivElement>(function ScanOverlay(_prop
       style={{
         opacity: 0,
         backgroundImage:
-          "repeating-linear-gradient(0deg, transparent, transparent 2px, hsla(217,91%,60%,0.03) 2px, hsla(217,91%,60%,0.03) 4px)",
+          overlays.scanLines,
         backgroundSize: "100% 4px",
         transition: "opacity 0.5s",
       }}
