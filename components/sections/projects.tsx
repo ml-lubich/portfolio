@@ -270,6 +270,15 @@ export function Projects() {
       stackOffset={16}
       scrollPerCard={55}
       perspective={1200}
+      activeCardId={selectedId}
+      onScrollDismiss={handleClose}
+      detailContent={
+        <DetailPanel
+          data={selected?.detail ?? null}
+          isOpen={isOpen}
+          onClose={handleClose}
+        />
+      }
       cards={projects.map((project) => ({
         id: project.id,
         children: (
@@ -372,12 +381,7 @@ export function Projects() {
         ),
       }))}
     >
-      {/* Detail panel */}
-      <DetailPanel
-        data={selected?.detail ?? null}
-        isOpen={isOpen}
-        onClose={handleClose}
-      />
+      {/* Extra content after cards (if any) */}
     </ScrollStackSection>
   )
 }

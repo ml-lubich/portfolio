@@ -71,6 +71,14 @@ interface ScrollStackSectionProps {
    * Google Scholar link). Receives full section width.
    */
   children?: ReactNode
+
+  /* ── Detail-panel split-view ────────────────────────────────────────── */
+  /** ID of the currently active/expanded card, or null */
+  activeCardId?: string | null
+  /** Called when scroll detected while detail panel is open */
+  onScrollDismiss?: () => void
+  /** Detail panel content rendered inside the sticky card area */
+  detailContent?: ReactNode
 }
 
 export function ScrollStackSection({
@@ -89,6 +97,9 @@ export function ScrollStackSection({
   maxWidth = "max-w-6xl",
   bgEffects,
   children,
+  activeCardId,
+  onScrollDismiss,
+  detailContent,
 }: ScrollStackSectionProps) {
   return (
     <section
@@ -122,6 +133,9 @@ export function ScrollStackSection({
           stackOffset={stackOffset}
           scrollPerCard={scrollPerCard}
           perspective={perspective}
+          activeCardId={activeCardId}
+          onScrollDismiss={onScrollDismiss}
+          detailContent={detailContent}
         />
       </div>
 

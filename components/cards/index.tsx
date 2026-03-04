@@ -26,6 +26,9 @@ export function ScrollStackCards({
   stackOffset = 20,
   scrollPerCard = 50,
   perspective = 1200,
+  activeCardId = null,
+  onScrollDismiss,
+  detailContent,
 }: ScrollStackCardsProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
@@ -40,6 +43,14 @@ export function ScrollStackCards({
   // Drag state per card
   const drags = useRef<DragState[]>([])
   const draggingIndex = useRef<number | null>(null)
+
+  // Detail-panel expansion state (derived + refs for stable closures)
+  const isExpanded = !!activeCardId
+  const activeCardIdRef = useRef(activeCardId)
+  activeCardIdRef.current = activeCardId
+  const onScrollDismissRef = useRef(onScrollDismiss)
+  onScrollDismissRef.current = onScrollDismiss
+  const expandedScrollY = useRef(0)
 
   // Ensure drag array is sized
   if (drags.current.length !== cards.length) {
@@ -266,6 +277,7 @@ export function ScrollStackCards({
   /* ── Mouse handlers ─────────────────────────────────────────────────── */
   const handleMouseDown = useCallback((e: ReactMouseEvent<HTMLDivElement>, index: number) => {
     if ((e.target as HTMLElement).closest("a, button")) return
+    if (activeCardIdRef.current) return // No drag while panel is open
     e.preventDefault()
     onPointerDown(e.clientX, e.clientY, index)
   }, [onPointerDown])
@@ -277,8 +289,9 @@ export function ScrollStackCards({
       return
     }
 
-    // Don't apply hover effects while scrolling / stacking
+    // Don't apply hover effects while scrolling / stacking or when panel is expanded
     if (isScrolling.current) return
+    if (activeCardIdRef.current) return
 
     const el = cardRefs.current[index]
     if (!el) return
@@ -341,6 +354,7 @@ export function ScrollStackCards({
   /* ── Touch handlers ─────────────────────────────────────────────────── */
   const handleTouchStart = useCallback((e: ReactTouchEvent<HTMLDivElement>, index: number) => {
     if ((e.target as HTMLElement).closest("a, button")) return
+    if (activeCardIdRef.current) return // No drag while panel is open
     const t = e.touches[0]
     onPointerDown(t.clientX, t.clientY, index)
   }, [onPointerDown])
@@ -385,11 +399,26 @@ export function ScrollStackCards({
     }
   }, [onPointerUp, onPointerMove])
 
+  /* ── Record scroll position when panel expands ────────────────────── */
+  useEffect(() => {
+    if (activeCardId) {
+      expandedScrollY.current = window.scrollY
+    }
+  }, [activeCardId])
+
   /* ================================================================== */
   /*  Scroll listener                                                    */
   /* ================================================================== */
   useEffect(() => {
     const onScroll = () => {
+      // Auto-dismiss detail panel on meaningful scroll (> 25px)
+      if (activeCardIdRef.current && onScrollDismissRef.current) {
+        const delta = Math.abs(window.scrollY - expandedScrollY.current)
+        if (delta > 25) {
+          onScrollDismissRef.current()
+        }
+      }
+
       isScrolling.current = true
       if (scrollTimer.current) clearTimeout(scrollTimer.current)
       scrollTimer.current = setTimeout(() => { isScrolling.current = false }, 150)
@@ -424,47 +453,75 @@ export function ScrollStackCards({
       >
         {header}
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr",
-            gridTemplateRows: "1fr",
-          }}
-        >
-          {cards.map((card, i) => (
-            <div
-              key={card.id}
-              ref={(el) => { cardRefs.current[i] = el }}
-              data-stack-card
-              className="will-change-transform select-none"
-              style={{
-                gridRow: "1 / -1",
-                gridColumn: "1 / -1",
-                marginTop: `${i * stackOffset}px`,
-                transformOrigin: "center top",
-                transformStyle: "preserve-3d",
-                borderRadius: "16px",
-                overflow: "hidden",
-                cursor: "grab",
-                zIndex: i + 1,
-                opacity: i === 0 ? 1 : 0,
-              }}
-              onMouseDown={(e) => handleMouseDown(e, i)}
-              onMouseMove={(e) => handleMouseMoveCard(e, i)}
-              onMouseUp={(e) => handleMouseUp(e, i)}
-              onMouseLeave={() => handleMouseLeave(i)}
-              onTouchStart={(e) => handleTouchStart(e, i)}
-              onTouchMove={(e) => handleTouchMove(e, i)}
-              onTouchEnd={(e) => handleTouchEnd(e, i)}
-            >
-              {card.children}
+        {/* Split-view container for cards + detail panel */}
+        <div className="relative">
+          {/* Card stack — shifts left when detail panel is open */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr",
+              gridTemplateRows: "1fr",
+              transform: isExpanded
+                ? "translateX(-15%) scale(0.85)"
+                : "translateX(0) scale(1)",
+              transformOrigin: "left top",
+              transition: "transform 0.65s cubic-bezier(0.16, 1, 0.3, 1)",
+            }}
+          >
+            {cards.map((card, i) => (
+              <div
+                key={card.id}
+                ref={(el) => { cardRefs.current[i] = el }}
+                data-stack-card
+                className="will-change-transform select-none"
+                style={{
+                  gridRow: "1 / -1",
+                  gridColumn: "1 / -1",
+                  marginTop: `${i * stackOffset}px`,
+                  transformOrigin: "center top",
+                  transformStyle: "preserve-3d",
+                  borderRadius: "16px",
+                  overflow: "hidden",
+                  cursor: isExpanded ? "pointer" : "grab",
+                  zIndex: i + 1,
+                  opacity: i === 0 ? 1 : 0,
+                }}
+                onMouseDown={(e) => handleMouseDown(e, i)}
+                onMouseMove={(e) => handleMouseMoveCard(e, i)}
+                onMouseUp={(e) => handleMouseUp(e, i)}
+                onMouseLeave={() => handleMouseLeave(i)}
+                onTouchStart={(e) => handleTouchStart(e, i)}
+                onTouchMove={(e) => handleTouchMove(e, i)}
+                onTouchEnd={(e) => handleTouchEnd(e, i)}
+              >
+                {card.children}
 
-              <GlowOverlay ref={(el) => { glowRefs.current[i] = el }} />
-              <ShineOverlay ref={(el) => { shineRefs.current[i] = el }} />
-              <ScanOverlay ref={(el) => { scanRefs.current[i] = el }} />
-              <CornerBrackets />
+                <GlowOverlay ref={(el) => { glowRefs.current[i] = el }} />
+                <ShineOverlay ref={(el) => { shineRefs.current[i] = el }} />
+                <ScanOverlay ref={(el) => { scanRefs.current[i] = el }} />
+                <CornerBrackets />
+              </div>
+            ))}
+          </div>
+
+          {/* Detail panel — slides in from right when a card is selected */}
+          {detailContent && (
+            <div
+              className="absolute top-0 right-0 w-[92%] sm:w-[56%] lg:w-[52%]"
+              style={{
+                maxHeight: `calc(100vh - ${stickyTop + 80}px)`,
+                overflowY: isExpanded ? "auto" : "hidden",
+                overscrollBehavior: "contain",
+                transform: isExpanded ? "translateX(0)" : "translateX(110%)",
+                opacity: isExpanded ? 1 : 0,
+                transition: "transform 0.65s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease",
+                pointerEvents: isExpanded ? "auto" : "none",
+                zIndex: cards.length + 20,
+              }}
+            >
+              {detailContent}
             </div>
-          ))}
+          )}
         </div>
       </div>
     </div>

@@ -18,6 +18,14 @@ export interface ScrollStackCardsProps {
   scrollPerCard?: number
   /** 3D perspective depth (px). Default: 1200 */
   perspective?: number
+
+  /* ── Detail-panel split-view ────────────────────────────────────────── */
+  /** ID of the currently active/expanded card, or null */
+  activeCardId?: string | null
+  /** Called when scroll detected while detail panel is open — should close panel */
+  onScrollDismiss?: () => void
+  /** Detail panel content to render on the right when a card is active */
+  detailContent?: ReactNode
 }
 
 /* ── Per-card drag physics state ─────────────────────────────────────── */

@@ -259,6 +259,15 @@ export function Journey() {
       stackOffset={16}
       scrollPerCard={55}
       perspective={1200}
+      activeCardId={selectedId}
+      onScrollDismiss={handleClose}
+      detailContent={
+        <DetailPanel
+          data={selected?.detail ?? null}
+          isOpen={isOpen}
+          onClose={handleClose}
+        />
+      }
       cards={experiences.map((exp) => ({
         id: exp.id,
         children: (
@@ -376,12 +385,7 @@ export function Journey() {
         ),
       }))}
     >
-      {/* Detail panel */}
-      <DetailPanel
-        data={selected?.detail ?? null}
-        isOpen={isOpen}
-        onClose={handleClose}
-      />
+      {/* Extra content after cards (if any) */}
     </ScrollStackSection>
   )
 }

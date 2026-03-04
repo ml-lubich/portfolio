@@ -22,11 +22,9 @@ export function DetailPanel({ data, isOpen, onClose }: DetailPanelProps) {
     }
     if (isOpen) {
       document.addEventListener("keydown", handler)
-      document.body.style.overflow = "hidden"
     }
     return () => {
       document.removeEventListener("keydown", handler)
-      document.body.style.overflow = ""
     }
   }, [isOpen, onClose])
 
@@ -40,21 +38,10 @@ export function DetailPanel({ data, isOpen, onClose }: DetailPanelProps) {
   if (!data) return null
 
   return (
-    <>
-      {/* Backdrop */}
-      <div
-        className={`fixed inset-0 z-40 bg-black/60 backdrop-blur-sm transition-opacity duration-500 ${
-          isOpen ? "opacity-100" : "pointer-events-none opacity-0"
-        }`}
-        onClick={onClose}
-      />
-
-      {/* Panel */}
       <div
         ref={panelRef}
-        className={`fixed right-0 top-0 z-50 h-full w-full overflow-y-auto border-l border-border/30 bg-background/95 backdrop-blur-2xl transition-[transform,visibility] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] sm:w-[540px] lg:w-[600px] ${
-          isOpen ? "translate-x-0 visible" : "translate-x-full invisible"
-        }`}
+        className="h-full w-full overflow-y-auto overscroll-contain rounded-2xl border border-border/30 bg-background/95 backdrop-blur-2xl"
+        style={{ scrollbarGutter: "stable" }}
         role="dialog"
         aria-modal="true"
         aria-label={data.title}
@@ -213,6 +200,5 @@ export function DetailPanel({ data, isOpen, onClose }: DetailPanelProps) {
           </div>
         </div>
       </div>
-    </>
   )
 }
