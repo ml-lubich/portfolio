@@ -34,6 +34,8 @@ export function ScrollStackCards({
   const shineRefs = useRef<(HTMLDivElement | null)[]>([])
   const rafId = useRef<number>(0)
   const hoveredIndex = useRef<number | null>(null)
+  const isScrolling = useRef(false)
+  const scrollTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Drag state per card
   const drags = useRef<DragState[]>([])
@@ -64,7 +66,14 @@ export function ScrollStackCards({
 
     cardRefs.current.forEach((el, i) => {
       if (!el) return
-      if (hoveredIndex.current === i || drags.current[i]?.active) return
+      if (drags.current[i]?.active) return
+      // When scrolling, override hover — let scroll transforms control all cards
+      if (isScrolling.current && hoveredIndex.current === i) {
+        hoveredIndex.current = null
+        const shine = shineRefs.current[i]
+        if (shine) shine.style.opacity = "0"
+      }
+      if (hoveredIndex.current === i) return
 
       const d = drags.current[i]
       const arriveAt = n > 1 ? i / (n - 1) : 0
@@ -268,6 +277,9 @@ export function ScrollStackCards({
       return
     }
 
+    // Don't apply hover effects while scrolling / stacking
+    if (isScrolling.current) return
+
     const el = cardRefs.current[index]
     if (!el) return
 
@@ -378,6 +390,9 @@ export function ScrollStackCards({
   /* ================================================================== */
   useEffect(() => {
     const onScroll = () => {
+      isScrolling.current = true
+      if (scrollTimer.current) clearTimeout(scrollTimer.current)
+      scrollTimer.current = setTimeout(() => { isScrolling.current = false }, 150)
       cancelAnimationFrame(rafId.current)
       rafId.current = requestAnimationFrame(updateCards)
     }
