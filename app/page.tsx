@@ -18,7 +18,7 @@ const Footer = dynamic(() => import("@/components/sections/footer").then(m => m.
 
 export default function Home() {
   return (
-    <main id="main-content" className="relative min-h-screen max-w-full overflow-x-clip bg-background" role="main">
+    <main id="main-content" className="relative min-h-screen max-w-full bg-background" role="main">
       <Navigation />
       <Hero />
       <LogoScroll />

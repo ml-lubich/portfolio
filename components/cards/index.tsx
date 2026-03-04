@@ -399,25 +399,13 @@ export function ScrollStackCards({
       className={className || undefined}
       style={{ height: runwayHeight, position: "relative" }}
     >
-      {cards.map((card, i) => (
-        <div
-          key={`snap-${card.id}`}
-          data-card-snap
-          aria-hidden="true"
-          style={{
-            position: "absolute",
-            top: `${i * scrollPerCard}vh`,
-            left: 0,
-            width: "1px",
-            height: "1px",
-            pointerEvents: "none",
-          }}
-        />
-      ))}
-
       <div
         className="sticky mx-auto"
-        style={{ top: `${stickyTop}px`, maxWidth: "100%" }}
+        style={{
+          top: `${stickyTop}px`,
+          maxWidth: "100%",
+          zIndex: 10,
+        }}
       >
         {header}
 

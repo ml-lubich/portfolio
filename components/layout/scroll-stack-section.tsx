@@ -93,7 +93,7 @@ export function ScrollStackSection({
   return (
     <section
       id={id}
-      className={`relative py-14 sm:py-20 overflow-clip ${className}`}
+      className={`relative py-14 sm:py-20 ${className}`}
     >
       {/* Background FX (optional) */}
       {bgEffects && (

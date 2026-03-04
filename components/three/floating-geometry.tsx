@@ -17,8 +17,8 @@ class WebGLErrorBoundary extends Component<
   static getDerivedStateFromError() {
     return { hasError: true }
   }
-  componentDidCatch(error: Error) {
-    console.warn("[FloatingGeometry] WebGL error caught:", error.message)
+  componentDidCatch() {
+    // Swallowed — hasError state handles the fallback UI
   }
   render() {
     if (this.state.hasError) return null

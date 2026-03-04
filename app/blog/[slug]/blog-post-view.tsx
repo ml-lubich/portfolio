@@ -2,6 +2,7 @@
 
 import React from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { motion } from "framer-motion"
 import type { BlogPost } from "@/lib/blog-data"
 import { getRelatedPosts, getReadingTime, AUTHOR } from "@/lib/blog-data"
@@ -117,11 +118,14 @@ export function BlogPostView({ post }: BlogPostViewProps) {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="relative mb-12 overflow-hidden rounded-2xl border border-white/[0.06]"
           >
-            <img
+            <Image
               src={post.coverImage}
               alt={post.title}
+              width={1200}
+              height={420}
               className="h-[300px] w-full object-cover md:h-[420px]"
               itemProp="image"
+              priority
             />
             <div className="absolute inset-0 bg-gradient-to-t from-background/40 to-transparent" />
           </motion.div>

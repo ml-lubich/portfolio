@@ -259,7 +259,7 @@ export function Projects() {
       label="Featured Projects"
       title={<>Innovative solutions that{" "}<span className="gradient-text">drive real-world impact</span></>}
       subtitle="Click any project to explore architecture, tech stack, and animated system diagrams."
-      className="overflow-clip"
+      className=""
       bgEffects={
         <>
           <div className="absolute left-1/4 top-20 h-[500px] w-[500px] rounded-full bg-accent/5 blur-[120px]" />

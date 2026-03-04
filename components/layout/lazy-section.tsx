@@ -46,7 +46,7 @@ export function LazySection({
   }, [rootMargin])
 
   return (
-    <div ref={ref} className={`overflow-x-clip ${className}`} style={visible ? undefined : { minHeight }}>
+    <div ref={ref} className={className || undefined} style={visible ? undefined : { minHeight }}>
       {visible ? children : null}
     </div>
   )

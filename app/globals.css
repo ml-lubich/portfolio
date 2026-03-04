@@ -63,42 +63,11 @@ body {
   /* hard cap on body width */
 }
 
-/* ── Scroll-snap anchor system ────────────────────────────────── */
-/* Proximity snapping: nudges to section boundaries when close,
-   but does NOT lock the user — lets them scroll freely through
-   long stacking-card runways.                                     */
-html {
-  scroll-snap-type: y proximity;
-  scroll-padding-top: 80px;
-  /* offset for fixed nav */
-}
-
-/* Each major section is a snap target */
-section[id],
-[data-snap] {
-  scroll-snap-align: start;
-  scroll-snap-stop: normal;
-  scroll-margin-top: 80px;
-  /* offset for fixed nav */
-}
-
-/* Short / decorative bands that should NOT be snap targets */
-section[id="partners"] {
-  scroll-snap-align: none;
-  scroll-snap-stop: normal;
-}
-
-/* Sections with stacking-card runways must NOT snap —
-   the user needs to scroll smoothly through the tall runway. */
-section[data-no-snap] {
-  scroll-snap-align: none;
-}
-
-/* Snap markers inside stacking-card runways */
-[data-card-snap] {
-  scroll-snap-align: start;
-  scroll-margin-top: 80px;
-}
+/* ── Scroll anchoring ─────────────────────────────────────────── */
+/* Scroll-snap is intentionally disabled globally so that
+   stacking-card runways (tall sticky sections) work correctly.
+   The runways use position:sticky + a tall container to "lock"
+   the viewport while cards stack one-by-one via scroll progress. */
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
@@ -954,6 +923,19 @@ section[data-no-snap] {
 .diagram-particle {
   opacity: 0;
   animation: diagram-particle-flow 0.8s ease-out forwards;
+}
+
+/* ──────────────────────────────────────────── */
+/*  Glass shimmer for profile card             */
+/* ──────────────────────────────────────────── */
+@keyframes glassShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 /* ──────────────────────────────────────────── */

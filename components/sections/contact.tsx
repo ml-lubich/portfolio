@@ -1,7 +1,7 @@
 "use client"
 
 import dynamic from "next/dynamic"
-import { Mail, Phone, MapPin, Calendar, Linkedin, Github, GraduationCap, FileText } from "lucide-react"
+import { Mail, Phone, MapPin, Calendar, Linkedin, Github, GraduationCap } from "lucide-react"
 import { AnimatedSection } from "../animations/animated-section"
 import { SectionHeader } from "../layout/section-header"
 
@@ -78,16 +78,7 @@ export function Contact() {
                 </div>
               ))}
 
-              {/* Download resume */}
-              <div className="mt-2">
-                <a
-                  href="#"
-                  className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-primary to-accent px-5 py-3 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
-                >
-                  <FileText className="h-4 w-4" />
-                  Download Resume
-                </a>
-              </div>
+
             </div>
           </AnimatedSection>
 

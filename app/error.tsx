@@ -10,7 +10,8 @@ export default function Error({
     reset: () => void
 }) {
     useEffect(() => {
-        console.error("[app/error.tsx]", error)
+        // Error is already captured by Next.js error reporting;
+        // no need to double-log to the browser console.
     }, [error])
 
     return (
