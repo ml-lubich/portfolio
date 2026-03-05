@@ -182,7 +182,15 @@ export function Navigation() {
           {/* Logo */}
           <a
             href="#"
-            onClick={(e) => handleLinkClick(e, "#")}
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              setHideNav(false)
+              // Scroll to top directly — don't go through navigateTo
+              window.scrollTo({ top: 0, behavior: "smooth" })
+              history.replaceState(null, "", window.location.pathname)
+              setMobileOpen(false)
+            }}
             className="group flex items-center gap-2"
           >
             <div
