@@ -11,6 +11,7 @@ import type { ScrollStackCardsProps, DragState } from "./types"
 import { SPRING, DAMPING, FLING_DECAY, DRAG_DEAD_ZONE, newDragState } from "./constants"
 import { GlowOverlay, ShineOverlay, ScanOverlay, CornerBrackets } from "./card-overlays"
 import { overlays, shadows } from "@/lib/theme"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 /**
  * Hen-ry.com–style sticky stacking cards with 3D transforms + drag physics.
@@ -31,6 +32,14 @@ export function ScrollStackCards({
   onScrollDismiss,
   detailContent,
 }: ScrollStackCardsProps) {
+  const isMobile = useIsMobile()
+
+  // Mobile-adjusted parameters for better small-viewport UX
+  const effStickyTop = isMobile ? Math.min(stickyTop, 56) : stickyTop
+  const effStackOffset = isMobile ? Math.min(stackOffset, 8) : stackOffset
+  const effScrollPerCard = isMobile ? Math.min(scrollPerCard, 35) : scrollPerCard
+  const effPerspective = isMobile ? Math.min(perspective, 800) : perspective
+
   const containerRef = useRef<HTMLDivElement>(null)
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
   const glowRefs = useRef<(HTMLDivElement | null)[]>([])
@@ -104,12 +113,14 @@ export function ScrollStackCards({
         )
       }
 
-      const scale = 1 - coverProgress * 0.06
-      const translateZ = coverProgress * -60
-      const rotateX = coverProgress * 2
+      // Softer transforms on mobile to keep cards readable
+      const mobile = isMobileRef.current
+      const scale = 1 - coverProgress * (mobile ? 0.03 : 0.06)
+      const translateZ = coverProgress * (mobile ? -25 : -60)
+      const rotateX = coverProgress * (mobile ? 0.8 : 2)
       const brightness = 1 - coverProgress * 0.2
       const borderRadius = 20 + coverProgress * 12
-      const slideUp = (1 - enterProgress) * 110
+      const slideUp = (1 - enterProgress) * (mobile ? 70 : 110)
       const enterOpacity = Math.min(enterProgress * 2.5, 1)
       const stackedOpacity = 1 - coverProgress * 0.3
       const opacity = enterOpacity * stackedOpacity
@@ -121,8 +132,9 @@ export function ScrollStackCards({
       const dragRotateY = d ? d.dx * 0.04 : 0
       const dragRotateX = d ? -d.dy * 0.04 : 0
 
+      const curPerspective = mobile ? Math.min(perspective, 800) : perspective
       el.style.transform = [
-        `perspective(${perspective}px)`,
+        `perspective(${curPerspective}px)`,
         `rotateX(${rotateX + dragRotateX}deg)`,
         `rotateY(${dragRotateY}deg)`,
         `translateX(${dragX}px)`,
@@ -152,6 +164,10 @@ export function ScrollStackCards({
       if (shine) shine.style.opacity = "0"
     })
   }, [cards.length, perspective])
+
+  // Stable ref for isMobile so updateCards can read it without re-creating
+  const isMobileRef = useRef(isMobile)
+  isMobileRef.current = isMobile
 
   /* ================================================================== */
   /*  DRAG  —  pointer down / move / up + touch equivalents             */
@@ -457,7 +473,7 @@ export function ScrollStackCards({
     }
   }, [updateCards])
 
-  const runwayHeight = `${(cards.length - 1) * scrollPerCard + 100}vh`
+  const runwayHeight = `${(cards.length - 1) * effScrollPerCard + 100}vh`
 
   return (
     <div
@@ -468,7 +484,7 @@ export function ScrollStackCards({
       <div
         className="sticky mx-auto"
         style={{
-          top: `${stickyTop}px`,
+          top: `${effStickyTop}px`,
           maxWidth: "100%",
           zIndex: 10,
         }}
@@ -483,6 +499,7 @@ export function ScrollStackCards({
               display: "grid",
               gridTemplateColumns: "1fr",
               gridTemplateRows: "1fr",
+              overflow: "hidden",
               transform: isExpanded
                 ? "translateX(-15%) scale(0.85)"
                 : "translateX(0) scale(1)",
@@ -499,7 +516,7 @@ export function ScrollStackCards({
                 style={{
                   gridRow: "1 / -1",
                   gridColumn: "1 / -1",
-                  marginTop: `${i * stackOffset}px`,
+                  marginTop: `${i * effStackOffset}px`,
                   transformOrigin: "center top",
                   transformStyle: "preserve-3d",
                   borderRadius: "20px",

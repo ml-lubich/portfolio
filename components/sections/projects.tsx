@@ -118,7 +118,7 @@ export function Projects() {
 
               {/* Metrics row */}
               {project.detail.metrics && (
-                <div className="mt-5 flex gap-4">
+                <div className="mt-5 flex flex-wrap gap-3 sm:gap-4">
                   {project.detail.metrics.map((m) => (
                     <div key={m.label} className="rounded-lg border border-border/50 bg-secondary px-3 py-2">
                       <p className="text-xs text-muted-foreground/50">{m.label}</p>

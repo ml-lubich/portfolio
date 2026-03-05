@@ -5,6 +5,7 @@ import { AnimatedSection } from "../animations/animated-section"
 import { AnimatedCounter } from "../animations/animated-counter"
 import { SectionHeader } from "../layout/section-header"
 import { gradients as g, toHsla, hsl } from "@/lib/theme"
+import { useIsMobile } from "@/hooks/use-mobile"
 import {
     GitFork,
     Star,
@@ -117,7 +118,9 @@ const DAY_LABELS = ["", "Mon", "", "Wed", "", "Fri", ""]
 const GITHUB_USERNAME = "ml-lubich"
 const WEEKS_TO_SHOW = 26
 const CELL = 15
+const CELL_MOBILE = 10
 const GAP = 3
+const GAP_MOBILE = 2
 
 /* ── Helpers ─────────────────────────────────────────────────── */
 function timeAgo(dateStr: string): string {
@@ -280,6 +283,9 @@ function buildRepoBubbles(repos: GitHubRepo[]): RepoBubble[] {
 
 /* ── Component ───────────────────────────────────────────────── */
 export function GitHubStats() {
+    const isMobile = useIsMobile()
+    const cellSize = isMobile ? CELL_MOBILE : CELL
+    const gapSize = isMobile ? GAP_MOBILE : GAP
     const [user, setUser] = useState<GitHubUser | null>(null)
     const [repos, setRepos] = useState<GitHubRepo[]>([])
     const [languages, setLanguages] = useState<LanguageStat[]>([])
@@ -457,10 +463,10 @@ export function GitHubStats() {
                         <div className="overflow-x-auto pb-2 -mx-2 px-2 flex justify-center">
                             <div className="inline-flex gap-0 min-w-max">
                                 {/* Day labels */}
-                                <div className="flex flex-col mr-2" style={{ gap: GAP }}>
-                                    <div style={{ height: 16 }} />
+                                <div className="flex flex-col mr-2" style={{ gap: gapSize }}>
+                                    <div style={{ height: isMobile ? 12 : 16 }} />
                                     {DAY_LABELS.map((label, i) => (
-                                        <div key={i} className="flex items-center justify-end pr-1 text-[10px] leading-none text-muted-foreground/50" style={{ height: CELL }}>
+                                        <div key={i} className="flex items-center justify-end pr-1 text-[10px] leading-none text-muted-foreground/50" style={{ height: cellSize, fontSize: isMobile ? '8px' : '10px' }}>
                                             {label}
                                         </div>
                                     ))}
@@ -468,25 +474,25 @@ export function GitHubStats() {
 
                                 <div className="relative">
                                     {/* Month labels */}
-                                    <div className="relative flex" style={{ height: 16, marginBottom: GAP }}>
+                                    <div className="relative flex" style={{ height: isMobile ? 12 : 16, marginBottom: gapSize }}>
                                         {monthPositions.map(({ label, col }, i) => (
-                                            <div key={label + "-" + i} className="absolute text-[10px] text-muted-foreground/50" style={{ left: col * (CELL + GAP) }}>
+                                            <div key={label + "-" + i} className="absolute text-muted-foreground/50" style={{ left: col * (cellSize + gapSize), fontSize: isMobile ? '8px' : '10px' }}>
                                                 {label}
                                             </div>
                                         ))}
                                     </div>
 
                                     {/* Cell grid */}
-                                    <div className="flex" style={{ gap: GAP }}>
+                                    <div className="flex" style={{ gap: gapSize }}>
                                         {contributionGrid.map((week, wIdx) => (
-                                            <div key={wIdx} className="flex flex-col" style={{ gap: GAP }}>
+                                            <div key={wIdx} className="flex flex-col" style={{ gap: gapSize }}>
                                                 {week.map((day) => (
                                                     <div
                                                         key={day.date}
                                                         className="rounded-[3px] transition-all duration-200 hover:scale-[1.7] hover:z-10 cursor-crosshair"
                                                         style={{
-                                                            width: CELL,
-                                                            height: CELL,
+                                                            width: cellSize,
+                                                            height: cellSize,
                                                             backgroundColor: LEVEL_COLORS[day.level],
                                                             border: day.level > 0 ? `1px solid ${toHsla(hsl.primary, 0.10)}` : `1px solid ${toHsla(hsl.border, 0.08)}`,
                                                             boxShadow: day.level >= 3 ? `0 0 ${day.level * 4}px ${toHsla(hsl.primary, day.level * 0.06)}` : "none",
@@ -499,7 +505,7 @@ export function GitHubStats() {
                                                     />
                                                 ))}
                                                 {week.length < 7 && [...Array(7 - week.length)].map((_, i) => (
-                                                    <div key={"pad-" + i} style={{ width: CELL, height: CELL }} />
+                                                    <div key={"pad-" + i} style={{ width: cellSize, height: cellSize }} />
                                                 ))}
                                             </div>
                                         ))}
@@ -627,7 +633,7 @@ export function GitHubStats() {
                                 }
                                 return (
                                     <div className="flex justify-center">
-                                        <svg viewBox="0 0 200 200" className="w-full max-w-[220px]">
+                                        <svg viewBox="0 0 200 200" className="w-full max-w-[180px] sm:max-w-[220px]">
                                             {/* Grid rings */}
                                             {[25, 50, 75, 100].map(p => (
                                                 <polygon key={p}
@@ -751,7 +757,7 @@ export function GitHubStats() {
                                 let offset = 0
                                 return (
                                     <div className="flex flex-col items-center gap-4">
-                                        <svg viewBox="0 0 160 160" className="w-full max-w-[180px]">
+                                        <svg viewBox="0 0 160 160" className="w-full max-w-[140px] sm:max-w-[180px]">
                                             {eventTypes.map((ev, i) => {
                                                 const dashLen = (ev.count / total) * circumference
                                                 const strokeW = R - r
@@ -847,9 +853,10 @@ export function GitHubStats() {
                             </h3>
                             {repoBubbles.length > 0 && (() => {
                                 const maxSize = repoBubbles[0]?.size || 1
-                                const minR = 22, maxR = 52
+                                const minR = isMobile ? 16 : 22
+                                const maxR = isMobile ? 36 : 52
                                 return (
-                                    <div className="flex flex-wrap items-center justify-center gap-3">
+                                    <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
                                         {repoBubbles.map((b, i) => {
                                             const pct = b.size / maxSize
                                             const radius = minR + pct * (maxR - minR)
