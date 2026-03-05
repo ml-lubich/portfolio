@@ -1,5 +1,12 @@
 /* ── Spring-physics "woosh" smooth scroll ─────────────────────────── */
 
+/**
+ * Global flag: true while a programmatic (woosh) scroll is in progress.
+ * Other scroll-driven components (e.g. navbar hide/show) should check
+ * this and skip their reactions to avoid visual glitches.
+ */
+export let isProgrammaticScroll = false
+
 export function wooshScrollTo(targetY: number) {
   const startY = window.scrollY
   const distance = targetY - startY
@@ -26,26 +33,63 @@ export function wooshScrollTo(targetY: number) {
     }
   }
 
+  // Signal that JS is driving the scroll
+  isProgrammaticScroll = true
   document.documentElement.style.scrollBehavior = "auto"
   rafId = requestAnimationFrame(tick)
 
   setTimeout(() => {
     document.documentElement.style.scrollBehavior = ""
     cancelAnimationFrame(rafId)
+    isProgrammaticScroll = false
   }, duration + 50)
 }
 
-/** Scroll to an anchor href with the woosh effect */
+/** Scroll to an anchor href with the woosh effect.
+ *  If the target element isn't in the DOM yet (e.g. inside a LazySection),
+ *  we progressively scroll down to trigger lazy-loading, then retry.
+ */
 export function navigateTo(href: string, callback?: () => void) {
   if (href.startsWith("/")) {
     window.location.href = href
     return
   }
   const id = href.replace("#", "")
-  const el = id ? document.getElementById(id) : null
-  const targetY = el ? el.getBoundingClientRect().top + window.scrollY - 80 : 0
 
-  wooshScrollTo(targetY)
-  if (id) history.pushState(null, "", `#${id}`)
-  callback?.()
+  function scrollToElement() {
+    const el = id ? document.getElementById(id) : null
+    if (el) {
+      const targetY = el.getBoundingClientRect().top + window.scrollY - 80
+      wooshScrollTo(targetY)
+      if (id) history.pushState(null, "", `#${id}`)
+      callback?.()
+      return
+    }
+
+    // Element not yet in DOM — scroll down in steps to trigger LazySection observers
+    let attempts = 0
+    const maxAttempts = 20
+    const step = () => {
+      const found = document.getElementById(id)
+      if (found) {
+        const targetY = found.getBoundingClientRect().top + window.scrollY - 80
+        wooshScrollTo(targetY)
+        if (id) history.pushState(null, "", `#${id}`)
+        callback?.()
+        return
+      }
+      attempts++
+      if (attempts >= maxAttempts) {
+        // Give up — scroll to bottom as fallback
+        callback?.()
+        return
+      }
+      // Nudge scroll down to trigger intersection observers
+      window.scrollBy({ top: window.innerHeight, behavior: "auto" })
+      requestAnimationFrame(() => setTimeout(step, 60))
+    }
+    step()
+  }
+
+  scrollToElement()
 }

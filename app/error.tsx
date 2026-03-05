@@ -10,24 +10,30 @@ export default function Error({
     reset: () => void
 }) {
     useEffect(() => {
-        // Error is already captured by Next.js error reporting;
-        // no need to double-log to the browser console.
+        console.error("Application error:", error.digest)
     }, [error])
 
     return (
-        <div className="flex min-h-screen flex-col items-center justify-center bg-black p-8 text-white">
-            <h2 className="mb-4 text-2xl font-bold text-red-400">Something went wrong</h2>
-            <pre className="mb-6 max-w-3xl overflow-auto rounded-lg bg-gray-900 p-4 text-sm text-red-300">
-                {error.message}
-                {"\n\n"}
-                {error.stack}
-            </pre>
-            <button
-                onClick={reset}
-                className="rounded-lg bg-blue-600 px-6 py-2 text-white hover:bg-blue-500"
-            >
-                Try again
-            </button>
-        </div>
+        <main className="flex min-h-screen flex-col items-center justify-center bg-black p-8 text-white">
+            <h1 className="mb-2 text-5xl font-bold tracking-tight">Oops</h1>
+            <h2 className="mb-4 text-lg text-muted-foreground">Something went wrong</h2>
+            <p className="mb-8 max-w-md text-center text-sm text-muted-foreground">
+                An unexpected error occurred. Please try again or return to the homepage.
+            </p>
+            <div className="flex gap-4">
+                <button
+                    onClick={reset}
+                    className="rounded-lg bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+                >
+                    Try again
+                </button>
+                <a
+                    href="/"
+                    className="rounded-lg border border-white/10 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-white/5"
+                >
+                    Go home
+                </a>
+            </div>
+        </main>
     )
 }

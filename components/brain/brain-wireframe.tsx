@@ -16,24 +16,16 @@ export function BrainWireframe() {
   const hitRef = useRef<THREE.Mesh>(null!)
   const result = useBrainData()
 
-  // Fade-in factor: ramps from 0 → 1 over ~1.5 s after data loads
-  const fadeRef = useRef(0)
-
   // Shared pull-deform uniforms
   const pull = useMemo(() => createPullUniforms(), [])
   const pullTarget = useRef(0)
 
-  // Target opacities for fade-in
-  const TARGET_BASE_OPACITY = 0.14
-  const TARGET_GLOW_OPACITY = 0.05
-  const TARGET_SIGNAL_OPACITY = 0.28
-
-  // Base wireframe material (dim — lets rainbow signal shine through)
+  // Base wireframe material (dim blue)
   const material = React.useMemo(() => {
     const m = new THREE.LineBasicMaterial({
       color: hexNum.wireBase,
       transparent: true,
-      opacity: 0,          // start invisible
+      opacity: 0.35,
       depthWrite: false,
     })
     injectPull(m, pull)
@@ -45,7 +37,7 @@ export function BrainWireframe() {
     const m = new THREE.LineBasicMaterial({
       color: hexNum.wireGlow,
       transparent: true,
-      opacity: 0,          // start invisible
+      opacity: 0.12,
       depthWrite: false,
     })
     injectPull(m, pull)
@@ -57,7 +49,7 @@ export function BrainWireframe() {
     const m = new THREE.LineBasicMaterial({
       vertexColors: true,
       transparent: true,
-      opacity: 0,          // start invisible
+      opacity: 1.0,
       depthWrite: false,
       blending: THREE.AdditiveBlending,
     })
@@ -86,17 +78,17 @@ export function BrainWireframe() {
   // Accumulated elapsed time (avoids deprecated THREE.Clock)
   const elapsedRef = useRef(0)
 
+  // Fade-in factor: ramps from 0 → 1 over ~1.5s after data loads
+  const fadeRef = useRef(0)
+
   useFrame((_state, delta) => {
     elapsedRef.current += delta
     const t = elapsedRef.current
 
-    // Smooth fade-in: ramp from 0 → 1 over ~1.5s
+    // Smooth fade-in for orbs
     if (fadeRef.current < 1) {
       fadeRef.current = Math.min(1, fadeRef.current + delta / 1.5)
       const ease = fadeRef.current * fadeRef.current * (3 - 2 * fadeRef.current) // smoothstep
-      material.opacity = TARGET_BASE_OPACITY * ease
-      glowMaterial.opacity = TARGET_GLOW_OPACITY * ease
-      signalMaterial.opacity = TARGET_SIGNAL_OPACITY * ease
       orbMaterial.uniforms.uFade.value = ease
     }
 
@@ -110,7 +102,7 @@ export function BrainWireframe() {
   const { geo, brainData } = result
 
   return (
-    <group ref={groupRef} scale={0.82}>
+    <group ref={groupRef} scale={0.82} rotation={[0, Math.PI * 0.5, 0]}>
       <group rotation={[-Math.PI * 0.5 + Math.PI * 0.08, 0, 0]}>
         {/* Invisible sphere for pull interaction */}
         <mesh

@@ -1,0 +1,54 @@
+---
+title: "Your ML Pipeline Is Technical Debt Disguised as Innovation"
+excerpt: "That fancy Kubeflow/Airflow/Prefect ML pipeline you built? It's the most expensive, fragile, and unnecessary code in your entire stack."
+date: "2025-08-28"
+category: "MLOps"
+tags: ["MLOps", "Technical Debt", "Pipelines", "Infrastructure"]
+coverImage: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=1200&h=630&fit=crop"
+---
+
+## The MLOps Industrial Complex
+
+Somewhere around 2022, the ML industry convinced itself that you need a 47-tool stack to deploy a model. Kubeflow, MLflow, Airflow, Prefect, DVC, Weights & Biases, Seldon, BentoML, Feature Stores, Model Registries, Experiment Trackers...
+
+**Most of you need none of this.**
+
+I'm not being contrarian for clicks. I've built and maintained ML pipelines at scale. I've used every tool in the MLOps landscape. And I'm telling you: for 90% of companies, these pipelines are the most expensive lines of code ever written — not because they cost a lot to build, but because they cost a fortune to maintain and slow everything down.
+
+```mermaid
+{
+  "type": "comparison",
+  "left": {
+    "title": "What You Built",
+    "color": "red",
+    "steps": ["Feature Store", "Training Pipeline", "Experiment Tracker", "Model Registry", "CI/CD Pipeline", "Serving Infrastructure", "Monitoring Stack", "Retraining Trigger ↩"]
+  },
+  "right": {
+    "title": "What You Needed",
+    "color": "green",
+    "steps": ["Python Script", "Model File", "API Endpoint"]
+  }
+}
+```
+
+## The Real Numbers
+
+At a previous company, our ML pipeline:
+- **Took 6 weeks to set up** before any model work began
+- **Required 2 full-time engineers** just to maintain the infrastructure
+- **Added 4-6 hours** to every model update cycle
+- **Cost $8K/month** in infrastructure alone
+
+The model it served? A gradient-boosted classifier that could run on a laptop.
+
+## When You Actually Need MLOps
+
+Real MLOps infrastructure is justified when:
+- You're retraining daily on new data
+- You have dozens of models in production simultaneously  
+- Regulatory compliance requires model versioning and audit trails
+- Your inference volume exceeds 10K requests/second
+
+If none of those apply — and for 90% of companies, they don't — just deploy a Docker container with a [FastAPI](https://fastapi.tiangolo.com/) endpoint and move on with your life.
+
+The best ML infrastructure is the one you didn't build.

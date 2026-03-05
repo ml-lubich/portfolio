@@ -65,6 +65,7 @@ export const experiences: Experience[] = [
             diagramType: "agents",
             gradient: g.primaryToAccent,
             accent: accentCycle[0],
+            link: { label: "Braintrust Data", url: "https://www.braintrust.dev" },
         },
     },
     {
@@ -107,6 +108,7 @@ export const experiences: Experience[] = [
             diagramType: "cicd",
             gradient: g.accentToCyan,
             accent: accentCycle[1],
+            link: { label: "Apple Developer", url: "https://developer.apple.com/" },
         },
     },
     {
@@ -148,6 +150,7 @@ export const experiences: Experience[] = [
             diagramType: "microservices",
             gradient: g.cyanToPrimary,
             accent: accentCycle[2],
+            link: { label: "Walmart Connect", url: "https://www.walmartconnect.com/solutions" },
         },
     },
     {
@@ -190,6 +193,7 @@ export const experiences: Experience[] = [
             diagramType: "ml-pipeline",
             gradient: g.primaryToMagenta,
             accent: accentCycle[3],
+            link: { label: "Berkeley Lab EESA", url: "https://eesa.lbl.gov/" },
         },
     },
     {
@@ -230,6 +234,7 @@ export const experiences: Experience[] = [
             diagramType: "pipeline",
             gradient: g.magentaToAccent,
             accent: accentCycle[4],
+            link: { label: "Honda Innovations", url: "https://www.honda.com" },
         },
     },
 ]

@@ -109,13 +109,13 @@ export function ProfileIntro() {
                                         multi-agent orchestration and RAG pipelines to production systems shipping at{" "}
                                         <span className="font-normal text-foreground/90">Braintrust Data</span>,{" "}
                                         <span className="font-normal text-foreground/90">Apple</span>, and{" "}
-                                        <span className="font-normal text-foreground/90">Walmart</span>.
+                                        <span className="font-normal text-foreground/90">Walmart</span>.{" "}
                                         {"If you're exploring the frontier of intelligent software, I'd love to connect."}
                                     </AnimatedText>
                                 </p>
 
                                 <p className="mt-5 font-mono text-xs tracking-widest uppercase text-muted-foreground/50">
-                                    Berkeley CS &nbsp;&middot;&nbsp; 6 published papers &nbsp;&middot;&nbsp; 100 M+ users impacted
+                                    <AnimatedText text="Berkeley CS · 6 published papers · 100 M+ users impacted" variant="fade-up" delay={600} stagger={30} duration={600} />
                                 </p>
                             </div>
                         </div>

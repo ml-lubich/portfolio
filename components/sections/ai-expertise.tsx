@@ -135,9 +135,6 @@ export function AIExpertise() {
     <AnimatedSection id="ai-expertise" className="relative py-14 sm:py-20 overflow-hidden">
       {/* Background effects */}
       <div className="absolute inset-0 dot-pattern opacity-30" aria-hidden="true" />
-      <div className="absolute top-10 right-1/4 h-[32rem] w-[32rem] rounded-full bg-primary/[0.06] blur-[80px] translucent-glow" aria-hidden="true" style={{ animationDelay: "-5s" }} />
-      <div className="absolute bottom-10 left-1/4 h-[32rem] w-[32rem] rounded-full bg-accent/[0.06] blur-[80px] translucent-glow-alt" style={{ animationDelay: "-12s" }} aria-hidden="true" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[36rem] w-[36rem] rounded-full bg-primary/[0.04] blur-[100px] translucent-glow" style={{ animationDelay: "-8s" }} aria-hidden="true" />
 
 
 

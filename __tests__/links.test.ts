@@ -39,6 +39,13 @@ const SKIP_PATTERNS = [
   /^javascript:/,
 ]
 
+/** External URLs that are valid but return non-2xx for bots (preconnect, bot-blocked, etc.) */
+const EXTERNAL_ALLOWLIST = new Set([
+  "https://fonts.googleapis.com",    // preconnect — no page at root
+  "https://fonts.gstatic.com",       // preconnect — no page at root
+  "https://www.googletagmanager.com", // dns-prefetch — no page at root
+])
+
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
 function walk(dir: string): string[] {
@@ -98,7 +105,9 @@ function collectSectionIds(files: string[]): Set<string> {
 }
 
 function internalPageExists(urlPath: string): boolean {
-  const stripped = urlPath === "/" ? "" : urlPath.replace(/^\//, "")
+  // Strip hash fragments (e.g. "/#about" → "/")
+  const pathOnly = urlPath.split("#")[0].split("?")[0]
+  const stripped = pathOnly === "/" ? "" : pathOnly.replace(/^\//, "")
   const dir = path.join(APP_DIR, stripped)
   if (!fs.existsSync(dir)) return false
   return (
@@ -164,6 +173,15 @@ function categorise() {
       const routePath = entry.href.split("?")[0]
       if (!pages.has(routePath)) pages.set(routePath, [])
       pages.get(routePath)!.push(rel)
+      // Also validate the anchor fragment if present (e.g. "/#about" → check #about)
+      const hashIdx = entry.href.indexOf("#")
+      if (hashIdx !== -1) {
+        const id = entry.href.slice(hashIdx + 1)
+        if (id) {
+          if (!anchors.has(id)) anchors.set(id, [])
+          anchors.get(id)!.push(rel)
+        }
+      }
     }
   }
   return { external, anchors, pages }
@@ -208,6 +226,7 @@ describe("Link smoke tests", () => {
   // ── External URLs ────────────────────────────────────────────────────────
   describe("External URLs (HTTP 2xx/3xx)", () => {
     for (const [url, locs] of external) {
+      if (EXTERNAL_ALLOWLIST.has(url)) continue // preconnect / dns-prefetch — no page at root
       const where = locs.map((l) => `${l.file}:${l.line}`).join(", ")
       const short = url.length > 60 ? url.slice(0, 57) + "…" : url
       it(`${short}  (${where})`, async () => {

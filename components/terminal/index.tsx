@@ -164,7 +164,7 @@ export function LiveTerminal() {
             <span className="text-emerald-400 shrink-0 select-none">❯</span>
             <span className="text-foreground/90">
               {dl.text}
-              {blink && <span className="animate-[pulse_0.5s_ease-in-out_infinite] text-primary">▊</span>}
+              {blink && <span className="animate-[terminal-blink_1s_step-end_infinite] text-emerald-400">▊</span>}
             </span>
           </div>
         )
@@ -175,7 +175,7 @@ export function LiveTerminal() {
           <div className="flex items-start min-h-[1.35em]">
             <span className="text-muted-foreground/25 select-none w-5 text-right mr-2 text-[11px] leading-relaxed shrink-0">{dl.li}</span>
             <span className="text-foreground/80">
-              {dl.done ? highlight(dl.text) : <>{dl.text}{blink && <span className="animate-[pulse_0.5s_ease-in-out_infinite] text-primary">▊</span>}</>}
+              {dl.done ? highlight(dl.text) : <>{dl.text}{blink && <span className="animate-[terminal-blink_1s_step-end_infinite] text-emerald-400">▊</span>}</>}
             </span>
           </div>
         )
@@ -199,7 +199,9 @@ export function LiveTerminal() {
         <AnimatedSection className="text-center mb-8">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-primary/20 bg-primary/5 mb-4">
             <Terminal className="w-4 h-4 text-primary" />
-            <span className="text-sm text-primary font-medium tracking-wide">Live Terminal</span>
+            <span className="text-sm text-primary font-medium tracking-wide">
+              <AnimatedText text="Live Terminal" variant="blur-slide" stagger={50} duration={600} />
+            </span>
           </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-foreground via-foreground to-muted-foreground bg-clip-text text-transparent mb-2">
             <AnimatedText text="A Day in My Life" variant="blur-slide" stagger={70} duration={800} />

@@ -1,0 +1,157 @@
+---
+title: "The Great AI Hiring Scam: Why Most AI Teams Ship Nothing"
+excerpt: "Companies are spending millions on AI teams that produce impressive demos and zero production value. I've seen it from the inside."
+date: "2025-09-22"
+category: "Engineering Culture"
+tags: ["Hiring", "AI Teams", "Management", "Productivity"]
+coverImage: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&h=630&fit=crop"
+---
+
+## The Demo-to-Production Gap
+
+Here's a pattern I've seen at five different companies. I could name names, but I like not being sued, so let's keep it general. Just know that at least two of these companies are ones you've used this week.
+
+1. CEO reads about AI in the Wall Street Journal (or, more realistically, an airport bookstore)
+2. Board asks uncomfortable questions about "our AI strategy"
+3. Company hires a "Head of AI" with a PhD and impressive publications
+4. Head of AI hires 5-8 ML engineers / researchers at $250-400K each
+5. Team builds amazing Jupyter notebook demos for 6 months
+6. Everyone is very impressed at the quarterly all-hands
+7. None of it ships to production
+8. Team gets quietly disbanded after 18 months
+9. Company announces "strategic pivot in AI strategy"
+10. Repeat from step 1 with a new Head of AI
+
+This isn't an exaggeration. This isn't a strawman. I've watched this play out in real-time, sometimes from the inside, sometimes as an advisor desperately trying to prevent it, sometimes as a competitor grateful that another company was burning $3M on research papers instead of building products.
+
+```mermaid
+{
+  "type": "tree",
+  "title": "The AI Hiring Cycle",
+  "color": "blue",
+  "steps": [
+    "CEO Reads AI Article",
+    "Hires Head of AI",
+    "Recruits Research Team",
+    "Builds Impressive Demos",
+    {
+      "label": "Can it ship?",
+      "branches": [
+        { "condition": "No (85% of teams)", "color": "red", "steps": ["Endless Research Cycle", "Team Disbanded", "Millions Wasted"], "loop": "CEO Reads AI Article" },
+        { "condition": "Yes (15% of teams)", "color": "green", "steps": ["Production Impact", "Real Revenue"] }
+      ]
+    }
+  ]
+}
+```
+
+## The $3 Million Jupyter Notebook
+
+Let me tell you about Company X. Mid-size SaaS company, ~500 employees, $80M ARR. The CEO went to Davos, came back convinced that AI was going to eat their market, and immediately greenlit a $3M annual budget for an AI team.
+
+They hired a Head of AI from a top research lab. Incredible credentials. Published at NeurIPS, ICML, ACL. The real deal, academically. This person then hired seven ML researchers, all with PhDs, all brilliant, all completely unsuited for what the company actually needed.
+
+Month 1-3: The team set up their research infrastructure. [Weights & Biases](https://wandb.ai/) for experiment tracking. Custom training pipelines on A100s. The works. Beautiful engineering. Zero customer impact.
+
+Month 4-6: They built a recommendation model from scratch. Custom architecture, novel attention mechanism, trained on the company's data. Accuracy on their internal benchmark: 94%. The all-hands demo was spectacular. Standing ovation from the product team.
+
+Month 7-9: The engineering team tried to productionize it. The model required a custom inference server. It needed 32GB of GPU memory. Latency was 4 seconds per request. The training pipeline took 6 hours and required manual data preprocessing. The API contract between the model and the product didn't exist.
+
+Month 10-12: A senior backend engineer quietly spent two weeks fine-tuning an off-the-shelf model using [OpenAI's fine-tuning API](https://platform.openai.com/docs/guides/fine-tuning). It scored 91% on the same benchmark. Latency: 200ms. Cost: $0.002 per request. Shipped to production in a PR that was 47 lines long.
+
+Month 13-18: The research team pivoted to "next-gen" projects three times. None shipped. The Head of AI left for another research lab. The team was dissolved.
+
+Total cost: ~$4.5M (salaries + infrastructure + opportunity cost). Total production impact: the 47-line PR from the backend engineer.
+
+## Why It Happens: The Incentive Trap
+
+The fundamental problem is **incentive misalignment.** It's not that the researchers are incompetent — they're often brilliant. They're just optimizing for a completely different game:
+
+```mermaid
+{
+  "type": "comparison",
+  "left": {
+    "title": "Researcher Incentives",
+    "color": "purple",
+    "steps": ["Novel Architecture", "Benchmark SOTA", "Paper Publication", "Conference Talk", "Career Advancement"]
+  },
+  "right": {
+    "title": "Business Incentives",
+    "color": "green",
+    "steps": ["User Problem", "Working Solution", "Revenue Impact", "Customer Retention", "Company Growth"]
+  }
+}
+```
+
+Notice how these two chains don't intersect at any point. The researcher is playing the academic game — novel contributions, peer recognition, career mobility. The business needs solved problems, happy customers, and revenue. These aren't the same game. They aren't even the same sport.
+
+A researcher's resume gets better when they build a novel architecture. A company's revenue gets better when they ship a product that works, even if it's architecturally boring. **The best production ML systems I've seen are embarrassingly simple.** Fine-tuned off-the-shelf models. Prompt engineering. Maybe a classifier and a few rules. Nothing publishable. Everything profitable.
+
+## The Hiring Anti-Patterns
+
+After watching this cycle repeat across industries, I've identified the red flags. If your AI hiring process has any of these, you're about to waste a lot of money:
+
+**Anti-pattern 1: "PhD required."** Unless you're doing fundamental research, a PhD is a negative signal for production AI work. It means 5-7 years of optimizing for academic metrics, not shipping metrics. The best production AI engineers I know have CS bachelor's degrees and 5 years of backend experience.
+
+**Anti-pattern 2: "Published at top-tier venues."** Great for hiring at DeepMind. Useless for building a product recommendation engine. You don't need someone who invented a new attention mechanism. You need someone who can fine-tune an existing model and deploy it behind an API.
+
+**Anti-pattern 3: "Build our AI from scratch."** If your first instinct is to train a custom model, you're doing it wrong. Start with API calls. Then fine-tuning. Then, and only then, if you've exhausted those options and have a genuine competitive advantage in your data, consider custom training.
+
+**Anti-pattern 4: "We need a large team."** No you don't. You need 2-3 strong engineers who can ship. Every person you add beyond that is communication overhead and committee decision-making.
+
+## What Actually Works
+
+The companies shipping real AI products — the ones whose AI features actually drive revenue and aren't just a checkbox on a pitch deck — have a different profile:
+
+1. **Small teams** — 2-3 strong engineers, not 8 specialists. The best AI team I've ever worked with was two senior backend engineers who learned AI and one ML engineer who learned backend. Three people. They shipped more production AI in 3 months than a 10-person research team shipped in 2 years. Cost the company a fifth as much.
+
+2. **Product-first** — Start with a user problem, not a model architecture. The question isn't "what can we build with AI?" The question is "what problem do our users have that AI might solve better than our current approach?"
+
+3. **Ship in weeks, not quarters** — v1 should be embarrassing but functional. I'd rather have a shippable GPT-4 wrapper in 2 weeks than a custom model in 6 months. You can always make it better. You can't get back the 6 months.
+
+4. **Software engineers who learned AI** — not researchers who learned software. This is the biggest one. A good software engineer can learn to use [OpenAI](https://openai.com/)'s API, fine-tune models, and build evaluation pipelines in a month. A good researcher learning production software engineering — error handling, observability, deployment, scaling, on-call — takes years.
+
+5. **Eval-driven development** — Before writing a single line of model code, build your evaluation suite. Define "good" quantitatively. Track it over time. Every change gets measured against baseline. This is what separates the teams that ship from the teams that demo.
+
+```python
+# The entire evaluation pipeline for a shipped AI feature
+# This is more valuable than any custom model architecture
+
+def evaluate_model(model, test_set: list[dict]) -> dict:
+    results = []
+    for case in test_set:
+        prediction = model.predict(case["input"])
+        results.append({
+            "correct": prediction == case["expected"],
+            "latency_ms": prediction.latency_ms,
+            "cost_usd": prediction.cost_usd,
+            "case_id": case["id"],
+        })
+    
+    return {
+        "accuracy": sum(r["correct"] for r in results) / len(results),
+        "p95_latency": percentile([r["latency_ms"] for r in results], 95),
+        "avg_cost": sum(r["cost_usd"] for r in results) / len(results),
+        "failures": [r for r in results if not r["correct"]],
+    }
+
+# Run this before and after every change. No exceptions.
+```
+
+## The Uncomfortable Truth About AI Leadership
+
+Most "Head of AI" roles are set up to fail. The job description asks for a researcher's credentials but expects an engineering leader's output. The person gets hired for their publications but gets fired for not shipping products. It's a bait-and-switch that wastes everyone's time and talent.
+
+If you're a company hiring AI leadership, here's what you actually need: **someone who has shipped AI to production, measured its impact, and iterated based on real user feedback.** Not someone who wrote a paper about a theoretical improvement. Not someone whose last production system was their PhD thesis.
+
+The title shouldn't be "Head of AI Research." It should be "Head of AI Engineering." And the first question in the interview shouldn't be "tell me about your latest publication." It should be "tell me about the last AI feature you shipped and how you measured its success."
+
+## The Way Forward
+
+Stop hiring AI researchers to solve engineering problems. Start hiring engineers to solve AI problems.
+
+Stop building custom models when API calls work. Stop optimizing benchmarks when users are churning. Stop publishing papers when features aren't shipping.
+
+The companies that get this right — small teams, product focus, shipping cadence, eng-first hiring — are building the future. The rest are funding very expensive reading groups and wondering why the board keeps asking about ROI.
+
+I've seen both sides. I know which one I'm betting on.

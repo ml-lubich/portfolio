@@ -1,0 +1,106 @@
+---
+title: "AI Evaluation Is the Hardest Unsolved Problem in Engineering"
+excerpt: "We've gotten incredibly good at building AI systems. We're still terrible at knowing whether they actually work. Evals are the bottleneck nobody's fixing."
+date: "2025-09-01"
+category: "MLOps"
+tags: ["Evaluation", "Testing", "Quality", "MLOps", "Best Practices"]
+coverImage: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&h=630&fit=crop"
+---
+
+## The Eval Crisis
+
+Here's a dirty secret about the AI industry: **most production AI systems have no meaningful evaluation pipeline.** None. Zero. They ship vibes-based AI.
+
+I'm not talking about academic benchmarks. MMLU and HumanEval are useless for telling you whether your customer support bot actually resolves tickets. I'm talking about evaluation for *your specific product, with your specific users, on your specific data*.
+
+```mermaid
+{
+  "type": "pie",
+  "title": "How Companies Evaluate AI (2025 Survey, n=200)",
+  "data": [
+    { "label": "No evaluation at all", "value": 35, "color": "red" },
+    { "label": "Manual spot-checking", "value": 30, "color": "amber" },
+    { "label": "Basic accuracy metrics", "value": 20, "color": "blue" },
+    { "label": "Comprehensive eval suite", "value": 10, "color": "cyan" },
+    { "label": "Continuous eval in prod", "value": 5, "color": "green" }
+  ]
+}
+```
+
+35% of companies shipping AI products have **no evaluation pipeline.** They pushed a prompt to production and prayed. Another 30% have one engineer who occasionally checks 20 outputs and says "looks good."
+
+## Why Evals Are So Hard
+
+1. **No ground truth.** For classification, you have labeled data. For generation? What's a "correct" summary? What's a "good" code review? The evaluation of quality is itself an AI-hard problem.
+
+2. **Distribution shift.** Your eval set from last month doesn't represent today's users. Production traffic evolves constantly. Static eval sets go stale fast.
+
+3. **Multiple dimensions.** An AI output can be accurate but unhelpful. Helpful but verbose. Concise but wrong. You need to evaluate along 5-10 axes simultaneously.
+
+4. **Scale.** Human evaluation is the gold standard and doesn't scale. LLM-as-judge scales but has its own biases.
+
+## A Practical Eval Framework
+
+Here's the framework I use in every AI project:
+
+```python
+# The three-layer eval pyramid
+
+class EvalPyramid:
+    """
+    Layer 1: Unit evals     — Fast, automated, run on every commit
+    Layer 2: Scenario evals — Weekly, broader test scenarios  
+    Layer 3: Human evals    — Monthly, gold-standard quality check
+    """
+    
+    def unit_eval(self, output: str, expected: dict) -> Score:
+        """Check structural correctness, format, safety."""
+        checks = [
+            self.check_format(output, expected["format"]),
+            self.check_safety(output),
+            self.check_length(output, expected["max_tokens"]),
+            self.check_required_fields(output, expected["fields"]),
+        ]
+        return aggregate(checks)
+    
+    def scenario_eval(self, output: str, scenario: Scenario) -> Score:
+        """LLM-as-judge for quality dimensions."""
+        return llm_judge(
+            output=output,
+            criteria=scenario.criteria,
+            rubric=scenario.rubric,
+            model="claude-3-5-sonnet",
+        )
+    
+    def human_eval(self, output: str, task: Task) -> Score:
+        """Expert human rating on 1-5 scale."""
+        return collect_human_rating(output, task, num_raters=3)
+```
+
+```mermaid
+{
+  "type": "tree",
+  "title": "Eval Deployment Pipeline",
+  "color": "green",
+  "steps": [
+    "Code Change",
+    "Unit Evals — Every Commit",
+    "Deploy to Staging",
+    "Scenario Evals — Weekly",
+    "Deploy to Production",
+    "Human Evals — Monthly",
+    {
+      "label": "Issues Found?",
+      "branches": [
+        { "condition": "Fail at Unit", "color": "red", "steps": ["Block Deploy"] },
+        { "condition": "Fail at Scenario", "color": "amber", "steps": ["Investigate & Fix"] },
+        { "condition": "Pass", "color": "green", "steps": ["Update Eval Suite"], "loop": "Unit Evals" }
+      ]
+    }
+  ]
+}
+```
+
+## The Bottom Line
+
+If you're building AI and you don't have evals, you don't have a product. You have a demo that might work. Build your eval suite before you build your product — or at least in parallel. It's the single highest-leverage investment you can make in AI quality.

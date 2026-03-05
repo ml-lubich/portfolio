@@ -4,17 +4,19 @@ import React from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { motion } from "framer-motion"
-import type { BlogPost } from "@/lib/blog-data"
-import { getRelatedPosts, getReadingTime, AUTHOR } from "@/lib/blog-data"
-import { BlogContent } from "@/components/blog/blog-content"
+import type { BlogPost } from "@/lib/blog-shared"
+import { getReadingTime, AUTHOR } from "@/lib/blog-shared"
 import { BlogCard } from "@/components/blog/blog-card"
 import { shadows } from "@/lib/theme"
+import { SITE_URL } from "@/lib/site-config"
 
 interface BlogPostViewProps {
   post: BlogPost
+  relatedPosts: BlogPost[]
+  children: React.ReactNode
 }
 
-export function BlogPostView({ post }: BlogPostViewProps) {
+export function BlogPostView({ post, relatedPosts, children }: BlogPostViewProps) {
   const readingTime = getReadingTime(post.content)
   const formattedDate = new Date(post.date).toLocaleDateString("en-US", {
     year: "numeric",
@@ -22,28 +24,10 @@ export function BlogPostView({ post }: BlogPostViewProps) {
     day: "numeric",
   })
 
-  const related = getRelatedPosts(post.slug, 3)
-
-  // JSON-LD for this article
-  const articleJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BlogPosting",
-    headline: post.title,
-    description: post.excerpt,
-    datePublished: post.date,
-    author: { "@type": "Person", name: AUTHOR.name },
-    image: post.coverImage,
-    keywords: post.tags.join(", "),
-    articleSection: post.category,
-  }
+  const related = relatedPosts
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
-      />
-
       <article className="relative mx-auto max-w-4xl px-6 py-12" itemScope itemType="https://schema.org/BlogPosting">
         {/* Ambient gradient orbs */}
         <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
@@ -56,7 +40,7 @@ export function BlogPostView({ post }: BlogPostViewProps) {
           <motion.nav
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
+            transition={{ duration: 0.2 }}
             className="mb-8 flex items-center gap-2 text-sm text-muted-foreground"
             aria-label="Breadcrumb"
           >
@@ -69,9 +53,9 @@ export function BlogPostView({ post }: BlogPostViewProps) {
 
           {/* Header */}
           <motion.header
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
             className="mb-10"
           >
             <div className="flex flex-wrap items-center gap-2 mb-4">
@@ -89,17 +73,33 @@ export function BlogPostView({ post }: BlogPostViewProps) {
               ))}
             </div>
 
-            <h1 className="text-3xl font-bold leading-tight tracking-tight text-foreground md:text-4xl lg:text-5xl" itemProp="headline">
+            <h1 className="no-metallic text-3xl font-bold leading-tight tracking-tight text-foreground md:text-4xl lg:text-5xl" itemProp="headline">
               {post.title}
             </h1>
 
-            <p className="mt-4 text-lg text-muted-foreground leading-relaxed" itemProp="description">
+            <motion.p
+              initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              transition={{
+                duration: 0.4,
+                delay: 0.15,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+              className="mt-4 text-lg text-muted-foreground leading-relaxed"
+              itemProp="description"
+            >
               {post.excerpt}
-            </p>
+            </motion.p>
 
             <div className="mt-6 flex items-center gap-4" itemProp="author" itemScope itemType="https://schema.org/Person">
-              <div className={`flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-primary to-accent shadow-[${shadows.blogAvatar}]`}>
-                <span className="text-xs font-bold text-primary-foreground">ML</span>
+              <div className={`relative h-10 w-10 overflow-hidden rounded-full ring-2 ring-primary/20 shadow-[${shadows.blogAvatar}]`}>
+                <Image
+                  src="/profile_blog.png"
+                  alt={AUTHOR.name}
+                  fill
+                  className="object-cover"
+                  sizes="40px"
+                />
               </div>
               <div>
                 <p className="text-sm font-medium text-foreground" itemProp="name">{AUTHOR.name}</p>
@@ -114,9 +114,9 @@ export function BlogPostView({ post }: BlogPostViewProps) {
 
           {/* Cover image */}
           <motion.div
-            initial={{ opacity: 0, y: 15, scale: 0.98 }}
+            initial={{ opacity: 0, y: 10, scale: 0.99 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
+            transition={{ duration: 0.3, delay: 0.05 }}
             className="relative mb-12 overflow-hidden rounded-2xl border border-white/[0.06]"
           >
             <Image
@@ -133,20 +133,20 @@ export function BlogPostView({ post }: BlogPostViewProps) {
 
           {/* Content */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            transition={{ duration: 0.3, delay: 0.1 }}
             className="blog-content"
             itemProp="articleBody"
           >
-            <BlogContent content={post.content} />
+            {children}
           </motion.div>
 
           {/* Tags */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
+            transition={{ delay: 0.15 }}
             className="mt-16 flex flex-wrap gap-2 border-t border-white/[0.06] pt-8"
           >
             {post.tags.map((tag) => (
@@ -172,7 +172,7 @@ export function BlogPostView({ post }: BlogPostViewProps) {
             <div className="flex items-center gap-3">
               <span className="text-xs text-muted-foreground">Share:</span>
               <a
-                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(`https://blog.mishalubich.com/${post.slug}`)}`}
+                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(`${SITE_URL}/blog/${post.slug}`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`rounded-lg border border-white/[0.06] bg-white/[0.03] p-2 text-muted-foreground backdrop-blur-sm transition-all hover:border-primary/20 hover:text-foreground hover:shadow-[${shadows.blogShare}]`}
@@ -183,7 +183,7 @@ export function BlogPostView({ post }: BlogPostViewProps) {
                 </svg>
               </a>
               <a
-                href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(`https://blog.mishalubich.com/${post.slug}`)}`}
+                href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(`${SITE_URL}/blog/${post.slug}`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`rounded-lg border border-white/[0.06] bg-white/[0.03] p-2 text-muted-foreground backdrop-blur-sm transition-all hover:border-primary/20 hover:text-foreground hover:shadow-[${shadows.blogShare}]`}
@@ -199,9 +199,9 @@ export function BlogPostView({ post }: BlogPostViewProps) {
           {/* Related posts */}
           {related.length > 0 && (
             <motion.section
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
+              transition={{ duration: 0.3, delay: 0.2 }}
               className="mt-16"
               aria-label="Related articles"
             >

@@ -1,0 +1,70 @@
+---
+title: "Claude Code Is the First Terminal AI That Actually Works"
+excerpt: "I've tried every AI coding CLI — Aider, Mentat, GPT-Engineer. Claude Code is the first one I trust to make changes across a real codebase without supervision."
+date: "2025-12-01"
+category: "AI Products"
+tags: ["Claude Code", "Anthropic", "Terminal", "AI Coding", "Developer Tools"]
+coverImage: "https://images.unsplash.com/photo-1629654297299-c8506221ca97?w=1200&h=630&fit=crop"
+---
+
+## The CLI AI Landscape Was Bleak
+
+Before Claude Code, every terminal-based AI coding tool had the same problem: they were fine for single-file edits and terrible for anything involving real project structure.
+
+**Aider:** Great concept, but it frequently corrupted git history and struggled with TypeScript monorepos.
+
+**GPT-Engineer:** Impressive demos, but the generated code was always "close but wrong" — like a junior dev who doesn't run the tests.
+
+**Mentat:** Good context awareness, but painfully slow and consumed entire context windows on file indexing.
+
+Then Anthropic shipped Claude Code, and the entire category leveled up.
+
+## What Makes Claude Code Different
+
+```mermaid
+{
+  "type": "comparison",
+  "left": {
+    "title": "Other CLI AI Tools",
+    "color": "red",
+    "steps": ["Read Files", "Generate Diff", "Apply Blindly", "Hope It Works"]
+  },
+  "right": {
+    "title": "Claude Code",
+    "color": "green",
+    "steps": ["Understand Project", "Plan Changes", "Search Codebase", "Edit Precisely", "Run Tests", "Iterate if Needed"]
+  }
+}
+```
+
+The key differentiator: Claude Code doesn't just generate code. It **understands your project's architecture**, searches for relevant files, reads them, plans multi-file changes, and then executes them with surgical precision.
+
+Here's a real session from last week:
+
+```bash
+$ claude-code "Add rate limiting to our API. Use Redis with sliding 
+window. Limit to 100 req/min per API key. Add proper 429 responses 
+and include rate limit headers."
+
+# Claude Code then:
+# 1. Found our existing middleware stack (3 files)
+# 2. Found our Redis connection config
+# 3. Created a new rate-limit middleware
+# 4. Integrated it into the middleware chain
+# 5. Added proper error responses matching our existing format
+# 6. Updated our API tests
+# 7. Ran the test suite — all passing
+
+Changes made across 6 files. All tests passing.
+```
+
+That's not a demo. That's a Thursday afternoon.
+
+## The Workflow That Works
+
+1. **Start with a clear, specific task.** Vague instructions produce vague results. "Add rate limiting with Redis" → great. "Make the API better" → garbage.
+2. **Let it read first.** Claude Code's strength is codebase understanding. Don't fight it — let it explore.
+3. **Review diffs carefully.** It's right 85% of the time. The other 15% is why code review exists.
+4. **Use it for the boring stuff.** Migrations, refactors, test generation, boilerplate — this is where it saves hours.
+
+Claude Code hasn't replaced my engineering judgment. It's replaced the mechanical parts of coding that nobody enjoys. And that's exactly what AI should do.

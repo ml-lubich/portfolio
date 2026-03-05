@@ -1,0 +1,107 @@
+---
+title: "Vibe Coding: The Future of Software or the Biggest Anti-Pattern in History?"
+excerpt: "Andrej Karpathy coined 'vibe coding' and Twitter loved it. But building production systems by vibes is how you get production incidents by vibes."
+date: "2026-02-22"
+category: "Hot Takes"
+tags: ["Vibe Coding", "AI Coding", "Best Practices", "Hot Takes", "Karpathy"]
+coverImage: "https://images.unsplash.com/photo-1550439062-609e1531270e?w=1200&h=630&fit=crop"
+---
+
+## What Is Vibe Coding?
+
+In early 2025, Andrej Karpathy tweeted about "vibe coding" — a workflow where you describe what you want to an AI, accept the generated code without fully understanding it, and keep iterating by describing bugs until things work.
+
+The tweet went viral. Developers cheered. "Finally, someone validated what we've all been doing!"
+
+**And that's exactly the problem.**
+
+## When Vibe Coding Works
+
+Let's be fair. Vibe coding is legitimately great for:
+
+- **Prototyping.** Build a demo in 30 minutes instead of 3 days.
+- **Personal tools.** Scripts you'll run once and throw away.
+- **Learning.** Generate code, study it, understand the patterns.
+- **Non-critical UIs.** Landing pages, admin dashboards, internal tools.
+
+For these use cases, vibe coding is a superpower. You don't need to understand every line of a throwaway script.
+
+## When Vibe Coding Is Dangerous
+
+```mermaid
+{
+  "type": "tree",
+  "title": "The Vibe Coding Danger Loop",
+  "color": "blue",
+  "steps": [
+    "Vibe Code a Feature",
+    {
+      "label": "Works in Demo?",
+      "branches": [
+        {
+          "condition": "Yes",
+          "color": "amber",
+          "steps": ["Ship to Production", "Edge Case Hits"]
+        }
+      ]
+    },
+    {
+      "label": "Understand the Code?",
+      "branches": [
+        { "condition": "No (Vibe Coding)", "color": "red", "steps": ["Can't Debug", "Copy Error to AI", "AI Generates Fix", "New Bug Created"], "loop": "Edge Case Hits" },
+        { "condition": "Yes (Understood)", "color": "green", "steps": ["Fix Quickly", "Ship Fix"] }
+      ]
+    }
+  ]
+}
+```
+
+Here's the nightmare scenario I've seen play out three times already:
+
+1. Developer vibe-codes a payment processing flow
+2. It works in testing — the happy path is fine
+3. In production, a concurrent request causes a race condition
+4. Developer can't debug it because they never understood the code
+5. They paste the error into the AI, which generates a "fix"
+6. The fix introduces a new edge case
+7. Loop repeats until a senior engineer rewrites everything from scratch
+
+```python
+# The vibe-coded version that "works"
+async def process_payment(user_id, amount):
+    balance = await get_balance(user_id)
+    if balance >= amount:
+        await deduct_balance(user_id, amount)
+        await create_transaction(user_id, amount)
+        return {"status": "success"}
+    return {"status": "insufficient_funds"}
+
+# The actually correct version
+async def process_payment(user_id, amount):
+    async with db.transaction() as tx:
+        balance = await tx.execute(
+            "SELECT balance FROM accounts WHERE id = $1 FOR UPDATE",
+            user_id
+        )
+        if balance.scalar() < amount:
+            raise InsufficientFunds(user_id, amount)
+        await tx.execute(
+            "UPDATE accounts SET balance = balance - $1 WHERE id = $2",
+            amount, user_id
+        )
+        await tx.execute(
+            "INSERT INTO transactions (user_id, amount, type) VALUES ($1, $2, 'debit')",
+            user_id, amount
+        )
+    return {"status": "success"}
+```
+
+The vibe-coded version has a race condition that will lose money. The AI generated it happily. Can you spot the difference? If not, vibe coding is dangerous for you.
+
+## The Right Approach
+
+**Use AI to write code faster. Don't use it to avoid understanding code.**
+
+The best developers I know in 2026 use AI constantly — Cursor, Claude Code, Copilot. But they review every line. They understand the design patterns. They catch the edge cases. They use AI as a force multiplier for their expertise, not a replacement for it.
+
+That's not vibe coding. That's AI-augmented engineering. And the difference matters.

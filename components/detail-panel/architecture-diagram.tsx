@@ -18,7 +18,7 @@ export function ArchitectureDiagram({ type, accent }: DiagramProps) {
       <svg
         viewBox="0 0 100 100"
         className="relative z-10 h-auto w-full"
-        style={{ minHeight: 220 }}
+        style={{ minHeight: 140, maxHeight: '25vh' }}
       >
         <defs>
           <filter id="glow-node">

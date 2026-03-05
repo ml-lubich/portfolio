@@ -37,7 +37,7 @@ export function RoleRotator() {
       <span className="block text-balance text-4xl font-semibold sm:text-5xl md:text-6xl lg:text-7xl">
         <AnimatedName name="Misha Lubich" trigger="mount" delay={800} duration={1400} metallic />
       </span>
-      <span className="relative mt-3 block h-[2.4rem] sm:h-[3rem] md:h-[3.6rem] lg:h-[4.5rem] overflow-hidden">
+      <span className="relative mt-3 block h-[2rem] sm:h-[2.4rem] md:h-[3rem] lg:h-[3.6rem] overflow-hidden">
         {roles.map((role, i) => {
           const isActive = i === roleIndex
           const isLeaving = i === prevRoleIndex && isTransitioning
@@ -67,7 +67,7 @@ export function RoleRotator() {
               }}
               aria-hidden={!isActive}
             >
-              <span className="gradient-text whitespace-nowrap text-3xl font-light sm:text-4xl md:text-5xl lg:text-6xl">
+              <span className="gradient-text whitespace-nowrap text-2xl font-light sm:text-3xl md:text-4xl lg:text-5xl">
                 {role}
               </span>
             </span>
@@ -83,7 +83,7 @@ export function RoleRotator() {
 
 export function HeroSubtitle() {
   return (
-    <p className="mx-auto mt-14 max-w-3xl text-base leading-relaxed text-white/85 sm:text-lg md:text-xl">
+    <p className="mx-auto mt-14 max-w-3xl text-sm leading-relaxed text-white/85 sm:text-base md:text-lg">
       <AnimatedText variant="blur-slide" delay={1200} stagger={30} duration={650}>
         {"Senior Software Engineer specializing in "}
         <span className="font-semibold text-foreground">AI-driven, cloud-native applications</span>

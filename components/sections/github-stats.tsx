@@ -433,7 +433,7 @@ export function GitHubStats() {
 
                 {/* Contribution heatmap */}
                 <AnimatedSection delay={160}>
-                    <div className="relative mb-5 overflow-hidden rounded-2xl border border-white/[0.03] bg-white/[0.01] backdrop-blur-2xl px-4 py-4 sm:px-5 sm:py-5 transition-all duration-500 hover:border-primary/20 hover:bg-white/[0.02]">
+                    <div className="relative mb-5 overflow-hidden rounded-2xl border border-white/[0.03] bg-white/[0.01] backdrop-blur-2xl px-4 py-4 sm:px-5 sm:py-5 transition-all duration-500 hover:border-primary/20 hover:bg-white/[0.02] glass-card-3d">
                         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/5 to-transparent" />
                         <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-primary/40 via-accent/40 to-primary/40 opacity-60" />
 

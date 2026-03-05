@@ -55,7 +55,7 @@ export function SocialLinks() {
         href="https://github.com/ml-lubich"
         target="_blank"
         rel="noopener noreferrer"
-        className="group rounded-lg border border-white/[0.1] bg-white/[0.05] p-2.5 text-muted-foreground backdrop-blur-sm transition-all hover:border-white/25 hover:bg-white/[0.1] hover:text-foreground magnetic"
+        className="group rounded-lg border border-white/[0.1] bg-white/[0.05] p-2.5 text-white/80 backdrop-blur-sm transition-all hover:border-white/25 hover:bg-white/[0.1] hover:text-white magnetic"
         aria-label="GitHub"
       >
         <Github className="h-5 w-5 transition-transform group-hover:scale-110" />
@@ -64,7 +64,7 @@ export function SocialLinks() {
         href="https://www.linkedin.com/in/misha-lubich/"
         target="_blank"
         rel="noopener noreferrer"
-        className="group rounded-lg border border-white/[0.1] bg-white/[0.05] p-2.5 text-muted-foreground backdrop-blur-sm transition-all hover:border-white/25 hover:bg-white/[0.1] hover:text-foreground magnetic"
+        className="group rounded-lg border border-white/[0.1] bg-white/[0.05] p-2.5 text-white/80 backdrop-blur-sm transition-all hover:border-white/25 hover:bg-white/[0.1] hover:text-white magnetic"
         aria-label="LinkedIn"
       >
         <Linkedin className="h-5 w-5 transition-transform group-hover:scale-110" />
@@ -73,7 +73,7 @@ export function SocialLinks() {
         href="https://scholar.google.com/citations?hl=en&user=Be6ZA78AAAAJ"
         target="_blank"
         rel="noopener noreferrer"
-        className="group rounded-lg border border-white/[0.1] bg-white/[0.05] p-2.5 text-muted-foreground backdrop-blur-sm transition-all hover:border-white/25 hover:bg-white/[0.1] hover:text-foreground magnetic"
+        className="group rounded-lg border border-white/[0.1] bg-white/[0.05] p-2.5 text-white/80 backdrop-blur-sm transition-all hover:border-white/25 hover:bg-white/[0.1] hover:text-white magnetic"
         aria-label="Google Scholar"
       >
         <GraduationCap className="h-5 w-5 transition-transform group-hover:scale-110" />

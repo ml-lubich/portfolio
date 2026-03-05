@@ -1,0 +1,52 @@
+---
+title: "Why I Bet My Startup on Open-Source Models (And Won)"
+excerpt: "We switched from GPT-4o to fine-tuned Llama and cut our costs by 94%. Our quality scores went up. Here's the playbook."
+date: "2025-10-15"
+category: "Open Source"
+tags: ["Open Source", "Llama", "Cost Optimization", "Self-Hosting"]
+coverImage: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1200&h=630&fit=crop"
+---
+
+## The $47,000/Month Wake-Up Call
+
+In March 2025, our OpenAI bill hit $47,000 for a single month. We were a 12-person startup with $2M in ARR. That's not a cost center — that's an existential threat.
+
+So we did what everyone said was impossible: we switched to open-source models. And it worked better than anyone expected.
+
+## The Migration
+
+```mermaid
+{
+  "type": "comparison",
+  "left": {
+    "title": "Before (March 2025)",
+    "color": "red",
+    "steps": ["GPT-4o", "$47K/month", "Quality: 87%", "Latency: 2.1s"]
+  },
+  "right": {
+    "title": "After (June 2025)",
+    "color": "green",
+    "steps": ["Llama 4 Maverick", "$2,800/month", "Quality: 91%", "Latency: 0.8s"]
+  }
+}
+```
+
+Yes, you read that right. **94% cost reduction. Quality went UP.** Here's why:
+
+## The Secret: Fine-Tuning Beats Scale
+
+GPT-4 is a generalist. It knows everything about everything, and you're paying for all that knowledge even when you only need it to classify support tickets.
+
+We fine-tuned [Llama 4 Maverick](https://llama.meta.com/) on our specific domain — 50K examples of our actual production data. The result was a model that understood our domain better than GPT-4o ever could, at a fraction of the cost.
+
+The key insight: **a focused open-source model beats a general frontier model on domain-specific tasks.** Every time.
+
+## The Playbook
+
+1. **Start with evals.** Before touching any model, build your evaluation suite. You need ground truth.
+2. **Baseline with the best.** Run Claude/GPT-4 on your evals. This is your quality ceiling.
+3. **Fine-tune incrementally.** Start with 1K examples. Measure. Add more. Measure again.
+4. **Deploy on [vLLM](https://github.com/vllm-project/vllm).** It's the production inference standard for a reason.
+5. **Keep a fallback.** Route the hardest 5% of queries to [Claude](https://www.anthropic.com/claude). Your average cost stays low.
+
+Open source isn't a compromise anymore. It's a competitive advantage. The companies still paying OpenAI $50K/month for tasks a fine-tuned 70B can handle are subsidizing Sam Altman's AGI dreams with their runway.

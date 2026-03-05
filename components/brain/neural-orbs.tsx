@@ -173,20 +173,20 @@ export function NeuralOrbs({
       orbPositions[i * 3 + 1] = vertexPositions[startV * 3 + 1] * (1 - frac) + vertexPositions[endV * 3 + 1] * frac
       orbPositions[i * 3 + 2] = vertexPositions[startV * 3 + 2] * (1 - frac) + vertexPositions[endV * 3 + 2] * frac
 
-      orbSizes[i] = 0.30 + 0.04 * Math.sin(t * 4.0 + i * 2.5)
+      orbSizes[i] = 0.20 + 0.03 * Math.sin(t * 4.0 + i * 2.5)
 
-      // Rainbow hue per orb — slowly drifts over time, mixed heavily with white
-      const hue = (i / ORB_COUNT + t * 0.05) % 1.0
-      const [rawR, rawG, rawB] = hueToRgb(hue)
-      const cr = rawR * (1 - wm) + wm
-      const cg = rawG * (1 - wm) + wm
-      const cb = rawB * (1 - wm) + wm
+      // Blue-tinted orb color
+      const phase = t * 0.3 + i * 1.7
+      const base = 0.50 + 0.10 * Math.sin(phase)
+      const cr = base * 0.4               // low red
+      const cg = base * 0.75              // medium green
+      const cb = base + 0.25              // strong blue
       orbColors[i * 3] = cr
       orbColors[i * 3 + 1] = cg
       orbColors[i * 3 + 2] = cb
 
-      // Energy trail on visible chain edges
-      const flicker = 0.92 + 0.08 * Math.sin(t * 14 + flickerSeeds.current[i])
+      // Energy trail on visible chain edges (continuous glow along wireframe)
+      const flicker = 0.96 + 0.04 * Math.sin(t * 3.5 + flickerSeeds.current[i])
 
       for (let e = 0; e < orb.chain.length; e++) {
         const chainEdge = orb.chain[e]
@@ -206,12 +206,13 @@ export function NeuralOrbs({
         const absA = Math.abs(dA)
         const absB = Math.abs(dB)
 
-        let wA = Math.exp(-absA * absA * 4.0)
-        let wB = Math.exp(-absB * absB * 4.0)
-        if (dA > 0) wA += Math.exp(-dA * 0.8) * 0.30
-        if (dB > 0) wB += Math.exp(-dB * 0.8) * 0.30
-        if (dA < 0) wA += Math.exp(-absA * 6.0) * 0.12
-        if (dB < 0) wB += Math.exp(-absB * 6.0) * 0.12
+        // Tight glow around the orb head, minimal trail
+        let wA = Math.exp(-absA * absA * 12.0)
+        let wB = Math.exp(-absB * absB * 12.0)
+        if (dA > 0) wA += Math.exp(-dA * 1.8) * 0.35
+        if (dB > 0) wB += Math.exp(-dB * 1.8) * 0.35
+        if (dA < 0) wA += Math.exp(-absA * 6.0) * 0.15
+        if (dB < 0) wB += Math.exp(-absB * 6.0) * 0.15
         wA = Math.min(1, wA * flicker)
         wB = Math.min(1, wB * flicker)
 
@@ -220,12 +221,12 @@ export function NeuralOrbs({
         const hotA = Math.exp(-absA * 3.0)
         const hotB = Math.exp(-absB * 3.0)
 
-        colors[off]     = Math.min(1, colors[off]     + (cr + (1 - cr) * hotA) * wA)
-        colors[off + 1] = Math.min(1, colors[off + 1] + (cg + (1 - cg) * hotA) * wA)
-        colors[off + 2] = Math.min(1, colors[off + 2] + (cb + (1 - cb) * hotA) * wA)
-        colors[off + 3] = Math.min(1, colors[off + 3] + (cr + (1 - cr) * hotB) * wB)
-        colors[off + 4] = Math.min(1, colors[off + 4] + (cg + (1 - cg) * hotB) * wB)
-        colors[off + 5] = Math.min(1, colors[off + 5] + (cb + (1 - cb) * hotB) * wB)
+        colors[off]     = Math.min(1, colors[off]     + (0.3 + 0.7 * hotA) * wA)
+        colors[off + 1] = Math.min(1, colors[off + 1] + (0.6 + 0.4 * hotA) * wA)
+        colors[off + 2] = Math.min(1, colors[off + 2] + 1.0 * wA)
+        colors[off + 3] = Math.min(1, colors[off + 3] + (0.3 + 0.7 * hotB) * wB)
+        colors[off + 4] = Math.min(1, colors[off + 4] + (0.6 + 0.4 * hotB) * wB)
+        colors[off + 5] = Math.min(1, colors[off + 5] + 1.0 * wB)
       }
     }
 

@@ -6,6 +6,7 @@ import {
     SiHonda,
 } from "react-icons/si"
 import { GraduationCap, FlaskConical, Brain } from "lucide-react"
+import { AnimatedText } from "../animations/animated-text"
 
 /* ──────────────────────────────────────────────────────────────────────
  *  LogoScroll — Infinite horizontal marquee of grey company logos
@@ -165,7 +166,7 @@ export function LogoScroll() {
         >
             {/* Heading */}
             <p className="mb-5 text-center text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground/50 sm:text-sm">
-                Trusted & partnered with:
+                <AnimatedText text="Trusted & partnered with:" variant="blur-slide" stagger={40} duration={600} />
             </p>
 
             {/* Fade edges */}

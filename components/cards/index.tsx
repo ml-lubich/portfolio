@@ -52,6 +52,7 @@ export function ScrollStackCards({
   const onScrollDismissRef = useRef(onScrollDismiss)
   onScrollDismissRef.current = onScrollDismiss
   const expandedScrollY = useRef(0)
+  const detailWrapperRef = useRef<HTMLDivElement>(null)
 
   // Ensure drag array is sized
   if (drags.current.length !== cards.length) {
@@ -400,6 +401,26 @@ export function ScrollStackCards({
     }
   }, [onPointerUp, onPointerMove])
 
+  /* ── Dynamically size detail panel to fit viewport ─────────────────── */
+  useEffect(() => {
+    const el = detailWrapperRef.current
+    if (!el || !isExpanded) return
+
+    const recalcHeight = () => {
+      const top = el.getBoundingClientRect().top
+      const available = window.innerHeight - top - 16
+      const h = `${Math.max(200, available)}px`
+      el.style.height = h
+      el.style.maxHeight = h
+    }
+
+    // Double rAF so layout has settled after the slide-in transition starts
+    requestAnimationFrame(() => requestAnimationFrame(recalcHeight))
+
+    window.addEventListener('resize', recalcHeight, { passive: true })
+    return () => window.removeEventListener('resize', recalcHeight)
+  }, [isExpanded])
+
   /* ── Record scroll position when panel expands ────────────────────── */
   useEffect(() => {
     if (activeCardId) {
@@ -455,23 +476,18 @@ export function ScrollStackCards({
         {header}
 
         {/* Split-view container for cards + detail panel */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "flex-start",
-            gap: isExpanded ? "1rem" : "0",
-            transition: "gap 0.65s cubic-bezier(0.16, 1, 0.3, 1)",
-          }}
-        >
-          {/* Card stack — shrinks left when detail panel is open */}
+        <div className="relative">
+          {/* Card stack — shifts left when detail panel is open */}
           <div
             style={{
               display: "grid",
               gridTemplateColumns: "1fr",
               gridTemplateRows: "1fr",
-              width: isExpanded ? "45%" : "100%",
-              flexShrink: 0,
-              transition: "width 0.65s cubic-bezier(0.16, 1, 0.3, 1)",
+              transform: isExpanded
+                ? "translateX(-15%) scale(0.85)"
+                : "translateX(0) scale(1)",
+              transformOrigin: "left top",
+              transition: "transform 0.65s cubic-bezier(0.16, 1, 0.3, 1)",
             }}
           >
             {cards.map((card, i) => (
@@ -510,20 +526,15 @@ export function ScrollStackCards({
             ))}
           </div>
 
-          {/* Detail panel — expands to the right of the card stack */}
+          {/* Detail panel — slides in from right when a card is selected */}
           {detailContent && (
             <div
-              className="detail-panel-scroll"
+              ref={detailWrapperRef}
+              className="absolute top-0 right-0 w-[92%] sm:w-[56%] lg:w-[52%]"
               style={{
-                width: isExpanded ? "54%" : "0",
-                flexShrink: 0,
-                maxHeight: `calc(100vh - ${stickyTop + 40}px)`,
-                overflowY: isExpanded ? "auto" : "hidden",
-                overflowX: "hidden",
-                overscrollBehavior: "contain",
-                scrollbarGutter: "stable",
+                transform: isExpanded ? "translateX(0)" : "translateX(110%)",
                 opacity: isExpanded ? 1 : 0,
-                transition: "width 0.65s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease",
+                transition: "transform 0.65s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease",
                 pointerEvents: isExpanded ? "auto" : "none",
                 zIndex: cards.length + 20,
               }}

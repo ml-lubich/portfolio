@@ -1,0 +1,84 @@
+---
+title: "CrewAI and Multi-Agent Frameworks: A Production Reality Check"
+excerpt: "CrewAI, AutoGen, and LangGraph promise autonomous agent teams. I deployed all three to production. Here's the unvarnished truth about what works and what's pure marketing."
+date: "2026-01-12"
+category: "AI Architecture"
+tags: ["CrewAI", "Multi-Agent", "AutoGen", "LangGraph", "Production"]
+coverImage: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=1200&h=630&fit=crop"
+---
+
+## The Multi-Agent Hype Cycle
+
+2025 was the year of multi-agent frameworks. [CrewAI](https://www.crewai.com/) hit 50K GitHub stars. Microsoft's [AutoGen](https://github.com/microsoft/autogen) became the enterprise darling. [LangGraph](https://www.langchain.com/langgraph) promised stateful agent orchestration. Every YC startup pitch included "multi-agent architecture" somewhere on slide 3.
+
+I deployed all three to production across different projects. **The results were... educational.**
+
+```mermaid
+{
+  "type": "comparison",
+  "left": {
+    "title": "What They Promise",
+    "color": "green",
+    "steps": ["Manager Agent", "Research / Writer / QA Agents", "Perfect Output"]
+  },
+  "right": {
+    "title": "What Actually Happens",
+    "color": "red",
+    "steps": ["Manager Agent", "Research Agent → Hallucinated data", "Writer Agent → Wrong format", "QA Agent → Approved garbage", "Broken Output", "Retry loop ×5"]
+  }
+}
+```
+
+## CrewAI: The Good and Bad
+
+CrewAI has the best developer experience of the three. Setting up a crew is delightful:
+
+```python
+from crewai import Agent, Task, Crew
+
+researcher = Agent(
+    role="Senior Research Analyst",
+    goal="Find accurate, up-to-date information",
+    backstory="You are a meticulous researcher...",
+    tools=[search_tool, scrape_tool],
+    llm="gpt-4o"
+)
+
+writer = Agent(
+    role="Technical Writer",
+    goal="Create clear, engaging content",
+    backstory="You are an expert technical writer...",
+    llm="claude-sonnet-4"
+)
+
+crew = Crew(
+    agents=[researcher, writer],
+    tasks=[research_task, writing_task],
+    process=Process.sequential
+)
+
+result = crew.kickoff()
+```
+
+**The good:** Great abstractions, easy to prototype, good community.
+
+**The bad:** In production, crews fail silently ~15% of the time. Agents go off-script, hallucinate tool results, and the retry logic is naive. We had to wrap every crew execution in 200 lines of error handling, timeout management, and output validation.
+
+## AutoGen: Enterprise Overkill
+
+Microsoft's [AutoGen](https://github.com/microsoft/autogen) is built for enterprise. It has conversation protocols, human-in-the-loop patterns, and Docker sandboxing. It's also wildly over-engineered for 90% of use cases. Setting up a simple two-agent conversation requires understanding GroupChat, ConversableAgent, AssistantAgent, and UserProxyAgent. That's four abstractions for two agents talking to each other.
+
+## LangGraph: The Right Idea, Wrong Execution
+
+[LangGraph](https://www.langchain.com/langgraph)'s state machine approach is actually the right mental model for agent orchestration. But it's grafted onto [LangChain](https://www.langchain.com/), which means you inherit all of LangChain's abstraction problems.
+
+## What Actually Works in Production
+
+After 6 months of multi-agent experiments, here's my recommendation:
+
+1. **Don't use multi-agent for simple tasks.** A single well-prompted agent with tools beats a crew of mediocre agents every time.
+2. **Use CrewAI for prototyping, but plan to outgrow it.** Build your own orchestration for production.
+3. **State machines are the right pattern.** Just implement them yourself in 100 lines of Python, not through a framework.
+4. **Always have a single-agent fallback.** When the crew fails, route to one capable agent.
+
+Multi-agent systems will be transformative. But today's frameworks are prototyping tools, not production infrastructure. Treat them accordingly.

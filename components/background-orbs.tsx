@@ -32,28 +32,41 @@ export function BackgroundOrbs() {
       className="fixed inset-0 z-0 pointer-events-none overflow-hidden"
       aria-hidden="true"
     >
-      {ORBS.map((orb, i) => (
-        <div
-          key={i}
-          style={{
-            position: "absolute",
-            left: `${orb.x}%`,
-            top: `${orb.y}%`,
-            width: `${orb.size}vw`,
-            height: `${orb.size}vw`,
-            maxWidth: "1100px",
-            maxHeight: "1100px",
-            borderRadius: "50%",
-            background: `radial-gradient(circle, hsl(${orb.hue} 100% 62% / 0.55), hsl(${(orb.hue + 35) % 360} 95% 55% / 0.28), transparent 72%)`,
-            filter: "blur(120px)",
-            willChange: "filter",
-            transform: "translate(-50%, -50%)",
-            opacity: mounted ? 1 : 0,
-            transition: "opacity 2s ease-in-out",
-            animation: `spectrum-drift-${orb.dir > 0 ? "a" : "b"} ${orb.dur}s ease-in-out infinite`,
-          }}
-        />
-      ))}
+      {ORBS.map((orb, i) => {
+        const h = orb.hue
+        const h2 = (h + 35) % 360
+        return (
+          <div
+            key={i}
+            style={{
+              position: "absolute",
+              left: `${orb.x}%`,
+              top: `${orb.y}%`,
+              width: `${orb.size}vw`,
+              height: `${orb.size}vw`,
+              borderRadius: "50%",
+              /* Smooth multi-stop gradient — avoids ring artifacts under dark overlays.
+                 Uses same-hue zero-alpha instead of `transparent` (which is rgba(0,0,0,0)
+                 and causes dark-band interpolation). */
+              background: [
+                `radial-gradient(circle,`,
+                `hsl(${h} 100% 62% / 0.55) 0%,`,
+                `hsl(${h} 100% 60% / 0.45) 15%,`,
+                `hsl(${h2} 95% 57% / 0.32) 30%,`,
+                `hsl(${h2} 90% 55% / 0.18) 45%,`,
+                `hsl(${h2} 85% 55% / 0.08) 60%,`,
+                `hsl(${h2} 80% 55% / 0) 75%)`,
+              ].join(" "),
+              filter: "blur(10vw)",
+              willChange: "filter",
+              transform: "translate(-50%, -50%)",
+              opacity: mounted ? 1 : 0,
+              transition: "opacity 2s ease-in-out",
+              animation: `spectrum-drift-${orb.dir > 0 ? "a" : "b"} ${orb.dur}s ease-in-out infinite`,
+            }}
+          />
+        )
+      })}
 
       {/* Subtle vignette — soft edge darkening only */}
       <div

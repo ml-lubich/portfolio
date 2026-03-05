@@ -2,8 +2,8 @@
 
 import React, { useRef, useState, useCallback } from "react"
 import Link from "next/link"
-import type { BlogPost } from "@/lib/blog-data"
-import { getReadingTime } from "@/lib/blog-data"
+import type { BlogPost } from "@/lib/blog-shared"
+import { getReadingTime } from "@/lib/blog-shared"
 import { overlays, shadows, blogBg } from "@/lib/theme"
 
 interface BlogCardProps {
@@ -82,7 +82,7 @@ export function BlogCard({ post, featured = false, onTagClick }: BlogCardProps) 
 
             {/* Content */}
             <div className="relative -mt-20 px-8 pb-8">
-              <h2 className="text-2xl font-semibold leading-tight text-foreground transition-colors group-hover:text-primary md:text-3xl">
+              <h2 className="no-metallic text-2xl font-semibold leading-tight text-foreground transition-colors group-hover:text-primary md:text-3xl">
                 {post.title}
               </h2>
               <p className="mt-3 line-clamp-2 text-base text-muted-foreground">
@@ -155,7 +155,7 @@ export function BlogCard({ post, featured = false, onTagClick }: BlogCardProps) 
               <span className="text-xs text-muted-foreground">{readingTime} min</span>
             </div>
 
-            <h3 className="mt-3 text-lg font-semibold leading-snug text-foreground transition-colors group-hover:text-primary">
+            <h3 className="no-metallic mt-3 text-lg font-semibold leading-snug text-foreground transition-colors group-hover:text-primary">
               {post.title}
             </h3>
 

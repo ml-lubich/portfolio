@@ -59,18 +59,18 @@ export const hex = {
     cyan: "#06b6d4",
     cyanLight: "#22d3ee",
     background: "#0a0c14",
-    /** brain wireframe base */
-    wireBase: "#d0d0d8",
-    /** brain wireframe glow / points */
-    wireGlow: "#c0c0cc",
+    /** brain wireframe base — cool grey for 3D depth */
+    wireBase: "#b0b2be",
+    /** brain wireframe glow — subtle teal tint */
+    wireGlow: "#90b0b4",
 } as const
 
 /* ── Three.js numeric hex colors ────────────────────────────────── */
 
 export const hexNum = {
-    wireBase: 0xd0d0d8,
-    wireGlow: 0xc0c0cc,
-    neuralBlue: 0xccccff,
+    wireBase: 0xb0b2be,
+    wireGlow: 0x90b0b4,
+    neuralBlue: 0x88dddd,
     background: 0x080810,
 } as const
 
@@ -78,7 +78,7 @@ export const hexNum = {
 
 export const glsl = {
     /** Primary glow color used in brain/orb shaders */
-    glowColor: "vec3(0.95, 0.95, 1.0)",
+    glowColor: "vec3(0.2, 0.45, 0.9)",
 } as const
 
 /* ── Tailwind gradient class strings ─────────────────────────────
@@ -217,25 +217,6 @@ export const terminalChrome = {
     dotClose: "#ff5f57",
     dotMinimize: "#febc2e",
     dotExpand: "#28c840",
-} as const
-
-/* ── Mermaid diagram theme ───────────────────────────────────────── */
-
-export const mermaidTheme = {
-    background: hex.background,
-    primaryColor: "#1e3a5f",
-    primaryTextColor: "#e2e8f0",
-    primaryBorderColor: hex.primary,
-    lineColor: hex.primary,
-    secondaryColor: "#1e5f3a",
-    tertiaryColor: "#3b1e5f",
-    nodeBorder: hex.primary,
-    mainBkg: "#1e3a5f",
-    clusterBkg: "#0f172a",
-    clusterBorder: "#1e293b",
-    titleColor: "#e2e8f0",
-    edgeLabelBackground: hex.background,
-    nodeTextColor: "#e2e8f0",
 } as const
 
 /* ── Hero overlay ────────────────────────────────────────────────── */

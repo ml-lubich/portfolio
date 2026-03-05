@@ -76,7 +76,7 @@ export function makeOrbMaterial(pull?: PullUniforms) {
           pos += (_dir / _d) * _f * uPullStrength * 0.12;
         }
         vec4 mv = modelViewMatrix * vec4(pos, 1.0);
-        gl_PointSize = size * (570.0 / -mv.z);
+        gl_PointSize = size * (380.0 / -mv.z);
         gl_Position = projectionMatrix * mv;
       }
     `,
@@ -88,24 +88,105 @@ export function makeOrbMaterial(pull?: PullUniforms) {
         float d = length(gl_PointCoord - vec2(0.5));
         if (d > 0.5) discard;
 
-        float core   = exp(-d * d * 160.0) * 0.38;
-        float inner  = exp(-d * d * 50.0)  * 0.32;
-        float mid    = exp(-d * d * 18.0)  * 0.18;
-        float outer  = exp(-d * d * 6.0)   * 0.09;
-        float fringe = exp(-d * d * 2.5)   * 0.035;
+        // Smooth gaussian layers — no hard edges
+        float core   = exp(-d * d * 120.0);
+        float inner  = exp(-d * d * 40.0)  * 0.85;
+        float mid    = exp(-d * d * 14.0)  * 0.50;
+        float outer  = exp(-d * d * 5.0)   * 0.28;
+        float fringe = exp(-d * d * 2.0)   * 0.10;
 
         float intensity = core + inner + mid + outer + fringe;
+        // Soft edge fade instead of hard discard boundary
+        intensity *= smoothstep(0.5, 0.25, d);
         intensity *= 0.88 + 0.12 * sin(uTime * 5.0);
         intensity *= uFade;
 
-        vec3 grey = vec3(0.90, 0.90, 0.94);
-        vec3 color = mix(vColor, grey, 0.3) * fringe
-                   + mix(vColor, grey, 0.25) * (outer + mid)
-                   + mix(vColor, grey, 0.5) * inner
-                   + mix(grey, vec3(1.0), 0.5) * core;
+        vec3 color = ${glsl.glowColor} * fringe
+                   + vec3(0.35, 0.65, 0.88) * (outer + mid)
+                   + vec3(0.70, 0.82, 0.90) * inner
+                   + vec3(0.92, 0.92, 0.94)  * core;
         color = min(color, vec3(1.0));
 
         gl_FragColor = vec4(color, intensity);
+      }
+    `,
+  })
+}
+
+/* ── Gradient wireframe material (dark→white + depth + rim glow) ──── */
+
+export function makeWireGradientMaterial(pull: PullUniforms, opacity: number) {
+  return new THREE.ShaderMaterial({
+    transparent: true,
+    depthWrite: false,
+    uniforms: {
+      uOpacity: { value: opacity },
+      uPullPoint: pull.uPullPoint,
+      uPullStrength: pull.uPullStrength,
+      uPullRadius: pull.uPullRadius,
+    },
+    vertexShader: /* glsl */ `
+      uniform vec3 uPullPoint;
+      uniform float uPullStrength;
+      uniform float uPullRadius;
+      varying float vGrad;
+      varying vec3 vMvPos;
+      varying vec3 vPos;
+      void main() {
+        vec3 pos = position;
+        vec3 _dir = uPullPoint - pos;
+        float _d = length(_dir);
+        if (_d < uPullRadius && _d > 0.001 && uPullStrength > 0.0) {
+          float _f = 1.0 - _d / uPullRadius;
+          _f *= _f;
+          pos += (_dir / _d) * _f * uPullStrength * 0.12;
+        }
+        vec4 mv = modelViewMatrix * vec4(pos, 1.0);
+        vGrad = smoothstep(-1.2, 1.2, pos.y);
+        vMvPos = mv.xyz;
+        vPos = pos;
+        gl_Position = projectionMatrix * mv;
+      }
+    `,
+    fragmentShader: /* glsl */ `
+      uniform float uOpacity;
+      varying float vGrad;
+      varying vec3 vMvPos;
+      varying vec3 vPos;
+      void main() {
+        // Enhanced 3D grey/white gradient: dark grey bottom → bright white top
+        vec3 deepGrey  = vec3(0.07, 0.08, 0.10);
+        vec3 midGrey   = vec3(0.30, 0.32, 0.36);
+        vec3 lightGrey = vec3(0.58, 0.60, 0.65);
+        vec3 brightWhite = vec3(0.80, 0.82, 0.85);
+
+        // Multi-stop gradient for realistic 3D shading
+        vec3 color;
+        if (vGrad < 0.3) {
+          color = mix(deepGrey, midGrey, vGrad / 0.3);
+        } else if (vGrad < 0.65) {
+          color = mix(midGrey, lightGrey, (vGrad - 0.3) / 0.35);
+        } else {
+          color = mix(lightGrey, brightWhite, (vGrad - 0.65) / 0.35);
+        }
+
+        // Depth-based brightness (closer to camera = brighter)
+        float depth = -vMvPos.z;
+        float df = smoothstep(4.5, 1.2, depth);
+        color *= 0.4 + 0.6 * df;
+
+        // Strong rim glow — silhouette edge highlight for 3D pop
+        vec3 viewDir = normalize(-vMvPos);
+        vec3 posDir  = normalize(vPos);
+        float rim = pow(1.0 - abs(dot(viewDir, posDir)), 2.5);
+        // Subtle teal tint on rim for cursor.com feel
+        color += vec3(0.04, 0.10, 0.12) * rim;
+
+        // Specular-like highlight on top-facing surfaces
+        float topLight = max(0.0, dot(normalize(vPos), vec3(0.0, 1.0, 0.3)));
+        color += brightWhite * pow(topLight, 4.0) * 0.05;
+
+        gl_FragColor = vec4(color, uOpacity);
       }
     `,
   })

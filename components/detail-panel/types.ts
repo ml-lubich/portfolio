@@ -13,6 +13,8 @@ export interface DetailPanelData {
   diagramType?: "pipeline" | "microservices" | "ml-pipeline" | "fullstack" | "agents" | "cicd"
   gradient: string
   accent: string
+  /** Optional external link (e.g. GitHub repo, live demo) shown as a clickable button */
+  link?: { label: string; url: string }
 }
 
 export interface ArchitectureNode {

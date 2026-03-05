@@ -1,0 +1,52 @@
+---
+title: "The Uncomfortable Truth About AI Safety Research"
+excerpt: "Most AI safety work is performative theater designed to look responsible while not actually slowing anything down. Let's have an honest conversation."
+date: "2025-06-25"
+category: "Hot Takes"
+tags: ["AI Safety", "Ethics", "Industry", "Regulation"]
+coverImage: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=1200&h=630&fit=crop"
+---
+
+## The Safety Theater
+
+I'm going to make a claim that will anger both sides of the AI safety debate: **most AI safety work at major labs is performative compliance designed to look responsible while not meaningfully constraining development.**
+
+This isn't a conspiracy. It's an incentive structure.
+
+[OpenAI](https://openai.com/), [Anthropic](https://www.anthropic.com/), [Google](https://ai.google/), and [Meta](https://ai.meta.com/) all have safety teams. Those teams publish papers, write blog posts, and present at conferences. Their work is real and often technically impressive. But here's the question nobody asks: **has any safety finding ever actually stopped or significantly delayed a planned release?**
+
+```mermaid
+{
+  "type": "tree",
+  "title": "Safety Research Findings — Decision Tree",
+  "color": "blue",
+  "steps": [
+    "Safety Research Finding",
+    {
+      "label": "Business Impact?",
+      "branches": [
+        { "condition": "Minor (90%)", "color": "amber", "steps": ["Add Guardrail", "Ship Anyway"] },
+        { "condition": "Major (9%)", "color": "amber", "steps": ["Delay 2–4 Weeks", "Ship With Disclaimer"] },
+        { "condition": "Existential (1%)", "color": "red", "steps": ["Internal Debate", "Board Decision", "Usually: Ship With Blog Post"] }
+      ]
+    }
+  ]
+}
+```
+
+## Both Sides Are Wrong
+
+**The doomers** are so focused on hypothetical superintelligence extinction scenarios that they ignore the very real, very present harms: deepfakes in elections, AI-powered scams targeting the elderly, algorithmic discrimination in hiring, and mass surveillance.
+
+**The accelerationists** are so focused on progress that they dismiss any concern as "doomerism" — a rhetorical trick that lets them avoid engaging with legitimate criticism.
+
+The truth is in the middle, and it's boring: AI safety is a real engineering problem that requires real engineering solutions, not philosophy papers or Twitter debates.
+
+## What Actual Safety Looks Like
+
+1. **Red teaming before every release.** Not as a PR exercise — as a genuine gate with veto power.
+2. **Incident response playbooks.** When your model does something harmful in production, how fast can you respond?
+3. **User-facing controls.** Give users the tools to customize, restrict, and audit AI interactions.
+4. **Honest capability disclosure.** Stop hiding behind "it's just a tool" when your system is clearly making autonomous decisions.
+
+The gap between AI safety research and AI safety practice is enormous. And the companies that close that gap through genuine engineering — not press releases — will be the ones users actually trust.

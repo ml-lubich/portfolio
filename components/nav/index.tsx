@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react"
 import { Menu, X, ChevronUp } from "lucide-react"
 import { navLinks } from "./nav-links"
-import { wooshScrollTo, navigateTo } from "./woosh-scroll"
+import { wooshScrollTo, navigateTo, isProgrammaticScroll } from "./woosh-scroll"
 import { useActiveSection } from "./use-nav-hooks"
 import { ExpandingText } from "./expanding-text"
 
@@ -119,10 +119,14 @@ export function Navigation() {
       rafId = requestAnimationFrame(() => {
         const y = window.scrollY
         setScrolled(y > 50)
-        if (y > 300 && y > lastScrollY.current + 8) {
-          setHideNav(true)
-        } else if (y < lastScrollY.current - 4) {
-          setHideNav(false)
+        // Skip hide/show logic during programmatic (navbar-initiated) scrolls
+        // to prevent the nav from flickering away mid-animation
+        if (!isProgrammaticScroll) {
+          if (y > 300 && y > lastScrollY.current + 8) {
+            setHideNav(true)
+          } else if (y < lastScrollY.current - 4) {
+            setHideNav(false)
+          }
         }
         lastScrollY.current = y
       })
@@ -152,6 +156,8 @@ export function Navigation() {
   const handleLinkClick = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
       e.preventDefault()
+      // Ensure navbar stays visible during the scroll animation
+      setHideNav(false)
       navigateTo(href, () => setMobileOpen(false))
     },
     [],
@@ -179,15 +185,25 @@ export function Navigation() {
             onClick={(e) => handleLinkClick(e, "#")}
             className="group flex items-center gap-2"
           >
-            <div className="relative flex h-14 w-14 items-center justify-center rounded-[12px] overflow-hidden">
+            <div
+              className="logo-flip-hover relative flex h-16 w-16 items-center justify-center rounded-[9px] overflow-hidden"
+              onMouseEnter={(e) => {
+                const el = e.currentTarget
+                if (!el.classList.contains('is-flipping')) {
+                  el.classList.add('is-flipping')
+                }
+              }}
+              onAnimationEnd={(e) => {
+                e.currentTarget.classList.remove('is-flipping')
+              }}
+            >
               <img src="/logo.png" alt="ML" className="h-full w-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
             </div>
           </a>
 
           {/* Desktop links */}
-          <div className="hidden items-center gap-0.5 md:flex relative">
-            {navLinks.map((link) => {
+          <div className="hidden items-center gap-0.5 lg:flex relative">
+            {navLinks.filter((l) => l.href !== "#contact").map((link) => {
               const isExternal = link.href.startsWith("/")
               const isActive = !isExternal && activeSection === link.href.replace("#", "")
 
@@ -200,7 +216,7 @@ export function Navigation() {
                   href={link.href}
                   onClick={(e) => handleLinkClick(e, link.href)}
                   className={[
-                    "group/link relative rounded-full px-3.5 py-1.5 text-[13px] tracking-wide transition-all duration-300",
+                    "group/link relative whitespace-nowrap rounded-full px-2.5 py-1.5 text-[13px] xl:px-3.5 xl:text-[14px] tracking-wide transition-all duration-300",
                     isActive
                       ? "text-foreground font-medium"
                       : "text-muted-foreground hover:text-foreground",
@@ -219,7 +235,7 @@ export function Navigation() {
               href="#contact"
               onClick={(e) => handleLinkClick(e, "#contact")}
               aria-label="Get In Touch"
-              className="group/link ml-3 rounded-full bg-primary px-4 py-1.5 text-[13px] font-medium text-primary-foreground transition-all duration-300 hover:shadow-lg hover:shadow-primary/25 hover:scale-[1.03] active:scale-[0.97]"
+              className="group/link ml-2 xl:ml-3 whitespace-nowrap rounded-full bg-primary px-3 py-1.5 text-[13px] xl:px-4 xl:text-[14px] font-medium text-primary-foreground transition-all duration-300 hover:shadow-lg hover:shadow-primary/25 hover:scale-[1.03] active:scale-[0.97]"
             >
               <ExpandingText text="Get In Touch" />
             </a>
@@ -229,7 +245,7 @@ export function Navigation() {
           <button
             type="button"
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="rounded-lg p-2 text-muted-foreground transition-colors hover:text-foreground md:hidden"
+            className="rounded-lg p-2 text-muted-foreground transition-colors hover:text-foreground lg:hidden"
             aria-label="Toggle menu"
           >
             <div className="relative h-5 w-5">
@@ -246,7 +262,7 @@ export function Navigation() {
         {/* Mobile menu */}
         <div
           className={[
-            "md:hidden overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
+            "lg:hidden overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
             mobileOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0",
           ].join(" ")}
         >

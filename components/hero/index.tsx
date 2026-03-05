@@ -38,17 +38,6 @@ export function Hero() {
 
       {/* Content */}
       <div className="relative z-10 mx-auto w-full max-w-6xl px-4 text-center sm:px-6 pointer-events-none">
-        {/* Badge */}
-        <div className="mb-8 inline-flex animate-fade-in items-center gap-2 rounded-full border border-white/[0.1] bg-white/[0.05] px-4 py-1.5 backdrop-blur-sm">
-          <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
-          </span>
-          <span className="font-mono text-xs text-muted-foreground">
-            Available for AI/ML consulting
-          </span>
-        </div>
-
         <RoleRotator />
         <HeroSubtitle />
         <HeroCTAs />
@@ -58,7 +47,7 @@ export function Hero() {
 
       {/* Scroll indicator */}
       <div
-        className="absolute bottom-6 left-1/2 -translate-x-1/2 animate-fade-in pointer-events-auto"
+        className="absolute bottom-6 left-1/2 z-10 -translate-x-1/2 animate-fade-in pointer-events-auto"
         style={{ animationDelay: "2.6s", opacity: 0 }}
       >
         <button

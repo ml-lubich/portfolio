@@ -14,8 +14,8 @@ const contactInfo = [
   {
     icon: Mail,
     label: "Email",
-    value: "michaelle.lubich@outlook.com",
-    href: "mailto:michaelle.lubich@outlook.com",
+    value: "michaelle.lubich@gmail.com",
+    href: "mailto:michaelle.lubich@gmail.com",
   },
   {
     icon: Phone,
@@ -99,7 +99,7 @@ export function Contact() {
                       href={link.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 rounded-xl border border-white/[0.1] bg-white/[0.04] px-4 py-3 text-sm text-muted-foreground transition-colors hover:border-white/20 hover:text-foreground"
+                      className="flex items-center gap-2 rounded-xl border border-white/[0.1] bg-white/[0.04] px-4 py-3 text-sm text-white/80 transition-colors hover:border-white/20 hover:text-white"
                     >
                       <link.icon className="h-4 w-4" />
                       <span className="text-xs">{link.label}</span>

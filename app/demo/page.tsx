@@ -1,4 +1,11 @@
+import type { Metadata } from "next"
 import { NeuralOrbDemo } from "@/components/three/neural-orb-demo"
+
+export const metadata: Metadata = {
+  title: "Neural Orb Demo",
+  description: "Interactive 3D neural network visualization demo — glowing orbs traversing graph edges with WebGL.",
+  robots: { index: false, follow: false },
+}
 
 export default function DemoPage() {
     return (

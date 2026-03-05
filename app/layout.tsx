@@ -7,6 +7,7 @@ import { GeistMono } from 'geist/font/mono'
 import './globals.css'
 import { ScrollShimmer } from '@/components/scroll-shimmer'
 import { BackgroundOrbs } from '@/components/background-orbs'
+import { JsonLd } from '@/components/seo/json-ld'
 
 const jetbrains = JetBrains_Mono({
   subsets: ['latin'],
@@ -25,50 +26,76 @@ const cormorant = Cormorant_Garamond({
   variable: '--font-cormorant',
 })
 
-const BASE_URL = "https://mishalubich.com"
+import { SITE_URL } from "@/lib/site-config"
+const BASE_URL = SITE_URL
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    default: "Misha Lubich | AI Engineer & Technical Leader",
+    default: "Misha Lubich | AI Engineer & Technical Leader — Portfolio",
     template: "%s | Misha Lubich",
   },
   description:
-    "Software Engineer and AI/ML Specialist building scalable solutions at Apple, GitHub, and beyond. Explore my portfolio of innovative projects and research.",
+    "Misha Lubich is a Senior AI Engineer and Technical Leader with experience at Apple, GitHub, and top-tier startups. Explore projects in machine learning, MLOps, LLMs, deep learning, and full-stack development.",
   keywords: [
     "AI Engineer",
-    "Machine Learning",
+    "Machine Learning Engineer",
     "Software Engineer",
     "MLOps",
     "LLM",
+    "Large Language Models",
     "Deep Learning",
     "Full-Stack Developer",
     "Technical Leader",
     "Misha Lubich",
     "Portfolio",
+    "Artificial Intelligence",
+    "Natural Language Processing",
+    "Computer Vision",
+    "Data Science",
+    "Python",
+    "TypeScript",
+    "React",
+    "Next.js",
+    "Neural Networks",
+    "Transformer Models",
+    "Apple Engineer",
+    "GitHub Engineer",
+    "AI Portfolio",
+    "ML Engineer Portfolio",
   ],
   authors: [{ name: "Misha Lubich", url: BASE_URL }],
   creator: "Misha Lubich",
   publisher: "Misha Lubich",
+  category: "technology",
   robots: {
     index: true,
     follow: true,
-    googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
+    nocache: false,
+    googleBot: {
+      index: true,
+      follow: true,
+      noimageindex: false,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
   },
   openGraph: {
     type: "website",
     locale: "en_US",
     url: BASE_URL,
-    siteName: "Misha Lubich — AI Engineer",
+    siteName: "Misha Lubich — AI Engineer & Technical Leader",
     title: "Misha Lubich | AI Engineer & Technical Leader",
     description:
-      "Software Engineer and AI/ML Specialist building scalable solutions at Apple, GitHub, and beyond.",
+      "Senior AI Engineer building scalable ML systems at Apple, GitHub, and beyond. Explore innovative projects, research publications, and engineering insights.",
     images: [
       {
         url: `${BASE_URL}/og-image.png`,
         width: 1200,
         height: 630,
-        alt: "Misha Lubich — AI Engineer & Technical Leader",
+        alt: "Misha Lubich — AI Engineer & Technical Leader Portfolio",
+        type: "image/png",
       },
     ],
   },
@@ -76,49 +103,45 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Misha Lubich | AI Engineer & Technical Leader",
     description:
-      "Software Engineer and AI/ML Specialist building scalable solutions at Apple, GitHub, and beyond.",
-    images: [`${BASE_URL}/og-image.png`],
+      "Senior AI Engineer building scalable ML systems at Apple, GitHub, and beyond. Projects, research & insights.",
+    images: [
+      {
+        url: `${BASE_URL}/og-image.png`,
+        alt: "Misha Lubich — AI Engineer & Technical Leader Portfolio",
+      },
+    ],
+    creator: "@mishalubich",
   },
   alternates: {
     canonical: BASE_URL,
+    types: {
+      "application/rss+xml": `${BASE_URL}/feed.xml`,
+    },
   },
   icons: {
     icon: [
-      { url: "/logo.png", type: "image/png" },
       { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/logo.png", type: "image/png" },
     ],
     apple: [
-      { url: "/logo.png", type: "image/png" },
+      { url: "/favicon/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
     ],
   },
+  manifest: "/favicon/site.webmanifest",
 }
 
 export const viewport: Viewport = {
-  themeColor: '#0a0c14',
+  themeColor: [
+    { media: '(prefers-color-scheme: dark)', color: '#0a0c14' },
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+  ],
   width: "device-width",
   initialScale: 1,
+  maximumScale: 5,
 }
 
-/* JSON-LD structured data for SEO */
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Person",
-  name: "Misha Lubich",
-  url: BASE_URL,
-  jobTitle: "AI Engineer & Technical Leader",
-  sameAs: [
-    "https://github.com/ml-lubich",
-    "https://linkedin.com/in/mishalubich",
-  ],
-  knowsAbout: [
-    "Artificial Intelligence",
-    "Machine Learning",
-    "Deep Learning",
-    "MLOps",
-    "Software Engineering",
-    "LLM",
-  ],
-}
 
 export default function RootLayout({
   children,
@@ -126,12 +149,15 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable} ${jetbrains.variable} ${italiana.variable} ${cormorant.variable}`}>
+    <html lang="en" dir="ltr" className={`${GeistSans.variable} ${GeistMono.variable} ${jetbrains.variable} ${italiana.variable} ${cormorant.variable}`}>
       <head>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
+        {/* Preconnect to critical origins for faster resource loading */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://images.unsplash.com" />
+        <link rel="dns-prefetch" href="https://images.unsplash.com" />
+        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+        <JsonLd />
       </head>
       <body className="font-sans antialiased font-light">
         {/* Spectrum gradient background orbs */}

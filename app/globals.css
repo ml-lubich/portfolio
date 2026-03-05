@@ -70,6 +70,12 @@
   }
 }
 
+/* ── Terminal cursor blink ──────────────────────────────────── */
+@keyframes terminal-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
 /* ── Rainbow gradient mesh (Cursor-style 2026) ─────────────── */
 @keyframes rainbow-mesh-shift {
   0% {
@@ -120,20 +126,20 @@
 
 /* Spectrum orbs: gentle drift + slow hue shift (variant A) */
 @keyframes spectrum-drift-a {
-  0%   { transform: translate(-50%, -50%) translate(0, 0);       filter: blur(120px) hue-rotate(0deg); }
-  25%  { transform: translate(-50%, -50%) translate(15px, -10px); filter: blur(120px) hue-rotate(12deg); }
-  50%  { transform: translate(-50%, -50%) translate(-8px, 12px);  filter: blur(120px) hue-rotate(25deg); }
-  75%  { transform: translate(-50%, -50%) translate(10px, 6px);   filter: blur(120px) hue-rotate(15deg); }
-  100% { transform: translate(-50%, -50%) translate(0, 0);       filter: blur(120px) hue-rotate(0deg); }
+  0%   { transform: translate(-50%, -50%) translate(0, 0);       filter: blur(10vw) hue-rotate(0deg); }
+  25%  { transform: translate(-50%, -50%) translate(1vw, -0.7vw); filter: blur(10vw) hue-rotate(12deg); }
+  50%  { transform: translate(-50%, -50%) translate(-0.6vw, 0.8vw);  filter: blur(10vw) hue-rotate(25deg); }
+  75%  { transform: translate(-50%, -50%) translate(0.7vw, 0.4vw);   filter: blur(10vw) hue-rotate(15deg); }
+  100% { transform: translate(-50%, -50%) translate(0, 0);       filter: blur(10vw) hue-rotate(0deg); }
 }
 
 /* Spectrum orbs: gentle drift + slow hue shift (variant B — reverse) */
 @keyframes spectrum-drift-b {
-  0%   { transform: translate(-50%, -50%) translate(0, 0);        filter: blur(120px) hue-rotate(0deg); }
-  25%  { transform: translate(-50%, -50%) translate(-12px, 8px);  filter: blur(120px) hue-rotate(-15deg); }
-  50%  { transform: translate(-50%, -50%) translate(10px, -14px); filter: blur(120px) hue-rotate(-25deg); }
-  75%  { transform: translate(-50%, -50%) translate(-6px, -5px);  filter: blur(120px) hue-rotate(-10deg); }
-  100% { transform: translate(-50%, -50%) translate(0, 0);        filter: blur(120px) hue-rotate(0deg); }
+  0%   { transform: translate(-50%, -50%) translate(0, 0);        filter: blur(10vw) hue-rotate(0deg); }
+  25%  { transform: translate(-50%, -50%) translate(-0.8vw, 0.6vw);  filter: blur(10vw) hue-rotate(-15deg); }
+  50%  { transform: translate(-50%, -50%) translate(0.7vw, -1vw); filter: blur(10vw) hue-rotate(-25deg); }
+  75%  { transform: translate(-50%, -50%) translate(-0.4vw, -0.3vw);  filter: blur(10vw) hue-rotate(-10deg); }
+  100% { transform: translate(-50%, -50%) translate(0, 0);        filter: blur(10vw) hue-rotate(0deg); }
 }
 
 /* Rainbow gradient text */
@@ -178,9 +184,10 @@
   pointer-events: none;
 }
 
-/* Smooth scrolling — native fallback (overridden by JS woosh) */
+/* Scroll behavior — JS woosh handles all nav scrolling;
+   native smooth-scroll is disabled to prevent conflicts. */
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
   overflow-x: hidden;
   /* fallback for older browsers */
   overflow-x: clip;
@@ -461,8 +468,36 @@ body {
 
 /* ── 3D Glass Card effect ── */
 .glass-card-3d {
+  position: relative;
   transform: perspective(800px) rotateX(0deg) rotateY(0deg);
   transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s ease, border-color 0.4s ease;
+}
+
+/* Shining glass sweep overlay */
+.glass-card-3d::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    hsla(0, 0%, 100%, 0.03) 38%,
+    hsla(0, 0%, 100%, 0.12) 46%,
+    hsla(0, 0%, 100%, 0.03) 54%,
+    transparent 62%
+  );
+  background-size: 250% 100%;
+  background-position: 200% center;
+  opacity: 0;
+  transition: opacity 0.4s ease, background-position 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card-3d:hover::after {
+  opacity: 1;
+  background-position: -50% center;
 }
 
 .glass-card-3d:hover {
@@ -1018,14 +1053,17 @@ strong:not(.no-metallic) {
 
 .blog-prose h1 {
   @apply text-3xl font-bold tracking-tight text-foreground mt-10 mb-4;
+  -webkit-text-fill-color: currentColor;
 }
 
 .blog-prose h2 {
   @apply text-2xl font-semibold tracking-tight text-foreground mt-10 mb-4;
+  -webkit-text-fill-color: currentColor;
 }
 
 .blog-prose h3 {
   @apply text-xl font-semibold text-foreground mt-8 mb-3;
+  -webkit-text-fill-color: currentColor;
 }
 
 .blog-prose p {
@@ -1120,11 +1158,6 @@ strong:not(.no-metallic) {
 
 .blog-prose .blog-table tr:hover td {
   @apply bg-secondary/20;
-}
-
-/* Mermaid diagram container override */
-.blog-prose .mermaid-container {
-  @apply my-8 rounded-xl border border-white/[0.06] bg-[#0c0e1a] p-6;
 }
 
 /* ──────────────────────────────────────────── */
@@ -1306,6 +1339,22 @@ strong:not(.no-metallic) {
   100% {
     background-position: -200% 0;
   }
+}
+
+/* ──────────────────────────────────────────── */
+/*  Logo 3D flip on hover                      */
+/* ──────────────────────────────────────────── */
+@keyframes logo-flip {
+  0%   { transform: perspective(400px) rotateY(0deg); }
+  100% { transform: perspective(400px) rotateY(360deg); }
+}
+
+.logo-flip-hover {
+  transform: perspective(400px) rotateY(0deg);
+}
+
+.logo-flip-hover.is-flipping {
+  animation: logo-flip 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) 1 forwards;
 }
 
 /* ──────────────────────────────────────────── */

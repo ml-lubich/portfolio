@@ -1,0 +1,52 @@
+---
+title: "Microservices Were a Mistake for ML Systems"
+excerpt: "The industry cargo-culted microservice architecture into ML platforms and created distributed systems nightmares. Monoliths are the answer."
+date: "2025-07-18"
+category: "MLOps"
+tags: ["Microservices", "Architecture", "ML Systems", "Infrastructure"]
+coverImage: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=1200&h=630&fit=crop"
+---
+
+## How We Got Here
+
+Around 2020, someone at a conference said "ML systems should be microservices" and the entire industry nodded along without thinking. The logic seemed sound: separate services for feature computation, model training, inference, and monitoring. Clean boundaries. Independent scaling. DevOps best practices.
+
+**It was a disaster.**
+
+I've spent the last two years migrating ML systems from microservice architectures back to monoliths at three different companies. Every time, the team's velocity increased 3-5x and infrastructure costs dropped 40-60%.
+
+```mermaid
+{
+  "type": "pipeline",
+  "title": "ML Microservices Nightmare",
+  "steps": [
+    { "label": "Feature Service", "annotation": "gRPC", "color": "red" },
+    { "label": "Training Service", "annotation": "S3", "color": "red" },
+    { "label": "Model Registry", "annotation": "HTTP", "color": "red" },
+    { "label": "Inference Service", "annotation": "Kafka", "color": "red" },
+    { "label": "Monitoring Service", "annotation": "Webhook", "color": "red" },
+    { "label": "Retraining Service", "annotation": "gRPC ↩ Feature Service", "color": "red" },
+    { "label": "+ API Gateway + Redis Cache + PostgreSQL", "color": "red" }
+  ]
+}
+```
+
+## Why Microservices Fail for ML
+
+ML workloads are fundamentally different from web services:
+
+1. **Data locality matters.** ML operations are data-intensive. Shipping gigabytes of feature data across network boundaries for every inference call is insane.
+2. **Tight coupling is inherent.** Your feature computation, model, and post-processing are intimately coupled. Pretending they're independent services doesn't make them so.
+3. **Debugging distributed inference is a nightmare.** When your model output is wrong, is it the feature service? The serialization? The model? The post-processing? With microservices, answering this takes hours. With a monolith, it takes minutes.
+4. **Cold start kills latency.** Kubernetes pods spinning up separate inference containers adds 5-30 seconds of latency that no user will tolerate.
+
+## The Majestic ML Monolith
+
+Here's what a well-designed ML monolith looks like:
+
+- One service that handles feature computation, inference, and post-processing
+- Horizontal scaling at the service level (not the component level)
+- Model files loaded at startup, hot-swapped in memory
+- Feature computation done in-process with vectorized operations
+
+It's boring. It's simple. It works. And your team can actually debug it without a PhD in distributed systems.

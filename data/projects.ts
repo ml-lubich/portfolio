@@ -129,6 +129,7 @@ export const projects: Project[] = [
             diagramType: "ml-pipeline",
             gradient: g.cyanToPrimary,
             accent: accentCycle[2],
+            link: { label: "Global Venture Catalyst", url: "https://scet.berkeley.edu/scet-students-shine-in-global-venture-catalyst-design-sprint/" },
         },
     },
     {
@@ -203,6 +204,7 @@ export const projects: Project[] = [
             diagramType: "pipeline",
             gradient: g.accentToPrimary,
             accent: accentCycle[4],
+            link: { label: "GitHub", url: "https://github.com/ml-lubich" },
         },
     },
     {
