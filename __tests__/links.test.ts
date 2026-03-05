@@ -46,6 +46,11 @@ const EXTERNAL_ALLOWLIST = new Set([
   "https://www.googletagmanager.com", // dns-prefetch — no page at root
 ])
 
+/** Domains that aggressively block cloud-IP / bot traffic (valid links, but 403 in CI). */
+const BOT_BLOCKED_DOMAINS = [
+  "scholar.google.com",
+]
+
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
 function walk(dir: string): string[] {
@@ -227,6 +232,8 @@ describe("Link smoke tests", () => {
   describe("External URLs (HTTP 2xx/3xx)", () => {
     for (const [url, locs] of external) {
       if (EXTERNAL_ALLOWLIST.has(url)) continue // preconnect / dns-prefetch — no page at root
+      const host = new URL(url).hostname
+      if (BOT_BLOCKED_DOMAINS.some((d) => host === d || host.endsWith(`.${d}`))) continue
       const where = locs.map((l) => `${l.file}:${l.line}`).join(", ")
       const short = url.length > 60 ? url.slice(0, 57) + "…" : url
       it(`${short}  (${where})`, async () => {
