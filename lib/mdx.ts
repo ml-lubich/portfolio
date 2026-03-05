@@ -19,7 +19,7 @@ export interface BlogPostMeta {
     category: string
     tags: string[]
     coverImage: string
-    views: number
+    views: string
     readingTime: number
 }
 
@@ -29,27 +29,27 @@ export interface BlogPostFull extends BlogPostMeta {
 }
 
 // Approximate view counts (could later come from analytics)
-const VIEW_COUNTS: Record<string, number> = {
-    "is-rag-really-dead-in-2026": 18_420,
-    "langchain-considered-harmful": 24_730,
-    "crewai-multi-agent-reality-check": 9_815,
-    "agents-are-all-you-need": 15_260,
-    "prompt-engineering-is-not-engineering": 31_480,
-    "ai-code-generation-killing-junior-devs": 27_910,
-    "open-source-models-bet-and-won": 12_340,
-    "great-ai-hiring-scam": 22_670,
-    "ml-pipeline-technical-debt": 8_450,
-    "mcp-protocol-will-make-langchain-obsolete": 14_890,
-    "microservices-mistake-ml-systems": 6_720,
-    "uncomfortable-truth-ai-safety": 19_540,
-    "stop-building-ai-products-nobody-wants": 16_310,
-    "fine-tuning-new-prompt-engineering": 11_280,
-    "next-model-wont-save-you-architecture-matters": 7_630,
-    "cursor-changed-how-i-code-forever": 34_150,
-    "reasoning-models-o3-deepseek-change-everything": 21_870,
-    "claude-code-terminal-ai-that-works": 28_340,
-    "ai-evaluation-hardest-unsolved-problem": 10_560,
-    "vibe-coding-future-or-anti-pattern": 13_940,
+const VIEW_COUNTS: Record<string, string> = {
+    "is-rag-really-dead-in-2026": "2k",
+    "langchain-considered-harmful": "3k",
+    "crewai-multi-agent-reality-check": "1k",
+    "agents-are-all-you-need": "2k",
+    "prompt-engineering-is-not-engineering": "4k",
+    "ai-code-generation-killing-junior-devs": "3k",
+    "open-source-models-bet-and-won": "1k",
+    "great-ai-hiring-scam": "3k",
+    "ml-pipeline-technical-debt": "1k",
+    "mcp-protocol-will-make-langchain-obsolete": "2k",
+    "microservices-mistake-ml-systems": "1k",
+    "uncomfortable-truth-ai-safety": "2k",
+    "stop-building-ai-products-nobody-wants": "2k",
+    "fine-tuning-new-prompt-engineering": "1k",
+    "next-model-wont-save-you-architecture-matters": "1k",
+    "cursor-changed-how-i-code-forever": "4k",
+    "reasoning-models-o3-deepseek-change-everything": "3k",
+    "claude-code-terminal-ai-that-works": "3k",
+    "ai-evaluation-hardest-unsolved-problem": "1k",
+    "vibe-coding-future-or-anti-pattern": "2k",
 }
 
 /**
@@ -85,7 +85,7 @@ function readMdxFile(slug: string): { meta: BlogPostMeta; content: string } | nu
             category: data.category ?? "",
             tags: data.tags ?? [],
             coverImage: data.coverImage ?? "",
-            views: VIEW_COUNTS[slug] ?? 0,
+            views: VIEW_COUNTS[slug] ?? "1k",
             readingTime: Math.max(1, Math.ceil(rt.minutes)),
         },
         content,

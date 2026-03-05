@@ -80,7 +80,7 @@ function BlogPageInner({ blogPosts }: { blogPosts: BlogPost[] }) {
         } else if (sortOrder === "oldest") {
             posts.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
         } else if (sortOrder === "popular") {
-            posts.sort((a, b) => b.views - a.views)
+            posts.sort((a, b) => parseInt(b.views) - parseInt(a.views))
         }
 
         return posts
@@ -88,7 +88,10 @@ function BlogPageInner({ blogPosts }: { blogPosts: BlogPost[] }) {
 
     const [featured, ...remainingPosts] = filtered
 
-    const totalViews = useMemo(() => blogPosts.reduce((sum, p) => sum + p.views, 0), [])
+    const totalViews = useMemo(() => {
+        const total = blogPosts.reduce((sum, p) => sum + parseInt(p.views), 0)
+        return `~${total}k`
+    }, [])
 
     const sortLabel = sortOrder === "newest" ? "Newest first" : sortOrder === "oldest" ? "Oldest first" : "Most popular"
     const SortIcon = sortOrder === "newest" ? ArrowDown : sortOrder === "oldest" ? ArrowUp : Eye
@@ -116,7 +119,7 @@ function BlogPageInner({ blogPosts }: { blogPosts: BlogPost[] }) {
                         </div>
                         <div className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.06] bg-white/[0.03] px-3 py-1.5 text-xs text-muted-foreground backdrop-blur-sm">
                             <Eye className="h-3 w-3" aria-hidden="true" />
-                            {totalViews.toLocaleString()} total views
+                            {totalViews} total views
                         </div>
                     </div>
                     <h1 className="mt-4 text-4xl font-bold tracking-tight text-foreground md:text-5xl lg:text-6xl">

@@ -188,6 +188,12 @@ export default function BlogLayout({
 }) {
   return (
     <div className="relative z-10 min-h-screen">
+      {/* Dark scrim — dims the fixed BackgroundOrbs so blog text stays crisp */}
+      <div
+        className="fixed inset-0 z-0 pointer-events-none"
+        aria-hidden="true"
+        style={{ background: "hsl(220 20% 4% / 0.92)" }}
+      />
       <BlogCollectionJsonLd />
       <Suspense fallback={null}>
         <BlogHeader />

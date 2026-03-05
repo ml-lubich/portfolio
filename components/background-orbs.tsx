@@ -50,14 +50,14 @@ export function BackgroundOrbs() {
               borderRadius: "50%",
               background: [
                 `radial-gradient(circle,`,
-                `rgba(${c1}, 1) 0%,`,
-                `rgba(${c1}, 0.85) 18%,`,
-                `rgba(${c2}, 0.65) 35%,`,
-                `rgba(${c2}, 0.38) 50%,`,
-                `rgba(${c2}, 0.15) 65%,`,
+                `rgba(${c1}, 0.65) 0%,`,
+                `rgba(${c1}, 0.50) 18%,`,
+                `rgba(${c2}, 0.35) 35%,`,
+                `rgba(${c2}, 0.18) 50%,`,
+                `rgba(${c2}, 0.06) 65%,`,
                 `rgba(${c2}, 0) 80%)`,
               ].join(" "),
-              filter: "blur(6vmax)",
+              filter: "blur(8vmax)",
               willChange: "filter",
               transform: "translate(-50%, -50%)",
               opacity: mounted ? 1 : 0,
@@ -68,7 +68,16 @@ export function BackgroundOrbs() {
         )
       })}
 
-      {/* No vignette — let the rainbow colors shine fully */}
+      {/* Light vignette to soften edges */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "radial-gradient(ellipse 85% 80% at 50% 45%, transparent 0%, rgba(8,10,18,0.08) 75%, rgba(8,10,18,0.30) 100%)",
+          zIndex: 1,
+        }}
+      />
     </div>
   )
 }

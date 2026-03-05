@@ -12,7 +12,7 @@ export interface BlogPost {
   tags: string[]
   coverImage: string
   content: string
-  views: number
+  views: string
 }
 
 export const BLOG_CATEGORIES = [
