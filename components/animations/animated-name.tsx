@@ -13,6 +13,8 @@ interface AnimatedNameProps {
   delay?: number
   /** Duration of the expansion (ms) */
   duration?: number
+  /** Apply a metallic shiny gradient effect */
+  metallic?: boolean
 }
 
 /**
@@ -31,6 +33,7 @@ export function AnimatedName({
   trigger = "mount",
   delay = 0,
   duration = 975,
+  metallic = false,
 }: AnimatedNameProps) {
   const containerRef = useRef<HTMLSpanElement>(null)
   // "hover" mode starts expanded (visible); "mount" mode starts collapsed
@@ -84,7 +87,7 @@ export function AnimatedName({
   return (
     <span
       ref={containerRef}
-      className={`animated-name-root ${className}`}
+      className={`animated-name-root${metallic ? ' animated-name-metallic' : ''} ${className}`}
       onMouseEnter={handleMouseEnter}
       aria-label={name}
       style={

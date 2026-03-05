@@ -89,7 +89,7 @@ export function ProfileIntro() {
                                         alt="Misha Lubich"
                                         width={256}
                                         height={384}
-                                        className="h-full w-full object-cover object-top brightness-[0.55] contrast-[1.1] saturate-[0.9] transition-all duration-500 group-hover:brightness-[0.6]"
+                                        className="h-full w-full object-cover object-top brightness-[0.82] contrast-[0.95] saturate-[1.05] transition-all duration-500 group-hover:brightness-[0.88] group-hover:saturate-[1.1]"
                                         priority={false}
                                     />
                                 </div>

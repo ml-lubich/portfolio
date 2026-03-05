@@ -35,7 +35,7 @@ export function RoleRotator() {
       style={{ animationDelay: "0.4s", opacity: 0, lineHeight: 1.1 }}
     >
       <span className="block text-balance text-4xl font-semibold sm:text-5xl md:text-6xl lg:text-7xl">
-        <AnimatedName name="Misha Lubich" trigger="mount" delay={800} duration={1400} />
+        <AnimatedName name="Misha Lubich" trigger="mount" delay={800} duration={1400} metallic />
       </span>
       <span className="relative mt-3 block h-[2.4rem] sm:h-[3rem] md:h-[3.6rem] lg:h-[4.5rem] overflow-hidden">
         {roles.map((role, i) => {
@@ -83,7 +83,7 @@ export function RoleRotator() {
 
 export function HeroSubtitle() {
   return (
-    <p className="mx-auto mt-14 max-w-3xl text-base leading-relaxed text-muted-foreground sm:text-lg md:text-xl">
+    <p className="mx-auto mt-14 max-w-3xl text-base leading-relaxed text-white/85 sm:text-lg md:text-xl">
       <AnimatedText variant="blur-slide" delay={1200} stagger={30} duration={650}>
         {"Senior Software Engineer specializing in "}
         <span className="font-semibold text-foreground">AI-driven, cloud-native applications</span>

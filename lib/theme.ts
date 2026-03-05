@@ -13,20 +13,28 @@
  * Keeping them here lets TS files build hsla()/hsl() strings easily. */
 
 export const hsl = {
-    primary: "217 91% 60%",
-    accent: "265 80% 65%",
+    primary: "0 0% 100%",
+    accent: "0 0% 85%",
     cyan: "180 70% 50%",
     magenta: "280 75% 60%",
     rose: "340 75% 55%",
     amber: "45 90% 55%",
     sky: "200 80% 55%",
     background: "220 20% 4%",
-    foreground: "210 20% 95%",
+    foreground: "0 0% 100%",
     card: "220 20% 6%",
-    border: "220 15% 9%",
-    muted: "215 15% 55%",
+    border: "220 15% 12%",
+    muted: "220 10% 70%",
     /** Slightly lighter border for overlays */
     borderLight: "220 15% 14%",
+    /* rainbow spectrum — smooth full-spectrum, desaturated */
+    rainbow1: "330 65% 58%",
+    rainbow2: "280 60% 55%",
+    rainbow3: "220 65% 52%",
+    rainbow4: "180 60% 48%",
+    rainbow5: "150 55% 48%",
+    rainbow6: "50 70% 52%",
+    rainbow7: "10 65% 55%",
 } as const
 
 /* ── HSL helpers (for inline styles that need hsl()/hsla() strings) ── */
@@ -42,27 +50,27 @@ export function toHsla(raw: string, alpha: number): string {
 /* ── Hex colors (for Three.js / WebGL / Canvas) ──────────────────── */
 
 export const hex = {
-    primary: "#3b82f6",
-    primaryLight: "#60a5fa",
-    primaryPale: "#93c5fd",
-    accent: "#8b5cf6",
-    accentLight: "#a78bfa",
-    accentPale: "#c4b5fd",
+    primary: "#ffffff",
+    primaryLight: "#f0f0f0",
+    primaryPale: "#d4d4d4",
+    accent: "#d4d4d4",
+    accentLight: "#e0e0e0",
+    accentPale: "#f0f0f0",
     cyan: "#06b6d4",
     cyanLight: "#22d3ee",
     background: "#0a0c14",
     /** brain wireframe base */
-    wireBase: "#3baaff",
+    wireBase: "#d0d0d8",
     /** brain wireframe glow / points */
-    wireGlow: "#6dcfff",
+    wireGlow: "#c0c0cc",
 } as const
 
 /* ── Three.js numeric hex colors ────────────────────────────────── */
 
 export const hexNum = {
-    wireBase: 0x3baaff,
-    wireGlow: 0x6dcfff,
-    neuralBlue: 0x2a6fbf,
+    wireBase: 0xd0d0d8,
+    wireGlow: 0xc0c0cc,
+    neuralBlue: 0xccccff,
     background: 0x080810,
 } as const
 
@@ -70,7 +78,7 @@ export const hexNum = {
 
 export const glsl = {
     /** Primary glow color used in brain/orb shaders */
-    glowColor: "vec3(0.2, 0.45, 0.9)",
+    glowColor: "vec3(0.95, 0.95, 1.0)",
 } as const
 
 /* ── Tailwind gradient class strings ─────────────────────────────
@@ -79,41 +87,29 @@ export const glsl = {
  * raw hsl() values in every data array. */
 
 export const gradients = {
-    /** Blue → Purple (primary → accent) */
-    primaryToAccent: "from-primary to-accent",
-    /** Purple → Cyan */
-    accentToCyan: `from-accent to-[hsl(${hsl.cyan})]`,
-    /** Cyan → Blue */
-    cyanToPrimary: `from-[hsl(${hsl.cyan})] to-primary`,
-    /** Blue → Magenta */
-    primaryToMagenta: `from-primary to-[hsl(${hsl.magenta})]`,
-    /** Magenta → Purple */
-    magentaToAccent: `from-[hsl(${hsl.magenta})] to-accent`,
-    /** Purple → Blue */
-    accentToPrimary: "from-accent to-primary",
-    /** Blue → Rose */
-    primaryToRose: `from-primary to-[hsl(${hsl.rose})]`,
-    /** Blue → Cyan */
-    primaryToCyan: `from-primary to-[hsl(${hsl.cyan})]`,
-    /** Three-stop: primary via accent to cyan */
-    primaryViaAccentToCyan: `from-primary via-accent to-[hsl(${hsl.cyan})]`,
-    /** Three-stop: accent via magenta to primary */
-    accentViaMagentaToPrimary: `from-accent via-[hsl(${hsl.magenta})] to-primary`,
-    /** Three-stop: cyan via primary to accent */
-    cyanViaPrimaryToAccent: `from-[hsl(${hsl.cyan})] via-primary to-accent`,
-    /** Three-stop: primary via sky to accent */
-    primaryViaSkyToAccent: `from-primary via-[hsl(${hsl.sky})] to-accent`,
+    primaryToAccent: "from-primary/80 to-primary/40",
+    accentToCyan: "from-primary/70 via-[hsl(200_65%_52%)] to-primary/40",
+    cyanToPrimary: "from-[hsl(195_60%_50%)] to-primary/60",
+    primaryToMagenta: "from-primary/70 via-[hsl(280_55%_55%)] to-primary/40",
+    magentaToAccent: "from-[hsl(300_50%_55%)] to-primary/50",
+    accentToPrimary: "from-primary/60 to-primary/80",
+    primaryToRose: "from-primary/70 via-[hsl(330_55%_55%)] to-primary/40",
+    primaryToCyan: "from-primary/70 via-[hsl(190_60%_48%)] to-primary/40",
+    primaryViaAccentToCyan: "from-primary/70 via-[hsl(210_55%_52%)] to-[hsl(190_55%_48%)]/50",
+    accentViaMagentaToPrimary: "from-primary/50 via-[hsl(275_50%_52%)] to-primary/70",
+    cyanViaPrimaryToAccent: "from-[hsl(190_55%_48%)]/50 via-primary/60 to-primary/40",
+    primaryViaSkyToAccent: "from-primary/70 via-[hsl(210_60%_55%)] to-primary/40",
 } as const
 
 /* ── Light (10% opacity) gradient variants for card overlays ──── */
 
 export const lightGradients = {
-  primaryToAccent: "from-primary/10 to-accent/10",
-  accentToCyan: `from-accent/10 to-[hsl(${hsl.cyan})]/10`,
-  cyanToPrimary: `from-[hsl(${hsl.cyan})]/10 to-primary/10`,
-  primaryToMagenta: `from-primary/10 to-[hsl(${hsl.magenta})]/10`,
-  magentaToAccent: `from-[hsl(${hsl.magenta})]/10 to-accent/10`,
-  accentToPrimary: "from-accent/10 to-primary/10",
+    primaryToAccent: "from-primary/8 to-primary/4",
+    accentToCyan: "from-primary/6 via-[hsl(200_65%_52%)]/8 to-primary/4",
+    cyanToPrimary: "from-[hsl(195_60%_50%)]/8 to-primary/6",
+    primaryToMagenta: "from-primary/6 via-[hsl(280_55%_55%)]/8 to-primary/4",
+    magentaToAccent: "from-[hsl(300_50%_55%)]/8 to-primary/5",
+    accentToPrimary: "from-primary/6 to-primary/8",
 } as const
 
 /* ── Ordered gradient/accent arrays ──────────────────────────────
@@ -143,8 +139,8 @@ export const accentCycle = [
 export const textColors = {
     primary: "text-primary",
     accent: "text-accent",
-    cyan: `text-[hsl(${hsl.cyan})]`,
-    magenta: `text-[hsl(${hsl.magenta})]`,
+    cyan: "text-[hsl(180_70%_50%)]",
+    magenta: "text-[hsl(280_75%_60%)]",
 } as const
 
 /* ── Terminal / syntax colors ────────────────────────────────────── */
@@ -206,17 +202,18 @@ export const shadows = {
 /* ── Profile-intro orb colors ────────────────────────────────────── */
 
 export const profileOrbs = {
-    topRight: `radial-gradient(circle, ${toHsla(hsl.primary, 0.25)}, transparent 70%)`,
-    bottomLeft: `radial-gradient(circle, ${toHsla(hsl.magenta, 0.2)}, transparent 70%)`,
-    photoRing: `radial-gradient(circle, ${toHsla(hsl.primary, 0.15)}, transparent 70%)`,
+    topRight: `radial-gradient(circle, ${toHsla(hsl.primary, 0.15)}, transparent 70%)`,
+    bottomLeft: `radial-gradient(circle, ${toHsla(hsl.primary, 0.1)}, transparent 70%)`,
+    photoRing: `radial-gradient(circle, ${toHsla(hsl.primary, 0.1)}, transparent 70%)`,
 } as const
 
 /* ── Terminal chrome colors ──────────────────────────────────────── */
 
 export const terminalChrome = {
-    bg: "hsl(220,20%,5%)",
-    headerBg: "hsl(220,20%,7%)",
-    footerBg: "hsl(220,20%,6%)",
+    bg: "hsla(220,18%,10%,0.82)",
+    headerBg: "hsla(220,18%,12%,0.88)",
+    footerBg: "hsla(220,18%,11%,0.85)",
+    revealBg: "hsla(220,18%,10%,0.78)",
     dotClose: "#ff5f57",
     dotMinimize: "#febc2e",
     dotExpand: "#28c840",
@@ -244,7 +241,7 @@ export const mermaidTheme = {
 /* ── Hero overlay ────────────────────────────────────────────────── */
 
 export const heroOverlay =
-    "radial-gradient(ellipse 60% 50% at 50% 45%, rgba(10,12,20,0.55) 0%, transparent 100%)"
+    "radial-gradient(ellipse 60% 50% at 50% 45%, rgba(10,12,20,0.35) 0%, transparent 100%)"
 
 /* ── Architecture diagram colors ─────────────────────────────────── */
 
@@ -256,8 +253,8 @@ export const archDiagram = {
 /* ── Blog background fades ───────────────────────────────────────── */
 
 export const blogBg = {
-    fade: `from-[hsl(${hsl.background})]`,
-    fadeSemi: `via-[hsl(${hsl.background}/0.6)]`,
+    fade: "from-[hsl(220_20%_4%)]",
+    fadeSemi: "via-[hsl(220_20%_4%/0.6)]",
 } as const
 
 /* ── Three.js preset shape colors ────────────────────────────────── */

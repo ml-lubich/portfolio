@@ -202,26 +202,26 @@ export function FloatingGeometry({
   return (
     <WebGLErrorBoundary>
       <div ref={wrapperRef} className={`pointer-events-none w-full h-full ${className}`}>
-          <Canvas
-            frameloop={visible ? "always" : "never"}
-            camera={{ position: [0, 0, 4.5], fov: 45 }}
-            dpr={[1, 1.5]}
-            gl={{
-              antialias: false,
-              alpha: true,
-              powerPreference: "high-performance",
-            }}
-            style={{ background: "transparent", visibility: visible ? "visible" : "hidden" }}
-            onCreated={({ gl }) => {
-              gl.setClearColor(0x000000, 0)
-              const canvas = gl.domElement
-              canvas.addEventListener('webglcontextlost', (e) => e.preventDefault(), false)
-            }}
-          >
-            <Suspense fallback={null}>
-              <Scene shapes={shapes} />
-            </Suspense>
-          </Canvas>
+        <Canvas
+          frameloop={visible ? "always" : "never"}
+          camera={{ position: [0, 0, 4.5], fov: 45 }}
+          dpr={[1, 1.5]}
+          gl={{
+            antialias: false,
+            alpha: true,
+            powerPreference: "high-performance",
+          }}
+          style={{ background: "transparent", visibility: visible ? "visible" : "hidden" }}
+          onCreated={({ gl }) => {
+            gl.setClearColor(0x000000, 0)
+            const canvas = gl.domElement
+            canvas.addEventListener('webglcontextlost', (e) => e.preventDefault(), false)
+          }}
+        >
+          <Suspense fallback={null}>
+            <Scene shapes={shapes} />
+          </Suspense>
+        </Canvas>
       </div>
     </WebGLErrorBoundary>
   )

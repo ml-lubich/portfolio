@@ -1,217 +1,31 @@
 "use client"
 
-import { useState, useEffect, useCallback, useRef } from "react"
-import { BookOpen, ExternalLink, X, ChevronRight, ArrowRight } from "lucide-react"
+import { useState, useCallback, useMemo } from "react"
+import { BookOpen, ExternalLink, ChevronRight, ArrowRight } from "lucide-react"
 import { AnimatedSection } from "../animations/animated-section"
 import { ScrollStackSection } from "../layout/scroll-stack-section"
+import { DetailPanel } from "../detail-panel"
+import type { DetailPanelData } from "../detail-panel/types"
 import { papers, gradients, accents } from "@/data/publications"
-import type { Paper } from "@/data/publications"
 
-/* ── Research Detail Panel (inline split-view — matches DetailPanel design) ── */
-
-function ResearchDetailPanel({
-  paper,
-  isOpen,
-  onClose,
-  gradient,
-  accent,
-}: {
-  paper: Paper | null
-  isOpen: boolean
-  onClose: () => void
-  gradient: string
-  accent: string
-}) {
-  const panelRef = useRef<HTMLDivElement>(null)
-  const [revealedSteps, setRevealedSteps] = useState(0)
-
-  // Close on Escape
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose()
-    }
-    if (isOpen) {
-      document.addEventListener("keydown", handler)
-    }
-    return () => {
-      document.removeEventListener("keydown", handler)
-    }
-  }, [isOpen, onClose])
-
-  // Scroll panel back to top + reset reveal when data changes
-  useEffect(() => {
-    if (panelRef.current && paper) {
-      panelRef.current.scrollTop = 0
-    }
-    setRevealedSteps(0)
-  }, [paper])
-
-  // Step-by-step reveal animation
-  useEffect(() => {
-    if (!paper || !isOpen) return
-    const total = paper.insights.length
-    if (revealedSteps >= total) return
-
-    const timer = setTimeout(() => {
-      setRevealedSteps((s) => s + 1)
-    }, revealedSteps === 0 ? 400 : 300)
-
-    return () => clearTimeout(timer)
-  }, [paper, isOpen, revealedSteps])
-
-  if (!paper) return null
-
-  return (
-    <div
-      ref={panelRef}
-      className="relative w-full rounded-2xl border border-border/30 bg-background/95 backdrop-blur-2xl"
-      role="dialog"
-      aria-modal="true"
-      aria-label={paper.title}
-    >
-      {/* Gradient accent line */}
-      <div className={`absolute left-0 top-0 h-full w-[2px] bg-gradient-to-b ${gradient}`} />
-
-      {/* Ambient glow */}
-      <div
-        className="pointer-events-none absolute -left-20 top-1/4 h-80 w-80 rounded-full opacity-10 blur-[100px]"
-        style={{ background: accent }}
-      />
-      <div
-        className="pointer-events-none absolute -right-20 bottom-1/4 h-60 w-60 rounded-full opacity-8 blur-[80px]"
-        style={{ background: accent }}
-      />
-
-      {/* Subtle grid pattern */}
-      <div className="pointer-events-none absolute inset-0 circuit-grid opacity-30" />
-
-      <div className="relative px-8 py-10 sm:px-10">
-        {/* Close button */}
-        <button
-          onClick={onClose}
-          className="group absolute right-6 top-6 flex h-10 w-10 items-center justify-center rounded-xl border border-border/50 bg-secondary/40 backdrop-blur-sm transition-all duration-300 hover:border-primary/40 hover:bg-secondary/80 hover:scale-105"
-          aria-label="Close panel"
-        >
-          <X className="h-4 w-4 text-muted-foreground transition-colors group-hover:text-primary" />
-        </button>
-
-        {/* Header */}
-        <div className="panel-stagger pr-12">
-          <div className="flex flex-wrap items-center gap-2 mb-3">
-            <span className={`inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-secondary/40 px-3 py-1 text-[11px] font-semibold backdrop-blur-sm ${paper.type === "Journal Article" ? "text-primary" : "text-accent"}`}>
-              <BookOpen className="h-3 w-3" />
-              {paper.type}
-            </span>
-            <span className="inline-block rounded-full border border-border/60 bg-secondary/40 px-3 py-1 font-mono text-[11px] text-muted-foreground backdrop-blur-sm">
-              {paper.year}
-            </span>
-          </div>
-          <h2 className="mt-4 font-display text-2xl font-medium tracking-tight text-foreground sm:text-3xl">
-            {paper.title}
-          </h2>
-          <p className="mt-1 text-sm font-semibold uppercase tracking-wider text-primary">
-            {paper.venue}
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">{paper.detail}</p>
-        </div>
-
-        {/* Divider */}
-        <div className={`my-8 h-px bg-gradient-to-r ${gradient} opacity-20`} />
-
-        {/* Summary */}
-        <div className="panel-stagger" style={{ animationDelay: "100ms" }}>
-          <p className="text-sm leading-relaxed text-muted-foreground">{paper.summary}</p>
-        </div>
-
-        {/* Step-by-step research insights */}
-        <div className="panel-stagger mt-10" style={{ animationDelay: "200ms" }}>
-          <h3 className="mb-5 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-            Research Breakdown
-          </h3>
-
-          <div className="relative pl-8">
-            {/* Connecting line */}
-            <div
-              className="absolute left-[13px] top-2 w-[2px] bg-gradient-to-b from-primary via-accent to-primary/20 transition-all duration-700 ease-out"
-              style={{
-                height: revealedSteps > 0
-                  ? `calc(${Math.min(revealedSteps, paper.insights.length) / paper.insights.length * 100}% - 8px)`
-                  : "0%",
-              }}
-            />
-
-            {paper.insights.map((step, i) => {
-              const isRevealed = i < revealedSteps
-              const Icon = step.icon
-              return (
-                <div
-                  key={step.label}
-                  className={`relative pb-5 last:pb-0 ${isRevealed ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"}`}
-                  style={{
-                    transitionProperty: "all",
-                    transitionDuration: "500ms",
-                    transitionTimingFunction: "ease-out",
-                    transitionDelay: `${i * 100}ms`,
-                  }}
-                >
-                  {/* Node dot */}
-                  <div
-                    className={`absolute -left-8 top-0.5 flex h-7 w-7 items-center justify-center rounded-full border-2 transition-all duration-500 ${isRevealed ? "border-primary bg-primary/10 scale-100" : "border-border bg-card scale-75"}`}
-                  >
-                    <Icon className={`h-3.5 w-3.5 transition-colors duration-300 ${isRevealed ? "text-primary" : "text-muted-foreground/50"}`} />
-                  </div>
-
-                  {/* Step content */}
-                  <div className="rounded-xl border border-border/60 bg-card p-4 shadow-sm transition-all duration-300 hover:border-primary/20 hover:shadow-md">
-                    <span
-                      className="mb-1.5 inline-block font-mono text-[10px] font-bold uppercase tracking-widest"
-                      style={{ color: accent }}
-                    >
-                      {step.label}
-                    </span>
-                    <p className="text-sm leading-relaxed text-muted-foreground">
-                      {step.text}
-                    </p>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-
-        {/* Tags */}
-        <div className="panel-stagger mt-10" style={{ animationDelay: "400ms" }}>
-          <h3 className="mb-4 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-            Research Topics
-          </h3>
-          <div className="flex flex-wrap gap-2">
-            {paper.tags.map((tag, i) => (
-              <span
-                key={tag}
-                className="rounded-lg border border-border/50 bg-secondary/30 px-3 py-1.5 font-mono text-xs text-muted-foreground backdrop-blur-sm transition-all duration-300 hover:border-primary/30 hover:bg-secondary/60 hover:text-foreground"
-                style={{ animationDelay: `${i * 30}ms` }}
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-        </div>
-
-        {/* View on Google Scholar CTA */}
-        <div className="panel-stagger mt-10" style={{ animationDelay: "500ms" }}>
-          <a
-            href={paper.href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r ${gradient} px-5 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl`}
-          >
-            View on Google Scholar
-            <ExternalLink className="h-4 w-4" />
-          </a>
-        </div>
-      </div>
-    </div>
-  )
+/** Convert a Paper + its gradient/accent into DetailPanelData so the
+ *  same DetailPanel component used by the career section can render it. */
+function paperToDetailData(
+  paper: typeof papers[number],
+  gradient: string,
+  accent: string,
+): DetailPanelData {
+  return {
+    title: paper.title,
+    subtitle: paper.venue,
+    period: `${paper.type} · ${paper.year}`,
+    location: paper.detail,
+    description: paper.summary,
+    highlights: paper.insights.map((s) => `${s.label}: ${s.text}`),
+    techStack: paper.tags,
+    gradient,
+    accent,
+  }
 }
 
 /* ── Main Publications Component ─────────────────────────────────────── */
@@ -230,6 +44,11 @@ export function Publications() {
   const selectedIndex = selected ? papers.indexOf(selected) : 0
   const selectedGradient = gradients[selectedIndex % gradients.length]
   const selectedAccent = accents[selectedIndex % accents.length]
+
+  const detailData = useMemo<DetailPanelData | null>(
+    () => selected ? paperToDetailData(selected, selectedGradient, selectedAccent) : null,
+    [selected, selectedGradient, selectedAccent],
+  )
 
   return (
     <ScrollStackSection
@@ -251,12 +70,10 @@ export function Publications() {
       activeCardId={selectedId}
       onScrollDismiss={handleClose}
       detailContent={
-        <ResearchDetailPanel
-          paper={selected}
+        <DetailPanel
+          data={detailData}
           isOpen={isOpen}
           onClose={handleClose}
-          gradient={selectedGradient}
-          accent={selectedAccent}
         />
       }
       cards={papers.map((paper, i) => {
@@ -344,8 +161,9 @@ export function Publications() {
                   </div>
 
                   {/* Explore CTA */}
-                  <div className="hidden shrink-0 items-center gap-1.5 self-start rounded-lg border border-border/50 bg-secondary px-3.5 py-2 text-xs font-medium text-muted-foreground/70 opacity-0 transition-all duration-300 group-hover:opacity-100 group-hover:text-primary sm:flex">
-                    <span>Explore</span>
+                  <div className="hidden shrink-0 items-center gap-1.5 self-start rounded-lg border border-border/50 bg-secondary px-3.5 py-2 text-xs font-medium text-muted-foreground/70 transition-all duration-300 group-hover:text-primary sm:flex">
+                    <span className="group-hover:hidden">Explore</span>
+                    <span className="hidden group-hover:inline">Click to Explore</span>
                     <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
                   </div>
                 </div>

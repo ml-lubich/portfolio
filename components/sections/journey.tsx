@@ -49,8 +49,8 @@ export function Journey() {
           <button
             onClick={() => handleSelect(exp.id)}
             className={`glass-stack-card group relative w-full overflow-hidden rounded-2xl border text-left transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${selectedId === exp.id
-              ? "border-primary/40 bg-card shadow-[0_0_40px_-8px] shadow-primary/20"
-              : "border-border/40 bg-card hover:border-primary/30"
+              ? "border-primary/40 shadow-[0_0_40px_-8px] shadow-primary/20"
+              : "border-white/[0.08] hover:border-primary/30"
               }`}
           >
             {/* Top gradient accent strip */}
@@ -82,9 +82,9 @@ export function Journey() {
 
                 {/* Gradient icon badge */}
                 <div
-                  className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br ${exp.gradient} shadow-lg shadow-black/25 ring-1 ring-white/10 transition-transform duration-500 group-hover:scale-110 group-hover:shadow-xl`}
+                  className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary shadow-lg shadow-black/25 ring-1 ring-white/10 transition-transform duration-500 group-hover:scale-110 group-hover:shadow-xl`}
                 >
-                  <Briefcase className="h-5 w-5 text-white" />
+                  <Briefcase className="h-5 w-5 text-primary-foreground" />
                 </div>
 
                 <div className="min-w-0 flex-1">
@@ -106,8 +106,9 @@ export function Journey() {
                 </div>
 
                 {/* Explore CTA */}
-                <div className="hidden shrink-0 items-center gap-1.5 self-start rounded-lg border border-border/50 bg-secondary px-3.5 py-2 text-xs font-medium text-muted-foreground/70 opacity-0 transition-all duration-300 group-hover:opacity-100 group-hover:text-primary sm:flex">
-                  <span>Explore</span>
+                <div className="hidden shrink-0 items-center gap-1.5 self-start rounded-lg border border-border/50 bg-secondary px-3.5 py-2 text-xs font-medium text-muted-foreground/70 transition-all duration-300 group-hover:text-primary sm:flex">
+                  <span className="group-hover:hidden">Explore</span>
+                  <span className="hidden group-hover:inline">Click to Explore</span>
                   <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
                 </div>
               </div>

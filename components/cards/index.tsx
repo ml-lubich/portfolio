@@ -107,7 +107,7 @@ export function ScrollStackCards({
       const translateZ = coverProgress * -60
       const rotateX = coverProgress * 2
       const brightness = 1 - coverProgress * 0.2
-      const borderRadius = 16 + coverProgress * 16
+      const borderRadius = 20 + coverProgress * 12
       const slideUp = (1 - enterProgress) * 110
       const enterOpacity = Math.min(enterProgress * 2.5, 1)
       const stackedOpacity = 1 - coverProgress * 0.3
@@ -486,7 +486,7 @@ export function ScrollStackCards({
                   marginTop: `${i * stackOffset}px`,
                   transformOrigin: "center top",
                   transformStyle: "preserve-3d",
-                  borderRadius: "16px",
+                  borderRadius: "20px",
                   overflow: "hidden",
                   cursor: isExpanded ? "pointer" : "grab",
                   zIndex: i + 1,
@@ -513,10 +513,11 @@ export function ScrollStackCards({
           {/* Detail panel — expands to the right of the card stack */}
           {detailContent && (
             <div
+              className="detail-panel-scroll"
               style={{
                 width: isExpanded ? "54%" : "0",
                 flexShrink: 0,
-                maxHeight: `calc(100vh - ${stickyTop + 80}px)`,
+                maxHeight: `calc(100vh - ${stickyTop + 40}px)`,
                 overflowY: isExpanded ? "auto" : "hidden",
                 overflowX: "hidden",
                 overscrollBehavior: "contain",

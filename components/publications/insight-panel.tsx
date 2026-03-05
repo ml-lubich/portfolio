@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback, useRef } from "react"
+import { createPortal } from "react-dom"
 import { BookOpen, ExternalLink, X, Brain } from "lucide-react"
 import type { Paper } from "./data"
 import { papers, gradients, accents } from "./data"
@@ -14,7 +15,11 @@ export function InsightPanel({
 }) {
   const [visible, setVisible] = useState(false)
   const [revealedSteps, setRevealedSteps] = useState(0)
+  const [mounted, setMounted] = useState(false)
   const panelRef = useRef<HTMLDivElement>(null)
+
+  // Only portal after hydration
+  useEffect(() => { setMounted(true) }, [])
 
   // Slide in on mount
   useEffect(() => {
@@ -70,16 +75,16 @@ export function InsightPanel({
     setTimeout(onClose, 350)
   }, [onClose])
 
-  if (!paper) return null
+  if (!paper || !mounted) return null
 
   const gradient = gradients[papers.indexOf(paper)] ?? gradients[0]
   const accent = accents[papers.indexOf(paper)] ?? accents[0]
 
-  return (
+  return createPortal(
     <>
       {/* Backdrop */}
       <div
-        className={`fixed inset-0 z-50 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${visible ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+        className={`fixed inset-0 z-[9998] bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${visible ? "opacity-100" : "opacity-0 pointer-events-none"}`}
         onClick={handleClose}
         aria-hidden="true"
       />
@@ -90,10 +95,11 @@ export function InsightPanel({
         role="dialog"
         aria-modal="true"
         aria-label={`Research insights: ${paper.title}`}
-        className={`fixed right-0 top-0 z-50 flex h-full w-full max-w-lg flex-col overflow-y-auto border-l border-border bg-card/95 backdrop-blur-xl shadow-2xl transition-[transform,visibility] duration-350 ease-out ${visible ? "translate-x-0 visible" : "translate-x-full invisible"}`}
+        className={`fixed inset-y-3 right-3 z-[9999] flex w-full max-w-lg flex-col rounded-[18px] border border-white/[0.12] bg-card/80 backdrop-blur-3xl shadow-2xl shadow-black/30 ring-1 ring-inset ring-white/[0.06] transition-[transform,visibility] duration-350 ease-out ${visible ? "translate-x-0 visible" : "translate-x-[calc(100%+12px)] invisible"}`}
+        style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.06), -20px 0 60px -15px rgba(0,0,0,0.3)' }}
       >
         {/* Header */}
-        <div className="sticky top-0 z-10 border-b border-border bg-card/90 backdrop-blur-md p-5">
+        <div className="shrink-0 z-10 border-b border-white/[0.08] bg-card/80 backdrop-blur-2xl p-5 rounded-t-[18px]">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2 mb-2">
@@ -118,7 +124,7 @@ export function InsightPanel({
             </div>
             <button
               onClick={handleClose}
-              className="shrink-0 rounded-lg border border-border bg-secondary/50 p-2 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              className="shrink-0 rounded-[14px] border border-white/[0.10] bg-white/[0.05] p-2 text-muted-foreground backdrop-blur-xl transition-all duration-200 hover:bg-white/[0.10] hover:text-foreground shadow-sm shadow-black/10"
               aria-label="Close panel"
             >
               <X className="h-4 w-4" />
@@ -127,10 +133,10 @@ export function InsightPanel({
         </div>
 
         {/* Content */}
-        <div className="flex-1 p-5 space-y-6">
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-5 pb-10 space-y-6">
           {/* Summary */}
           <div
-            className={`rounded-xl border border-border/60 bg-secondary/30 p-4 transition-all duration-500 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+            className={`rounded-[18px] border border-white/[0.10] bg-white/[0.04] p-4 backdrop-blur-md shadow-sm shadow-black/5 transition-all duration-500 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
           >
             <p className="text-sm leading-relaxed text-muted-foreground">{paper.summary}</p>
           </div>
@@ -172,12 +178,12 @@ export function InsightPanel({
                     }}
                   >
                     <div
-                      className={`absolute -left-8 top-0.5 flex h-7 w-7 items-center justify-center rounded-full border-2 transition-all duration-500 ${isRevealed ? "border-primary bg-primary/10 scale-100" : "border-border bg-card scale-75"}`}
+                      className={`absolute -left-8 top-0.5 flex h-7 w-7 items-center justify-center rounded-[10px] border-2 transition-all duration-500 ${isRevealed ? "border-primary bg-primary/10 scale-100" : "border-border bg-card scale-75"}`}
                     >
                       <Icon className={`h-3.5 w-3.5 transition-colors duration-300 ${isRevealed ? "text-primary" : "text-muted-foreground/50"}`} />
                     </div>
 
-                    <div className="rounded-xl border border-border/60 bg-card p-4 shadow-sm transition-all duration-300 hover:border-primary/20 hover:shadow-md">
+                    <div className="rounded-[16px] border border-white/[0.08] bg-white/[0.04] p-4 backdrop-blur-md shadow-sm shadow-black/5 transition-all duration-200 hover:border-white/[0.14] hover:shadow-md">
                       <span
                         className="mb-1.5 inline-block font-mono text-[10px] font-bold uppercase tracking-widest"
                         style={{ color: accent }}
@@ -199,7 +205,7 @@ export function InsightPanel({
             {paper.tags.map((tag) => (
               <span
                 key={tag}
-                className="rounded-full border border-border/60 bg-secondary/40 px-3 py-1 font-mono text-xs text-muted-foreground"
+                className="rounded-[12px] border border-white/[0.08] bg-white/[0.04] px-3 py-1 font-mono text-xs text-muted-foreground backdrop-blur-md shadow-sm shadow-black/5"
               >
                 {tag}
               </span>
@@ -211,13 +217,14 @@ export function InsightPanel({
             href={paper.href}
             target="_blank"
             rel="noopener noreferrer"
-            className={`flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r ${gradient} px-5 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl`}
+            className={`flex items-center justify-center gap-2 rounded-[16px] bg-gradient-to-r ${gradient} px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-black/20 transition-all duration-200 hover:scale-[1.02] hover:shadow-xl`}
           >
             View on Google Scholar
             <ExternalLink className="h-4 w-4" />
           </a>
         </div>
       </div>
-    </>
+    </>,
+    document.body
   )
 }

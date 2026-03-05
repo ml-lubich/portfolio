@@ -2,11 +2,96 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo } from "react"
 import { Menu, X, ChevronUp } from "lucide-react"
-import { AnimatedName } from "../animations/animated-name"
 import { navLinks } from "./nav-links"
 import { wooshScrollTo, navigateTo } from "./woosh-scroll"
-import { useActiveSection, useScrollProgress } from "./use-nav-hooks"
+import { useActiveSection } from "./use-nav-hooks"
 import { ExpandingText } from "./expanding-text"
+
+/* ── Isolated scroll-driven micro-components ─────────────────────────
+   Each manages its own scroll listener and state, so the parent
+   Navigation never re-renders due to scroll position changes.
+   ──────────────────────────────────────────────────────────────────── */
+
+/** Progress bar — updates DOM directly via ref, never triggers React re-render. */
+function ScrollProgressBar() {
+  const barRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    let rafId: number
+    function update() {
+      const docH = document.documentElement.scrollHeight - window.innerHeight
+      const progress = docH > 0 ? Math.min(window.scrollY / docH, 1) : 0
+      if (barRef.current) barRef.current.style.width = `${progress * 100}%`
+    }
+    function onScroll() {
+      cancelAnimationFrame(rafId)
+      rafId = requestAnimationFrame(update)
+    }
+    window.addEventListener("scroll", onScroll, { passive: true })
+    update()
+    return () => {
+      window.removeEventListener("scroll", onScroll)
+      cancelAnimationFrame(rafId)
+    }
+  }, [])
+
+  return (
+    <div className="fixed top-0 left-0 right-0 z-[60] h-[2px]">
+      <div
+        ref={barRef}
+        className="h-full"
+        style={{ width: "0%", background: "linear-gradient(90deg, hsl(330 70% 60%), hsl(280 65% 58%), hsl(220 70% 55%), hsl(180 65% 48%), hsl(140 60% 48%), hsl(50 75% 55%), hsl(330 70% 60%))" }}
+      />
+    </div>
+  )
+}
+
+/** Back-to-top FAB — only re-renders when visibility toggles (not every scroll frame). */
+function BackToTopButton() {
+  const [visible, setVisible] = useState(false)
+  const wasVisible = useRef(false)
+
+  useEffect(() => {
+    let rafId: number
+    function update() {
+      const docH = document.documentElement.scrollHeight - window.innerHeight
+      const progress = docH > 0 ? Math.min(window.scrollY / docH, 1) : 0
+      const show = progress > 0.1
+      if (show !== wasVisible.current) {
+        wasVisible.current = show
+        setVisible(show)
+      }
+    }
+    function onScroll() {
+      cancelAnimationFrame(rafId)
+      rafId = requestAnimationFrame(update)
+    }
+    window.addEventListener("scroll", onScroll, { passive: true })
+    update()
+    return () => {
+      window.removeEventListener("scroll", onScroll)
+      cancelAnimationFrame(rafId)
+    }
+  }, [])
+
+  return (
+    <button
+      type="button"
+      onClick={() => wooshScrollTo(0)}
+      aria-label="Back to top"
+      className={[
+        "fixed bottom-6 right-6 z-50 flex h-10 w-10 items-center justify-center rounded-full",
+        "nav-glass border border-white/[0.04] text-muted-foreground hover:text-foreground",
+        "transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
+        visible
+          ? "translate-y-0 opacity-100 scale-100"
+          : "translate-y-4 opacity-0 scale-90 pointer-events-none",
+      ].join(" ")}
+    >
+      <ChevronUp className="h-4 w-4" />
+    </button>
+  )
+}
 
 /* ══════════════════════════════════════════════════════════════════
    Navigation Component
@@ -25,7 +110,6 @@ export function Navigation() {
     [],
   )
   const activeSection = useActiveSection(sectionIds)
-  const scrollProgress = useScrollProgress()
 
   /* Hide navbar on scroll-down, reveal on scroll-up */
   useEffect(() => {
@@ -75,13 +159,7 @@ export function Navigation() {
 
   return (
     <>
-      {/* Progress bar */}
-      <div className="fixed top-0 left-0 right-0 z-[60] h-[2px]">
-        <div
-          className="h-full bg-gradient-to-r from-primary via-accent to-primary transition-[width] duration-150 ease-out"
-          style={{ width: `${scrollProgress * 100}%` }}
-        />
-      </div>
+      <ScrollProgressBar />
 
       {/* Main nav bar */}
       <nav
@@ -91,7 +169,7 @@ export function Navigation() {
           "fixed top-0 left-0 right-0 z-50",
           "transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
           hideNav ? "-translate-y-full opacity-0" : "translate-y-0 opacity-100",
-          scrolled ? "nav-glass py-2.5" : "bg-transparent py-5",
+          scrolled ? "bg-transparent py-2.5" : "bg-transparent py-5",
         ].join(" ")}
       >
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6">
@@ -101,13 +179,10 @@ export function Navigation() {
             onClick={(e) => handleLinkClick(e, "#")}
             className="group flex items-center gap-2"
           >
-            <div className="relative flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent overflow-hidden">
-              <span className="text-sm font-bold text-primary-foreground relative z-10">ML</span>
+            <div className="relative flex h-14 w-14 items-center justify-center rounded-[12px] overflow-hidden">
+              <img src="/logo.png" alt="ML" className="h-full w-full object-cover" />
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
             </div>
-            <span className="text-sm font-semibold text-foreground transition-colors group-hover:text-primary">
-              <AnimatedName name="Misha Lubich" trigger="hover" duration={500} />
-            </span>
           </a>
 
           {/* Desktop links */}
@@ -144,7 +219,7 @@ export function Navigation() {
               href="#contact"
               onClick={(e) => handleLinkClick(e, "#contact")}
               aria-label="Get In Touch"
-              className="group/link ml-3 rounded-full bg-gradient-to-r from-primary to-accent px-4 py-1.5 text-[13px] font-medium text-primary-foreground transition-all duration-300 hover:shadow-lg hover:shadow-primary/25 hover:scale-[1.03] active:scale-[0.97]"
+              className="group/link ml-3 rounded-full bg-primary px-4 py-1.5 text-[13px] font-medium text-primary-foreground transition-all duration-300 hover:shadow-lg hover:shadow-primary/25 hover:scale-[1.03] active:scale-[0.97]"
             >
               <ExpandingText text="Get In Touch" />
             </a>
@@ -199,7 +274,7 @@ export function Navigation() {
               <a
                 href="#contact"
                 onClick={(e) => handleLinkClick(e, "#contact")}
-                className="mt-2 rounded-xl bg-gradient-to-r from-primary to-accent px-4 py-3 text-center text-sm font-medium text-primary-foreground"
+                className="mt-2 rounded-xl bg-primary px-4 py-3 text-center text-sm font-medium text-primary-foreground"
               >
                 Get In Touch
               </a>
@@ -208,22 +283,7 @@ export function Navigation() {
         </div>
       </nav>
 
-      {/* Back to top FAB */}
-      <button
-        type="button"
-        onClick={() => wooshScrollTo(0)}
-        aria-label="Back to top"
-        className={[
-          "fixed bottom-6 right-6 z-50 flex h-10 w-10 items-center justify-center rounded-full",
-          "nav-glass border border-white/[0.04] text-muted-foreground hover:text-foreground",
-          "transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
-          scrollProgress > 0.1
-            ? "translate-y-0 opacity-100 scale-100"
-            : "translate-y-4 opacity-0 scale-90 pointer-events-none",
-        ].join(" ")}
-      >
-        <ChevronUp className="h-4 w-4" />
-      </button>
+      <BackToTopButton />
     </>
   )
 }

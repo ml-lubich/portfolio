@@ -44,10 +44,10 @@ function UsageCard({ item, onNavigate }: { item: SkillUsageItem; onNavigate: () 
         return (
             <button
                 onClick={onNavigate}
-                className="group relative w-full overflow-hidden rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 text-left backdrop-blur-sm transition-all duration-300 hover:border-primary/30 hover:bg-white/[0.05] hover:shadow-lg hover:shadow-primary/5"
+                className="group relative w-full overflow-hidden rounded-[16px] border border-white/[0.06] bg-white/[0.02] p-4 text-left backdrop-blur-sm transition-all duration-200 hover:border-primary/30 hover:bg-white/[0.05] hover:shadow-lg hover:shadow-primary/5"
             >
                 {/* Gradient accent strip */}
-                <div className={`absolute inset-y-0 left-0 w-1 bg-gradient-to-b ${item.gradient} opacity-60 transition-opacity group-hover:opacity-100`} />
+                <div className={`absolute inset-y-0 left-0 w-1 rounded-l-[16px] bg-gradient-to-b ${item.gradient} opacity-60 transition-opacity group-hover:opacity-100`} />
 
                 <div className="pl-3">
                     <div className="flex items-center gap-2 mb-1">
@@ -73,9 +73,9 @@ function UsageCard({ item, onNavigate }: { item: SkillUsageItem; onNavigate: () 
         return (
             <button
                 onClick={onNavigate}
-                className="group relative w-full overflow-hidden rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 text-left backdrop-blur-sm transition-all duration-300 hover:border-accent/30 hover:bg-white/[0.05] hover:shadow-lg hover:shadow-accent/5"
+                className="group relative w-full overflow-hidden rounded-[16px] border border-white/[0.06] bg-white/[0.02] p-4 text-left backdrop-blur-sm transition-all duration-200 hover:border-accent/30 hover:bg-white/[0.05] hover:shadow-lg hover:shadow-accent/5"
             >
-                <div className={`absolute inset-y-0 left-0 w-1 bg-gradient-to-b ${item.gradient} opacity-60 transition-opacity group-hover:opacity-100`} />
+                <div className={`absolute inset-y-0 left-0 w-1 rounded-l-[16px] bg-gradient-to-b ${item.gradient} opacity-60 transition-opacity group-hover:opacity-100`} />
 
                 <div className="pl-3">
                     <div className="flex items-center gap-2 mb-1">
@@ -102,9 +102,9 @@ function UsageCard({ item, onNavigate }: { item: SkillUsageItem; onNavigate: () 
             href={item.href}
             target="_blank"
             rel="noopener noreferrer"
-            className="group relative block w-full overflow-hidden rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 text-left backdrop-blur-sm transition-all duration-300 hover:border-cyan-500/30 hover:bg-white/[0.05] hover:shadow-lg hover:shadow-cyan-500/5"
+            className="group relative block w-full overflow-hidden rounded-[16px] border border-white/[0.06] bg-white/[0.02] p-4 text-left backdrop-blur-sm transition-all duration-200 hover:border-cyan-500/30 hover:bg-white/[0.05] hover:shadow-lg hover:shadow-cyan-500/5"
         >
-            <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-cyan-500 to-primary opacity-60 transition-opacity group-hover:opacity-100" />
+            <div className="absolute inset-y-0 left-0 w-1 rounded-l-[16px] bg-gradient-to-b from-cyan-500 to-primary opacity-60 transition-opacity group-hover:opacity-100" />
 
             <div className="pl-3">
                 <div className="flex items-center gap-2 mb-1">
@@ -151,17 +151,13 @@ export function SkillDetailModal({ skill, open, onOpenChange }: SkillDetailModal
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-xl border-white/[0.08] bg-card/95 backdrop-blur-2xl sm:rounded-2xl overflow-hidden p-0">
+            <DialogContent className="max-w-xl border-white/[0.12] bg-card/80 backdrop-blur-3xl sm:rounded-[28px] overflow-hidden p-0 ring-1 ring-inset ring-white/[0.06]" style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.06), 0 25px 50px -12px rgba(0,0,0,0.25)' }}>
                 {/* ── Header with gradient background ─────────────────────── */}
                 <div className="relative overflow-hidden px-6 pt-6 pb-4">
-                    {/* Ambient glow */}
-                    <div className="pointer-events-none absolute -right-20 -top-20 h-40 w-40 rounded-full bg-primary/20 blur-3xl" />
-                    <div className="pointer-events-none absolute -left-10 -bottom-10 h-32 w-32 rounded-full bg-accent/15 blur-3xl" />
-
                     <DialogHeader className="relative">
                         <div className="flex items-center gap-3">
                             {/* Icon badge */}
-                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent text-white shadow-lg shadow-primary/25 ring-1 ring-white/10">
+                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px] bg-gradient-to-br from-primary to-accent text-white shadow-lg shadow-primary/25 ring-1 ring-white/10">
                                 <span className="text-lg">{icon}</span>
                             </div>
 
@@ -171,7 +167,7 @@ export function SkillDetailModal({ skill, open, onOpenChange }: SkillDetailModal
                                 </DialogTitle>
                                 <DialogDescription className="mt-0.5">
                                     {category && (
-                                        <span className="inline-flex items-center rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-[11px] font-medium text-primary">
+                                        <span className="inline-flex items-center rounded-[10px] border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-[11px] font-medium text-primary">
                                             {category}
                                         </span>
                                     )}
@@ -183,21 +179,21 @@ export function SkillDetailModal({ skill, open, onOpenChange }: SkillDetailModal
                     {/* Stats row */}
                     <div className="mt-4 flex gap-3">
                         {expCount > 0 && (
-                            <div className="flex items-center gap-1.5 rounded-lg border border-white/[0.06] bg-white/[0.03] px-3 py-1.5">
+                            <div className="flex items-center gap-1.5 rounded-[10px] border border-white/[0.06] bg-white/[0.03] px-3 py-1.5">
                                 <Briefcase className="h-3 w-3 text-primary/70" />
                                 <span className="text-xs font-medium text-foreground">{expCount}</span>
                                 <span className="text-[10px] text-muted-foreground/60">experience{expCount !== 1 ? "s" : ""}</span>
                             </div>
                         )}
                         {projCount > 0 && (
-                            <div className="flex items-center gap-1.5 rounded-lg border border-white/[0.06] bg-white/[0.03] px-3 py-1.5">
+                            <div className="flex items-center gap-1.5 rounded-[10px] border border-white/[0.06] bg-white/[0.03] px-3 py-1.5">
                                 <Sparkles className="h-3 w-3 text-accent/70" />
                                 <span className="text-xs font-medium text-foreground">{projCount}</span>
                                 <span className="text-[10px] text-muted-foreground/60">project{projCount !== 1 ? "s" : ""}</span>
                             </div>
                         )}
                         {pubCount > 0 && (
-                            <div className="flex items-center gap-1.5 rounded-lg border border-white/[0.06] bg-white/[0.03] px-3 py-1.5">
+                            <div className="flex items-center gap-1.5 rounded-[10px] border border-white/[0.06] bg-white/[0.03] px-3 py-1.5">
                                 <BookOpen className="h-3 w-3 text-cyan-400/70" />
                                 <span className="text-xs font-medium text-foreground">{pubCount}</span>
                                 <span className="text-[10px] text-muted-foreground/60">paper{pubCount !== 1 ? "s" : ""}</span>

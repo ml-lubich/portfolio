@@ -50,8 +50,8 @@ export function Projects() {
           <button
             onClick={() => handleSelect(project.id)}
             className={`glass-stack-card group relative w-full overflow-hidden rounded-2xl border text-left transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${selectedId === project.id
-              ? "border-primary/40 bg-card shadow-[0_0_40px_-8px] shadow-primary/20"
-              : "border-border/40 bg-card hover:border-primary/30"
+              ? "border-primary/40 shadow-[0_0_40px_-8px] shadow-primary/20"
+              : "border-white/[0.08] hover:border-primary/30"
               }`}
           >
             {/* Top gradient accent strip */}
@@ -92,8 +92,9 @@ export function Projects() {
                 </div>
 
                 {/* Explore CTA */}
-                <div className="hidden shrink-0 items-center gap-1.5 self-start rounded-lg border border-border/50 bg-secondary px-3.5 py-2 text-xs font-medium text-muted-foreground/70 opacity-0 transition-all duration-300 group-hover:opacity-100 group-hover:text-primary sm:flex">
-                  <span>Explore</span>
+                <div className="hidden shrink-0 items-center gap-1.5 self-start rounded-lg border border-border/50 bg-secondary px-3.5 py-2 text-xs font-medium text-muted-foreground/70 transition-all duration-300 group-hover:text-primary sm:flex">
+                  <span className="group-hover:hidden">Explore</span>
+                  <span className="hidden group-hover:inline">Click to Explore</span>
                   <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
                 </div>
               </div>

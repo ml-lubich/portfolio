@@ -1,15 +1,17 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 
 /* ── Active section tracker (IntersectionObserver) ────────────────── */
 
 export function useActiveSection(sectionIds: string[]) {
   const [activeId, setActiveId] = useState("")
+  const currentId = useRef("")
 
   useEffect(() => {
     const visibleRatios = new Map<string, number>()
     const observerMap = new Map<string, IntersectionObserver>()
+    let mutationRef: MutationObserver | null = null
 
     function updateBest() {
       let best = ""
@@ -20,7 +22,11 @@ export function useActiveSection(sectionIds: string[]) {
           best = sId
         }
       })
-      if (best) setActiveId(best)
+      // Only trigger re-render when the active section actually changes
+      if (best && best !== currentId.current) {
+        currentId.current = best
+        setActiveId(best)
+      }
     }
 
     function observeSection(id: string) {
@@ -33,7 +39,8 @@ export function useActiveSection(sectionIds: string[]) {
           visibleRatios.set(id, entry.intersectionRatio)
           updateBest()
         },
-        { threshold: [0, 0.1, 0.2, 0.3, 0.5, 0.7, 1] },
+        // Fewer thresholds = fewer callbacks, still accurate for section tracking
+        { threshold: [0, 0.25, 0.5, 1] },
       )
       observer.observe(el)
       observerMap.set(id, observer)
@@ -42,13 +49,18 @@ export function useActiveSection(sectionIds: string[]) {
     sectionIds.forEach(observeSection)
 
     // Watch for lazily-rendered sections appearing in the DOM
-    const mutation = new MutationObserver(() => {
+    mutationRef = new MutationObserver(() => {
       sectionIds.forEach(observeSection)
+      // Disconnect once all sections are observed — no more DOM watching needed
+      if (observerMap.size >= sectionIds.length) {
+        mutationRef?.disconnect()
+        mutationRef = null
+      }
     })
-    mutation.observe(document.body, { childList: true, subtree: true })
+    mutationRef.observe(document.body, { childList: true, subtree: true })
 
     return () => {
-      mutation.disconnect()
+      mutationRef?.disconnect()
       observerMap.forEach((o) => o.disconnect())
     }
   }, [sectionIds])

@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic"
 import { AnimatedSection } from "../animations/animated-section"
 import { AnimatedCounter } from "../animations/animated-counter"
-import { AnimatedBars } from "../animations/animated-bars"
+import { AnimatedBars, type BarItem } from "../animations/animated-bars"
 import { ScrollMiniBar } from "../layout/scroll-mini-bar"
 import { SectionHeader } from "../layout/section-header"
 import { gradients as g, textColors as tc } from "@/lib/theme"
@@ -67,12 +67,67 @@ const metrics = [
   { icon: Code2, value: "15+", label: "Production ML Systems", color: tc.magenta, bar: 78, gradient: g.primaryToMagenta },
 ]
 
-const techBars = [
-  { label: "PyTorch / TensorFlow / scikit-learn", value: 95, display: "Expert", gradient: g.primaryToAccent },
-  { label: "LLMs & RAG Systems", value: 94, display: "Expert", gradient: g.magentaToAccent },
-  { label: "Multi-Agent Orchestration", value: 92, display: "Expert", gradient: g.cyanToPrimary },
-  { label: "MLOps & AWS", value: 90, display: "Expert", gradient: g.primaryToMagenta },
-  { label: "Guardrails & Observability", value: 88, display: "Advanced", gradient: g.primaryToCyan },
+const techBars: BarItem[] = [
+  {
+    label: "PyTorch / TensorFlow / scikit-learn",
+    value: 95,
+    display: "Expert",
+    gradient: g.primaryToAccent,
+    details: [
+      "Built containerized ML pipelines with Docker, Airflow, MLflow & automated hyperparameter tuning",
+      "Neural networks, clustering, and tree-based models for environmental science & production systems",
+      "Deployed models and pipelines serving 100M+ users at Apple scale",
+      "Published 6 peer-reviewed papers applying ML to hydrology and environmental science",
+    ],
+  },
+  {
+    label: "LLMs & RAG Systems",
+    value: 94,
+    display: "Expert",
+    gradient: g.magentaToAccent,
+    details: [
+      "Fine-tuning & deploying GPT-4o, Claude Sonnet 4, Gemini 2.0, Llama 4, Mistral for production",
+      "RAG architectures with pgvector, FAISS, Pinecone, Weaviate — adaptive chunking & re-ranking",
+      "Prompt engineering, multi-model routing, and self-improving agentic retrieval systems",
+      "Comprehensive LLM observability with LangSmith, Prometheus, Grafana dashboards",
+    ],
+  },
+  {
+    label: "Multi-Agent Orchestration",
+    value: 92,
+    display: "Expert",
+    gradient: g.cyanToPrimary,
+    details: [
+      "Production multi-agent orchestration with CrewAI, LangGraph, and shared state graphs",
+      "MCP tool server integration for context-engineered autonomous agents",
+      "Designed feedback loops, self-correction, and circuit-breaker alerting for guardrail violations",
+      "Built self-improving review policies and adaptive agent routing",
+    ],
+  },
+  {
+    label: "MLOps & AWS Infrastructure",
+    value: 90,
+    display: "Expert",
+    gradient: g.primaryToMagenta,
+    details: [
+      "AWS ECS, Lambda, RDS, S3, Bedrock — Terraform IaC, CI/CD, model versioning with MLflow",
+      "Led migration from monolithic to event-driven microservices on AWS",
+      "A/B testing frameworks and automated LLM evaluation with RAGAS & DeepEval",
+      "99.9% uptime SLA across 15+ production ML systems with K8s & Docker",
+    ],
+  },
+  {
+    label: "Guardrails & Observability",
+    value: 88,
+    display: "Advanced",
+    gradient: g.primaryToCyan,
+    details: [
+      "Real-time monitoring dashboards with Prometheus, Grafana, and OpenTelemetry",
+      "Circuit-breaker alerting for guardrail violations and drift detection",
+      "Automated quality gates in CI/CD for model performance regression",
+      "End-to-end tracing across LLM chains, retrieval, and agent execution",
+    ],
+  },
 ]
 
 export function AIExpertise() {
@@ -80,9 +135,9 @@ export function AIExpertise() {
     <AnimatedSection id="ai-expertise" className="relative py-14 sm:py-20 overflow-hidden">
       {/* Background effects */}
       <div className="absolute inset-0 dot-pattern opacity-30" aria-hidden="true" />
-      <div className="absolute top-20 right-10 h-96 w-96 rounded-full bg-primary/8 blur-3xl translucent-glow" aria-hidden="true" />
-      <div className="absolute bottom-20 left-10 h-96 w-96 rounded-full bg-accent/8 blur-3xl translucent-glow" style={{ animationDelay: "2.5s" }} aria-hidden="true" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[600px] w-[600px] rounded-full bg-primary/[0.03] blur-[100px] translucent-glow" style={{ animationDelay: "1.2s" }} aria-hidden="true" />
+      <div className="absolute top-10 right-1/4 h-[32rem] w-[32rem] rounded-full bg-primary/[0.06] blur-[80px] translucent-glow" aria-hidden="true" style={{ animationDelay: "-5s" }} />
+      <div className="absolute bottom-10 left-1/4 h-[32rem] w-[32rem] rounded-full bg-accent/[0.06] blur-[80px] translucent-glow-alt" style={{ animationDelay: "-12s" }} aria-hidden="true" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[36rem] w-[36rem] rounded-full bg-primary/[0.04] blur-[100px] translucent-glow" style={{ animationDelay: "-8s" }} aria-hidden="true" />
 
 
 
@@ -120,8 +175,8 @@ export function AIExpertise() {
             <AnimatedSection key={metric.label} delay={i * 100}>
               <div className="group relative overflow-hidden rounded-2xl border border-white/[0.04] bg-card/30 p-6 backdrop-blur-xl transition-all duration-500 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/15 glass-card-3d spotlight">
                 {/* Top edge light */}
-                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/8 to-transparent" />
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/[0.03] via-transparent to-accent/[0.03] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                <div className="absolute inset-x-0 top-0 h-px bg-white/[0.06]" />
+                <div className="absolute inset-0 rounded-2xl bg-primary/[0.03] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
                 <metric.icon className={`relative mb-3 h-8 w-8 ${metric.color} transition-transform duration-500 group-hover:scale-110 group-hover:drop-shadow-[0_0_8px_currentColor]`} />
                 <AnimatedCounter
                   value={metric.value}
@@ -147,29 +202,34 @@ export function AIExpertise() {
         {/* AI Domains — Step-by-step cards */}
         <div className="relative">
           {/* Vertical connector line (visible on lg) */}
-          <div className="absolute left-1/2 top-0 bottom-0 hidden w-px -translate-x-1/2 bg-gradient-to-b from-primary/30 via-accent/20 to-transparent lg:block" aria-hidden="true" />
+          <div className="absolute left-1/2 top-0 bottom-0 hidden w-px -translate-x-1/2 bg-primary/20 lg:block" aria-hidden="true" />
 
           <div className="grid gap-8 lg:grid-cols-2">
             {aiDomains.map((domain, i) => (
               <AnimatedSection key={domain.title} delay={i * 150}>
-                <div className="group relative h-full overflow-hidden rounded-2xl border border-border bg-card/80 backdrop-blur-xl transition-all duration-500 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/10">
-                  {/* Gradient top accent */}
-                  <div className={`h-1 w-full bg-gradient-to-r ${domain.gradient}`} />
+                <div className="group relative h-full overflow-hidden rounded-2xl border border-white/[0.04] bg-card/30 backdrop-blur-xl transition-all duration-500 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/15 glass-card-3d spotlight">
+                  {/* Top edge light */}
+                  <div className="absolute inset-x-0 top-0 h-px bg-white/[0.06]" />
+                  {/* Hover overlay */}
+                  <div className="absolute inset-0 rounded-2xl bg-primary/[0.03] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 
-                  <div className="p-8">
+                  {/* Top accent */}
+                  <div className={`h-1 w-full bg-primary`} />
+
+                  <div className="relative p-8">
                     {/* Step number + icon header */}
                     <div className="flex items-start gap-4">
                       <div className="relative">
-                        <div className={`rounded-xl bg-gradient-to-br ${domain.gradient} p-3 transition-transform duration-300 group-hover:scale-110`}>
-                          <domain.icon className="h-6 w-6 text-white" />
+                        <div className={`rounded-xl bg-primary p-3 transition-all duration-500 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-primary/20`}>
+                          <domain.icon className="h-6 w-6 text-primary-foreground transition-all duration-500 group-hover:drop-shadow-[0_0_8px_rgba(0,0,0,0.3)]" />
                         </div>
                         {/* Step number badge */}
-                        <div className={`absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br ${domain.gradient} text-[11px] font-bold text-white ring-2 ring-background`}>
+                        <div className={`absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground ring-2 ring-background transition-transform duration-500 group-hover:scale-110`}>
                           {i + 1}
                         </div>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-xl font-display font-medium text-foreground">{domain.title}</h3>
+                        <h3 className="text-xl font-display font-medium text-foreground transition-colors duration-300 group-hover:text-primary">{domain.title}</h3>
                         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                           {domain.description}
                         </p>
@@ -178,14 +238,15 @@ export function AIExpertise() {
 
                     {/* Details — always visible */}
                     <div className="mt-6 space-y-3">
-                      <div className="h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+                      <div className="h-px bg-white/[0.06]" />
                       {domain.details.map((detail, idx) => (
                         <div
                           key={idx}
-                          className="flex items-start gap-3 rounded-lg border border-border/50 bg-secondary/15 p-3 transition-colors duration-300 hover:border-primary/20 hover:bg-secondary/25"
+                          className="flex items-start gap-3 rounded-lg border border-white/[0.04] bg-white/[0.02] p-3 transition-all duration-300 hover:border-primary/20 hover:bg-white/[0.04] hover:translate-x-1"
+                          style={{ transitionDelay: `${idx * 50}ms` }}
                         >
-                          <div className={`mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-gradient-to-r ${domain.gradient}`} />
-                          <p className="text-sm text-foreground">{detail}</p>
+                          <div className={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary transition-shadow duration-300 group-hover:shadow-[0_0_6px_1px_hsl(var(--primary)/0.4)]`} />
+                          <p className="text-sm text-muted-foreground transition-colors duration-300 hover:text-foreground">{detail}</p>
                         </div>
                       ))}
                     </div>

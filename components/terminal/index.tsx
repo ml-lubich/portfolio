@@ -232,9 +232,11 @@ export function LiveTerminal() {
         </div>
 
         {/* Terminal window */}
-        <div className={`rounded-xl border border-border bg-[${terminalChrome.bg}] shadow-2xl shadow-black/30 overflow-hidden`}>
+        <div className={`rounded-xl border border-white/[0.08] bg-[${terminalChrome.bg}] shadow-2xl shadow-black/30 overflow-hidden backdrop-blur-xl`}>
+          {/* Subtle top-edge glow */}
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent z-10" />
           {/* Title bar */}
-          <div className={`flex items-center justify-between px-4 py-2.5 bg-[${terminalChrome.headerBg}] border-b border-border`}>
+          <div className={`flex items-center justify-between px-4 py-2.5 bg-[${terminalChrome.headerBg}] border-b border-white/[0.06]`}>
             <div className="flex items-center gap-2">
               <div className="flex gap-1.5">
                 <div className={`w-3 h-3 rounded-full bg-[${terminalChrome.dotClose}]`} />
@@ -262,7 +264,7 @@ export function LiveTerminal() {
           </div>
 
           {/* Info bar */}
-          <div className="px-4 py-1 bg-primary/[0.03] border-b border-border/30 flex items-center justify-between">
+          <div className="px-4 py-1 bg-white/[0.02] border-b border-white/[0.04] flex items-center justify-between">
             <div className="flex items-center gap-2 text-[11px]">
               <Clock className="w-3 h-3 text-primary/30" />
               <span className="font-mono text-foreground/50">{cur?.icon} {cur?.time} — {cur?.label}</span>
@@ -288,7 +290,7 @@ export function LiveTerminal() {
           </div>
 
           {/* Footer */}
-          <div className={`px-4 py-1 bg-[${terminalChrome.footerBg}] border-t border-border/30 flex items-center justify-between text-[10px] font-mono text-muted-foreground/25`}>
+          <div className={`px-4 py-1 bg-[${terminalChrome.footerBg}] border-t border-white/[0.04] flex items-center justify-between text-[10px] font-mono text-muted-foreground/25`}>
             <span>SESSION {activeSession + 1}/{S.length}</span>
             <span>zsh — 80×24</span>
           </div>

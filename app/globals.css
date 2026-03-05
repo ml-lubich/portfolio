@@ -23,17 +23,26 @@
     --muted-foreground: 215 15% 55%;
 
     /* brand */
-    --primary: 217 91% 60%;
-    --primary-foreground: 0 0% 100%;
-    --accent: 265 80% 65%;
-    --accent-foreground: 0 0% 100%;
+    --primary: 0 0% 100%;
+    --primary-foreground: 220 20% 4%;
+    --accent: 0 0% 85%;
+    --accent-foreground: 220 20% 4%;
 
     /* semantic */
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 220 15% 9%;
-    --input: 220 15% 9%;
-    --ring: 217 91% 60%;
+    --border: 220 15% 12%;
+    --input: 220 15% 12%;
+    --ring: 0 0% 100%;
+
+    /* rainbow accents */
+    --rainbow-1: 340 80% 65%;
+    --rainbow-2: 30 90% 60%;
+    --rainbow-3: 55 90% 55%;
+    --rainbow-4: 150 70% 50%;
+    --rainbow-5: 200 80% 55%;
+    --rainbow-6: 265 80% 65%;
+    --rainbow-7: 310 75% 60%;
 
     /* charts (must mirror lib/theme.ts hsl.*) */
     --chart-1: 217 91% 60%;
@@ -59,6 +68,114 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* ── Rainbow gradient mesh (Cursor-style 2026) ─────────────── */
+@keyframes rainbow-mesh-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  25% {
+    background-position: 50% 100%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  75% {
+    background-position: 50% 0%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Smooth floating keyframes for background orbs (3 variants) */
+@keyframes orb-float-0 {
+  0%   { transform: translate(0%, 0%) scale(1); }
+  20%  { transform: translate(4%, -6%) scale(1.06); }
+  40%  { transform: translate(-3%, 4%) scale(0.97); }
+  60%  { transform: translate(-5%, -2%) scale(1.04); }
+  80%  { transform: translate(3%, 5%) scale(0.98); }
+  100% { transform: translate(0%, 0%) scale(1); }
+}
+
+@keyframes orb-float-1 {
+  0%   { transform: translate(0%, 0%) scale(1); }
+  25%  { transform: translate(-6%, 5%) scale(1.08); }
+  50%  { transform: translate(5%, -3%) scale(0.94); }
+  75%  { transform: translate(-2%, -5%) scale(1.03); }
+  100% { transform: translate(0%, 0%) scale(1); }
+}
+
+@keyframes orb-float-2 {
+  0%   { transform: translate(0%, 0%) scale(1); }
+  30%  { transform: translate(5%, 4%) scale(1.05); }
+  60%  { transform: translate(-4%, -6%) scale(0.96); }
+  100% { transform: translate(0%, 0%) scale(1); }
+}
+
+/* Spectrum orbs: gentle drift + slow hue shift (variant A) */
+@keyframes spectrum-drift-a {
+  0%   { transform: translate(-50%, -50%) translate(0, 0);       filter: blur(120px) hue-rotate(0deg); }
+  25%  { transform: translate(-50%, -50%) translate(15px, -10px); filter: blur(120px) hue-rotate(12deg); }
+  50%  { transform: translate(-50%, -50%) translate(-8px, 12px);  filter: blur(120px) hue-rotate(25deg); }
+  75%  { transform: translate(-50%, -50%) translate(10px, 6px);   filter: blur(120px) hue-rotate(15deg); }
+  100% { transform: translate(-50%, -50%) translate(0, 0);       filter: blur(120px) hue-rotate(0deg); }
+}
+
+/* Spectrum orbs: gentle drift + slow hue shift (variant B — reverse) */
+@keyframes spectrum-drift-b {
+  0%   { transform: translate(-50%, -50%) translate(0, 0);        filter: blur(120px) hue-rotate(0deg); }
+  25%  { transform: translate(-50%, -50%) translate(-12px, 8px);  filter: blur(120px) hue-rotate(-15deg); }
+  50%  { transform: translate(-50%, -50%) translate(10px, -14px); filter: blur(120px) hue-rotate(-25deg); }
+  75%  { transform: translate(-50%, -50%) translate(-6px, -5px);  filter: blur(120px) hue-rotate(-10deg); }
+  100% { transform: translate(-50%, -50%) translate(0, 0);        filter: blur(120px) hue-rotate(0deg); }
+}
+
+/* Rainbow gradient text */
+.rainbow-text {
+  background: linear-gradient(90deg,
+      hsl(340 80% 65%),
+      hsl(30 90% 60%),
+      hsl(55 90% 55%),
+      hsl(150 70% 50%),
+      hsl(200 80% 55%),
+      hsl(265 80% 65%),
+      hsl(340 80% 65%));
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: rainbow-mesh-shift 8s linear infinite;
+}
+
+/* Rainbow border glow */
+.rainbow-border {
+  position: relative;
+}
+
+.rainbow-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: linear-gradient(135deg,
+      hsl(340 80% 65% / 0.4),
+      hsl(55 90% 55% / 0.3),
+      hsl(150 70% 50% / 0.4),
+      hsl(200 80% 55% / 0.3),
+      hsl(265 80% 65% / 0.4));
+  background-size: 300% 300%;
+  animation: rainbow-mesh-shift 6s ease infinite;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
 }
 
 /* Smooth scrolling — native fallback (overridden by JS woosh) */
@@ -106,13 +223,65 @@ body {
   background: hsl(var(--primary));
 }
 
-/* Gradient text utility — primary → accent */
+/* Detail panel scroll container */
+.detail-panel-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--border)) transparent;
+}
+
+.detail-panel-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+
+.detail-panel-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.detail-panel-scroll::-webkit-scrollbar-thumb {
+  background: hsl(var(--border) / 0.5);
+  border-radius: 3px;
+}
+
+.detail-panel-scroll::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary) / 0.7);
+}
+
+/* Highlight text — metallic sheen (scroll-driven) */
 .gradient-text {
-  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
   font-weight: 700;
+  background-image: linear-gradient(
+    120deg,
+    hsl(0 0% 100%) 0%,
+    hsl(220 20% 82%) 16%,
+    hsl(0 0% 100%) 28%,
+    hsl(220 15% 75%) 40%,
+    hsl(0 0% 100%) 52%,
+    hsl(220 20% 82%) 66%,
+    hsl(0 0% 100%) 78%,
+    hsl(220 15% 75%) 90%,
+    hsl(0 0% 100%) 100%
+  );
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  /*
+   * Scroll-driven shine: --scroll-y is set by <ScrollShimmer />.
+   * Dividing by a divisor controls how "fast" the sweep feels.
+   * The modulo-like wrapping happens naturally because background
+   * repeats at 250%.  A subtle idle animation keeps it alive when
+   * the user isn't scrolling.
+   */
+  background-position: calc(var(--scroll-y, 0) * 0.08% + 50%) center;
+  animation: metallic-idle-pulse 6s ease-in-out infinite;
+  transition: background-position 0.05s linear;
+}
+
+/* tiny idle shimmer so text isn't static when not scrolling */
+@keyframes metallic-idle-pulse {
+  0%, 100% { filter: brightness(1); }
+  50%      { filter: brightness(1.12); }
 }
 
 /* Glow effects — use palette variables */
@@ -194,9 +363,14 @@ body {
   inset: 0;
   padding: 1px;
   border-radius: inherit;
-  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent)), hsl(var(--chart-3)));
-  background-size: 200% 200%;
-  animation: gradient-shift 6s ease infinite;
+  background: linear-gradient(135deg,
+      hsl(340 80% 65% / 0.3),
+      hsl(55 90% 55% / 0.2),
+      hsl(150 70% 50% / 0.3),
+      hsl(200 80% 55% / 0.2),
+      hsl(265 80% 65% / 0.3));
+  background-size: 300% 300%;
+  animation: rainbow-mesh-shift 6s ease infinite;
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
@@ -226,13 +400,25 @@ body {
     opacity: 0;
   }
 
-  50% {
+  30% {
     opacity: 1;
   }
 
   100% {
-    transform: translateX(100%);
+    transform: translateX(300%);
     opacity: 0;
+  }
+}
+
+@keyframes bar-breathe {
+
+  0%,
+  100% {
+    opacity: 0.08;
+  }
+
+  50% {
+    opacity: 0.2;
   }
 }
 
@@ -256,15 +442,21 @@ body {
 
 /* ── Glass Stack Card effect (used inside ScrollStackCards) ── */
 .glass-stack-card {
+  background: hsla(220, 18%, 10%, 0.82);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
   box-shadow:
     0 4px 24px -4px hsla(0, 0%, 0%, 0.4),
-    0 0 0 1px hsla(220, 15%, 12%, 0.15);
+    0 0 0 1px hsla(220, 15%, 12%, 0.15),
+    inset 0 1px 0 0 hsla(0, 0%, 100%, 0.04);
 }
 
 .glass-stack-card:hover {
+  background: hsla(220, 18%, 11%, 0.86);
   box-shadow:
     0 8px 40px -8px hsl(var(--primary) / 0.12),
-    0 0 0 1px hsl(var(--primary) / 0.12);
+    0 0 0 1px hsl(var(--primary) / 0.12),
+    inset 0 1px 0 0 hsla(0, 0%, 100%, 0.06);
 }
 
 /* ── 3D Glass Card effect ── */
@@ -325,6 +517,11 @@ body {
     0 0 24px -4px hsl(var(--primary) / 0.15),
     inset 0 1px 0 0 hsla(0, 0%, 100%, 0.1);
 }
+
+/* ══════════════════════════════════════════════════════════════
+   Flip Card System — 3D card flip on hover with glass shine
+   Used by: skill category cards, about highlight cards
+   ══════════════════════════════════════════════════════════════ */
 
 /* ── Frosted glass panel ── */
 .frosted-panel {
@@ -403,7 +600,7 @@ body {
   opacity: 1;
 }
 
-/* ── Animated Name (Anthropic-style expand) ── */
+/* ── Animated Name (Anthropic-style expand + metallic sheen) ── */
 .animated-name-root {
   display: inline-flex;
   overflow: hidden;
@@ -425,6 +622,163 @@ body {
   transform: translateX(0);
   opacity: 1;
   filter: blur(0px);
+}
+
+/* ── Metallic shiny name effect (scroll-driven) ── */
+.animated-name-metallic .animated-name-char {
+  background: linear-gradient(120deg,
+      hsl(var(--foreground)) 0%,
+      hsl(220 15% 75%) 20%,
+      hsl(0 0% 100%) 30%,
+      hsl(220 15% 75%) 40%,
+      hsl(var(--foreground)) 55%,
+      hsl(220 15% 75%) 70%,
+      hsl(0 0% 100%) 80%,
+      hsl(220 15% 75%) 90%,
+      hsl(var(--foreground)) 100%);
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-position: calc(var(--scroll-y, 0) * 0.08% + 50%) center;
+  transition: background-position 0.1s linear;
+}
+
+@keyframes metallic-shimmer {
+  0% {
+    background-position: 150% center;
+  }
+
+  100% {
+    background-position: -50% center;
+  }
+}
+
+/* ── Global metallic sheen on all bold text ────────────────────── */
+/* Targets:
+   1. Elements with Tailwind bold utility classes (direct text)
+   2. Animated word/letter children INSIDE bold parents
+   3. Blog prose headings (use @apply, no utility class in DOM)
+   4. <b> and <strong> tags
+   Excludes elements with bg-* (buttons, badges, cards).
+   Add class "no-metallic" on any element to opt out.              */
+
+/* ─ Shared metallic mixin (use via class="metallic-text") ─ */
+@layer utilities {
+  .metallic-text {
+    background-image: linear-gradient(
+      120deg,
+      hsl(var(--foreground)) 0%,
+      hsl(220 15% 78%) 18%,
+      hsl(0 0% 100%) 30%,
+      hsl(220 15% 78%) 40%,
+      hsl(var(--foreground)) 54%,
+      hsl(220 15% 78%) 68%,
+      hsl(0 0% 100%) 78%,
+      hsl(220 15% 78%) 88%,
+      hsl(var(--foreground)) 100%
+    );
+    background-size: 250% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-position: calc(var(--scroll-y, 0) * 0.06% + 50%) center;
+    transition: background-position 0.1s linear;
+  }
+}
+
+/* ── Global metallic sheen on all bold text (scroll-driven) ─── */
+/* The light-streak position is tied to --scroll-y, set by
+   <ScrollShimmer />. As the user scrolls, the highlight sweeps
+   across each bold element like a ray of light.                   */
+
+/* 1 ─ Direct bold elements */
+.font-bold:not([class*="bg-"]):not(.no-metallic),
+.font-semibold:not([class*="bg-"]):not(.no-metallic),
+.font-extrabold:not([class*="bg-"]):not(.no-metallic),
+.font-black:not([class*="bg-"]):not(.no-metallic),
+b:not(.no-metallic),
+strong:not(.no-metallic) {
+  background-image: linear-gradient(
+    120deg,
+    hsl(var(--foreground)) 0%,
+    hsl(220 15% 78%) 18%,
+    hsl(0 0% 100%) 30%,
+    hsl(220 15% 78%) 40%,
+    hsl(var(--foreground)) 54%,
+    hsl(220 15% 78%) 68%,
+    hsl(0 0% 100%) 78%,
+    hsl(220 15% 78%) 88%,
+    hsl(var(--foreground)) 100%
+  );
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-position: calc(var(--scroll-y, 0) * 0.06% + 50%) center;
+  transition: background-position 0.1s linear;
+}
+
+/* 2 ─ Animated text children inside bold / gradient parents */
+.font-bold:not(.no-metallic) .animated-text-word,
+.font-semibold:not(.no-metallic) .animated-text-word,
+.font-extrabold:not(.no-metallic) .animated-text-word,
+.font-black:not(.no-metallic) .animated-text-word,
+.gradient-text:not(.no-metallic) .animated-text-word {
+  background-image: linear-gradient(
+    120deg,
+    hsl(var(--foreground)) 0%,
+    hsl(220 15% 78%) 18%,
+    hsl(0 0% 100%) 30%,
+    hsl(220 15% 78%) 40%,
+    hsl(var(--foreground)) 54%,
+    hsl(220 15% 78%) 68%,
+    hsl(0 0% 100%) 78%,
+    hsl(220 15% 78%) 88%,
+    hsl(var(--foreground)) 100%
+  );
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-position: calc(var(--scroll-y, 0) * 0.06% + 50%) center;
+  transition: background-position 0.1s linear;
+}
+
+/* 3 ─ Blog prose headings + inline bold */
+.blog-prose h1,
+.blog-prose h2,
+.blog-prose h3,
+.blog-prose h4,
+.blog-prose strong,
+.blog-prose b {
+  background-image: linear-gradient(
+    120deg,
+    hsl(var(--foreground)) 0%,
+    hsl(220 15% 78%) 18%,
+    hsl(0 0% 100%) 30%,
+    hsl(220 15% 78%) 40%,
+    hsl(var(--foreground)) 54%,
+    hsl(220 15% 78%) 68%,
+    hsl(0 0% 100%) 78%,
+    hsl(220 15% 78%) 88%,
+    hsl(var(--foreground)) 100%
+  );
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-position: calc(var(--scroll-y, 0) * 0.06% + 50%) center;
+  transition: background-position 0.1s linear;
+}
+
+/* ─ Opt-out: add .no-metallic to reset ─ */
+.no-metallic,
+.no-metallic .animated-text-word {
+  background-image: none !important;
+  -webkit-background-clip: border-box !important;
+  background-clip: border-box !important;
+  -webkit-text-fill-color: inherit !important;
 }
 
 /* ── AnimatedText — Anthropic-style word/letter reveals ─────── */
@@ -541,19 +895,25 @@ body {
 }
 
 .gradient-text-animated {
-  background: linear-gradient(90deg,
-      hsl(var(--primary)) 0%,
-      hsl(var(--accent)) 25%,
-      hsl(var(--primary) / 0.85) 50%,
-      hsl(var(--accent)) 75%,
-      hsl(var(--primary)) 100%);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
   font-weight: 700;
-  animation: gradient-shimmer 4s ease-in-out infinite;
-  animation-delay: 1s;
+  background-image: linear-gradient(
+    120deg,
+    hsl(var(--foreground)) 0%,
+    hsl(220 15% 78%) 18%,
+    hsl(0 0% 100%) 30%,
+    hsl(220 15% 78%) 40%,
+    hsl(var(--foreground)) 54%,
+    hsl(220 15% 78%) 68%,
+    hsl(0 0% 100%) 78%,
+    hsl(220 15% 78%) 88%,
+    hsl(var(--foreground)) 100%
+  );
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-position: calc(var(--scroll-y, 0) * 0.06% + 50%) center;
+  transition: background-position 0.1s linear;
 }
 
 /* Glitch effect */
@@ -613,12 +973,7 @@ body {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg,
-      transparent 0%,
-      hsl(var(--primary) / 0.06) 40%,
-      hsl(var(--primary) / 0.12) 50%,
-      hsl(var(--primary) / 0.06) 60%,
-      transparent 100%);
+  background: hsl(var(--primary) / 0.06);
   animation: scan-sweep 6s linear infinite;
   pointer-events: none;
   z-index: 5;
@@ -641,13 +996,12 @@ body {
 
 .holo-shimmer {
   background: linear-gradient(135deg,
-      hsl(var(--primary) / 0.08) 0%,
-      hsl(var(--accent) / 0.08) 25%,
-      hsl(var(--chart-3) / 0.08) 50%,
-      hsl(var(--accent) / 0.08) 75%,
-      hsl(var(--primary) / 0.08) 100%);
-  background-size: 400% 400%;
-  animation: holo-shift 9s ease infinite;
+      hsl(340 80% 65% / 0.04),
+      hsl(55 90% 55% / 0.03),
+      hsl(200 80% 55% / 0.04),
+      hsl(265 80% 65% / 0.03));
+  background-size: 300% 300%;
+  animation: rainbow-mesh-shift 6s ease infinite;
 }
 
 /* ── Data-stream grid lines (subtle circuit-board pattern) ── */
@@ -790,10 +1144,7 @@ body {
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: linear-gradient(135deg,
-      hsl(var(--primary) / 0.04) 0%,
-      transparent 40%,
-      hsl(var(--accent) / 0.03) 100%);
+  background: hsl(var(--primary) / 0.03);
   pointer-events: none;
   z-index: 1;
 }

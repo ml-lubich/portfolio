@@ -68,24 +68,24 @@ function SceneCanvas({
   return (
     <SceneBoundary>
       <div ref={wrapperRef} className={`pointer-events-none absolute inset-0 ${className}`}>
-          <Canvas
-            frameloop={visible ? "always" : "never"}
-            camera={camera ?? { position: [0, 0, 5], fov: 45 }}
-            dpr={[1, 1.5]}
-            gl={{
-              antialias: false,
-              alpha: true,
-              powerPreference: "high-performance",
-            }}
-            style={{ background: "transparent", visibility: visible ? "visible" : "hidden" }}
-            onCreated={({ gl }) => {
-              gl.setClearColor(0x000000, 0)
-              const canvas = gl.domElement
-              canvas.addEventListener('webglcontextlost', (e) => e.preventDefault(), false)
-            }}
-          >
-            <Suspense fallback={null}>{children}</Suspense>
-          </Canvas>
+        <Canvas
+          frameloop={visible ? "always" : "never"}
+          camera={camera ?? { position: [0, 0, 5], fov: 45 }}
+          dpr={[1, 1.5]}
+          gl={{
+            antialias: false,
+            alpha: true,
+            powerPreference: "high-performance",
+          }}
+          style={{ background: "transparent", visibility: visible ? "visible" : "hidden" }}
+          onCreated={({ gl }) => {
+            gl.setClearColor(0x000000, 0)
+            const canvas = gl.domElement
+            canvas.addEventListener('webglcontextlost', (e) => e.preventDefault(), false)
+          }}
+        >
+          <Suspense fallback={null}>{children}</Suspense>
+        </Canvas>
       </div>
     </SceneBoundary>
   )

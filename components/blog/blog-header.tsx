@@ -40,11 +40,11 @@ export function BlogHeader() {
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6">
         {/* Logo */}
         <Link href="/" className="group flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-accent">
-            <span className="text-sm font-bold text-primary-foreground">ML</span>
+          <div className="flex h-11 w-11 items-center justify-center rounded-[10px] overflow-hidden">
+            <img src="/logo.png" alt="ML" className="h-full w-full object-cover" />
           </div>
           <span className="text-sm font-semibold text-foreground transition-colors group-hover:text-primary">
-            <AnimatedName name="Misha Lubich" trigger="hover" duration={500} />
+            <AnimatedName name="Misha Lubich" trigger="hover" duration={500} metallic />
           </span>
         </Link>
 
@@ -59,8 +59,8 @@ export function BlogHeader() {
                 key={link.href}
                 href={link.href}
                 className={`relative rounded-lg px-3 py-2 text-sm transition-all duration-300 ${isActive
-                    ? "text-primary font-medium bg-primary/10"
-                    : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                  ? "text-primary font-medium bg-primary/10"
+                  : "text-muted-foreground hover:text-foreground hover:bg-secondary"
                   }`}
               >
                 {link.label}
@@ -103,8 +103,8 @@ export function BlogHeader() {
                   href={link.href}
                   onClick={() => setMobileOpen(false)}
                   className={`rounded-lg px-4 py-3 text-sm transition-colors ${isActive
-                      ? "text-primary font-medium bg-primary/10 border-l-2 border-primary"
-                      : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+                    ? "text-primary font-medium bg-primary/10 border-l-2 border-primary"
+                    : "text-muted-foreground hover:text-foreground hover:bg-secondary"
                     }`}
                 >
                   {link.label}

@@ -11,9 +11,9 @@ export function ArchitectureDiagram({ type, accent }: DiagramProps) {
   const config = diagramConfigs[type] || diagramConfigs.pipeline
 
   return (
-    <div className={`relative overflow-hidden rounded-2xl border border-border/30 bg-[${archDiagram.bg}] p-1`}>
+    <div className={`relative overflow-hidden rounded-[16px] border border-white/[0.06] bg-white/[0.02] p-1`}>
       {/* Floating grid background */}
-      <div className="absolute inset-0 circuit-grid opacity-20" />
+      <div className="absolute inset-0 circuit-grid opacity-10" />
 
       <svg
         viewBox="0 0 100 100"
@@ -138,7 +138,7 @@ export function ArchitectureDiagram({ type, accent }: DiagramProps) {
       </svg>
 
       {/* Floating label */}
-      <div className="absolute bottom-3 right-3 rounded-md bg-secondary/40 px-2 py-1 backdrop-blur-sm">
+      <div className="absolute bottom-3 right-3 rounded-[10px] bg-white/[0.04] px-2 py-1 backdrop-blur-sm">
         <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground/60">
           {type.replace("-", " ")}
         </span>

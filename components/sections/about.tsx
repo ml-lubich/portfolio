@@ -1,5 +1,6 @@
 "use client"
 
+import { useState, useCallback, useRef } from "react"
 import { GraduationCap, BookOpen, Users, Code2, Award, Briefcase } from "lucide-react"
 import dynamic from "next/dynamic"
 import { AnimatedSection } from "../animations/animated-section"
@@ -17,6 +18,52 @@ const ParticleField = dynamic(
   { ssr: false }
 )
 
+/* ── Tilt + horizontal glass-shine card wrapper ── */
+function TiltCard({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const [tilt, setTilt] = useState({ x: 0, y: 0 })
+  const [shine, setShine] = useState({ x: 50, opacity: 0 })
+
+  const handleMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (!ref.current) return
+    const r = ref.current.getBoundingClientRect()
+    const x = (e.clientX - r.left) / r.width
+    const y = (e.clientY - r.top) / r.height
+    setTilt({ x: (y - 0.5) * -10, y: (x - 0.5) * 10 })
+    setShine({ x: x * 100, opacity: 1 })
+  }, [])
+
+  const handleLeave = useCallback(() => {
+    setTilt({ x: 0, y: 0 })
+    setShine({ x: 50, opacity: 0 })
+  }, [])
+
+  return (
+    <div
+      ref={ref}
+      onMouseMove={handleMove}
+      onMouseLeave={handleLeave}
+      className={className}
+      style={{
+        transform: `perspective(800px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale(${tilt.x || tilt.y ? 1.04 : 1})`,
+        transition: "transform 0.15s ease-out",
+        willChange: "transform",
+      }}
+    >
+      {children}
+      {/* Horizontal glass shine band — tracks mouse X */}
+      <div
+        className="pointer-events-none absolute inset-0 z-20 rounded-2xl"
+        style={{
+          background: `linear-gradient(105deg, transparent ${shine.x - 18}%, hsla(0,0%,100%,0.02) ${shine.x - 8}%, hsla(0,0%,100%,0.12) ${shine.x - 1}%, hsla(0,0%,100%,0.12) ${shine.x + 1}%, hsla(0,0%,100%,0.02) ${shine.x + 8}%, transparent ${shine.x + 18}%)`,
+          opacity: shine.opacity,
+          transition: "opacity 0.25s ease-out",
+        }}
+      />
+    </div>
+  )
+}
+
 
 
 const highlights = [
@@ -27,6 +74,7 @@ const highlights = [
     subtitleText: "UC Berkeley",
     detail: "B.A. Computer Science",
     gradient: lg.primaryToAccent,
+    backDescription: "UC Berkeley B.A. in Computer Science with a focus on machine learning, distributed systems, and algorithms. Foundation for peer-reviewed research and industry-scale engineering.",
   },
   {
     icon: Briefcase,
@@ -35,6 +83,7 @@ const highlights = [
     subtitleText: "Braintrust, Apple, Walmart",
     detail: "Fortune 500 + AI Startups",
     gradient: lg.accentToCyan,
+    backDescription: "Built production AI platforms at Braintrust, led ML inference pipelines at Apple serving 100M+ users, and architected cloud-native microservices at Walmart at enterprise scale.",
   },
   {
     icon: BookOpen,
@@ -43,6 +92,7 @@ const highlights = [
     subtitleText: " Research Papers",
     detail: "Machine Learning & Hydrology",
     gradient: lg.cyanToPrimary,
+    backDescription: "Published 6 peer-reviewed papers applying ML to hydrology and environmental science — neural networks, clustering, and tree-based models for real-world prediction systems.",
   },
   {
     icon: Award,
@@ -51,6 +101,7 @@ const highlights = [
     subtitleText: " Users Reached",
     detail: "Industry Impact",
     gradient: lg.primaryToMagenta,
+    backDescription: "Deployed models and pipelines reaching 100M+ users at Apple scale. Recognized for driving 300% model performance gains and maintaining 99.9% uptime SLAs.",
   },
   {
     icon: Users,
@@ -59,6 +110,7 @@ const highlights = [
     subtitleText: "Team Lead & Mentor",
     detail: "Cross-functional Teams",
     gradient: lg.accentToPrimary,
+    backDescription: "Led cross-functional engineering teams across ML, backend, and infrastructure. Mentored junior engineers, established code review standards, and drove Agile delivery processes.",
   },
   {
     icon: Code2,
@@ -67,16 +119,18 @@ const highlights = [
     subtitleText: "LangChain, CrewAI, Spring",
     detail: "Community Driven",
     gradient: lg.magentaToAccent,
+    backDescription: "Active contributor to LangChain, CrewAI, and Spring ecosystems. Built open-source MCP tool servers, agent templates, and shared knowledge through community talks and demos.",
   },
 ]
 
 export function About() {
   return (
     <AnimatedSection id="about" className="relative py-14 sm:py-20 overflow-hidden">
-      {/* Animated background elements */}
+      {/* Ambient background orbs — constant, overlapping, smoothly drifting */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-        <div className="absolute right-1/3 top-1/4 h-96 w-96 rounded-full bg-primary/8 blur-3xl translucent-glow" style={{ animationDelay: "1s" }} />
-        <div className="absolute left-1/3 bottom-1/4 h-96 w-96 rounded-full bg-accent/8 blur-3xl translucent-glow" style={{ animationDelay: "4s" }} />
+        <div className="absolute right-1/4 top-1/4 h-[32rem] w-[32rem] rounded-full bg-primary/[0.06] blur-[80px] translucent-glow" style={{ animationDelay: "-3s" }} />
+        <div className="absolute left-1/4 bottom-1/4 h-[32rem] w-[32rem] rounded-full bg-accent/[0.06] blur-[80px] translucent-glow-alt" style={{ animationDelay: "-10s" }} />
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[28rem] w-[28rem] rounded-full bg-primary/[0.04] blur-[90px] translucent-glow" style={{ animationDelay: "-7s" }} />
       </div>
 
       {/* 3D particle network background */}
@@ -113,37 +167,34 @@ export function About() {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {highlights.map((item, i) => (
             <AnimatedSection key={item.title} delay={i * 80}>
-              <div className="group relative h-full overflow-hidden rounded-2xl border border-white/[0.04] bg-card/25 backdrop-blur-xl transition-all duration-500 hover:border-primary/40 hover:bg-card/50 glass-card-3d">
-                {/* Top edge reflection */}
-                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/8 to-transparent" />
-                {/* Gradient background on hover */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${item.gradient} opacity-0 transition-opacity duration-500 group-hover:opacity-100`} />
+              <TiltCard className="relative h-full">
+                <div className="group relative h-full overflow-hidden rounded-2xl border border-white/[0.06] bg-card/25 backdrop-blur-xl transition-all duration-300 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/15">
+                  {/* Top edge reflection */}
+                  <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
+                  {/* Animated corner glow */}
+                  <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-primary/10 blur-2xl opacity-0 transition-all duration-500 group-hover:opacity-100 group-hover:scale-150" />
 
-                {/* Corner accent */}
-                <div className={`absolute -right-8 -top-8 h-24 w-24 rounded-full bg-gradient-to-br ${item.gradient} blur-2xl opacity-0 transition-all duration-500 group-hover:opacity-100 group-hover:scale-150`} />
-
-                <div className="relative p-6">
-                  <div className={`mb-4 inline-flex rounded-xl bg-gradient-to-br ${item.gradient} p-3 ring-1 ring-border transition-all duration-300 group-hover:scale-110 group-hover:ring-2`}>
-                    <item.icon className="h-5 w-5 text-primary transition-transform duration-300 group-hover:rotate-12" />
+                  <div className="relative p-6">
+                    <div className="mb-4 inline-flex rounded-xl bg-primary p-3 ring-1 ring-white/[0.06] transition-all duration-300 group-hover:scale-110">
+                      <item.icon className="h-5 w-5 text-primary-foreground transition-transform duration-300 group-hover:rotate-12" />
+                    </div>
+                    <h3 className="text-base font-semibold text-foreground transition-colors duration-300 group-hover:text-primary">
+                      {item.title}
+                    </h3>
+                    <p className="mt-1.5 text-sm font-medium text-primary">
+                      {item.subtitleNum ? (
+                        <><AnimatedCounter value={item.subtitleNum} duration={1800} />{item.subtitleText}</>
+                      ) : (
+                        item.subtitleText
+                      )}
+                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground">{item.detail}</p>
                   </div>
-                  <h3 className="text-base font-semibold text-foreground transition-colors duration-300 group-hover:text-primary">
-                    {item.title}
-                  </h3>
-                  <p className="mt-1.5 text-sm font-medium text-primary">
-                    {item.subtitleNum ? (
-                      <><AnimatedCounter value={item.subtitleNum} duration={1800} />{item.subtitleText}</>
-                    ) : (
-                      item.subtitleText
-                    )}
-                  </p>
-                  <p className="mt-1 text-xs text-muted-foreground transition-colors duration-300 group-hover:text-foreground">
-                    {item.detail}
-                  </p>
-                </div>
 
-                {/* Shimmer effect */}
-                <div className="absolute inset-0 shimmer opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-              </div>
+                  {/* Shimmer effect */}
+                  <div className="absolute inset-0 shimmer opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                </div>
+              </TiltCard>
             </AnimatedSection>
           ))}
         </div>

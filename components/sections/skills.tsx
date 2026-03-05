@@ -1,11 +1,10 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useRef } from "react"
 import dynamic from "next/dynamic"
 import { AnimatedSection } from "../animations/animated-section"
 import { AnimatedBars } from "../animations/animated-bars"
 import { getSkillIcon } from "./skill-icons"
-import { CodeParticles } from "../three/code-particles"
 import { SectionHeader } from "../layout/section-header"
 import { skillCategories, proficiencyBars } from "@/data/skills"
 import { hex } from "@/lib/theme"
@@ -16,38 +15,49 @@ const ParticleField = dynamic(
   { ssr: false }
 )
 
-function SkillTag({ item, idx, onSelect }: { item: string; idx: number; onSelect: (skill: string) => void }) {
-  const [hovered, setHovered] = useState(false)
-  const icon = getSkillIcon(item)
+/* ── Tilt + horizontal glass-shine card wrapper ── */
+function TiltCard({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const [tilt, setTilt] = useState({ x: 0, y: 0 })
+  const [shine, setShine] = useState({ x: 50, opacity: 0 })
+
+  const handleMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (!ref.current) return
+    const r = ref.current.getBoundingClientRect()
+    const x = (e.clientX - r.left) / r.width
+    const y = (e.clientY - r.top) / r.height
+    setTilt({ x: (y - 0.5) * -10, y: (x - 0.5) * 10 })
+    setShine({ x: x * 100, opacity: 1 })
+  }, [])
+
+  const handleLeave = useCallback(() => {
+    setTilt({ x: 0, y: 0 })
+    setShine({ x: 50, opacity: 0 })
+  }, [])
 
   return (
-    <button
-      type="button"
-      onClick={() => onSelect(item)}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      className={`group/tag relative inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 font-mono text-xs transition-all duration-300 animate-slide-up cursor-pointer
-        ${hovered
-          ? "border-primary/60 bg-primary/10 text-foreground shadow-lg shadow-primary/20 scale-110 skill-tag-shine"
-          : "border-border bg-secondary/50 text-muted-foreground hover:scale-105 hover:border-primary/40 hover:bg-secondary hover:text-foreground hover:shadow-md hover:shadow-primary/10"
-        }`}
-      style={{ animationDelay: `${idx * 50}ms`, opacity: 0 }}
+    <div
+      ref={ref}
+      onMouseMove={handleMove}
+      onMouseLeave={handleLeave}
+      className={className}
+      style={{
+        transform: `perspective(800px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale(${tilt.x || tilt.y ? 1.04 : 1})`,
+        transition: "transform 0.15s ease-out",
+        willChange: "transform",
+      }}
     >
-      {icon && (
-        <span className={`transition-opacity ${hovered ? "opacity-100" : "opacity-60 group-hover/tag:opacity-100"}`}>
-          {icon}
-        </span>
-      )}
-      {item}
-
-      {/* Glow ring */}
-      {hovered && (
-        <span className="pointer-events-none absolute inset-0 rounded-lg ring-1 ring-primary/40 animate-pulse" />
-      )}
-
-      {/* Code particles */}
-      <CodeParticles skill={item} isHovered={hovered} />
-    </button>
+      {children}
+      {/* Horizontal glass shine band — tracks mouse X */}
+      <div
+        className="pointer-events-none absolute inset-0 z-20 rounded-2xl"
+        style={{
+          background: `linear-gradient(105deg, transparent ${shine.x - 18}%, hsla(0,0%,100%,0.02) ${shine.x - 8}%, hsla(0,0%,100%,0.12) ${shine.x - 1}%, hsla(0,0%,100%,0.12) ${shine.x + 1}%, hsla(0,0%,100%,0.02) ${shine.x + 8}%, transparent ${shine.x + 18}%)`,
+          opacity: shine.opacity,
+          transition: "opacity 0.25s ease-out",
+        }}
+      />
+    </div>
   )
 }
 
@@ -62,10 +72,11 @@ export function Skills() {
 
   return (
     <AnimatedSection id="skills" className="relative py-14 sm:py-20 overflow-hidden">
-      {/* Animated background elements */}
+      {/* Ambient background orbs — constant, overlapping, smoothly drifting */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-        <div className="absolute -left-40 top-1/4 h-96 w-96 rounded-full bg-primary/8 blur-3xl translucent-glow" />
-        <div className="absolute -right-40 bottom-1/4 h-96 w-96 rounded-full bg-accent/8 blur-3xl translucent-glow" style={{ animationDelay: "2s" }} />
+        <div className="absolute -left-20 top-1/4 h-[32rem] w-[32rem] rounded-full bg-primary/[0.06] blur-[80px] translucent-glow" style={{ animationDelay: "-4s" }} />
+        <div className="absolute -right-20 bottom-1/4 h-[32rem] w-[32rem] rounded-full bg-accent/[0.06] blur-[80px] translucent-glow-alt" style={{ animationDelay: "-11s" }} />
+        <div className="absolute left-1/3 top-1/2 -translate-y-1/2 h-[28rem] w-[28rem] rounded-full bg-primary/[0.03] blur-[90px] translucent-glow" style={{ animationDelay: "-7s" }} />
       </div>
 
       {/* 3D particle field background */}
@@ -88,33 +99,45 @@ export function Skills() {
           </div>
         </AnimatedSection>
 
-        {/* Skills grid */}
+        {/* Skills grid — pop-out tilt + liquid glass on hover */}
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {skillCategories.map((cat, i) => (
             <AnimatedSection key={cat.category} delay={i * 80}>
-              <div className="group relative h-full overflow-hidden rounded-2xl border border-white/[0.04] bg-card/25 backdrop-blur-xl p-6 transition-all duration-500 hover:border-primary/40 hover:bg-card/50 glass-card-3d">
-                {/* Top edge reflection */}
-                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/8 to-transparent" />
-                {/* Gradient overlay on hover */}
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/0 via-accent/0 to-primary/0 opacity-0 transition-opacity duration-500 group-hover:from-primary/5 group-hover:via-accent/5 group-hover:to-primary/5 group-hover:opacity-100" />
+              <TiltCard className="relative h-full">
+                <div className="group relative h-full overflow-hidden rounded-2xl border border-white/[0.06] bg-card/25 backdrop-blur-xl p-6 transition-all duration-300 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/15">
+                  {/* Top edge reflection */}
+                  <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
+                  {/* Gradient overlay on hover */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/0 via-accent/0 to-primary/0 opacity-0 transition-opacity duration-500 group-hover:from-primary/5 group-hover:via-accent/5 group-hover:to-primary/5 group-hover:opacity-100" />
+                  {/* Animated corner glow */}
+                  <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-primary/10 blur-2xl opacity-0 transition-all duration-500 group-hover:opacity-100 group-hover:scale-150" />
 
-                {/* Animated corner accent */}
-                <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-primary/10 blur-2xl opacity-0 transition-all duration-500 group-hover:opacity-100 group-hover:scale-150" />
+                  <div className="relative">
+                    <h3 className="mb-5 text-base font-bold text-foreground transition-colors group-hover:text-primary sm:text-lg">
+                      {cat.category}
+                    </h3>
 
-                <div className="relative">
-                  <h3 className="mb-5 text-base font-bold text-foreground transition-colors group-hover:text-primary sm:text-lg">
-                    {cat.category}
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {cat.items.map((item, idx) => (
-                      <SkillTag key={item} item={item} idx={idx} onSelect={handleSelectSkill} />
-                    ))}
+                    <div className="flex flex-wrap gap-2">
+                      {cat.items.map((item, idx) => {
+                        const icon = getSkillIcon(item)
+                        return (
+                          <span
+                            key={item}
+                            className="group/tag relative inline-flex items-center gap-1.5 rounded-lg border border-border bg-secondary/50 px-3 py-1.5 font-mono text-xs text-muted-foreground transition-all duration-200 hover:border-primary/40 hover:bg-secondary hover:text-foreground hover:scale-105 hover:shadow-md hover:shadow-primary/10 cursor-default"
+                            style={{ animationDelay: `${idx * 40}ms` }}
+                          >
+                            {icon && <span className="opacity-60 group-hover/tag:opacity-100 transition-opacity">{icon}</span>}
+                            {item}
+                          </span>
+                        )
+                      })}
+                    </div>
                   </div>
-                </div>
 
-                {/* Shimmer effect */}
-                <div className="absolute inset-0 shimmer opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-              </div>
+                  {/* Shimmer */}
+                  <div className="absolute inset-0 shimmer opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                </div>
+              </TiltCard>
             </AnimatedSection>
           ))}
         </div>

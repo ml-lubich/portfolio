@@ -18,42 +18,65 @@ const Footer = dynamic(() => import("@/components/sections/footer").then(m => m.
 
 export default function Home() {
   return (
-    <main id="main-content" className="relative min-h-screen max-w-full bg-background" role="main">
+    <main id="main-content" className="relative z-10 min-h-screen max-w-full" role="main">
       <Navigation />
       <Hero />
-      <LogoScroll />
 
-      {/* Each LazySection defers rendering until near viewport,
-          preventing 6+ WebGL canvases from booting at once */}
-      <LazySection>
-        <LiveTerminal />
-      </LazySection>
-      <ProfileIntro />
-      <LazySection>
-        <AIExpertise />
-      </LazySection>
-      <LazySection>
-        <About />
-      </LazySection>
-      <LazySection>
-        <Journey />
-      </LazySection>
-      <LazySection>
-        <Projects />
-      </LazySection>
-      <LazySection>
-        <Skills />
-      </LazySection>
-      <LazySection>
-        <GitHubStats />
-      </LazySection>
-      <LazySection>
-        <Publications />
-      </LazySection>
-      <LazySection minHeight="30vh">
-        <Contact />
-      </LazySection>
-      <Footer />
+      {/* ── Dark scrim below hero ────────────────────────────────────
+       *  Dims the fixed BackgroundOrbs behind all below-fold content
+       *  so text is crisp & readable — cursor.com-style dark sections
+       *  with just a whisper of colour bleeding through.
+       * ─────────────────────────────────────────────────────────────── */}
+      <div
+        className="relative"
+        style={{
+          background:
+            "linear-gradient(to bottom, transparent 0%, hsl(220 20% 4% / 0.88) 120px)",
+        }}
+      >
+        {/* Inner backdrop keeps the dark tint for the rest of the page */}
+        <div
+          className="relative"
+          style={{
+            backgroundColor: "hsl(220 20% 4% / 0.88)",
+            marginTop: "-1px", /* avoid sub-pixel seam */
+          }}
+        >
+          <LogoScroll />
+
+          {/* Each LazySection defers rendering until near viewport,
+              preventing 6+ WebGL canvases from booting at once */}
+          <LazySection>
+            <LiveTerminal />
+          </LazySection>
+          <ProfileIntro />
+          <LazySection>
+            <AIExpertise />
+          </LazySection>
+          <LazySection>
+            <About />
+          </LazySection>
+          <LazySection>
+            <Journey />
+          </LazySection>
+          <LazySection>
+            <Projects />
+          </LazySection>
+          <LazySection>
+            <Skills />
+          </LazySection>
+          <LazySection>
+            <GitHubStats />
+          </LazySection>
+          <LazySection>
+            <Publications />
+          </LazySection>
+          <LazySection minHeight="30vh">
+            <Contact />
+          </LazySection>
+          <Footer />
+        </div>
+      </div>
     </main>
   )
 }

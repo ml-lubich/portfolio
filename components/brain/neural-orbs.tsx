@@ -4,8 +4,22 @@ import { useRef, useEffect, useMemo } from "react"
 import { useFrame } from "@react-three/fiber"
 import * as THREE from "three"
 import type { BrainData } from "./types"
-import { ORB_COUNT, CHAIN_BUFFER, CHAIN_TRIM_BEHIND, TRAIL_LENGTH } from "./constants"
+import { ORB_COUNT, CHAIN_BUFFER, CHAIN_TRIM_BEHIND, TRAIL_LENGTH, AMBIENT_RAINBOW, WHITE_MIX } from "./constants"
 import { buildAdjacency, buildInitialChain, extendChain } from "./graph-utils"
+
+/* ── HSL → RGB (s=1, l=0.5 → pure rainbow) ───────────────────────── */
+function hueToRgb(h: number): [number, number, number] {
+  h = ((h % 1) + 1) % 1
+  const c = 1, x = c * (1 - Math.abs((h * 6) % 2 - 1)), m = 0
+  let r: number, g: number, b: number
+  if (h < 1 / 6)      { r = c; g = x; b = 0 }
+  else if (h < 2 / 6) { r = x; g = c; b = 0 }
+  else if (h < 3 / 6) { r = 0; g = c; b = x }
+  else if (h < 4 / 6) { r = 0; g = x; b = c }
+  else if (h < 5 / 6) { r = x; g = 0; b = c }
+  else                 { r = c; g = 0; b = x }
+  return [r + m, g + m, b + m]
+}
 
 /* ──────────────────────────────────────────────────────────────────────
  *  NeuralOrbs — Glowing orbs that continuously travel connected edges,
@@ -24,6 +38,28 @@ export function NeuralOrbs({
 }) {
   const { edgePairs, edgeCount, vertexPositions } = brainData
 
+  // Pre-compute a per-vertex rainbow hue based on spatial position
+  // so the ENTIRE brain always glows as a continuous spectrum
+  const vertexHues = useMemo(() => {
+    const totalVerts = vertexPositions.length / 3
+    const hues = new Float32Array(totalVerts)
+    // Find Y bounds for normalisation
+    let minY = Infinity, maxY = -Infinity
+    for (let i = 0; i < totalVerts; i++) {
+      const y = vertexPositions[i * 3 + 1]
+      if (y < minY) minY = y
+      if (y > maxY) maxY = y
+    }
+    const rangeY = maxY - minY || 1
+    for (let i = 0; i < totalVerts; i++) {
+      const y = vertexPositions[i * 3 + 1]
+      const x = vertexPositions[i * 3]
+      // Combine Y (main axis) with a bit of X for variety
+      hues[i] = ((y - minY) / rangeY + x * 0.15 + 1) % 1
+    }
+    return hues
+  }, [vertexPositions])
+
   const adjacency = useMemo(
     () => buildAdjacency(edgePairs, edgeCount),
     [edgePairs, edgeCount]
@@ -38,9 +74,10 @@ export function NeuralOrbs({
     })
   )
 
-  // Orb position + size buffers
+  // Orb position + size + color buffers
   const orbPositions = useMemo(() => new Float32Array(ORB_COUNT * 3), [])
   const orbSizes = useMemo(() => new Float32Array(ORB_COUNT), [])
+  const orbColors = useMemo(() => new Float32Array(ORB_COUNT * 3), [])
 
   // Flicker seeds
   const flickerSeeds = useRef(
@@ -59,22 +96,36 @@ export function NeuralOrbs({
     orbGeoRef.current.setAttribute(
       "size", new THREE.BufferAttribute(orbSizes, 1)
     )
-  }, [orbGeoRef, orbPositions, orbSizes])
+    orbGeoRef.current.setAttribute(
+      "color", new THREE.BufferAttribute(orbColors, 3)
+    )
+  }, [orbGeoRef, orbPositions, orbSizes, orbColors])
 
   useFrame((_state, delta) => {
     elapsedRef.current += delta
     const colors = colorAttr.array as Float32Array
     const t = elapsedRef.current
 
-    // Clear only edges used by active orbs (efficient)
-    const dirtyEdges = new Set<number>()
-    for (const orb of orbs.current) {
-      for (const eIdx of orb.chain) dirtyEdges.add(eIdx)
-    }
-    for (const eIdx of dirtyEdges) {
+    // Reset ALL edges to a dim mostly-white ambient base with subtle rainbow tint
+    const totalEdges = edgeCount
+    const amb = AMBIENT_RAINBOW
+    const wm = WHITE_MIX
+    const slowDrift = t * 0.03  // slow hue drift keeps it alive
+    for (let eIdx = 0; eIdx < totalEdges; eIdx++) {
       const off = eIdx * 6
-      colors[off] = 0; colors[off + 1] = 0; colors[off + 2] = 0
-      colors[off + 3] = 0; colors[off + 4] = 0; colors[off + 5] = 0
+      const vA = edgePairs[eIdx * 2]
+      const vB = edgePairs[eIdx * 2 + 1]
+      const hA = (vertexHues[vA] + slowDrift) % 1
+      const hB = (vertexHues[vB] + slowDrift) % 1
+      const [rA, gA, bA] = hueToRgb(hA)
+      const [rB, gB, bB] = hueToRgb(hB)
+      // Mix rainbow toward white, then apply ambient intensity
+      colors[off]     = (rA * (1 - wm) + wm) * amb
+      colors[off + 1] = (gA * (1 - wm) + wm) * amb
+      colors[off + 2] = (bA * (1 - wm) + wm) * amb
+      colors[off + 3] = (rB * (1 - wm) + wm) * amb
+      colors[off + 4] = (gB * (1 - wm) + wm) * amb
+      colors[off + 5] = (bB * (1 - wm) + wm) * amb
     }
 
     // Update each orb
@@ -122,7 +173,17 @@ export function NeuralOrbs({
       orbPositions[i * 3 + 1] = vertexPositions[startV * 3 + 1] * (1 - frac) + vertexPositions[endV * 3 + 1] * frac
       orbPositions[i * 3 + 2] = vertexPositions[startV * 3 + 2] * (1 - frac) + vertexPositions[endV * 3 + 2] * frac
 
-      orbSizes[i] = 0.45 + 0.06 * Math.sin(t * 4.0 + i * 2.5)
+      orbSizes[i] = 0.30 + 0.04 * Math.sin(t * 4.0 + i * 2.5)
+
+      // Rainbow hue per orb — slowly drifts over time, mixed heavily with white
+      const hue = (i / ORB_COUNT + t * 0.05) % 1.0
+      const [rawR, rawG, rawB] = hueToRgb(hue)
+      const cr = rawR * (1 - wm) + wm
+      const cg = rawG * (1 - wm) + wm
+      const cb = rawB * (1 - wm) + wm
+      orbColors[i * 3] = cr
+      orbColors[i * 3 + 1] = cg
+      orbColors[i * 3 + 2] = cb
 
       // Energy trail on visible chain edges
       const flicker = 0.92 + 0.08 * Math.sin(t * 14 + flickerSeeds.current[i])
@@ -147,10 +208,10 @@ export function NeuralOrbs({
 
         let wA = Math.exp(-absA * absA * 4.0)
         let wB = Math.exp(-absB * absB * 4.0)
-        if (dA > 0) wA += Math.exp(-dA * 0.8) * 0.45
-        if (dB > 0) wB += Math.exp(-dB * 0.8) * 0.45
-        if (dA < 0) wA += Math.exp(-absA * 6.0) * 0.2
-        if (dB < 0) wB += Math.exp(-absB * 6.0) * 0.2
+        if (dA > 0) wA += Math.exp(-dA * 0.8) * 0.30
+        if (dB > 0) wB += Math.exp(-dB * 0.8) * 0.30
+        if (dA < 0) wA += Math.exp(-absA * 6.0) * 0.12
+        if (dB < 0) wB += Math.exp(-absB * 6.0) * 0.12
         wA = Math.min(1, wA * flicker)
         wB = Math.min(1, wB * flicker)
 
@@ -159,12 +220,12 @@ export function NeuralOrbs({
         const hotA = Math.exp(-absA * 3.0)
         const hotB = Math.exp(-absB * 3.0)
 
-        colors[off] = Math.min(1, colors[off] + (0.3 + 0.7 * hotA) * wA)
-        colors[off + 1] = Math.min(1, colors[off + 1] + (0.6 + 0.4 * hotA) * wA)
-        colors[off + 2] = Math.min(1, colors[off + 2] + 1.0 * wA)
-        colors[off + 3] = Math.min(1, colors[off + 3] + (0.3 + 0.7 * hotB) * wB)
-        colors[off + 4] = Math.min(1, colors[off + 4] + (0.6 + 0.4 * hotB) * wB)
-        colors[off + 5] = Math.min(1, colors[off + 5] + 1.0 * wB)
+        colors[off]     = Math.min(1, colors[off]     + (cr + (1 - cr) * hotA) * wA)
+        colors[off + 1] = Math.min(1, colors[off + 1] + (cg + (1 - cg) * hotA) * wA)
+        colors[off + 2] = Math.min(1, colors[off + 2] + (cb + (1 - cb) * hotA) * wA)
+        colors[off + 3] = Math.min(1, colors[off + 3] + (cr + (1 - cr) * hotB) * wB)
+        colors[off + 4] = Math.min(1, colors[off + 4] + (cg + (1 - cg) * hotB) * wB)
+        colors[off + 5] = Math.min(1, colors[off + 5] + (cb + (1 - cb) * hotB) * wB)
       }
     }
 
@@ -173,8 +234,10 @@ export function NeuralOrbs({
     if (orbGeoRef.current) {
       const pa = orbGeoRef.current.getAttribute("position") as THREE.BufferAttribute
       const sa = orbGeoRef.current.getAttribute("size") as THREE.BufferAttribute
+      const ca = orbGeoRef.current.getAttribute("color") as THREE.BufferAttribute
       if (pa) pa.needsUpdate = true
       if (sa) sa.needsUpdate = true
+      if (ca) ca.needsUpdate = true
     }
   })
 

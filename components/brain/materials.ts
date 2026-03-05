@@ -15,7 +15,7 @@ export function createPullUniforms(): PullUniforms {
 /* ── Inject GPU pull-displacement into Three.js material ──────────── */
 
 export function injectPull(mat: THREE.Material, u: PullUniforms) {
-  ;(mat as any).onBeforeCompile = (shader: any) => {
+  ; (mat as any).onBeforeCompile = (shader: any) => {
     shader.uniforms.uPullPoint = u.uPullPoint
     shader.uniforms.uPullStrength = u.uPullStrength
     shader.uniforms.uPullRadius = u.uPullRadius
@@ -53,16 +53,20 @@ export function makeOrbMaterial(pull?: PullUniforms) {
     blending: THREE.AdditiveBlending,
     uniforms: {
       uTime: { value: 0 },
+      uFade: { value: 0 },
       uPullPoint: pull?.uPullPoint ?? { value: new THREE.Vector3() },
       uPullStrength: pull?.uPullStrength ?? { value: 0 },
       uPullRadius: pull?.uPullRadius ?? { value: 0.35 },
     },
     vertexShader: /* glsl */ `
       attribute float size;
+      attribute vec3 color;
+      varying vec3 vColor;
       uniform vec3 uPullPoint;
       uniform float uPullStrength;
       uniform float uPullRadius;
       void main() {
+        vColor = color;
         vec3 pos = position;
         vec3 _dir = uPullPoint - pos;
         float _d = length(_dir);
@@ -72,29 +76,33 @@ export function makeOrbMaterial(pull?: PullUniforms) {
           pos += (_dir / _d) * _f * uPullStrength * 0.12;
         }
         vec4 mv = modelViewMatrix * vec4(pos, 1.0);
-        gl_PointSize = size * (620.0 / -mv.z);
+        gl_PointSize = size * (570.0 / -mv.z);
         gl_Position = projectionMatrix * mv;
       }
     `,
     fragmentShader: /* glsl */ `
       uniform float uTime;
+      uniform float uFade;
+      varying vec3 vColor;
       void main() {
         float d = length(gl_PointCoord - vec2(0.5));
         if (d > 0.5) discard;
 
-        float core   = exp(-d * d * 160.0);
-        float inner  = exp(-d * d * 50.0)  * 0.9;
-        float mid    = exp(-d * d * 18.0)  * 0.55;
-        float outer  = exp(-d * d * 6.0)   * 0.3;
-        float fringe = exp(-d * d * 2.5)   * 0.12;
+        float core   = exp(-d * d * 160.0) * 0.38;
+        float inner  = exp(-d * d * 50.0)  * 0.32;
+        float mid    = exp(-d * d * 18.0)  * 0.18;
+        float outer  = exp(-d * d * 6.0)   * 0.09;
+        float fringe = exp(-d * d * 2.5)   * 0.035;
 
         float intensity = core + inner + mid + outer + fringe;
         intensity *= 0.88 + 0.12 * sin(uTime * 5.0);
+        intensity *= uFade;
 
-        vec3 color = ${glsl.glowColor} * fringe
-                   + vec3(0.4, 0.75, 1.0) * (outer + mid)
-                   + vec3(0.8, 0.92, 1.0) * inner
-                   + vec3(1.0, 1.0, 1.0)  * core;
+        vec3 grey = vec3(0.90, 0.90, 0.94);
+        vec3 color = mix(vColor, grey, 0.3) * fringe
+                   + mix(vColor, grey, 0.25) * (outer + mid)
+                   + mix(vColor, grey, 0.5) * inner
+                   + mix(grey, vec3(1.0), 0.5) * core;
         color = min(color, vec3(1.0));
 
         gl_FragColor = vec4(color, intensity);

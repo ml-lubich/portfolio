@@ -18,6 +18,7 @@ export function useScrollProgress(offset = 0.35) {
   const ref = useRef<HTMLDivElement>(null)
   const [progress, setProgress] = useState(0)
   const rafRef = useRef<number>(0)
+  const prevProgress = useRef(0)
 
   const update = useCallback(() => {
     const el = ref.current
@@ -40,7 +41,12 @@ export function useScrollProgress(offset = 0.35) {
     // Apply ease-out for a smooth, unhurried feel
     const eased = 1 - Math.pow(1 - clamped, 1.4)
 
-    setProgress(eased)
+    // Only update state when change is visually meaningful (> 0.5%)
+    // This prevents hundreds of unnecessary re-renders while scrolling
+    if (Math.abs(eased - prevProgress.current) > 0.005) {
+      prevProgress.current = eased
+      setProgress(eased)
+    }
   }, [offset])
 
   useEffect(() => {

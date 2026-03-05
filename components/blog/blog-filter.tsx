@@ -19,11 +19,10 @@ export function BlogFilter({ activeCategory, onCategoryChange }: BlogFilterProps
           role="tab"
           aria-selected={activeCategory === cat}
           aria-label={`Filter by ${cat}`}
-          className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all duration-300 ${
-            activeCategory === cat
+          className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all duration-300 ${activeCategory === cat
               ? `bg-primary text-primary-foreground shadow-[${shadows.filterActive}]`
               : "border border-white/[0.06] bg-white/[0.03] text-muted-foreground backdrop-blur-sm hover:border-primary/30 hover:text-foreground hover:bg-white/[0.06]"
-          }`}
+            }`}
         >
           {cat}
         </button>
@@ -49,11 +48,10 @@ export function BlogTagFilter({ activeTags, onTagToggle }: BlogTagFilterProps) {
             key={tag}
             onClick={() => onTagToggle(tag)}
             aria-pressed={isActive}
-            className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-300 ${
-              isActive
+            className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-300 ${isActive
                 ? `bg-accent/20 text-accent border border-accent/40 shadow-[${shadows.filterTag}]`
                 : "border border-white/[0.04] bg-white/[0.02] text-muted-foreground/70 backdrop-blur-sm hover:border-accent/20 hover:text-muted-foreground hover:bg-white/[0.04]"
-            }`}
+              }`}
           >
             #{tag}
           </button>

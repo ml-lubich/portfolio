@@ -109,10 +109,10 @@ export function RotatingStats() {
               perspective: "600px",
             }}
           >
-            <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/[0.04] via-transparent to-accent/[0.04] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+            <div className="absolute inset-0 rounded-2xl bg-primary/[0.04] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+            <div className="absolute inset-x-0 top-0 h-px bg-white/[0.06]" />
             <div
-              className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/[0.06] to-transparent"
+              className="pointer-events-none absolute inset-0 -translate-x-full bg-white/[0.04]"
               style={{
                 animation: cardPhases[i] === "enter"
                   ? `shimmer-sweep 0.8s ${i * 0.1}s ease-out forwards`
@@ -145,8 +145,8 @@ export function RotatingStats() {
               if (i !== setIndex) triggerTransition(i)
             }}
             className={`h-1.5 rounded-full transition-all duration-500 ${i === setIndex
-                ? "w-6 bg-primary/60"
-                : "w-1.5 bg-muted-foreground/20 hover:bg-muted-foreground/40"
+              ? "w-6 bg-primary/60"
+              : "w-1.5 bg-muted-foreground/20 hover:bg-muted-foreground/40"
               }`}
             aria-label={`Show stat set ${i + 1}`}
           />

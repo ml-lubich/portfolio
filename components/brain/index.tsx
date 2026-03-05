@@ -58,9 +58,23 @@ function ResponsiveCamera() {
 
 export function Brain3D({ className = "" }: { className?: string }) {
   const initCam = React.useMemo(() => getResponsiveCam(), [])
+  const [ready, setReady] = React.useState(false)
+
+  // Trigger fade-in shortly after mount so the CSS transition fires
+  React.useEffect(() => {
+    const id = requestAnimationFrame(() => setReady(true))
+    return () => cancelAnimationFrame(id)
+  }, [])
+
   return (
     <WebGLErrorBoundary>
-      <div className={`w-full h-full cursor-grab active:cursor-grabbing ${className}`}>
+      <div
+        className={`w-full h-full cursor-grab active:cursor-grabbing ${className}`}
+        style={{
+          opacity: ready ? 1 : 0,
+          transition: "opacity 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+        }}
+      >
         <Canvas
           camera={{ position: [0, 0, initCam.z], fov: initCam.fov }}
           dpr={[1, 1.5]}

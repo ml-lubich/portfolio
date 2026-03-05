@@ -5,6 +5,8 @@ import { GeistSans } from 'geist/font/sans'
 import { GeistMono } from 'geist/font/mono'
 
 import './globals.css'
+import { ScrollShimmer } from '@/components/scroll-shimmer'
+import { BackgroundOrbs } from '@/components/background-orbs'
 
 const jetbrains = JetBrains_Mono({
   subsets: ['latin'],
@@ -80,6 +82,15 @@ export const metadata: Metadata = {
   alternates: {
     canonical: BASE_URL,
   },
+  icons: {
+    icon: [
+      { url: "/logo.png", type: "image/png" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
+    apple: [
+      { url: "/logo.png", type: "image/png" },
+    ],
+  },
 }
 
 export const viewport: Viewport = {
@@ -123,6 +134,10 @@ export default function RootLayout({
         />
       </head>
       <body className="font-sans antialiased font-light">
+        {/* Spectrum gradient background orbs */}
+        <BackgroundOrbs />
+        {/* Scroll-driven shine on gradient-text */}
+        <ScrollShimmer />
         {/* Skip to main content — accessibility */}
         <a
           href="#main-content"
