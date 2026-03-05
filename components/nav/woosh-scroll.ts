@@ -56,6 +56,14 @@ export function navigateTo(href: string, callback?: () => void) {
   }
   const id = href.replace("#", "")
 
+  // Bare "#" or empty → scroll to top
+  if (!id) {
+    wooshScrollTo(0)
+    history.pushState(null, "", window.location.pathname)
+    callback?.()
+    return
+  }
+
   function scrollToElement() {
     const el = id ? document.getElementById(id) : null
     if (el) {

@@ -33,7 +33,8 @@ class WebGLErrorBoundary extends Component<
 
 function getResponsiveCam() {
   const w = typeof window !== "undefined" ? window.innerWidth : 1200
-  if (w < 640) return { z: 3.4, fov: 50 }
+  if (w < 480) return { z: 4.2, fov: 44 }
+  if (w < 640) return { z: 3.8, fov: 46 }
   if (w < 1024) return { z: 3.0, fov: 47 }
   return { z: 2.7, fov: 44 }
 }

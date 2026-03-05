@@ -10,11 +10,30 @@ import { hexNum } from "@/lib/theme"
 
 /* ── Rotating wireframe brain with neural orb effects ──────────────── */
 
+/* ── Responsive scale — smaller brain on narrow viewports ──────────── */
+function useResponsiveScale() {
+  const [scale, setScale] = React.useState(0.82)
+  React.useEffect(() => {
+    const update = () => {
+      const w = window.innerWidth
+      if (w < 480) setScale(0.58)
+      else if (w < 640) setScale(0.65)
+      else if (w < 1024) setScale(0.74)
+      else setScale(0.82)
+    }
+    update()
+    window.addEventListener("resize", update)
+    return () => window.removeEventListener("resize", update)
+  }, [])
+  return scale
+}
+
 export function BrainWireframe() {
   const groupRef = useRef<THREE.Group>(null!)
   const orbGeoRef = useRef<THREE.BufferGeometry>(null!)
   const hitRef = useRef<THREE.Mesh>(null!)
   const result = useBrainData()
+  const brainScale = useResponsiveScale()
 
   // Shared pull-deform uniforms
   const pull = useMemo(() => createPullUniforms(), [])
@@ -60,6 +79,20 @@ export function BrainWireframe() {
   // Orb shader material
   const orbMaterial = useMemo(() => makeOrbMaterial(pull), [pull])
 
+  // Responsive orb size multiplier — larger on small screens to stay visible
+  React.useEffect(() => {
+    const update = () => {
+      const w = window.innerWidth
+      if (w < 480) orbMaterial.uniforms.uSizeMul.value = 520
+      else if (w < 640) orbMaterial.uniforms.uSizeMul.value = 460
+      else if (w < 1024) orbMaterial.uniforms.uSizeMul.value = 420
+      else orbMaterial.uniforms.uSizeMul.value = 380
+    }
+    update()
+    window.addEventListener("resize", update)
+    return () => window.removeEventListener("resize", update)
+  }, [orbMaterial])
+
   // Build signal geometry
   const signalGeo = useMemo(() => {
     if (!result) return null
@@ -102,7 +135,7 @@ export function BrainWireframe() {
   const { geo, brainData } = result
 
   return (
-    <group ref={groupRef} scale={0.82} rotation={[0, Math.PI * 0.5, 0]}>
+    <group ref={groupRef} scale={brainScale} rotation={[0, Math.PI * 0.5, 0]}>
       <group rotation={[-Math.PI * 0.5 + Math.PI * 0.08, 0, 0]}>
         {/* Invisible sphere for pull interaction */}
         <mesh

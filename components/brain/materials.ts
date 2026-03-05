@@ -54,6 +54,7 @@ export function makeOrbMaterial(pull?: PullUniforms) {
     uniforms: {
       uTime: { value: 0 },
       uFade: { value: 0 },
+      uSizeMul: { value: 380.0 },
       uPullPoint: pull?.uPullPoint ?? { value: new THREE.Vector3() },
       uPullStrength: pull?.uPullStrength ?? { value: 0 },
       uPullRadius: pull?.uPullRadius ?? { value: 0.35 },
@@ -62,6 +63,7 @@ export function makeOrbMaterial(pull?: PullUniforms) {
       attribute float size;
       attribute vec3 color;
       varying vec3 vColor;
+      uniform float uSizeMul;
       uniform vec3 uPullPoint;
       uniform float uPullStrength;
       uniform float uPullRadius;
@@ -76,7 +78,7 @@ export function makeOrbMaterial(pull?: PullUniforms) {
           pos += (_dir / _d) * _f * uPullStrength * 0.12;
         }
         vec4 mv = modelViewMatrix * vec4(pos, 1.0);
-        gl_PointSize = size * (380.0 / -mv.z);
+        gl_PointSize = size * (uSizeMul / -mv.z);
         gl_Position = projectionMatrix * mv;
       }
     `,

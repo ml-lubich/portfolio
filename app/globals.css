@@ -126,20 +126,20 @@
 
 /* Spectrum orbs: gentle drift + slow hue shift (variant A) */
 @keyframes spectrum-drift-a {
-  0%   { transform: translate(-50%, -50%) translate(0, 0);       filter: blur(10vw) hue-rotate(0deg); }
-  25%  { transform: translate(-50%, -50%) translate(1vw, -0.7vw); filter: blur(10vw) hue-rotate(12deg); }
-  50%  { transform: translate(-50%, -50%) translate(-0.6vw, 0.8vw);  filter: blur(10vw) hue-rotate(25deg); }
-  75%  { transform: translate(-50%, -50%) translate(0.7vw, 0.4vw);   filter: blur(10vw) hue-rotate(15deg); }
-  100% { transform: translate(-50%, -50%) translate(0, 0);       filter: blur(10vw) hue-rotate(0deg); }
+  0%   { transform: translate(-50%, -50%) translate(0, 0);           filter: blur(6vmax) hue-rotate(0deg); }
+  25%  { transform: translate(-50%, -50%) translate(1vmax, -0.7vmax); filter: blur(6vmax) hue-rotate(12deg); }
+  50%  { transform: translate(-50%, -50%) translate(-0.6vmax, 0.8vmax);  filter: blur(6vmax) hue-rotate(25deg); }
+  75%  { transform: translate(-50%, -50%) translate(0.7vmax, 0.4vmax);   filter: blur(6vmax) hue-rotate(15deg); }
+  100% { transform: translate(-50%, -50%) translate(0, 0);           filter: blur(6vmax) hue-rotate(0deg); }
 }
 
 /* Spectrum orbs: gentle drift + slow hue shift (variant B — reverse) */
 @keyframes spectrum-drift-b {
-  0%   { transform: translate(-50%, -50%) translate(0, 0);        filter: blur(10vw) hue-rotate(0deg); }
-  25%  { transform: translate(-50%, -50%) translate(-0.8vw, 0.6vw);  filter: blur(10vw) hue-rotate(-15deg); }
-  50%  { transform: translate(-50%, -50%) translate(0.7vw, -1vw); filter: blur(10vw) hue-rotate(-25deg); }
-  75%  { transform: translate(-50%, -50%) translate(-0.4vw, -0.3vw);  filter: blur(10vw) hue-rotate(-10deg); }
-  100% { transform: translate(-50%, -50%) translate(0, 0);        filter: blur(10vw) hue-rotate(0deg); }
+  0%   { transform: translate(-50%, -50%) translate(0, 0);            filter: blur(6vmax) hue-rotate(0deg); }
+  25%  { transform: translate(-50%, -50%) translate(-0.8vmax, 0.6vmax);  filter: blur(6vmax) hue-rotate(-15deg); }
+  50%  { transform: translate(-50%, -50%) translate(0.7vmax, -1vmax); filter: blur(6vmax) hue-rotate(-25deg); }
+  75%  { transform: translate(-50%, -50%) translate(-0.4vmax, -0.3vmax);  filter: blur(6vmax) hue-rotate(-10deg); }
+  100% { transform: translate(-50%, -50%) translate(0, 0);            filter: blur(6vmax) hue-rotate(0deg); }
 }
 
 /* Rainbow gradient text */
