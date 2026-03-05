@@ -187,13 +187,13 @@ export default function BlogLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="relative z-10 min-h-screen">
-      {/* Dark scrim — dims the fixed BackgroundOrbs so blog text stays crisp */}
-      <div
-        className="fixed inset-0 z-0 pointer-events-none"
-        aria-hidden="true"
-        style={{ background: "hsl(220 20% 4% / 0.92)" }}
-      />
+    <div
+      className="relative z-10 min-h-screen"
+      style={{
+        background:
+          "linear-gradient(to bottom, transparent 0%, hsl(220 20% 4% / 0.88) 120px)",
+      }}
+    >
       <BlogCollectionJsonLd />
       <Suspense fallback={null}>
         <BlogHeader />

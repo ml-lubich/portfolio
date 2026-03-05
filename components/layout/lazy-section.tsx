@@ -10,6 +10,13 @@ interface LazySectionProps {
   minHeight?: string
   /** CSS class on the wrapper (always applied) */
   className?: string
+  /**
+   * Section id used for nav scroll targeting. Sets a data-section attribute
+   * on the wrapper so navigateTo() can find the placeholder before the
+   * lazy children have mounted (avoids the jarring progressive-scroll
+   * fallback).
+   */
+  sectionId?: string
 }
 
 /**
@@ -24,6 +31,7 @@ export function LazySection({
   rootMargin = "400px",
   minHeight = "50vh",
   className = "",
+  sectionId,
 }: LazySectionProps) {
   const ref = useRef<HTMLDivElement>(null)
   const [visible, setVisible] = useState(false)
@@ -46,7 +54,7 @@ export function LazySection({
   }, [rootMargin])
 
   return (
-    <div ref={ref} className={className || undefined} style={visible ? undefined : { minHeight }}>
+    <div ref={ref} className={className || undefined} data-section={sectionId || undefined} style={visible ? undefined : { minHeight }}>
       {visible ? children : null}
     </div>
   )

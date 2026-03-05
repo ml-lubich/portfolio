@@ -132,7 +132,7 @@ const techBars: BarItem[] = [
 
 export function AIExpertise() {
   return (
-    <AnimatedSection id="ai-expertise" className="relative py-14 sm:py-20 overflow-hidden">
+    <AnimatedSection id="ai-expertise" className="relative py-14 sm:py-20">
       {/* Background effects */}
       <div className="absolute inset-0 dot-pattern opacity-30" aria-hidden="true" />
 
@@ -189,7 +189,7 @@ export function AIExpertise() {
         </div>
 
         {/* Proficiency bars */}
-        <AnimatedSection delay={200}>
+        <AnimatedSection delay={200} className="relative z-10">
           <div className="mb-16 rounded-2xl border border-white/[0.04] bg-card/25 p-8 backdrop-blur-xl frosted-panel">
             <h3 className="mb-6 text-lg font-bold text-foreground">Core Proficiency</h3>
             <AnimatedBars bars={techBars} duration={1600} stagger={150} />

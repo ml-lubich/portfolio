@@ -186,8 +186,7 @@ export function Navigation() {
               e.preventDefault()
               e.stopPropagation()
               setHideNav(false)
-              // Scroll to top directly — don't go through navigateTo
-              window.scrollTo({ top: 0, behavior: "smooth" })
+              wooshScrollTo(0)
               history.replaceState(null, "", window.location.pathname)
               setMobileOpen(false)
             }}

@@ -23,10 +23,13 @@ export default function BlogPage() {
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   )
 
+  // Compute total views on the server so client & server always match
+  const totalViews = `${blogPosts.reduce((sum, p) => sum + parseInt(p.views), 0)}k`
+
   return (
     <>
       {/* Interactive client-side blog page for users */}
-      <BlogPageClient blogPosts={blogPosts} />
+      <BlogPageClient blogPosts={blogPosts} totalViews={totalViews} />
 
       {/* ── Server-rendered SEO content ────────────────────────────
        *  This section is visually hidden but in the DOM for crawlers.

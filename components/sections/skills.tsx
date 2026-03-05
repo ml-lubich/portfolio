@@ -20,8 +20,10 @@ function TiltCard({ children, className = "" }: { children: React.ReactNode; cla
   const ref = useRef<HTMLDivElement>(null)
   const [tilt, setTilt] = useState({ x: 0, y: 0 })
   const [shine, setShine] = useState({ x: 50, opacity: 0 })
+  const lastTouchRef = useRef(0)
 
   const handleMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (Date.now() - lastTouchRef.current < 500) return
     if (!ref.current) return
     const r = ref.current.getBoundingClientRect()
     const x = (e.clientX - r.left) / r.width
@@ -35,11 +37,18 @@ function TiltCard({ children, className = "" }: { children: React.ReactNode; cla
     setShine({ x: 50, opacity: 0 })
   }, [])
 
+  const handleTouchEnd = useCallback(() => {
+    lastTouchRef.current = Date.now()
+    setTilt({ x: 0, y: 0 })
+    setShine({ x: 50, opacity: 0 })
+  }, [])
+
   return (
     <div
       ref={ref}
       onMouseMove={handleMove}
       onMouseLeave={handleLeave}
+      onTouchEnd={handleTouchEnd}
       className={className}
       style={{
         transform: `perspective(800px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale(${tilt.x || tilt.y ? 1.04 : 1})`,
@@ -71,7 +80,7 @@ export function Skills() {
   }, [])
 
   return (
-    <AnimatedSection id="skills" className="relative py-14 sm:py-20 overflow-hidden">
+    <AnimatedSection id="skills" className="relative py-14 sm:py-20">
       {/* Ambient background orbs — constant, overlapping, smoothly drifting */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
         <div className="absolute -left-20 top-1/4 h-[32rem] w-[32rem] rounded-full bg-primary/[0.06] blur-[80px] translucent-glow" style={{ animationDelay: "-4s" }} />
@@ -92,7 +101,7 @@ export function Skills() {
         />
 
         {/* Proficiency bars */}
-        <AnimatedSection delay={100}>
+        <AnimatedSection delay={100} className="relative z-10">
           <div className="mb-12 rounded-2xl border border-white/[0.04] bg-card/25 p-8 backdrop-blur-xl frosted-panel">
             <h3 className="mb-6 text-lg font-bold text-foreground">Overall Proficiency</h3>
             <AnimatedBars bars={proficiencyBars} duration={1600} stagger={120} />

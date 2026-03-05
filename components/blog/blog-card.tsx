@@ -24,7 +24,11 @@ export function BlogCard({ post, featured = false, onTagClick }: BlogCardProps) 
   const [tilt, setTilt] = useState({ x: 0, y: 0 })
   const [glare, setGlare] = useState({ x: 50, y: 50, opacity: 0 })
 
+  const lastTouchRef = useRef(0)
+
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    // Suppress synthetic mouse events fired after a touch tap
+    if (Date.now() - lastTouchRef.current < 500) return
     if (!cardRef.current) return
     const rect = cardRef.current.getBoundingClientRect()
     const x = (e.clientX - rect.left) / rect.width
@@ -38,6 +42,12 @@ export function BlogCard({ post, featured = false, onTagClick }: BlogCardProps) 
     setGlare({ x: 50, y: 50, opacity: 0 })
   }, [])
 
+  const handleTouchEnd = useCallback(() => {
+    lastTouchRef.current = Date.now()
+    setTilt({ x: 0, y: 0 })
+    setGlare({ x: 50, y: 50, opacity: 0 })
+  }, [])
+
   if (featured) {
     return (
       <Link href={`/blog/${post.slug}`} className="group block cursor-pointer">
@@ -45,6 +55,7 @@ export function BlogCard({ post, featured = false, onTagClick }: BlogCardProps) 
           ref={cardRef}
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
+          onTouchEnd={handleTouchEnd}
           style={{
             transform: `perspective(800px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
             transition: "transform 0.15s ease-out",
@@ -105,6 +116,8 @@ export function BlogCard({ post, featured = false, onTagClick }: BlogCardProps) 
                 <time dateTime={post.date}>{formattedDate}</time>
                 <span className="h-1 w-1 rounded-full bg-muted-foreground/40" aria-hidden="true" />
                 <span>{readingTime} min read</span>
+                <span className="h-1 w-1 rounded-full bg-muted-foreground/40" aria-hidden="true" />
+                <span>{post.views} views</span>
               </div>
             </div>
           </article>
@@ -118,6 +131,7 @@ export function BlogCard({ post, featured = false, onTagClick }: BlogCardProps) 
       ref={cardRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
+      onTouchEnd={handleTouchEnd}
       style={{
         transform: `perspective(600px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
         transition: "transform 0.15s ease-out",
@@ -153,6 +167,7 @@ export function BlogCard({ post, featured = false, onTagClick }: BlogCardProps) 
                 {post.category}
               </span>
               <span className="text-xs text-muted-foreground">{readingTime} min</span>
+              <span className="text-xs text-muted-foreground">{post.views} views</span>
             </div>
 
             <h3 className="no-metallic mt-3 text-lg font-semibold leading-snug text-foreground transition-colors group-hover:text-primary">

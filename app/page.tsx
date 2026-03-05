@@ -81,25 +81,25 @@ export default function Home() {
         <LazySection>
           <AIExpertise />
         </LazySection>
-        <LazySection>
+        <LazySection sectionId="about">
           <About />
         </LazySection>
-        <LazySection>
+        <LazySection sectionId="journey">
           <Journey />
         </LazySection>
-        <LazySection>
+        <LazySection sectionId="projects">
           <Projects />
         </LazySection>
-        <LazySection>
+        <LazySection sectionId="skills">
           <Skills />
         </LazySection>
         <LazySection>
           <GitHubStats />
         </LazySection>
-        <LazySection>
+        <LazySection sectionId="research">
           <Publications />
         </LazySection>
-        <LazySection minHeight="30vh">
+        <LazySection sectionId="contact" minHeight="30vh">
           <Contact />
         </LazySection>
         <Footer />

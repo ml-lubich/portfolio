@@ -238,46 +238,76 @@ export function LiveTerminal() {
           {/* Subtle top-edge glow */}
           <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent z-10" />
           {/* Title bar */}
-          <div className={`flex items-center justify-between px-4 py-2.5 bg-[${terminalChrome.headerBg}] border-b border-white/[0.06]`}>
-            <div className="flex items-center gap-2">
-              <div className="flex gap-1.5">
-                <div className={`w-3 h-3 rounded-full bg-[${terminalChrome.dotClose}]`} />
-                <div className={`w-3 h-3 rounded-full bg-[${terminalChrome.dotMinimize}]`} />
-                <div className={`w-3 h-3 rounded-full bg-[${terminalChrome.dotExpand}]`} />
+          <div className={`px-2.5 sm:px-4 py-2 sm:py-2.5 bg-[${terminalChrome.headerBg}] border-b border-white/[0.06]`}>
+            {/* Desktop: single row */}
+            <div className="hidden sm:flex items-center justify-between gap-2 min-w-0">
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="flex gap-1.5 shrink-0">
+                  <div className={`w-3 h-3 rounded-full bg-[${terminalChrome.dotClose}]`} />
+                  <div className={`w-3 h-3 rounded-full bg-[${terminalChrome.dotMinimize}]`} />
+                  <div className={`w-3 h-3 rounded-full bg-[${terminalChrome.dotExpand}]`} />
+                </div>
+                <span className="ml-3 text-xs text-muted-foreground/50 font-mono truncate min-w-0">
+                  misha@dev ~ {cur?.label}
+                </span>
               </div>
-              <span className="ml-3 text-xs text-muted-foreground/50 font-mono truncate max-w-[280px]">
-                misha@dev ~ {cur?.label}
-              </span>
+              <div className="flex items-center gap-3 text-[11px] shrink-0">
+                <div className="flex items-center gap-1">
+                  <Zap className="w-3 h-3 text-yellow-400/60" />
+                  <span className="font-mono text-yellow-400/60">{wpm} WPM</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Activity className="w-3 h-3 text-primary/40" />
+                  <span className="font-mono text-primary/40">{totalChars.toLocaleString()}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="text-emerald-400/60 font-mono">LIVE</span>
+                </div>
+              </div>
             </div>
-            <div className="flex items-center gap-3 text-[11px] shrink-0">
-              <div className="flex items-center gap-1">
-                <Zap className="w-3 h-3 text-yellow-400/60" />
-                <span className="font-mono text-yellow-400/60">{wpm} WPM</span>
+            {/* Mobile: two rows */}
+            <div className="sm:hidden">
+              <div className="flex items-center gap-2">
+                <div className="flex gap-1.5 shrink-0">
+                  <div className={`w-2.5 h-2.5 rounded-full bg-[${terminalChrome.dotClose}]`} />
+                  <div className={`w-2.5 h-2.5 rounded-full bg-[${terminalChrome.dotMinimize}]`} />
+                  <div className={`w-2.5 h-2.5 rounded-full bg-[${terminalChrome.dotExpand}]`} />
+                </div>
+                <span className="ml-1 text-[10px] text-muted-foreground/50 font-mono min-w-0">
+                  misha@dev ~ {cur?.label}
+                </span>
               </div>
-              <div className="flex items-center gap-1">
-                <Activity className="w-3 h-3 text-primary/40" />
-                <span className="font-mono text-primary/40">{totalChars.toLocaleString()}</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-emerald-400/60 font-mono">LIVE</span>
+              <div className="flex items-center gap-3 mt-1.5 ml-[calc(3*0.625rem+0.375rem+0.5rem)] text-[10px]">
+                <div className="flex items-center gap-1">
+                  <Zap className="w-3 h-3 text-yellow-400/60" />
+                  <span className="font-mono text-yellow-400/60">{wpm} WPM</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Activity className="w-3 h-3 text-primary/40" />
+                  <span className="font-mono text-primary/40">{totalChars.toLocaleString()}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="text-emerald-400/60 font-mono">LIVE</span>
+                </div>
               </div>
             </div>
           </div>
 
           {/* Info bar */}
-          <div className="px-4 py-1 bg-white/[0.02] border-b border-white/[0.04] flex items-center justify-between">
-            <div className="flex items-center gap-2 text-[11px]">
-              <Clock className="w-3 h-3 text-primary/30" />
-              <span className="font-mono text-foreground/50">{cur?.icon} {cur?.time} — {cur?.label}</span>
+          <div className="px-2.5 sm:px-4 py-1 bg-white/[0.02] border-b border-white/[0.04] flex items-center justify-between gap-2 min-w-0">
+            <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-[11px] min-w-0">
+              <Clock className="w-3 h-3 text-primary/30 shrink-0" />
+              <span className="font-mono text-foreground/50 truncate min-w-0">{cur?.icon} {cur?.time} — {cur?.label}</span>
             </div>
-            <span className="text-[10px] font-mono text-muted-foreground/25">{linesCount} lines</span>
+            <span className="text-[10px] font-mono text-muted-foreground/25 shrink-0">{linesCount} lines</span>
           </div>
 
           {/* Body */}
           <div
             ref={scrollRef}
-            className="p-4 font-mono text-[13px] leading-relaxed h-[380px] overflow-y-auto scrollbar-thin scrollbar-thumb-border/40 scrollbar-track-transparent"
+            className="p-2.5 sm:p-4 font-mono text-[11px] sm:text-[13px] leading-relaxed h-[320px] sm:h-[380px] overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-border/40 scrollbar-track-transparent"
           >
             {lines.length === 0 && visible && (
               <div className="text-muted-foreground/20 animate-pulse flex items-center gap-2">
@@ -292,7 +322,7 @@ export function LiveTerminal() {
           </div>
 
           {/* Footer */}
-          <div className={`px-4 py-1 bg-[${terminalChrome.footerBg}] border-t border-white/[0.04] flex items-center justify-between text-[10px] font-mono text-muted-foreground/25`}>
+          <div className={`px-2.5 sm:px-4 py-1 bg-[${terminalChrome.footerBg}] border-t border-white/[0.04] flex items-center justify-between text-[10px] font-mono text-muted-foreground/25`}>
             <span>SESSION {activeSession + 1}/{S.length}</span>
             <span>zsh — 80×24</span>
           </div>

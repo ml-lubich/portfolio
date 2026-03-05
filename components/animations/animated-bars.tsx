@@ -233,7 +233,7 @@ export function AnimatedBars({
               <div
                 className="overflow-hidden"
                 style={{
-                  maxHeight: isExpanded ? `${(bar.details!.length * 44) + 16}px` : "0",
+                  maxHeight: isExpanded ? `${(bar.details!.length * 80) + 24}px` : "0",
                   opacity: isExpanded ? 1 : 0,
                   transition: isExpanded
                     ? "max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease-out"

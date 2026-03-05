@@ -21,10 +21,12 @@ export function Hero() {
 
       {/* 3D Brain */}
       <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-screen z-[3]"
+        className="pointer-events-none absolute inset-0 z-[3] flex items-center justify-center"
         aria-hidden="true"
       >
-        <Brain3D className="h-full w-full pointer-events-auto" />
+        <div className="h-[115vw] w-[115vw] -translate-y-[45%] sm:translate-y-0 sm:h-full sm:w-full">
+          <Brain3D className="h-full w-full pointer-events-auto" />
+        </div>
       </div>
 
       {/* Vignette */}

@@ -11,7 +11,10 @@ export function ProfileIntro() {
     const [tilt, setTilt] = useState({ x: 0, y: 0 })
     const [isHovered, setIsHovered] = useState(false)
 
+    const lastTouchRef = useRef(0)
+
     const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+        if (Date.now() - lastTouchRef.current < 500) return
         if (!cardRef.current) return
         const rect = cardRef.current.getBoundingClientRect()
         const x = (e.clientX - rect.left) / rect.width - 0.5
@@ -19,8 +22,17 @@ export function ProfileIntro() {
         setTilt({ x: y * -12, y: x * 12 })
     }, [])
 
-    const handleMouseEnter = useCallback(() => setIsHovered(true), [])
+    const handleMouseEnter = useCallback(() => {
+        if (Date.now() - lastTouchRef.current < 500) return
+        setIsHovered(true)
+    }, [])
     const handleMouseLeave = useCallback(() => {
+        setIsHovered(false)
+        setTilt({ x: 0, y: 0 })
+    }, [])
+
+    const handleTouchEnd = useCallback(() => {
+        lastTouchRef.current = Date.now()
         setIsHovered(false)
         setTilt({ x: 0, y: 0 })
     }, [])
@@ -35,6 +47,7 @@ export function ProfileIntro() {
                         onMouseMove={handleMouseMove}
                         onMouseEnter={handleMouseEnter}
                         onMouseLeave={handleMouseLeave}
+                        onTouchEnd={handleTouchEnd}
                         className="group relative overflow-hidden rounded-3xl p-8 sm:p-10 md:p-12 will-change-transform"
                         style={{
                             transform: `perspective(800px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) translateY(${isHovered ? -8 : 0}px) scale(${isHovered ? 1.015 : 1})`,
@@ -89,7 +102,7 @@ export function ProfileIntro() {
                                         alt="Misha Lubich"
                                         width={256}
                                         height={384}
-                                        className="h-full w-full object-cover object-top brightness-[0.82] contrast-[0.95] saturate-[1.05] transition-all duration-500 group-hover:brightness-[0.88] group-hover:saturate-[1.1]"
+                                        className="h-full w-full object-cover object-top brightness-[0.72] contrast-[0.95] saturate-[1.05] transition-all duration-500 group-hover:brightness-[0.78] group-hover:saturate-[1.1]"
                                         priority={false}
                                     />
                                 </div>

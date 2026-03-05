@@ -7,20 +7,42 @@
  */
 export let isProgrammaticScroll = false
 
+/** Cancel handle for the currently-running woosh animation, if any. */
+let activeRafId: number | null = null
+let activeTimeoutId: ReturnType<typeof setTimeout> | null = null
+
+/** Immediately stop any in-flight woosh animation. */
+function cancelActiveWoosh() {
+  if (activeRafId !== null) {
+    cancelAnimationFrame(activeRafId)
+    activeRafId = null
+  }
+  if (activeTimeoutId !== null) {
+    clearTimeout(activeTimeoutId)
+    activeTimeoutId = null
+  }
+  isProgrammaticScroll = false
+  document.documentElement.style.scrollBehavior = ""
+}
+
 export function wooshScrollTo(targetY: number) {
+  // Cancel any in-flight animation so two scrolls never fight
+  cancelActiveWoosh()
+
   const startY = window.scrollY
   const distance = targetY - startY
   if (Math.abs(distance) < 2) return
 
   const duration = Math.min(1200, Math.max(600, Math.abs(distance) * 0.4))
   let startTime: number | null = null
-  let rafId: number
+  let cancelled = false
 
   function springEase(t: number): number {
     return 1 - Math.pow(1 - t, 3) * Math.cos(t * Math.PI * 0.5)
   }
 
   function tick(now: number) {
+    if (cancelled) return
     if (!startTime) startTime = now
     const elapsed = now - startTime
     const progress = Math.min(elapsed / duration, 1)
@@ -29,18 +51,26 @@ export function wooshScrollTo(targetY: number) {
     window.scrollTo(0, startY + distance * eased)
 
     if (progress < 1) {
-      rafId = requestAnimationFrame(tick)
+      activeRafId = requestAnimationFrame(tick)
+    } else {
+      // Animation finished naturally
+      activeRafId = null
     }
   }
 
   // Signal that JS is driving the scroll
   isProgrammaticScroll = true
   document.documentElement.style.scrollBehavior = "auto"
-  rafId = requestAnimationFrame(tick)
+  activeRafId = requestAnimationFrame(tick)
 
-  setTimeout(() => {
+  activeTimeoutId = setTimeout(() => {
+    cancelled = true
     document.documentElement.style.scrollBehavior = ""
-    cancelAnimationFrame(rafId)
+    if (activeRafId !== null) {
+      cancelAnimationFrame(activeRafId)
+      activeRafId = null
+    }
+    activeTimeoutId = null
     isProgrammaticScroll = false
   }, duration + 50)
 }
@@ -74,12 +104,57 @@ export function navigateTo(href: string, callback?: () => void) {
       return
     }
 
-    // Element not yet in DOM — scroll down in steps to trigger LazySection observers
+    // Element not yet in DOM — look for a LazySection wrapper with
+    // a matching data-section attribute.  Scroll there first (which
+    // triggers the IntersectionObserver), then wait for the real
+    // element to mount and do one precise adjustment.
+    const wrapper = document.querySelector(`[data-section="${id}"]`)
+    if (wrapper) {
+      const wrapperY = wrapper.getBoundingClientRect().top + window.scrollY - 80
+      wooshScrollTo(wrapperY)
+
+      // Poll briefly for the real element to appear after lazy-load
+      let retries = 0
+      const maxRetries = 20
+      const poll = () => {
+        const found = document.getElementById(id)
+        if (found) {
+          // Element mounted — do a quick adjustment if needed
+          const finalY = found.getBoundingClientRect().top + window.scrollY - 80
+          if (Math.abs(finalY - window.scrollY) > 4) {
+            wooshScrollTo(finalY)
+          }
+          history.pushState(null, "", `#${id}`)
+          callback?.()
+          return
+        }
+        retries++
+        if (retries >= maxRetries) {
+          // Give up — wrapper scroll position is close enough
+          history.pushState(null, "", `#${id}`)
+          callback?.()
+          return
+        }
+        setTimeout(poll, 100)
+      }
+      // Start polling after a short delay to let IntersectionObserver fire
+      setTimeout(poll, 150)
+      return
+    }
+
+    // No wrapper either — fall back to progressive scroll discovery.
+    // (Should rarely happen now that LazySection carries data-section.)
+    cancelActiveWoosh()
+    isProgrammaticScroll = true
+    document.documentElement.style.scrollBehavior = "auto"
+
     let attempts = 0
     const maxAttempts = 20
     const step = () => {
       const found = document.getElementById(id)
       if (found) {
+        isProgrammaticScroll = false
+        document.documentElement.style.scrollBehavior = ""
         const targetY = found.getBoundingClientRect().top + window.scrollY - 80
         wooshScrollTo(targetY)
         if (id) history.pushState(null, "", `#${id}`)
@@ -88,13 +163,13 @@ export function navigateTo(href: string, callback?: () => void) {
       }
       attempts++
       if (attempts >= maxAttempts) {
-        // Give up — scroll to bottom as fallback
+        isProgrammaticScroll = false
+        document.documentElement.style.scrollBehavior = ""
         callback?.()
         return
       }
-      // Nudge scroll down to trigger intersection observers
-      window.scrollBy({ top: window.innerHeight, behavior: "auto" })
-      requestAnimationFrame(() => setTimeout(step, 60))
+      window.scrollTo(0, window.scrollY + window.innerHeight * 0.6)
+      setTimeout(step, 100)
     }
     step()
   }

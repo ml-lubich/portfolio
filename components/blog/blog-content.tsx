@@ -74,8 +74,11 @@ const mdComponents: Components = {
     )
   },
   code: ({ children, className, ...props }) => {
+    // Block code — has className like "language-python" — no extra styles
+    if (className) {
+      return <code className={className} {...props}>{children}</code>
+    }
     // Inline code — no className from remark
-    // Block code — has className like "language-python"
     return <code {...props}>{children}</code>
   },
 

@@ -310,6 +310,8 @@ export function ScrollStackCards({
     // Don't apply hover effects while scrolling / stacking or when panel is expanded
     if (isScrolling.current) return
     if (activeCardIdRef.current) return
+    // Suppress synthetic mouse events that fire after a touch tap (within 500ms)
+    if (Date.now() - lastTouchTime.current < 500) return
 
     const el = cardRefs.current[index]
     if (!el) return
@@ -370,9 +372,13 @@ export function ScrollStackCards({
   }, [updateCards, onPointerUp])
 
   /* ── Touch handlers ─────────────────────────────────────────────────── */
+  // Track recent touch to suppress synthetic mouse-hover that fires after tap
+  const lastTouchTime = useRef(0)
+
   const handleTouchStart = useCallback((e: ReactTouchEvent<HTMLDivElement>, index: number) => {
     if ((e.target as HTMLElement).closest("a, button")) return
     if (activeCardIdRef.current) return // No drag while panel is open
+    lastTouchTime.current = Date.now()
     const t = e.touches[0]
     onPointerDown(t.clientX, t.clientY, index)
   }, [onPointerDown])
@@ -393,7 +399,18 @@ export function ScrollStackCards({
 
   const handleTouchEnd = useCallback((_e: ReactTouchEvent<HTMLDivElement>, index: number) => {
     if (drags.current[index].active) onPointerUp(index)
-  }, [onPointerUp])
+
+    // Clear shine / glow so they don't stay frozen after a tap on mobile
+    hoveredIndex.current = null
+    const shine = shineRefs.current[index]
+    if (shine) shine.style.opacity = "0"
+    const glow = glowRefs.current[index]
+    if (glow) glow.style.opacity = "0"
+
+    // Re-run layout so the card snaps back to its scroll-stack position
+    cancelAnimationFrame(rafId.current)
+    rafId.current = requestAnimationFrame(updateCards)
+  }, [onPointerUp, updateCards])
 
   /* ================================================================== */
   /*  Global mouse-up safety net (if pointer leaves card while dragging) */
@@ -499,7 +516,6 @@ export function ScrollStackCards({
               display: "grid",
               gridTemplateColumns: "1fr",
               gridTemplateRows: "1fr",
-              overflow: "hidden",
               transform: isExpanded
                 ? "translateX(-15%) scale(0.85)"
                 : "translateX(0) scale(1)",

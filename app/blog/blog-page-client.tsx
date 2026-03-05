@@ -11,7 +11,7 @@ import { ArrowUpDown, ArrowUp, ArrowDown, Eye } from "lucide-react"
 
 type SortOrder = "newest" | "oldest" | "popular"
 
-function BlogPageInner({ blogPosts }: { blogPosts: BlogPost[] }) {
+function BlogPageInner({ blogPosts, totalViews }: { blogPosts: BlogPost[]; totalViews: string }) {
     const searchParams = useSearchParams()
     const router = useRouter()
 
@@ -88,11 +88,6 @@ function BlogPageInner({ blogPosts }: { blogPosts: BlogPost[] }) {
 
     const [featured, ...remainingPosts] = filtered
 
-    const totalViews = useMemo(() => {
-        const total = blogPosts.reduce((sum, p) => sum + parseInt(p.views), 0)
-        return `~${total}k`
-    }, [])
-
     const sortLabel = sortOrder === "newest" ? "Newest first" : sortOrder === "oldest" ? "Oldest first" : "Most popular"
     const SortIcon = sortOrder === "newest" ? ArrowDown : sortOrder === "oldest" ? ArrowUp : Eye
 
@@ -119,7 +114,7 @@ function BlogPageInner({ blogPosts }: { blogPosts: BlogPost[] }) {
                         </div>
                         <div className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.06] bg-white/[0.03] px-3 py-1.5 text-xs text-muted-foreground backdrop-blur-sm">
                             <Eye className="h-3 w-3" aria-hidden="true" />
-                            {totalViews} total views
+                            <span suppressHydrationWarning>{totalViews} total views</span>
                         </div>
                     </div>
                     <h1 className="mt-4 text-4xl font-bold tracking-tight text-foreground md:text-5xl lg:text-6xl">
@@ -308,10 +303,10 @@ function BlogPageInner({ blogPosts }: { blogPosts: BlogPost[] }) {
     )
 }
 
-export function BlogPageClient({ blogPosts }: { blogPosts: BlogPost[] }) {
+export function BlogPageClient({ blogPosts, totalViews }: { blogPosts: BlogPost[]; totalViews: string }) {
     return (
         <Suspense fallback={<div className="min-h-screen" />}>
-            <BlogPageInner blogPosts={blogPosts} />
+            <BlogPageInner blogPosts={blogPosts} totalViews={totalViews} />
         </Suspense>
     )
 }

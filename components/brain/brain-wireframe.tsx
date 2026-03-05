@@ -12,14 +12,14 @@ import { hexNum } from "@/lib/theme"
 
 /* ── Responsive scale — smaller brain on narrow viewports ──────────── */
 function useResponsiveScale() {
-  const [scale, setScale] = React.useState(0.82)
+  const [scale, setScale] = React.useState(0.54)
   React.useEffect(() => {
     const update = () => {
       const w = window.innerWidth
-      if (w < 480) setScale(0.58)
-      else if (w < 640) setScale(0.65)
-      else if (w < 1024) setScale(0.74)
-      else setScale(0.82)
+      if (w < 480) setScale(0.46)
+      else if (w < 640) setScale(0.48)
+      else if (w < 1024) setScale(0.48)
+      else setScale(0.54)
     }
     update()
     window.addEventListener("resize", update)

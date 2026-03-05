@@ -23,8 +23,10 @@ function TiltCard({ children, className = "" }: { children: React.ReactNode; cla
   const ref = useRef<HTMLDivElement>(null)
   const [tilt, setTilt] = useState({ x: 0, y: 0 })
   const [shine, setShine] = useState({ x: 50, opacity: 0 })
+  const lastTouchRef = useRef(0)
 
   const handleMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (Date.now() - lastTouchRef.current < 500) return
     if (!ref.current) return
     const r = ref.current.getBoundingClientRect()
     const x = (e.clientX - r.left) / r.width
@@ -38,11 +40,18 @@ function TiltCard({ children, className = "" }: { children: React.ReactNode; cla
     setShine({ x: 50, opacity: 0 })
   }, [])
 
+  const handleTouchEnd = useCallback(() => {
+    lastTouchRef.current = Date.now()
+    setTilt({ x: 0, y: 0 })
+    setShine({ x: 50, opacity: 0 })
+  }, [])
+
   return (
     <div
       ref={ref}
       onMouseMove={handleMove}
       onMouseLeave={handleLeave}
+      onTouchEnd={handleTouchEnd}
       className={className}
       style={{
         transform: `perspective(800px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale(${tilt.x || tilt.y ? 1.04 : 1})`,

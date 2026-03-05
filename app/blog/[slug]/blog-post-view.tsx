@@ -28,7 +28,7 @@ export function BlogPostView({ post, relatedPosts, children }: BlogPostViewProps
 
   return (
     <>
-      <article className="relative mx-auto max-w-4xl px-6 py-12" itemScope itemType="https://schema.org/BlogPosting">
+      <article className="relative mx-auto max-w-4xl overflow-x-hidden px-6 py-12" itemScope itemType="https://schema.org/BlogPosting">
         {/* Ambient gradient orbs */}
         <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
           <div className="absolute -top-[300px] right-0 h-[500px] w-[500px] rounded-full bg-primary/[0.03] blur-[120px]" />

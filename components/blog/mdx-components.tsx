@@ -349,8 +349,8 @@ export const mdxComponents = {
                 />
             )
         }
-        // Code block code — pass through (styled by pre)
-        return <code {...props} />
+        // Block code — no extra styling, inherits from pre/.blog-code-block
+        return <code className={props.className} {...props} />
     },
     pre: (props: React.HTMLAttributes<HTMLPreElement> & { children?: React.ReactNode }) => {
         // Intercept ```mermaid code fences → render as charts
@@ -358,17 +358,29 @@ export const mdxComponents = {
             className?: string
             children?: string
         }> | undefined
+
+        const childClassName = React.isValidElement(child)
+            ? (child.props as { className?: string })?.className
+            : undefined
+
         if (
             React.isValidElement(child) &&
-            typeof child.props?.className === "string" &&
-            child.props.className.includes("language-mermaid")
+            typeof childClassName === "string" &&
+            childClassName.includes("language-mermaid")
         ) {
-            const chartJson = typeof child.props.children === "string" ? child.props.children : ""
-            return <MermaidDiagram chart={chartJson} />
+            const chartJson = typeof (child.props as { children?: string }).children === "string" ? (child.props as { children?: string }).children : ""
+            return <MermaidDiagram chart={chartJson || ""} />
         }
+
+        // Extract language for label badge
+        const langMatch = typeof childClassName === "string"
+            ? /language-(\w+)/.exec(childClassName)
+            : null
+
         return (
             <pre
-                className="my-6 overflow-x-auto rounded-xl border border-white/[0.06] bg-[#0d1117] p-5 text-sm leading-relaxed"
+                className="blog-code-block"
+                {...(langMatch ? { "data-lang": langMatch[1] } : {})}
                 {...props}
             />
         )
