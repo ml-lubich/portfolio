@@ -33,7 +33,7 @@ export function wooshScrollTo(targetY: number) {
   const distance = targetY - startY
   if (Math.abs(distance) < 2) return
 
-  const duration = Math.min(1200, Math.max(600, Math.abs(distance) * 0.4))
+  const duration = Math.min(900, Math.max(400, Math.abs(distance) * 0.35))
   let startTime: number | null = null
   let cancelled = false
 

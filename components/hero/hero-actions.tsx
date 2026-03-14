@@ -9,7 +9,7 @@ export function HeroCTAs() {
   return (
     <div
       className="mt-10 flex animate-fade-in-up flex-wrap items-center justify-center gap-3 sm:gap-4 pointer-events-auto"
-      style={{ animationDelay: "1.2s", opacity: 0 }}
+      style={{ animationDelay: "0.35s", opacity: 0 }}
     >
       <button
         type="button"
@@ -49,13 +49,13 @@ export function SocialLinks() {
   return (
     <div
       className="mt-6 flex animate-fade-in-up items-center justify-center gap-3 pointer-events-auto"
-      style={{ animationDelay: "1.5s", opacity: 0 }}
+      style={{ animationDelay: "0.5s", opacity: 0 }}
     >
       <a
         href="https://github.com/ml-lubich"
         target="_blank"
         rel="noopener noreferrer"
-        className="group rounded-lg border border-white/[0.1] bg-white/[0.05] p-2.5 text-white/80 backdrop-blur-sm transition-all hover:border-white/25 hover:bg-white/[0.1] hover:text-white magnetic"
+        className="group flex h-12 w-12 min-h-[48px] min-w-[48px] items-center justify-center rounded-lg border border-white/[0.1] bg-white/[0.05] text-white/80 backdrop-blur-sm transition-all hover:border-white/25 hover:bg-white/[0.1] hover:text-white magnetic"
         aria-label="GitHub"
       >
         <Github className="h-5 w-5 transition-transform group-hover:scale-110" />
@@ -64,7 +64,7 @@ export function SocialLinks() {
         href="https://www.linkedin.com/in/misha-lubich/"
         target="_blank"
         rel="noopener noreferrer"
-        className="group rounded-lg border border-white/[0.1] bg-white/[0.05] p-2.5 text-white/80 backdrop-blur-sm transition-all hover:border-white/25 hover:bg-white/[0.1] hover:text-white magnetic"
+        className="group flex h-12 w-12 min-h-[48px] min-w-[48px] items-center justify-center rounded-lg border border-white/[0.1] bg-white/[0.05] text-white/80 backdrop-blur-sm transition-all hover:border-white/25 hover:bg-white/[0.1] hover:text-white magnetic"
         aria-label="LinkedIn"
       >
         <Linkedin className="h-5 w-5 transition-transform group-hover:scale-110" />
@@ -73,7 +73,7 @@ export function SocialLinks() {
         href="https://scholar.google.com/citations?hl=en&user=Be6ZA78AAAAJ"
         target="_blank"
         rel="noopener noreferrer"
-        className="group rounded-lg border border-white/[0.1] bg-white/[0.05] p-2.5 text-white/80 backdrop-blur-sm transition-all hover:border-white/25 hover:bg-white/[0.1] hover:text-white magnetic"
+        className="group flex h-12 w-12 min-h-[48px] min-w-[48px] items-center justify-center rounded-lg border border-white/[0.1] bg-white/[0.05] text-white/80 backdrop-blur-sm transition-all hover:border-white/25 hover:bg-white/[0.1] hover:text-white magnetic"
         aria-label="Google Scholar"
       >
         <GraduationCap className="h-5 w-5 transition-transform group-hover:scale-110" />

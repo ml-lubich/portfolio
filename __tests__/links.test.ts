@@ -5,7 +5,7 @@
  * ✓ Internal pages (/path) → matching app/ route directory must exist
  * ✓ External URLs (https:) → HEAD/GET must return 2xx or 3xx
  *
- * Runs automatically before `next build` via the "prebuild" npm script
+ * Runs automatically before `next build` via the "prebuild" script
  * so a broken link fails the build.
  *
  *   bun run test            # run all tests

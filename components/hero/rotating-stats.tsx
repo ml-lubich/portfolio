@@ -97,7 +97,7 @@ export function RotatingStats() {
   return (
     <div
       className="mx-auto mt-8 w-full max-w-2xl animate-fade-in-up pointer-events-auto"
-      style={{ animationDelay: "1.8s", opacity: 0 }}
+      style={{ animationDelay: "0.65s", opacity: 0 }}
     >
       <div className="grid grid-cols-2 gap-2.5 sm:gap-3 lg:grid-cols-4">
         {currentStats.map((stat, i) => (

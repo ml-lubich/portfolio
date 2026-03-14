@@ -5,8 +5,8 @@
  * nav links are complete and well-formed. Catches missing fields,
  * duplicate IDs, empty arrays, and other data quality issues before build.
  *
- *   npm run test            # run all tests
- *   npx vitest run __tests__/data-integrity.test.ts
+ *   bun run test            # run all tests
+ *   bunx vitest run __tests__/data-integrity.test.ts
  */
 
 import { describe, it, expect } from "vitest"

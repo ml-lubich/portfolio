@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { AnimatedSection } from "../animations/animated-section"
 import { AnimatedText } from "../animations/animated-text"
 
@@ -26,7 +27,7 @@ export function Footer() {
             {/* Brand */}
             <div className="flex items-center gap-2">
               <div className="flex h-9 w-9 items-center justify-center rounded-[8px] overflow-hidden">
-                <img src="/logo.png" alt="Misha Lubich logo" width={36} height={36} className="h-full w-full object-cover" loading="lazy" />
+                <Image src="/logo.png" alt="Misha Lubich logo" width={36} height={36} sizes="36px" className="h-full w-full object-cover" loading="lazy" />
               </div>
               <div>
                 <span className="block text-sm font-medium text-white">

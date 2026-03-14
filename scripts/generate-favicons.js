@@ -1,3 +1,6 @@
+/**
+ * Generate favicons from public/logo.png. Run with Bun: bun run generate-favicons
+ */
 const sharp = require('sharp');
 const path = require('path');
 const fs = require('fs');

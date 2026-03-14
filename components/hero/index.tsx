@@ -1,5 +1,6 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import dynamic from "next/dynamic"
 import { ArrowDown } from "lucide-react"
 import { ParticleCanvas } from "./particle-canvas"
@@ -14,18 +15,41 @@ const Brain3D = dynamic(
   { ssr: false }
 )
 
+/** Defer 3D brain (and Three.js) until well after LCP to reduce TBT and main-thread work. */
+function useDeferBrain() {
+  const [show, setShow] = useState(false)
+  useEffect(() => {
+    const cb = () => setShow(true)
+    const id =
+      typeof requestIdleCallback !== "undefined"
+        ? requestIdleCallback(cb, { timeout: 2500 })
+        : window.setTimeout(cb, 2000)
+    return () => {
+      if (typeof cancelIdleCallback !== "undefined") cancelIdleCallback(id as number)
+      else clearTimeout(id)
+    }
+  }, [])
+  return show
+}
+
 export function Hero() {
+  const showBrain = useDeferBrain()
+
   return (
-    <section id="hero" className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden pb-16 pt-24 [clip-path:inset(0)]">
+    <section id="hero" className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden pb-24 pt-24 [clip-path:inset(0)]">
       <ParticleCanvas />
 
-      {/* 3D Brain */}
+      {/* 3D Brain — deferred for LCP; fades in via CSS (opacity-only, compositor) for performance */}
       <div
         className="pointer-events-none absolute inset-0 z-[3] flex items-center justify-center"
         aria-hidden="true"
       >
         <div className="h-[115vw] w-[115vw] -translate-y-[45%] sm:translate-y-0 sm:h-full sm:w-full">
-          <Brain3D className="h-full w-full pointer-events-auto" />
+          {showBrain && (
+            <div className="h-full w-full animate-fade-in">
+              <Brain3D className="h-full w-full pointer-events-auto" />
+            </div>
+          )}
         </div>
       </div>
 
@@ -47,17 +71,17 @@ export function Hero() {
         <RotatingStats />
       </div>
 
-      {/* Scroll indicator */}
+      {/* Scroll indicator — positioned in reserved bottom band so it never overlaps nav tabs (z-10 < nav z-50) */}
       <div
-        className="absolute bottom-6 left-1/2 z-10 -translate-x-1/2 animate-fade-in pointer-events-auto"
-        style={{ animationDelay: "2.6s", opacity: 0 }}
+        className="absolute bottom-8 left-1/2 z-10 -translate-x-1/2 animate-fade-in pointer-events-auto sm:bottom-10"
+        style={{ animationDelay: "0.7s", opacity: 0 }}
       >
         <button
           type="button"
           onClick={() => {
             navigateTo("#ai-expertise")
           }}
-          className="group flex flex-col items-center gap-2 text-muted-foreground transition-colors hover:text-primary cursor-pointer"
+          className="group flex min-h-[48px] min-w-[48px] flex-col items-center justify-center gap-2 py-3 px-4 text-muted-foreground transition-colors hover:text-primary cursor-pointer rounded-lg"
           aria-label="Scroll down"
         >
           <span className="font-mono text-xs">Explore</span>

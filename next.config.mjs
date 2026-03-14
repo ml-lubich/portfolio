@@ -26,6 +26,7 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: [
       "lucide-react",
+      "framer-motion",
       "@radix-ui/react-accordion",
       "@radix-ui/react-dialog",
       "@radix-ui/react-dropdown-menu",

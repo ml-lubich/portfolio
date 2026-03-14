@@ -3,7 +3,13 @@
 import { useEffect, useRef } from "react"
 import { particleFill, particleStroke } from "@/lib/theme"
 
-/* ── Animated particle canvas background ──────────────────────────── */
+const DESKTOP_PARTICLE_COUNT = 35
+const MOBILE_PARTICLE_COUNT = 18
+const MOBILE_BREAKPOINT = 768
+
+/* ── Animated particle canvas background ────────────────────────────
+ *  Fewer particles on mobile; pauses when tab is hidden to save CPU/battery.
+ */
 
 export function ParticleCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -15,8 +21,19 @@ export function ParticleCanvas() {
     if (!ctx) return
 
     let animationId: number
+    let isVisible = true
+    const particleCount =
+      typeof window !== "undefined" && window.innerWidth < MOBILE_BREAKPOINT
+        ? MOBILE_PARTICLE_COUNT
+        : DESKTOP_PARTICLE_COUNT
+
     const particles: Array<{
-      x: number; y: number; vx: number; vy: number; size: number; opacity: number
+      x: number
+      y: number
+      vx: number
+      vy: number
+      size: number
+      opacity: number
     }> = []
 
     const resize = () => {
@@ -26,7 +43,12 @@ export function ParticleCanvas() {
     resize()
     window.addEventListener("resize", resize)
 
-    for (let i = 0; i < 35; i++) {
+    const visibilityHandler = () => {
+      isVisible = document.visibilityState === "visible"
+    }
+    document.addEventListener("visibilitychange", visibilityHandler)
+
+    for (let i = 0; i < particleCount; i++) {
       particles.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
@@ -38,6 +60,10 @@ export function ParticleCanvas() {
     }
 
     const animate = () => {
+      if (!isVisible) {
+        animationId = requestAnimationFrame(animate)
+        return
+      }
       ctx.clearRect(0, 0, canvas.width, canvas.height)
       particles.forEach((p, i) => {
         p.x += p.vx
@@ -71,6 +97,7 @@ export function ParticleCanvas() {
     return () => {
       cancelAnimationFrame(animationId)
       window.removeEventListener("resize", resize)
+      document.removeEventListener("visibilitychange", visibilityHandler)
     }
   }, [])
 

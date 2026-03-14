@@ -168,8 +168,8 @@ const config: Config = {
       animation: {
         'accordion-down': 'accordion-down 0.3s ease-out',
         'accordion-up': 'accordion-up 0.3s ease-out',
-        'fade-in-up': 'fade-in-up 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-        'fade-in': 'fade-in 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'fade-in-up': 'fade-in-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'fade-in': 'fade-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards',
         'slide-in-left': 'slide-in-left 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
         'slide-in-right': 'slide-in-right 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
         'slide-up': 'slide-up 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',

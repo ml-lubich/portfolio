@@ -5,8 +5,8 @@
  * Scans page.tsx imports and confirms the modules exist and export
  * the expected symbols.
  *
- *   npm run test
- *   npx vitest run __tests__/component-exports.test.ts
+ *   bun run test
+ *   bunx vitest run __tests__/component-exports.test.ts
  */
 
 import { describe, it, expect } from "vitest"

@@ -12,18 +12,21 @@ import { JsonLd } from '@/components/seo/json-ld'
 const jetbrains = JetBrains_Mono({
   subsets: ['latin'],
   variable: '--font-jetbrains',
+  display: 'swap',
 })
 
 const italiana = Italiana({
   weight: '400',
   subsets: ['latin'],
   variable: '--font-italiana',
+  display: 'swap',
 })
 
 const cormorant = Cormorant_Garamond({
   weight: ['300', '400', '500'],
   subsets: ['latin'],
   variable: '--font-cormorant',
+  display: 'swap',
 })
 
 import { SITE_URL } from "@/lib/site-config"
@@ -151,11 +154,7 @@ export default function RootLayout({
   return (
     <html lang="en" dir="ltr" className={`${GeistSans.variable} ${GeistMono.variable} ${jetbrains.variable} ${italiana.variable} ${cormorant.variable}`}>
       <head>
-        {/* Preconnect to critical origins for faster resource loading */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link rel="preconnect" href="https://images.unsplash.com" />
-        <link rel="dns-prefetch" href="https://images.unsplash.com" />
+        {/* Preconnect only to origins used on initial load. Google Fonts are bundled by next/font; Unsplash is used only on blog. */}
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <JsonLd />
       </head>

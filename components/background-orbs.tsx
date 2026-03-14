@@ -26,34 +26,46 @@ const ORBS = [
 ] as const
 
 const MOBILE_BREAKPOINT = 768
+/** Fewer orbs on small screens to reduce composite layers and GPU cost */
+const MOBILE_ORB_COUNT = 5
 
 export function BackgroundOrbs() {
   const [mounted, setMounted] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
+    const reducedMotionMql = window.matchMedia("(prefers-reduced-motion: reduce)")
+    const setReduced = () => setPrefersReducedMotion(reducedMotionMql.matches)
     checkMobile()
+    setReduced()
     const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
     mql.addEventListener("change", checkMobile)
+    reducedMotionMql.addEventListener("change", setReduced)
 
     requestAnimationFrame(() => setMounted(true))
-    return () => mql.removeEventListener("change", checkMobile)
+    return () => {
+      mql.removeEventListener("change", checkMobile)
+      reducedMotionMql.removeEventListener("change", setReduced)
+    }
   }, [])
+
+  /* Transform-only animation (no hue-rotate) for mobile and reduced-motion — much cheaper on GPU */
+  const useLightAnimation = isMobile || prefersReducedMotion
+  const orbsToRender = isMobile ? ORBS.slice(0, MOBILE_ORB_COUNT) : ORBS
 
   return (
     <div
       className="fixed inset-0 z-0 pointer-events-none overflow-hidden"
       aria-hidden="true"
     >
-      {ORBS.map((orb, i) => {
+      {orbsToRender.map((orb, i) => {
         const h = orb.hue
         const h2 = (h + 35) % 360
 
-        /* Same proportional size on both — only blur & animation differ
-           for mobile GPU perf (no hue-rotate, lighter blur). */
-        const blur = isMobile ? "blur(7vmax)" : "blur(10vmax)"
-        const anim = isMobile
+        const blur = useLightAnimation ? "blur(7vmax)" : "blur(10vmax)"
+        const anim = useLightAnimation
           ? `spectrum-drift-mobile-${orb.dir > 0 ? "a" : "b"} ${orb.dur}s ease-in-out infinite`
           : `spectrum-drift-${orb.dir > 0 ? "a" : "b"} ${orb.dur}s ease-in-out infinite`
 
@@ -67,9 +79,6 @@ export function BackgroundOrbs() {
               width: `${orb.size}vmax`,
               height: `${orb.size}vmax`,
               borderRadius: "50%",
-              /* Smooth multi-stop gradient — avoids ring artifacts under dark overlays.
-                 Uses same-hue zero-alpha instead of `transparent` (which is rgba(0,0,0,0)
-                 and causes dark-band interpolation). */
               background: [
                 `radial-gradient(circle,`,
                 `hsl(${h} 100% 62% / 0.55) 0%,`,
@@ -80,7 +89,7 @@ export function BackgroundOrbs() {
                 `hsl(${h2} 80% 55% / 0) 75%)`,
               ].join(" "),
               filter: blur,
-              willChange: isMobile ? "transform" : "filter",
+              willChange: useLightAnimation ? "transform" : "filter",
               transform: "translate(-50%, -50%)",
               opacity: mounted ? 1 : 0,
               transition: "opacity 2s ease-in-out",

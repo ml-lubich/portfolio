@@ -6,8 +6,8 @@
  * is well-formed. These are the kind of pre-deploy checks that catch
  * regressions Vercel won't warn you about.
  *
- *   npm run test
- *   npx vitest run __tests__/seo-structure.test.ts
+ *   bun run test
+ *   bunx vitest run __tests__/seo-structure.test.ts
  */
 
 import { describe, it, expect } from "vitest"

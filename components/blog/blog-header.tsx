@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname, useSearchParams } from "next/navigation"
 import { Menu, X } from "lucide-react"
 
@@ -73,7 +74,7 @@ export function BlogHeader() {
               e.currentTarget.classList.remove('is-flipping')
             }}
           >
-            <img src="/logo.png" alt="ML" className="h-full w-full object-cover" />
+            <Image src="/logo.png" alt="ML" width={64} height={64} sizes="64px" className="h-full w-full object-cover" />
           </div>
         </Link>
 

@@ -32,10 +32,10 @@ export function RoleRotator() {
   return (
     <h1
       className="animate-fade-in-up font-display tracking-tight text-foreground"
-      style={{ animationDelay: "0.4s", opacity: 0, lineHeight: 1.1 }}
+      style={{ animationDelay: "0.15s", opacity: 0, lineHeight: 1.1 }}
     >
       <span className="block text-balance text-4xl font-semibold sm:text-5xl md:text-6xl lg:text-7xl">
-        <AnimatedName name="Misha Lubich" trigger="mount" delay={800} duration={1400} metallic />
+        <AnimatedName name="Misha Lubich" trigger="mount" delay={400} duration={700} metallic />
       </span>
       <span className="relative mt-3 block h-[2rem] sm:h-[2.4rem] md:h-[3rem] lg:h-[3.6rem] overflow-hidden">
         {roles.map((role, i) => {

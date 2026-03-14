@@ -10,7 +10,7 @@
  *
  * Usage:
  *   node scripts/check-links.js          # run standalone
- *   npm run test:links                   # via package.json script
+ *   bun run test:links                   # via package.json script
  *
  * Exit codes:  0 = all good,  1 = broken links found
  */

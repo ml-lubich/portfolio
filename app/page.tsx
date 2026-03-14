@@ -2,7 +2,7 @@ import dynamic from "next/dynamic"
 import Link from "next/link"
 import { Navigation } from "@/components/nav"
 import { Hero } from "@/components/hero"
-import { LogoScroll, ProfileIntro } from "@/components/sections"
+import { ProfileIntro } from "@/components/sections"
 import { LazySection } from "@/components/layout"
 
 /* ── Skeleton placeholder while chunks load ─────────────────────────── */
@@ -49,6 +49,10 @@ const Contact = dynamic(() => import("@/components/sections/contact").then(m => 
 const Footer = dynamic(() => import("@/components/sections/footer").then(m => m.Footer), {
   loading: () => <SectionSkeleton height="10vh" />,
 })
+const LogoScroll = dynamic(
+  () => import("@/components/sections/logo-scroll").then(m => ({ default: m.LogoScroll })),
+  { loading: () => <div className="h-24" aria-hidden="true" /> }
+)
 
 export default function Home() {
   return (

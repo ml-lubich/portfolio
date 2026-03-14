@@ -40,12 +40,33 @@ When designing this site, I wanted it to be more than a digital resume. I aimed 
 
 ---
 
+## 🏃 Development
+
+This project uses [Bun](https://bun.sh/) as the package manager and runtime. Do not use npm or yarn.
+
+```bash
+bun install              # install dependencies
+bun run dev              # start dev server (Next.js)
+bun run build            # run tests then build for production
+bun run start            # start production server
+bun run test             # run tests
+bun run lint             # run ESLint
+bun run resize-logo      # (optional) resize public/logo.png to 256×256 for performance
+bun run generate-favicons # (optional) regenerate favicons from public/logo.png
+```
+
+---
+
 ## 📂 Project Structure
 
 The codebase is organized for clarity and scalability. I separate concerns by feature, use modular components, and follow best practices for maintainability.  
 *(See the `/components`, `/pages`, and `/styles` directories for details.)*
 
 ---
+
+## ⚡ Performance
+
+- **Logo:** If `public/logo.png` is very large (e.g. 4096×4096), run `bun run resize-logo` (uses `sharp` from devDependencies). This resizes to 256×256 and reduces payload; a backup is saved as `public/logo-original.png`. Then run `bun run generate-favicons` if you use custom favicons.
 
 ## 💡 What’s Next?
 

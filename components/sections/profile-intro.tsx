@@ -100,8 +100,9 @@ export function ProfileIntro() {
                                     <Image
                                         src="/profile.jpg"
                                         alt="Misha Lubich"
-                                        width={256}
-                                        height={384}
+                                        width={412}
+                                        height={628}
+                                        sizes="(max-width: 640px) 208px, 412px"
                                         className="h-full w-full object-cover object-top brightness-[0.72] contrast-[0.95] saturate-[1.05] transition-all duration-500 group-hover:brightness-[0.78] group-hover:saturate-[1.1]"
                                         priority={false}
                                     />

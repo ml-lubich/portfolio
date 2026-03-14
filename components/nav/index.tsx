@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useRef, useCallback, useMemo } from "react"
+import Image from "next/image"
 import { Menu, X, ChevronUp } from "lucide-react"
 import { navLinks } from "./nav-links"
 import { wooshScrollTo, navigateTo, isProgrammaticScroll } from "./woosh-scroll"
@@ -11,40 +12,6 @@ import { ExpandingText } from "./expanding-text"
    Each manages its own scroll listener and state, so the parent
    Navigation never re-renders due to scroll position changes.
    ──────────────────────────────────────────────────────────────────── */
-
-/** Progress bar — updates DOM directly via ref, never triggers React re-render. */
-function ScrollProgressBar() {
-  const barRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    let rafId: number
-    function update() {
-      const docH = document.documentElement.scrollHeight - window.innerHeight
-      const progress = docH > 0 ? Math.min(window.scrollY / docH, 1) : 0
-      if (barRef.current) barRef.current.style.width = `${progress * 100}%`
-    }
-    function onScroll() {
-      cancelAnimationFrame(rafId)
-      rafId = requestAnimationFrame(update)
-    }
-    window.addEventListener("scroll", onScroll, { passive: true })
-    update()
-    return () => {
-      window.removeEventListener("scroll", onScroll)
-      cancelAnimationFrame(rafId)
-    }
-  }, [])
-
-  return (
-    <div className="fixed top-0 left-0 right-0 z-[60] h-[2px]">
-      <div
-        ref={barRef}
-        className="h-full"
-        style={{ width: "0%", background: "linear-gradient(90deg, hsl(330 70% 60%), hsl(280 65% 58%), hsl(220 70% 55%), hsl(180 65% 48%), hsl(140 60% 48%), hsl(50 75% 55%), hsl(330 70% 60%))" }}
-      />
-    </div>
-  )
-}
 
 /** Back-to-top FAB — only re-renders when visibility toggles (not every scroll frame). */
 function BackToTopButton() {
@@ -80,9 +47,9 @@ function BackToTopButton() {
       onClick={() => wooshScrollTo(0)}
       aria-label="Back to top"
       className={[
-        "fixed bottom-6 right-6 z-50 flex h-10 w-10 items-center justify-center rounded-full",
+        "fixed bottom-6 right-6 z-50 flex h-12 w-12 min-h-[48px] min-w-[48px] items-center justify-center rounded-full",
         "nav-glass border border-white/[0.04] text-muted-foreground hover:text-foreground",
-        "transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
+        "transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]",
         visible
           ? "translate-y-0 opacity-100 scale-100"
           : "translate-y-4 opacity-0 scale-90 pointer-events-none",
@@ -165,15 +132,13 @@ export function Navigation() {
 
   return (
     <>
-      <ScrollProgressBar />
-
       {/* Main nav bar */}
       <nav
         ref={navRef}
         onKeyDown={handleKeyNav}
         className={[
           "fixed top-0 left-0 right-0 z-50",
-          "transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
+          "transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]",
           hideNav ? "-translate-y-full opacity-0" : "translate-y-0 opacity-100",
           scrolled ? "bg-transparent py-2.5" : "bg-transparent py-5",
         ].join(" ")}
@@ -204,7 +169,7 @@ export function Navigation() {
                 e.currentTarget.classList.remove('is-flipping')
               }}
             >
-              <img src="/logo.png" alt="ML" className="h-full w-full object-cover" />
+              <Image src="/logo.png" alt="ML" width={64} height={64} sizes="64px" className="h-full w-full object-cover" />
             </div>
           </a>
 
@@ -248,11 +213,11 @@ export function Navigation() {
             </a>
           </div>
 
-          {/* Mobile toggle */}
+          {/* Mobile toggle — min 48px touch target for accessibility */}
           <button
             type="button"
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="rounded-lg p-2 text-muted-foreground transition-colors hover:text-foreground lg:hidden"
+            className="rounded-lg p-3 min-h-[48px] min-w-[48px] flex items-center justify-center text-muted-foreground transition-colors hover:text-foreground lg:hidden"
             aria-label="Toggle menu"
           >
             <div className="relative h-5 w-5">
@@ -269,7 +234,7 @@ export function Navigation() {
         {/* Mobile menu */}
         <div
           className={[
-            "lg:hidden overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
+            "lg:hidden overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]",
             mobileOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0",
           ].join(" ")}
         >
