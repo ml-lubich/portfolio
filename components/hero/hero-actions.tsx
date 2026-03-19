@@ -31,7 +31,7 @@ export function HeroCTAs() {
         View AI Expertise
       </button>
       <a
-        href="https://calendly.com/michaelle-lubich"
+        href="https://cal.com/misha-lubich"
         target="_blank"
         rel="noopener noreferrer"
         className="rounded-xl border border-white/[0.12] bg-white/[0.06] px-6 py-3 text-sm font-medium text-foreground backdrop-blur-sm transition-all hover:border-white/25 hover:bg-white/[0.1] hover-lift sm:px-8 sm:py-3.5"

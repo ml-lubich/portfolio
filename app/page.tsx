@@ -60,20 +60,8 @@ export default function Home() {
       <Navigation />
       <Hero />
 
-      {/* ── Dark scrim below hero ────────────────────────────────────
-       *  Dims the fixed BackgroundOrbs behind all below-fold content
-       *  so text is crisp & readable — cursor.com-style dark sections
-       *  with just a whisper of colour bleeding through.
-       *  The gradient fades from transparent → dark over 120px, then
-       *  holds solid for the rest of the page.
-       * ─────────────────────────────────────────────────────────────── */}
-      <div
-        className="relative"
-        style={{
-          background:
-            "linear-gradient(to bottom, transparent 0%, hsl(220 20% 4% / 0.88) 120px)",
-        }}
-      >
+      {/* Below hero: solid black only. Rainbow orbs are masked to first viewport in layout; no gradient here so fast scroll on mobile doesn’t stutter. */}
+      <div className="relative bg-background">
         <LogoScroll />
 
         {/* Each LazySection defers rendering until near viewport,

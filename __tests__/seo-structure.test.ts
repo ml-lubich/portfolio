@@ -55,7 +55,7 @@ describe("Essential files exist", () => {
         "app/error.tsx",
         "app/robots.ts",
         "app/sitemap.ts",
-        "middleware.ts",
+        "proxy.ts",
         "next.config.mjs",
         "tailwind.config.ts",
         "tsconfig.json",

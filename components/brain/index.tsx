@@ -29,29 +29,23 @@ class WebGLErrorBoundary extends Component<
   }
 }
 
-/* ── Responsive camera helper ─────────────────────────────────────── */
+/* ── Camera set once on mount so the brain doesn’t shrink on mobile when resize fires during touch/rotate ─────── */
 
-function getResponsiveCam() {
+function getInitialCam() {
   const w = typeof window !== "undefined" ? window.innerWidth : 1200
-  // Camera pulled back so the brain is smaller in the viewport
   if (w < 480) return { z: 1.8, fov: 42 }
   if (w < 640) return { z: 1.9, fov: 42 }
   if (w < 1024) return { z: 2.0, fov: 44 }
   return { z: 1.85, fov: 42 }
 }
 
-function ResponsiveCamera() {
+function InitialCamera() {
   const { camera } = useThree()
   React.useEffect(() => {
-    const update = () => {
-      const { z, fov } = getResponsiveCam()
-        ; (camera as THREE.PerspectiveCamera).fov = fov
-      camera.position.z = z
-        ; (camera as THREE.PerspectiveCamera).updateProjectionMatrix()
-    }
-    update()
-    window.addEventListener("resize", update)
-    return () => window.removeEventListener("resize", update)
+    const { z, fov } = getInitialCam()
+    ;(camera as THREE.PerspectiveCamera).fov = fov
+    camera.position.z = z
+    ;(camera as THREE.PerspectiveCamera).updateProjectionMatrix()
   }, [camera])
   return null
 }
@@ -59,7 +53,7 @@ function ResponsiveCamera() {
 /* ── Exported wrapper ─────────────────────────────────────────────── */
 
 export function Brain3D({ className = "" }: { className?: string }) {
-  const initCam = React.useMemo(() => getResponsiveCam(), [])
+  const initCam = React.useMemo(() => getInitialCam(), [])
   const [ready, setReady] = React.useState(false)
 
   // Trigger fade-in shortly after mount so the CSS transition fires
@@ -92,7 +86,7 @@ export function Brain3D({ className = "" }: { className?: string }) {
             canvas.addEventListener('webglcontextlost', (e) => e.preventDefault(), false)
           }}
         >
-          <ResponsiveCamera />
+          <InitialCamera />
           <Suspense fallback={null}>
             <BrainWireframe />
             <OrbitControls

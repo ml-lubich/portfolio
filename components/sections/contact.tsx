@@ -32,7 +32,7 @@ const contactInfo = [
 ]
 
 const socialLinks = [
-  { icon: Calendar, label: "Schedule a Call", href: "https://calendly.com/michaelle-lubich" },
+  { icon: Calendar, label: "Schedule a Call", href: "https://cal.com/misha-lubich" },
   { icon: Linkedin, label: "LinkedIn", href: "https://www.linkedin.com/in/misha-lubich/" },
   { icon: Github, label: "GitHub", href: "https://github.com/ml-lubich" },
   { icon: GraduationCap, label: "Google Scholar", href: "https://scholar.google.com/citations?hl=en&user=Be6ZA78AAAAJ" },

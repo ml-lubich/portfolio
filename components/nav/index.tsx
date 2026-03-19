@@ -11,7 +11,45 @@ import { ExpandingText } from "./expanding-text"
 /* ── Isolated scroll-driven micro-components ─────────────────────────
    Each manages its own scroll listener and state, so the parent
    Navigation never re-renders due to scroll position changes.
+   All render the same HTML on server and client to avoid hydration mismatch.
    ──────────────────────────────────────────────────────────────────── */
+
+const PROGRESS_BAR_GRADIENT =
+  "linear-gradient(90deg, hsl(330 70% 60%), hsl(280 65% 58%), hsl(220 70% 55%), hsl(180 65% 48%), hsl(140 60% 48%), hsl(50 75% 55%), hsl(330 70% 60%))"
+
+/** Progress bar — updates DOM via ref only (no state), same markup on server and client. */
+function ScrollProgressBar() {
+  const barRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    let rafId: number
+    function update() {
+      const docH = document.documentElement.scrollHeight - window.innerHeight
+      const progress = docH > 0 ? Math.min(window.scrollY / docH, 1) : 0
+      if (barRef.current) barRef.current.style.width = `${progress * 100}%`
+    }
+    function onScroll() {
+      cancelAnimationFrame(rafId)
+      rafId = requestAnimationFrame(update)
+    }
+    window.addEventListener("scroll", onScroll, { passive: true })
+    update()
+    return () => {
+      window.removeEventListener("scroll", onScroll)
+      cancelAnimationFrame(rafId)
+    }
+  }, [])
+
+  return (
+    <div className="fixed top-0 left-0 right-0 z-[60] h-[2px]" aria-hidden="true">
+      <div
+        ref={barRef}
+        className="h-full transition-[width] duration-75 ease-out"
+        style={{ width: "0%", background: PROGRESS_BAR_GRADIENT }}
+      />
+    </div>
+  )
+}
 
 /** Back-to-top FAB — only re-renders when visibility toggles (not every scroll frame). */
 function BackToTopButton() {
@@ -132,6 +170,7 @@ export function Navigation() {
 
   return (
     <>
+      <ScrollProgressBar />
       {/* Main nav bar */}
       <nav
         ref={navRef}

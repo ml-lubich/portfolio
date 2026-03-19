@@ -49,6 +49,7 @@ const EXTERNAL_ALLOWLIST = new Set([
 /** Domains that aggressively block cloud-IP / bot traffic (valid links, but 403 in CI). */
 const BOT_BLOCKED_DOMAINS = [
   "scholar.google.com",
+  "linkedin.com",
 ]
 
 // ── Helpers ────────────────────────────────────────────────────────────────────

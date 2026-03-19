@@ -10,22 +10,17 @@ import { hexNum } from "@/lib/theme"
 
 /* ── Rotating wireframe brain with neural orb effects ──────────────── */
 
-/* ── Responsive scale — smaller brain on narrow viewports ──────────── */
-function useResponsiveScale() {
-  const [scale, setScale] = React.useState(0.54)
-  React.useEffect(() => {
-    const update = () => {
-      const w = window.innerWidth
-      if (w < 480) setScale(0.46)
-      else if (w < 640) setScale(0.48)
-      else if (w < 1024) setScale(0.48)
-      else setScale(0.54)
-    }
-    update()
-    window.addEventListener("resize", update)
-    return () => window.removeEventListener("resize", update)
-  }, [])
-  return scale
+/* ── Scale set once on mount so the brain never shrinks on mobile when resize fires during touch/rotate ──────────── */
+function useInitialScale() {
+  const scaleRef = React.useRef<number | null>(null)
+  if (scaleRef.current === null && typeof window !== "undefined") {
+    const w = window.innerWidth
+    if (w < 480) scaleRef.current = 0.46
+    else if (w < 640) scaleRef.current = 0.48
+    else if (w < 1024) scaleRef.current = 0.48
+    else scaleRef.current = 0.54
+  }
+  return scaleRef.current ?? 0.54
 }
 
 export function BrainWireframe() {
@@ -33,7 +28,7 @@ export function BrainWireframe() {
   const orbGeoRef = useRef<THREE.BufferGeometry>(null!)
   const hitRef = useRef<THREE.Mesh>(null!)
   const result = useBrainData()
-  const brainScale = useResponsiveScale()
+  const brainScale = useInitialScale()
 
   // Shared pull-deform uniforms
   const pull = useMemo(() => createPullUniforms(), [])
@@ -79,18 +74,13 @@ export function BrainWireframe() {
   // Orb shader material
   const orbMaterial = useMemo(() => makeOrbMaterial(pull), [pull])
 
-  // Responsive orb size multiplier — larger on small screens to stay visible
+  // Orb size set once on mount so it doesn’t change on resize (avoids brain “shrinking” on mobile during spin)
   React.useEffect(() => {
-    const update = () => {
-      const w = window.innerWidth
-      if (w < 480) orbMaterial.uniforms.uSizeMul.value = 520
-      else if (w < 640) orbMaterial.uniforms.uSizeMul.value = 460
-      else if (w < 1024) orbMaterial.uniforms.uSizeMul.value = 420
-      else orbMaterial.uniforms.uSizeMul.value = 380
-    }
-    update()
-    window.addEventListener("resize", update)
-    return () => window.removeEventListener("resize", update)
+    const w = typeof window !== "undefined" ? window.innerWidth : 1024
+    if (w < 480) orbMaterial.uniforms.uSizeMul.value = 520
+    else if (w < 640) orbMaterial.uniforms.uSizeMul.value = 460
+    else if (w < 1024) orbMaterial.uniforms.uSizeMul.value = 420
+    else orbMaterial.uniforms.uSizeMul.value = 380
   }, [orbMaterial])
 
   // Build signal geometry

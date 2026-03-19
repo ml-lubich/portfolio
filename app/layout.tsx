@@ -126,7 +126,6 @@ export const metadata: Metadata = {
       { url: "/favicon.ico", sizes: "any" },
       { url: "/favicon/favicon-16x16.png", sizes: "16x16", type: "image/png" },
       { url: "/favicon/favicon-32x32.png", sizes: "32x32", type: "image/png" },
-      { url: "/logo.png", type: "image/png" },
     ],
     apple: [
       { url: "/favicon/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
@@ -159,8 +158,17 @@ export default function RootLayout({
         <JsonLd />
       </head>
       <body className="font-sans antialiased font-light">
-        {/* Spectrum gradient background orbs */}
+        {/* Spectrum gradient background orbs — full page, but masked below fold so only hero is rainbow */}
         <BackgroundOrbs />
+        {/* Mask: solid black below 100vh so orbs only show in hero. No gradient = no scroll repaint issues on mobile. */}
+        <div
+          className="fixed inset-0 z-[1] pointer-events-none"
+          aria-hidden="true"
+          style={{
+            background:
+              "linear-gradient(to bottom, transparent 0, transparent 100vh, hsl(var(--background)) 100vh, hsl(var(--background)) 100%)",
+          }}
+        />
         {/* Scroll-driven shine on gradient-text */}
         <ScrollShimmer />
         {/* Skip to main content — accessibility */}

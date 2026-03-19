@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
 
 /**
- * Middleware for subdomain routing.
+ * Proxy for subdomain routing (Next.js proxy convention).
+ * This project uses proxy.ts only — do not add middleware.ts (Next detects both and errors).
  *
  * Routes requests from blog.mishalubich.com → /blog/*
  * while keeping the main domain routes intact.
  */
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const hostname = request.headers.get("host") || ""
   const { pathname } = request.nextUrl
 
