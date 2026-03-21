@@ -77,7 +77,10 @@ describe("Static assets exist", () => {
         "public/favicon/favicon-16x16.png",
         "public/favicon/favicon-32x32.png",
         "public/favicon/apple-touch-icon.png",
+        "public/favicon/android-chrome-192x192.png",
+        "public/favicon/android-chrome-512x512.png",
         "public/favicon/site.webmanifest",
+        "public/favicon.ico",
     ]
 
     for (const asset of requiredAssets) {
