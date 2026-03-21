@@ -22,6 +22,9 @@ function ScrollProgressBar() {
   const barRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    if (typeof window !== "undefined" && window.matchMedia("(max-width: 767px)").matches) {
+      return
+    }
     let rafId: number
     function update() {
       const docH = document.documentElement.scrollHeight - window.innerHeight
@@ -41,7 +44,7 @@ function ScrollProgressBar() {
   }, [])
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-[60] h-[2px]" aria-hidden="true">
+    <div className="fixed top-0 left-0 right-0 z-[60] hidden h-[2px] md:block" aria-hidden="true">
       <div
         ref={barRef}
         className="h-full transition-[width] duration-75 ease-out"
@@ -115,6 +118,7 @@ export function Navigation() {
     [],
   )
   const activeSection = useActiveSection(sectionIds)
+  const scrolledPastHeroRef = useRef(false)
 
   /* Hide navbar on scroll-down, reveal on scroll-up */
   useEffect(() => {
@@ -123,7 +127,11 @@ export function Navigation() {
       cancelAnimationFrame(rafId)
       rafId = requestAnimationFrame(() => {
         const y = window.scrollY
-        setScrolled(y > 50)
+        const nextScrolled = y > 50
+        if (nextScrolled !== scrolledPastHeroRef.current) {
+          scrolledPastHeroRef.current = nextScrolled
+          setScrolled(nextScrolled)
+        }
         // Skip hide/show logic during programmatic (navbar-initiated) scrolls
         // to prevent the nav from flickering away mid-animation
         if (!isProgrammaticScroll) {

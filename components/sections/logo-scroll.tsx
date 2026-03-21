@@ -61,6 +61,7 @@ function LogoItem({ logo }: { logo: Logo }) {
 }
 
 export function LogoScroll() {
+    const sectionRef = useRef<HTMLElement>(null)
     const trackRef = useRef<HTMLDivElement>(null)
     const offsetRef = useRef(0)           // current translateX (negative = scrolled left)
     const rafRef = useRef<number>(0)
@@ -72,6 +73,7 @@ export function LogoScroll() {
     const lastPointerXRef = useRef(0)
     const lastPointerTimeRef = useRef(0)
     const [dragging, setDragging] = useState(false)
+    const marqueePausedRef = useRef(false)
 
     // We render 6 copies so there's always enough to wrap seamlessly
     const repeated = [...LOGOS, ...LOGOS, ...LOGOS, ...LOGOS, ...LOGOS, ...LOGOS]
@@ -98,6 +100,10 @@ export function LogoScroll() {
     /** Main animation loop */
     const animate = useCallback(
         (time: number) => {
+            if (marqueePausedRef.current) {
+                rafRef.current = 0
+                return
+            }
             if (lastTimeRef.current === 0) lastTimeRef.current = time
             const dt = (time - lastTimeRef.current) / 1000 // seconds
             lastTimeRef.current = time
@@ -122,8 +128,34 @@ export function LogoScroll() {
     )
 
     useEffect(() => {
-        rafRef.current = requestAnimationFrame(animate)
-        return () => cancelAnimationFrame(rafRef.current)
+        const root = sectionRef.current
+        if (!root || typeof IntersectionObserver === "undefined") {
+            rafRef.current = requestAnimationFrame(animate)
+            return () => cancelAnimationFrame(rafRef.current)
+        }
+        const io = new IntersectionObserver(
+            ([e]) => {
+                const vis = e.isIntersecting
+                if (vis) {
+                    marqueePausedRef.current = false
+                    if (!rafRef.current) {
+                        lastTimeRef.current = 0
+                        rafRef.current = requestAnimationFrame(animate)
+                    }
+                } else {
+                    marqueePausedRef.current = true
+                    cancelAnimationFrame(rafRef.current)
+                    rafRef.current = 0
+                }
+            },
+            { threshold: 0, rootMargin: "80px" },
+        )
+        io.observe(root)
+        return () => {
+            io.disconnect()
+            cancelAnimationFrame(rafRef.current)
+            rafRef.current = 0
+        }
     }, [animate])
 
     /* ── Pointer (mouse + touch) handlers ─────────────────────────── */
@@ -160,8 +192,9 @@ export function LogoScroll() {
 
     return (
         <section
+            ref={sectionRef}
             id="partners"
-            className="relative w-full overflow-hidden border-b border-border/40 bg-background/40 backdrop-blur-sm py-6 sm:py-8"
+            className="relative w-full overflow-hidden border-b border-border/40 bg-background/40 py-6 sm:py-8 md:backdrop-blur-sm"
             aria-label="Companies and institutions"
         >
             {/* Heading */}

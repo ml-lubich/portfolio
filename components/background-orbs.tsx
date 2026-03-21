@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 /* ── Cursor.com-style light spectrum ─────────────────────────────────
  *  7 large, heavily-blurred orbs that overlap and blend into a
@@ -30,9 +30,21 @@ const MOBILE_BREAKPOINT = 768
 const MOBILE_ORB_COUNT = 5
 
 export function BackgroundOrbs() {
-  const [mounted, setMounted] = useState(false)
+  const rootRef = useRef<HTMLDivElement>(null)
+  const [inView, setInView] = useState(true)
   const [isMobile, setIsMobile] = useState(false)
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+
+  useEffect(() => {
+    const el = rootRef.current
+    if (!el) return
+    const io = new IntersectionObserver(([e]) => setInView(e.isIntersecting), {
+      threshold: 0,
+      rootMargin: "0px",
+    })
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
@@ -44,7 +56,6 @@ export function BackgroundOrbs() {
     mql.addEventListener("change", checkMobile)
     reducedMotionMql.addEventListener("change", setReduced)
 
-    requestAnimationFrame(() => setMounted(true))
     return () => {
       mql.removeEventListener("change", checkMobile)
       reducedMotionMql.removeEventListener("change", setReduced)
@@ -55,9 +66,12 @@ export function BackgroundOrbs() {
   const useLightAnimation = isMobile || prefersReducedMotion
   const orbsToRender = isMobile ? ORBS.slice(0, MOBILE_ORB_COUNT) : ORBS
 
+  const playState = inView ? "running" : "paused"
+
   return (
     <div
-      className="fixed inset-0 z-0 pointer-events-none overflow-hidden"
+      ref={rootRef}
+      className="absolute inset-0 z-0 min-h-full pointer-events-none overflow-hidden"
       aria-hidden="true"
     >
       {orbsToRender.map((orb, i) => {
@@ -65,9 +79,9 @@ export function BackgroundOrbs() {
         const h2 = (h + 35) % 360
 
         const blur = useLightAnimation ? "blur(7vmax)" : "blur(10vmax)"
-        const anim = useLightAnimation
-          ? `spectrum-drift-mobile-${orb.dir > 0 ? "a" : "b"} ${orb.dur}s ease-in-out infinite`
-          : `spectrum-drift-${orb.dir > 0 ? "a" : "b"} ${orb.dur}s ease-in-out infinite`
+        const animationName = useLightAnimation
+          ? `spectrum-drift-mobile-${orb.dir > 0 ? "a" : "b"}`
+          : `spectrum-drift-${orb.dir > 0 ? "a" : "b"}`
 
         return (
           <div
@@ -91,24 +105,15 @@ export function BackgroundOrbs() {
               filter: blur,
               willChange: useLightAnimation ? "transform" : "filter",
               transform: "translate(-50%, -50%)",
-              opacity: mounted ? 1 : 0,
-              transition: "opacity 2s ease-in-out",
-              animation: anim,
+              animationName,
+              animationDuration: `${orb.dur}s`,
+              animationTimingFunction: "ease-in-out",
+              animationIterationCount: "infinite",
+              animationPlayState: playState,
             }}
           />
         )
       })}
-
-      {/* Subtle vignette — soft edge darkening only */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          background:
-            "radial-gradient(ellipse 80% 75% at 50% 45%, transparent 0%, hsl(220 15% 4% / 0.10) 70%, hsl(220 15% 4% / 0.35) 100%)",
-          zIndex: 1,
-        }}
-      />
     </div>
   )
 }

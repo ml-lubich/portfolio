@@ -50,8 +50,10 @@ export function AnimatedSection({
     return () => observer.disconnect()
   }, [delay])
 
-  // Continuous scroll-driven parallax — direct DOM mutation, zero re-renders
+  // Continuous scroll-driven parallax — skipped on small viewports (touch scroll cost).
   useEffect(() => {
+    if (typeof window !== "undefined" && window.innerWidth < 768) return
+
     function updateParallax() {
       const el = ref.current
       if (!el || !revealDone.current) return
@@ -59,7 +61,6 @@ export function AnimatedSection({
       const windowH = window.innerHeight
       const centerOffset = (rect.top + rect.height / 2 - windowH / 2) / windowH
       const parallaxY = centerOffset * 16
-      // Update DOM directly — no React state, no re-render
       el.style.transform = `perspective(1200px) translateY(${parallaxY}px) rotateX(0deg) scale(1)`
       el.style.transitionProperty = "opacity"
     }

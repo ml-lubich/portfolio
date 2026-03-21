@@ -6,7 +6,6 @@ import { GeistMono } from 'geist/font/mono'
 
 import './globals.css'
 import { ScrollShimmer } from '@/components/scroll-shimmer'
-import { BackgroundOrbs } from '@/components/background-orbs'
 import { JsonLd } from '@/components/seo/json-ld'
 
 const jetbrains = JetBrains_Mono({
@@ -158,17 +157,6 @@ export default function RootLayout({
         <JsonLd />
       </head>
       <body className="font-sans antialiased font-light">
-        {/* Spectrum gradient background orbs — full page, but masked below fold so only hero is rainbow */}
-        <BackgroundOrbs />
-        {/* Mask: solid black below 100vh so orbs only show in hero. No gradient = no scroll repaint issues on mobile. */}
-        <div
-          className="fixed inset-0 z-[1] pointer-events-none"
-          aria-hidden="true"
-          style={{
-            background:
-              "linear-gradient(to bottom, transparent 0, transparent 100vh, hsl(var(--background)) 100vh, hsl(var(--background)) 100%)",
-          }}
-        />
         {/* Scroll-driven shine on gradient-text */}
         <ScrollShimmer />
         {/* Skip to main content — accessibility */}

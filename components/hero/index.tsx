@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import dynamic from "next/dynamic"
 import { ArrowDown } from "lucide-react"
+import { BackgroundOrbs } from "@/components/background-orbs"
 import { ParticleCanvas } from "./particle-canvas"
 import { RoleRotator, HeroSubtitle } from "./role-rotator"
 import { HeroCTAs, SocialLinks } from "./hero-actions"
@@ -37,7 +38,9 @@ export function Hero() {
 
   return (
     <section id="hero" className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden pb-24 pt-24 [clip-path:inset(0)]">
-      <ParticleCanvas />
+      {/* Spectrum lives only in this section (not fixed to viewport) — avoids mobile scroll seam / mask repaint */}
+      <BackgroundOrbs />
+      <ParticleCanvas className="z-[1]" />
 
       {/* 3D Brain — deferred for LCP; fades in via CSS (opacity-only, compositor) for performance */}
       <div

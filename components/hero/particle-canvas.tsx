@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef } from "react"
+import { cn } from "@/lib/utils"
 import { particleFill, particleStroke } from "@/lib/theme"
 
 const DESKTOP_PARTICLE_COUNT = 35
@@ -11,7 +12,7 @@ const MOBILE_BREAKPOINT = 768
  *  Fewer particles on mobile; pauses when tab is hidden to save CPU/battery.
  */
 
-export function ParticleCanvas() {
+export function ParticleCanvas({ className }: { className?: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -20,8 +21,9 @@ export function ParticleCanvas() {
     const ctx = canvas.getContext("2d")
     if (!ctx) return
 
-    let animationId: number
-    let isVisible = true
+    let animationId = 0
+    let tabVisible = true
+    let heroOnScreen = true
     const particleCount =
       typeof window !== "undefined" && window.innerWidth < MOBILE_BREAKPOINT
         ? MOBILE_PARTICLE_COUNT
@@ -37,16 +39,49 @@ export function ParticleCanvas() {
     }> = []
 
     const resize = () => {
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
+      const section = canvas.closest("section")
+      const w = section?.clientWidth ?? window.innerWidth
+      const h = section?.clientHeight ?? window.innerHeight
+      canvas.width = w
+      canvas.height = h
     }
     resize()
     window.addEventListener("resize", resize)
+    const section = canvas.closest("section")
+    const ro =
+      section &&
+      typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(() => resize())
+        : null
+    if (section && ro) ro.observe(section)
 
     const visibilityHandler = () => {
-      isVisible = document.visibilityState === "visible"
+      tabVisible = document.visibilityState === "visible"
+      if (!tabVisible && animationId) {
+        cancelAnimationFrame(animationId)
+        animationId = 0
+      } else if (tabVisible && heroOnScreen && !animationId) {
+        animationId = requestAnimationFrame(animate)
+      }
     }
     document.addEventListener("visibilitychange", visibilityHandler)
+
+    const heroIo =
+      section && typeof IntersectionObserver !== "undefined"
+        ? new IntersectionObserver(
+            ([e]) => {
+              heroOnScreen = e.isIntersecting
+              if (!heroOnScreen && animationId) {
+                cancelAnimationFrame(animationId)
+                animationId = 0
+              } else if (heroOnScreen && tabVisible && !animationId) {
+                animationId = requestAnimationFrame(animate)
+              }
+            },
+            { threshold: 0, rootMargin: "0px" },
+          )
+        : null
+    if (section && heroIo) heroIo.observe(section)
 
     for (let i = 0; i < particleCount; i++) {
       particles.push({
@@ -60,8 +95,8 @@ export function ParticleCanvas() {
     }
 
     const animate = () => {
-      if (!isVisible) {
-        animationId = requestAnimationFrame(animate)
+      if (!tabVisible || !heroOnScreen) {
+        animationId = 0
         return
       }
       ctx.clearRect(0, 0, canvas.width, canvas.height)
@@ -97,6 +132,8 @@ export function ParticleCanvas() {
     return () => {
       cancelAnimationFrame(animationId)
       window.removeEventListener("resize", resize)
+      ro?.disconnect()
+      heroIo?.disconnect()
       document.removeEventListener("visibilitychange", visibilityHandler)
     }
   }, [])
@@ -104,7 +141,7 @@ export function ParticleCanvas() {
   return (
     <canvas
       ref={canvasRef}
-      className="pointer-events-none absolute inset-0"
+      className={cn("pointer-events-none absolute inset-0", className)}
       aria-hidden="true"
     />
   )

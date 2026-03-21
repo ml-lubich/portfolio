@@ -60,7 +60,7 @@ export default function Home() {
       <Navigation />
       <Hero />
 
-      {/* Below hero: solid black only. Rainbow orbs are masked to first viewport in layout; no gradient here so fast scroll on mobile doesn’t stutter. */}
+      {/* Below hero: solid page bg. Rainbow orbs render only inside <Hero> (not fixed), so fast scroll doesn’t drag a full-viewport effect. */}
       <div className="relative bg-background">
         <LogoScroll />
 
