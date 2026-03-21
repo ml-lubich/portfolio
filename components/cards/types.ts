@@ -14,7 +14,7 @@ export interface ScrollStackCardsProps {
   stickyTop?: number
   /** Extra vertical offset per card so you see the stack peek (px). Default: 20 */
   stackOffset?: number
-  /** Scroll distance allocated per card (vh). Default: 50 */
+  /** Scroll distance allocated per card (vh). Default: 38 */
   scrollPerCard?: number
   /** 3D perspective depth (px). Default: 1200 */
   perspective?: number

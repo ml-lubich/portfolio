@@ -31,8 +31,8 @@ export function Journey() {
         </>
       }
       stickyTop={90}
-      stackOffset={16}
-      scrollPerCard={55}
+      stackOffset={14}
+      scrollPerCard={34}
       perspective={1200}
       activeCardId={selectedId}
       onScrollDismiss={handleClose}

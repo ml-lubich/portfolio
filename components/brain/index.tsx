@@ -6,6 +6,7 @@ import { Canvas, useThree } from "@react-three/fiber"
 import { OrbitControls } from "@react-three/drei"
 import * as THREE from "three"
 import { BrainWireframe } from "./brain-wireframe"
+import { getBrainBinPromise } from "./use-brain-data"
 
 /* ── Error boundary — keeps WebGL crashes from nuking the page ────── */
 
@@ -52,23 +53,61 @@ function InitialCamera() {
 
 /* ── Exported wrapper ─────────────────────────────────────────────── */
 
-export function Brain3D({ className = "" }: { className?: string }) {
-  const initCam = React.useMemo(() => getInitialCam(), [])
-  const [ready, setReady] = React.useState(false)
+type Brain3DProps = {
+  className?: string
+  /** When false, opacity stays 0 until true (e.g. hero name reveal). Default: no gate. */
+  revealGate?: boolean
+  /** Opacity transition length in ms (match hero `AnimatedName` duration / easing). */
+  fadeDurationMs?: number
+}
 
-  // Trigger fade-in shortly after mount so the CSS transition fires
+export function Brain3D({
+  className = "",
+  revealGate = true,
+  fadeDurationMs = 2350,
+}: Brain3DProps) {
+  const initCam = React.useMemo(() => getInitialCam(), [])
+  const [geometryCommitted, setGeometryCommitted] = React.useState(false)
+  const [visible, setVisible] = React.useState(false)
+
   React.useEffect(() => {
-    const id = requestAnimationFrame(() => setReady(true))
-    return () => cancelAnimationFrame(id)
+    let cancelled = false
+    let raf0: number | undefined
+    let raf1: number | undefined
+
+    getBrainBinPromise()
+      .then(() => {
+        if (cancelled) return
+        raf0 = requestAnimationFrame(() => {
+          if (cancelled) return
+          raf1 = requestAnimationFrame(() => {
+            if (!cancelled) setGeometryCommitted(true)
+          })
+        })
+      })
+      .catch(() => {
+        /* load failure: stay hidden; wireframe never mounts content */
+      })
+
+    return () => {
+      cancelled = true
+      if (raf0 !== undefined) cancelAnimationFrame(raf0)
+      if (raf1 !== undefined) cancelAnimationFrame(raf1)
+    }
   }, [])
+
+  React.useEffect(() => {
+    if (geometryCommitted && revealGate) setVisible(true)
+  }, [geometryCommitted, revealGate])
 
   return (
     <WebGLErrorBoundary>
       <div
         className={`w-full h-full cursor-grab active:cursor-grabbing ${className}`}
         style={{
-          opacity: ready ? 1 : 0,
-          transition: "opacity 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+          opacity: visible ? 1 : 0,
+          transition: `opacity ${fadeDurationMs}ms cubic-bezier(0.16, 1, 0.3, 1)`,
+          willChange: visible ? "auto" : "opacity",
         }}
       >
         <Canvas

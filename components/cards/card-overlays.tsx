@@ -48,15 +48,3 @@ export const ScanOverlay = forwardRef<HTMLDivElement>(function ScanOverlay(_prop
     />
   )
 })
-
-/* ── Corner tech brackets ── */
-export function CornerBrackets() {
-  return (
-    <>
-      <div className="pointer-events-none absolute left-2 top-2 z-10 h-4 w-4 border-l border-t border-primary/20" />
-      <div className="pointer-events-none absolute right-2 top-2 z-10 h-4 w-4 border-r border-t border-primary/20" />
-      <div className="pointer-events-none absolute bottom-2 left-2 z-10 h-4 w-4 border-b border-l border-primary/20" />
-      <div className="pointer-events-none absolute bottom-2 right-2 z-10 h-4 w-4 border-b border-r border-primary/20" />
-    </>
-  )
-}

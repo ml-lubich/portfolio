@@ -24,7 +24,7 @@ export function Publications() {
       bgEffects={null}
       stickyTop={90}
       stackOffset={12}
-      scrollPerCard={42}
+      scrollPerCard={34}
       perspective={1200}
       cards={papers.map((paper, i) => {
         const gradient = gradients[i % gradients.length]

@@ -9,9 +9,20 @@ import {
 } from "react"
 import type { ScrollStackCardsProps, DragState } from "./types"
 import { SPRING, DAMPING, FLING_DECAY, DRAG_DEAD_ZONE, newDragState } from "./constants"
-import { GlowOverlay, ShineOverlay, ScanOverlay, CornerBrackets } from "./card-overlays"
+import { GlowOverlay, ShineOverlay, ScanOverlay } from "./card-overlays"
 import { overlays, shadows } from "@/lib/theme"
 import { useIsMobile } from "@/hooks/use-mobile"
+
+/** One shadow value during scroll — avoids interpolating box-shadow every frame (repaint-heavy). */
+const DESKTOP_SCROLL_STACK_SHADOW =
+  "0 22px 50px -12px rgba(0,0,0,0.32), 0 0 0 1px rgba(255,255,255,0.03)"
+
+/** Bias linear scroll progress so most motion happens in the first part of each card segment (snappier). */
+function snapScrollProgress(t: number, power: number): number {
+  if (t <= 0) return 0
+  if (t >= 1) return 1
+  return 1 - (1 - t) ** power
+}
 
 /**
  * Hen-ry.com–style sticky stacking cards with 3D transforms + drag physics.
@@ -26,7 +37,7 @@ export function ScrollStackCards({
   header,
   stickyTop = 80,
   stackOffset = 20,
-  scrollPerCard = 50,
+  scrollPerCard = 38,
   perspective = 1200,
   activeCardId = null,
   onScrollDismiss,
@@ -37,7 +48,7 @@ export function ScrollStackCards({
   // Mobile-adjusted parameters for better small-viewport UX
   const effStickyTop = isMobile ? Math.min(stickyTop, 56) : stickyTop
   const effStackOffset = isMobile ? Math.min(stackOffset, 8) : stackOffset
-  const effScrollPerCard = isMobile ? Math.min(scrollPerCard, 35) : scrollPerCard
+  const effScrollPerCard = isMobile ? Math.min(scrollPerCard, 28) : scrollPerCard
   const effPerspective = isMobile ? Math.min(perspective, 800) : perspective
 
   const containerRef = useRef<HTMLDivElement>(null)
@@ -49,6 +60,13 @@ export function ScrollStackCards({
   const hoveredIndex = useRef<number | null>(null)
   const isScrolling = useRef(false)
   const scrollTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  /** Index of the top interactive card (tilt / hover); -1 if none. */
+  const tiltableIndexRef = useRef<number>(-1)
+  /** Scratch buffers for enter/cover progress (no per-frame object alloc). */
+  const scrollMetricsRef = useRef<{ enter: Float64Array; cover: Float64Array }>({
+    enter: new Float64Array(0),
+    cover: new Float64Array(0),
+  })
 
   // Drag state per card
   const drags = useRef<DragState[]>([])
@@ -81,10 +99,21 @@ export function ScrollStackCards({
 
     const scrolled = -rect.top
     const maxScroll = container.offsetHeight - vh
-    if (maxScroll <= 0) return
-
-    const totalProgress = Math.max(0, Math.min(scrolled / maxScroll, 1))
+    const totalProgress =
+      maxScroll <= 0
+        ? 1
+        : Math.max(0, Math.min(scrolled / maxScroll, 1))
     const step = n > 1 ? 1 / (n - 1) : 1
+
+    let { enter: enterBuf, cover: coverBuf } = scrollMetricsRef.current
+    if (enterBuf.length !== n) {
+      enterBuf = new Float64Array(n)
+      coverBuf = new Float64Array(n)
+      scrollMetricsRef.current = { enter: enterBuf, cover: coverBuf }
+    }
+
+    const scrolling = isScrolling.current
+    let tiltable = -1
 
     cardRefs.current.forEach((el, i) => {
       if (!el) return
@@ -101,29 +130,31 @@ export function ScrollStackCards({
       const arriveAt = n > 1 ? i / (n - 1) : 0
 
       const enterStart = Math.max(0, arriveAt - step)
-      const enterProgress = i === 0
-        ? 1
-        : Math.min(Math.max((totalProgress - enterStart) / step, 0), 1)
+      const rawEnter =
+        i === 0 ? 1 : Math.min(Math.max((totalProgress - enterStart) / step, 0), 1)
+      const enterProgress = i === 0 ? 1 : snapScrollProgress(rawEnter, 2.55)
 
-      let coverProgress = 0
+      let rawCover = 0
       if (i < n - 1) {
-        coverProgress = Math.min(
-          Math.max((totalProgress - arriveAt) / step, 0),
-          1,
-        )
+        rawCover = Math.min(Math.max((totalProgress - arriveAt) / step, 0), 1)
       }
+      const coverProgress = snapScrollProgress(rawCover, 2.45)
+
+      enterBuf[i] = enterProgress
+      coverBuf[i] = coverProgress
 
       // Softer transforms on mobile to keep cards readable
       const mobile = isMobileRef.current
       const scale = 1 - coverProgress * (mobile ? 0.03 : 0.06)
       const translateZ = coverProgress * (mobile ? -25 : -60)
       const rotateX = coverProgress * (mobile ? 0.8 : 2)
-      const brightness = 1 - coverProgress * 0.2
       const borderRadius = 20 + coverProgress * 12
-      const slideUp = (1 - enterProgress) * (mobile ? 70 : 110)
-      const enterOpacity = Math.min(enterProgress * 2.5, 1)
+      const slideUp = (1 - enterProgress) * (mobile ? 38 : 52)
+      const enterOpacity = Math.min(enterProgress * 4.25, 1)
       const stackedOpacity = 1 - coverProgress * 0.3
-      const opacity = enterOpacity * stackedOpacity
+      /* Bake “brightness” into opacity on all viewports — filter:brightness() repaints during scroll. */
+      const dimFactor = mobile ? 1 - coverProgress * 0.18 : 1 - coverProgress * 0.2
+      const opacity = enterOpacity * stackedOpacity * dimFactor
       const shadowBlur = 30 + coverProgress * 20
       const shadowOpacity = 0.15 + coverProgress * 0.1
 
@@ -143,26 +174,50 @@ export function ScrollStackCards({
         `scale(${scale})`,
       ].join(" ")
       el.style.opacity = `${opacity}`
-      el.style.filter = `brightness(${brightness})`
+      el.style.filter = ""
+      if (mobile) {
+        el.style.boxShadow = "0 12px 28px -10px rgba(0,0,0,0.35)"
+        el.style.backfaceVisibility = "hidden"
+      } else if (scrolling) {
+        el.style.boxShadow = DESKTOP_SCROLL_STACK_SHADOW
+        el.style.backfaceVisibility = "hidden"
+      } else {
+        el.style.boxShadow = `0 ${10 + coverProgress * 15}px ${shadowBlur}px -8px rgba(0,0,0,${shadowOpacity})`
+        el.style.backfaceVisibility = ""
+      }
       el.style.borderRadius = `${borderRadius}px`
-      el.style.boxShadow = `0 ${10 + coverProgress * 15}px ${shadowBlur}px -8px rgba(0,0,0,${shadowOpacity})`
-      el.style.pointerEvents = enterProgress < 0.5 ? "none" : "auto"
+      el.style.pointerEvents = enterProgress < 0.28 ? "none" : "auto"
       el.style.transition = "none"
 
-      const glow = glowRefs.current[i]
-      if (glow) {
-        const glowOpacity = enterProgress > 0.5 ? (1 - coverProgress) * 0.6 : 0
-        glow.style.opacity = `${glowOpacity}`
-      }
+      if (!scrolling) {
+        const glow = glowRefs.current[i]
+        if (glow) {
+          const glowOpacity = enterProgress > 0.32 ? (1 - coverProgress) * 0.6 : 0
+          glow.style.opacity = `${glowOpacity}`
+        }
 
-      const scan = scanRefs.current[i]
-      if (scan) {
-        scan.style.opacity = enterProgress > 0.5 ? "1" : "0"
+        const scan = scanRefs.current[i]
+        if (scan) {
+          scan.style.opacity = enterProgress > 0.32 ? "1" : "0"
+        }
+      } else {
+        const glow = glowRefs.current[i]
+        if (glow) glow.style.opacity = "0"
+        const scan = scanRefs.current[i]
+        if (scan) scan.style.opacity = "0"
       }
 
       const shine = shineRefs.current[i]
       if (shine) shine.style.opacity = "0"
     })
+
+    for (let i = n - 1; i >= 0; i--) {
+      if (enterBuf[i] > 0.38 && coverBuf[i] < 0.9) {
+        tiltable = i
+        break
+      }
+    }
+    tiltableIndexRef.current = tiltable
   }, [cards.length, perspective])
 
   // Stable ref for isMobile so updateCards can read it without re-creating
@@ -310,6 +365,9 @@ export function ScrollStackCards({
     // Don't apply hover effects while scrolling / stacking or when panel is expanded
     if (isScrolling.current) return
     if (activeCardIdRef.current) return
+
+    // Only the front (top) card runs tilt / shine — avoids extra layout + gradient work on the stack
+    if (index !== tiltableIndexRef.current) return
     // Suppress synthetic mouse events that fire after a touch tap (within 500ms)
     if (Date.now() - lastTouchTime.current < 500) return
 
@@ -358,7 +416,7 @@ export function ScrollStackCards({
     hoveredIndex.current = null
     const el = cardRefs.current[index]
     if (!el) return
-    el.style.transition = "transform 0.5s cubic-bezier(0.23,1,0.32,1), box-shadow 0.5s ease, filter 0.5s ease, opacity 0.5s ease, border-radius 0.5s ease"
+    el.style.transition = "transform 0.28s cubic-bezier(0.25, 0.9, 0.35, 1), box-shadow 0.28s ease, filter 0.28s ease, opacity 0.28s ease, border-radius 0.28s ease"
     el.style.cursor = ""
 
     const glow = glowRefs.current[index]
@@ -465,6 +523,8 @@ export function ScrollStackCards({
   /*  Scroll listener                                                    */
   /* ================================================================== */
   useEffect(() => {
+    let scrollCoalesce = 0
+    let scrollRafId = 0
     const onScroll = () => {
       // Auto-dismiss detail panel on meaningful scroll (> 25px)
       if (activeCardIdRef.current && onScrollDismissRef.current) {
@@ -476,21 +536,52 @@ export function ScrollStackCards({
 
       isScrolling.current = true
       if (scrollTimer.current) clearTimeout(scrollTimer.current)
-      scrollTimer.current = setTimeout(() => { isScrolling.current = false }, 150)
-      cancelAnimationFrame(rafId.current)
-      rafId.current = requestAnimationFrame(updateCards)
+      scrollTimer.current = setTimeout(() => {
+        isScrolling.current = false
+        updateCards()
+      }, 120)
+      /* One transform pass per frame while scrolling — coalesces burst scroll events. */
+      if (!scrollRafId) {
+        scrollRafId = requestAnimationFrame(() => {
+          scrollRafId = 0
+          updateCards()
+        })
+      }
+    }
+    const onResize = () => {
+      if (scrollCoalesce) return
+      scrollCoalesce = requestAnimationFrame(() => {
+        scrollCoalesce = 0
+        updateCards()
+      })
     }
     window.addEventListener("scroll", onScroll, { passive: true })
-    window.addEventListener("resize", onScroll, { passive: true })
+    window.addEventListener("resize", onResize, { passive: true })
+
+    const container = containerRef.current
+    const ro =
+      container && typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(() => {
+            updateCards()
+          })
+        : null
+    if (container && ro) ro.observe(container)
+
     updateCards()
+    requestAnimationFrame(() => updateCards())
+
     return () => {
+      if (scrollTimer.current) clearTimeout(scrollTimer.current)
+      if (scrollCoalesce) cancelAnimationFrame(scrollCoalesce)
+      if (scrollRafId) cancelAnimationFrame(scrollRafId)
       cancelAnimationFrame(rafId.current)
+      ro?.disconnect()
       window.removeEventListener("scroll", onScroll)
-      window.removeEventListener("resize", onScroll)
+      window.removeEventListener("resize", onResize)
     }
   }, [updateCards])
 
-  const runwayHeight = `${(cards.length - 1) * effScrollPerCard + 100}vh`
+  const runwayHeight = `${(cards.length - 1) * effScrollPerCard + 64}vh`
 
   return (
     <div
@@ -554,7 +645,6 @@ export function ScrollStackCards({
                 <GlowOverlay ref={(el) => { glowRefs.current[i] = el }} />
                 <ShineOverlay ref={(el) => { shineRefs.current[i] = el }} />
                 <ScanOverlay ref={(el) => { scanRefs.current[i] = el }} />
-                <CornerBrackets />
               </div>
             ))}
           </div>

@@ -156,31 +156,22 @@ const breadcrumbSchema = {
 }
 
 /**
- * SiteNavigationElement schema — helps Google understand
- * site structure and can enable sitelinks in search results.
+ * ItemList of in-site destinations — valid structured data (Schema.org ListItem)
+ * for navigation, replacing invalid parallel-array SiteNavigationElement.
  */
 const siteNavigationSchema = {
   "@context": "https://schema.org",
-  "@type": "SiteNavigationElement",
-  name: [
-    "Home",
-    "About",
-    "Projects",
-    "Skills",
-    "Experience",
-    "Publications",
-    "Blog",
-    "Contact",
-  ],
-  url: [
-    BASE_URL,
-    `${BASE_URL}/#about`,
-    `${BASE_URL}/#projects`,
-    `${BASE_URL}/#skills`,
-    `${BASE_URL}/#journey`,
-    `${BASE_URL}/#publications`,
-    `${BASE_URL}/blog`,
-    `${BASE_URL}/#contact`,
+  "@type": "ItemList",
+  name: "Site navigation",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: BASE_URL },
+    { "@type": "ListItem", position: 2, name: "About", item: `${BASE_URL}/#about` },
+    { "@type": "ListItem", position: 3, name: "Projects", item: `${BASE_URL}/#projects` },
+    { "@type": "ListItem", position: 4, name: "Skills", item: `${BASE_URL}/#skills` },
+    { "@type": "ListItem", position: 5, name: "Experience", item: `${BASE_URL}/#journey` },
+    { "@type": "ListItem", position: 6, name: "Publications", item: `${BASE_URL}/#research` },
+    { "@type": "ListItem", position: 7, name: "Blog", item: `${BASE_URL}/blog` },
+    { "@type": "ListItem", position: 8, name: "Contact", item: `${BASE_URL}/#contact` },
   ],
 }
 

@@ -65,7 +65,7 @@ export function Publications() {
       }
       stickyTop={90}
       stackOffset={12}
-      scrollPerCard={42}
+      scrollPerCard={34}
       perspective={1200}
       activeCardId={selectedId}
       onScrollDismiss={handleClose}

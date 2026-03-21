@@ -1,12 +1,14 @@
 "use client"
 
 import { useState, useEffect, useRef, useCallback } from "react"
+import { useIsMobile } from "@/hooks/use-mobile"
 import { AnimatedCounter } from "../animations/animated-counter"
 import { statSets, STAT_ROTATE_INTERVAL, STAT_STAGGER_DELAY } from "./data"
 
 /* ── Rotating Stats with staggered card animations ────────────────── */
 
 export function RotatingStats() {
+  const isMobile = useIsMobile()
   const [setIndex, setSetIndex] = useState(0)
   const [prevSetIndex, setPrevSetIndex] = useState(-1)
   const [cardPhases, setCardPhases] = useState<("idle" | "exit" | "enter")[]>([
@@ -73,31 +75,28 @@ export function RotatingStats() {
         return {
           opacity: 0,
           transform: "translateY(-18px) scale(0.92) rotateX(8deg)",
-          filter: "blur(6px)",
-          transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
+          transition: "opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
         }
       case "enter":
         return {
           opacity: 1,
           transform: "translateY(0px) scale(1) rotateX(0deg)",
-          filter: "blur(0px)",
-          transition: "all 0.55s cubic-bezier(0.16, 1, 0.3, 1)",
+          transition: "opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1), transform 0.55s cubic-bezier(0.16, 1, 0.3, 1)",
         }
       case "idle":
       default:
         return {
           opacity: 1,
           transform: "translateY(0px) scale(1) rotateX(0deg)",
-          filter: "blur(0px)",
-          transition: "all 0.55s cubic-bezier(0.16, 1, 0.3, 1)",
+          transition: "opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1), transform 0.55s cubic-bezier(0.16, 1, 0.3, 1)",
         }
     }
   }
 
   return (
     <div
-      className="mx-auto mt-8 w-full max-w-2xl animate-fade-in-up pointer-events-auto"
-      style={{ animationDelay: "0.65s", opacity: 0 }}
+      className="mx-auto mt-8 w-full max-w-2xl animate-fade-in-up-subtle pointer-events-auto"
+      style={{ animationDelay: "0.45s" }}
     >
       <div className="grid grid-cols-2 gap-2.5 sm:gap-3 lg:grid-cols-4">
         {currentStats.map((stat, i) => (
@@ -107,9 +106,15 @@ export function RotatingStats() {
             style={{
               ...getCardStyle(cardPhases[i]),
               perspective: "600px",
-              background: "hsla(220, 20%, 16%, 0.35)",
-              backdropFilter: "blur(24px) saturate(1.6)",
-              WebkitBackdropFilter: "blur(24px) saturate(1.6)",
+              background: isMobile
+                ? "hsla(220, 20%, 12%, 0.92)"
+                : "hsla(220, 20%, 16%, 0.35)",
+              ...(isMobile
+                ? {}
+                : {
+                    backdropFilter: "blur(24px) saturate(1.6)",
+                    WebkitBackdropFilter: "blur(24px) saturate(1.6)",
+                  }),
               boxShadow: "0 2px 16px -4px hsla(0,0%,0%,0.25), inset 0 1px 0 0 hsla(0,0%,100%,0.06)",
             }}
           >
@@ -140,19 +145,26 @@ export function RotatingStats() {
       </div>
 
       {/* Progress dots */}
-      <div className="mt-4 flex items-center justify-center gap-2">
+      <div className="mt-2 flex items-center justify-center gap-1">
         {statSets.map((_, i) => (
           <button
             key={i}
+            type="button"
             onClick={() => {
               if (i !== setIndex) triggerTransition(i)
             }}
-            className={`h-1.5 rounded-full transition-all duration-500 ${i === setIndex
-              ? "w-6 bg-primary/60"
-              : "w-1.5 bg-muted-foreground/20 hover:bg-muted-foreground/40"
-              }`}
-            aria-label={`Show stat set ${i + 1}`}
-          />
+            className="flex min-h-11 min-w-11 items-center justify-center rounded-full p-2 touch-manipulation"
+            aria-label={`Show stat set ${i + 1} of ${statSets.length}`}
+            aria-pressed={i === setIndex}
+          >
+            <span
+              className={`block h-1.5 rounded-full transition-all duration-500 ${i === setIndex
+                ? "w-6 bg-primary/70"
+                : "w-1.5 bg-muted-foreground/30 hover:bg-muted-foreground/50"
+                }`}
+              aria-hidden="true"
+            />
+          </button>
         ))}
       </div>
     </div>

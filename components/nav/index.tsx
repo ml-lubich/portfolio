@@ -193,7 +193,7 @@ export function Navigation() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6">
           {/* Logo */}
           <a
-            href="#"
+            href="#hero"
             onClick={(e) => {
               e.preventDefault()
               e.stopPropagation()

@@ -26,6 +26,7 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: [
       "lucide-react",
+      "react-icons",
       "framer-motion",
       "@radix-ui/react-accordion",
       "@radix-ui/react-dialog",
@@ -78,6 +79,10 @@ const nextConfig = {
         {
           key: "Strict-Transport-Security",
           value: "max-age=63072000; includeSubDomains; preload",
+        },
+        {
+          key: "Cross-Origin-Opener-Policy",
+          value: "same-origin",
         },
         // X-DNS-Prefetch-Control — enables DNS prefetching for performance
         { key: "X-DNS-Prefetch-Control", value: "on" },

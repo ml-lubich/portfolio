@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { Home, BookOpen, ArrowLeft, Terminal } from "lucide-react"
 
 /* ── Floating particle for the background ──────────────────────────── */
@@ -271,6 +272,35 @@ export function NotFoundContent() {
                     transform: mounted ? "translateY(0)" : "translateY(20px)",
                 }}
             >
+                <Link
+                    href="/"
+                    className="group mb-8 flex flex-col items-center rounded-[11px] focus:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+                    aria-label="Misha Lubich — home"
+                >
+                    <div
+                        className="logo-flip-hover relative flex h-16 w-16 items-center justify-center rounded-[9px] overflow-hidden"
+                        onMouseEnter={(e) => {
+                            const el = e.currentTarget
+                            if (!el.classList.contains("is-flipping")) {
+                                el.classList.add("is-flipping")
+                            }
+                        }}
+                        onAnimationEnd={(e) => {
+                            e.currentTarget.classList.remove("is-flipping")
+                        }}
+                    >
+                        <Image
+                            src="/logo.png"
+                            alt=""
+                            width={64}
+                            height={64}
+                            sizes="64px"
+                            className="h-full w-full object-cover"
+                            priority
+                        />
+                    </div>
+                </Link>
+
                 <Glitch404 />
 
                 <h2

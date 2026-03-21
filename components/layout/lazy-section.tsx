@@ -54,7 +54,13 @@ export function LazySection({
   }, [rootMargin])
 
   return (
-    <div ref={ref} className={className || undefined} data-section={sectionId || undefined} style={visible ? undefined : { minHeight }}>
+    <div
+      ref={ref}
+      className={["lazy-section-wrap", className].filter(Boolean).join(" ") || undefined}
+      data-section={sectionId || undefined}
+      data-lazy-loaded={visible ? "true" : "false"}
+      style={visible ? undefined : { minHeight }}
+    >
       {visible ? children : null}
     </div>
   )

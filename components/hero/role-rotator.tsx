@@ -7,7 +7,14 @@ import { AnimatedText } from "../animations/animated-text"
 
 /* ── Role rotator with smooth slide transitions ───────────────────── */
 
-export function RoleRotator() {
+/** Hero H1 name timing — shared with brain fade-in in `hero/index.tsx`. */
+export const HERO_NAME_REVEAL = { delayMs: 400, durationMs: 700 } as const
+
+export function RoleRotator({
+  onNameRevealStart,
+}: {
+  onNameRevealStart?: () => void
+} = {}) {
   const [roleIndex, setRoleIndex] = useState(0)
   const [prevRoleIndex, setPrevRoleIndex] = useState(-1)
   const [isTransitioning, setIsTransitioning] = useState(false)
@@ -31,11 +38,18 @@ export function RoleRotator() {
 
   return (
     <h1
-      className="animate-fade-in-up font-display tracking-tight text-foreground"
-      style={{ animationDelay: "0.15s", opacity: 0, lineHeight: 1.1 }}
+      className="animate-fade-in-up-subtle font-display tracking-tight text-foreground"
+      style={{ animationDelay: "0.1s", lineHeight: 1.1 }}
     >
       <span className="block text-balance text-4xl font-semibold sm:text-5xl md:text-6xl lg:text-7xl">
-        <AnimatedName name="Misha Lubich" trigger="mount" delay={400} duration={700} metallic />
+        <AnimatedName
+          name="Misha Lubich"
+          trigger="mount"
+          delay={HERO_NAME_REVEAL.delayMs}
+          duration={HERO_NAME_REVEAL.durationMs}
+          metallic
+          onReveal={onNameRevealStart}
+        />
       </span>
       <span className="relative mt-3 block h-[2rem] sm:h-[2.4rem] md:h-[3rem] lg:h-[3.6rem] overflow-hidden">
         {roles.map((role, i) => {
@@ -44,13 +58,16 @@ export function RoleRotator() {
 
           let translateY = "60px"
           let opacity = 0
-          let blur = "blur(8px)"
           let scale = "scale(0.96)"
 
           if (isActive) {
-            translateY = "0px"; opacity = 1; blur = "blur(0px)"; scale = "scale(1)"
+            translateY = "0px"
+            opacity = 1
+            scale = "scale(1)"
           } else if (isLeaving) {
-            translateY = "-50px"; opacity = 0; blur = "blur(6px)"; scale = "scale(0.97)"
+            translateY = "-50px"
+            opacity = 0
+            scale = "scale(0.97)"
           }
 
           return (
@@ -60,9 +77,8 @@ export function RoleRotator() {
               style={{
                 opacity,
                 transform: `translateY(${translateY}) ${scale}`,
-                filter: blur,
                 transition: isActive || isLeaving
-                  ? "opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), filter 0.8s cubic-bezier(0.16, 1, 0.3, 1)"
+                  ? "opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)"
                   : "none",
               }}
               aria-hidden={!isActive}
@@ -83,7 +99,7 @@ export function RoleRotator() {
 
 export function HeroSubtitle() {
   return (
-    <p className="mx-auto mt-14 max-w-3xl text-sm leading-relaxed text-white/85 sm:text-base md:text-lg">
+    <p className="mx-auto mt-14 max-w-3xl text-sm leading-relaxed text-white/95 sm:text-base md:text-lg">
       <AnimatedText variant="blur-slide" delay={1200} stagger={30} duration={650}>
         {"Senior Software Engineer specializing in "}
         <span className="font-semibold text-foreground">AI-driven, cloud-native applications</span>

@@ -45,6 +45,19 @@ async function loadBrainBin(): Promise<BrainData> {
   }
 }
 
+/** Single in-flight fetch so Canvas shell and wireframe share one network + parse pass. */
+let brainBinPromise: Promise<BrainData> | null = null
+
+export function getBrainBinPromise(): Promise<BrainData> {
+  if (!brainBinPromise) {
+    brainBinPromise = loadBrainBin().catch((err) => {
+      brainBinPromise = null
+      throw err
+    })
+  }
+  return brainBinPromise
+}
+
 /* ── React hook to load brain data ────────────────────────────────── */
 
 export function useBrainData() {
@@ -55,7 +68,7 @@ export function useBrainData() {
 
   useEffect(() => {
     let cancelled = false
-    loadBrainBin().then((data) => {
+    getBrainBinPromise().then((data) => {
       if (cancelled) return
       const g = new THREE.BufferGeometry()
       g.setAttribute("position", new THREE.BufferAttribute(data.positions, 3))

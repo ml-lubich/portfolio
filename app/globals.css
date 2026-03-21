@@ -781,20 +781,17 @@ body {
 
 .animated-name-char {
   display: inline-block;
-  transform: translateX(var(--collapse-x, 0));
+  transform: translateX(var(--collapse-x, 0)) scale(0.94);
   opacity: 0;
-  filter: blur(4px);
   transition:
     transform var(--name-duration, 900ms) cubic-bezier(0.16, 1, 0.3, 1) var(--stagger, 0ms),
-    opacity calc(var(--name-duration, 900ms) * 0.6) ease-out var(--stagger, 0ms),
-    filter calc(var(--name-duration, 900ms) * 0.7) ease-out var(--stagger, 0ms);
-  will-change: transform, opacity, filter;
+    opacity calc(var(--name-duration, 900ms) * 0.6) ease-out var(--stagger, 0ms);
+  will-change: transform, opacity;
 }
 
 .animated-name-char[data-expanded="true"] {
-  transform: translateX(0);
+  transform: translateX(0) scale(1);
   opacity: 1;
-  filter: blur(0px);
 }
 
 /* ── Metallic shiny name effect (scroll-driven) ── */
@@ -817,7 +814,6 @@ body {
   transition:
     transform var(--name-duration, 900ms) cubic-bezier(0.16, 1, 0.3, 1) var(--stagger, 0ms),
     opacity calc(var(--name-duration, 900ms) * 0.6) ease-out var(--stagger, 0ms),
-    filter calc(var(--name-duration, 900ms) * 0.7) ease-out var(--stagger, 0ms),
     background-position 0.1s linear;
 }
 
@@ -965,24 +961,21 @@ strong:not(.no-metallic) {
 /* ─ Shared base for all word variants ─ */
 .animated-text-word {
   display: inline-block;
-  will-change: transform, opacity, filter;
+  will-change: transform, opacity;
 }
 
-/* ── blur-slide: Signature Anthropic blur + vertical slide ───── */
+/* ── blur-slide: slide + fade (no filter — GPU-friendly, Lighthouse-friendly) ─ */
 .at-blur-slide {
   opacity: 0;
-  filter: blur(8px);
-  transform: translateY(12px);
+  transform: translateY(14px) scale(0.985);
   transition:
     opacity var(--at-duration, 700ms) cubic-bezier(0.16, 1, 0.3, 1) var(--at-delay, 0ms),
-    filter var(--at-duration, 700ms) cubic-bezier(0.16, 1, 0.3, 1) var(--at-delay, 0ms),
     transform var(--at-duration, 700ms) cubic-bezier(0.16, 1, 0.3, 1) var(--at-delay, 0ms);
 }
 
 .at-blur-slide[data-visible="true"] {
   opacity: 1;
-  filter: blur(0px);
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
 }
 
 /* ── fade-up: Classic opacity + rise ─────────────────────────── */
@@ -1550,5 +1543,13 @@ strong:not(.no-metallic) {
   *::after {
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* Mobile: browser may skip layout/paint for sections that are off-screen */
+@media (max-width: 767px) {
+  .lazy-section-wrap[data-lazy-loaded="true"] {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 50vh;
   }
 }

@@ -15,6 +15,8 @@ interface AnimatedNameProps {
   duration?: number
   /** Apply a metallic shiny gradient effect */
   metallic?: boolean
+  /** Fires once when the expand animation starts (after `delay` in `mount` mode). */
+  onReveal?: () => void
 }
 
 /**
@@ -34,8 +36,11 @@ export function AnimatedName({
   delay = 0,
   duration = 975,
   metallic = false,
+  onReveal,
 }: AnimatedNameProps) {
   const containerRef = useRef<HTMLSpanElement>(null)
+  const onRevealRef = useRef(onReveal)
+  onRevealRef.current = onReveal
   // "hover" mode starts expanded (visible); "mount" mode starts collapsed
   const [expanded, setExpanded] = useState(trigger === "hover")
   const [hasBeenVisible, setHasBeenVisible] = useState(false)
@@ -57,7 +62,10 @@ export function AnimatedName({
       ([entry]) => {
         if (entry.isIntersecting && !hasBeenVisible) {
           setHasBeenVisible(true)
-          setTimeout(() => setExpanded(true), delay)
+          setTimeout(() => {
+            onRevealRef.current?.()
+            setExpanded(true)
+          }, delay)
         }
       },
       { threshold: 0.3 }
@@ -85,17 +93,19 @@ export function AnimatedName({
   }, [])
 
   return (
-    <span
-      ref={containerRef}
-      className={`animated-name-root${metallic ? ' animated-name-metallic' : ''} ${className}`}
-      onMouseEnter={handleMouseEnter}
-      aria-label={name}
-      style={
-        {
-          "--name-duration": `${duration}ms`,
-        } as React.CSSProperties
-      }
-    >
+    <span className={`relative inline-block ${className}`}>
+      <span className="sr-only">{name}</span>
+      <span
+        ref={containerRef}
+        className={`animated-name-root${metallic ? " animated-name-metallic" : ""}`}
+        aria-hidden="true"
+        onMouseEnter={handleMouseEnter}
+        style={
+          {
+            "--name-duration": `${duration}ms`,
+          } as React.CSSProperties
+        }
+      >
       {chars.map((char, i) => {
         // Distance from center: -1 (far left) to +1 (far right)
         const normalizedOffset = (i - midpoint) / midpoint || 0
@@ -111,7 +121,6 @@ export function AnimatedName({
           <span
             key={`${char}-${i}`}
             className="animated-name-char"
-            aria-hidden="true"
             style={
               {
                 "--collapse-x": `${collapseDistance}em`,
@@ -125,6 +134,7 @@ export function AnimatedName({
           </span>
         )
       })}
+      </span>
     </span>
   )
 }

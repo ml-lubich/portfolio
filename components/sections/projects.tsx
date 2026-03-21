@@ -33,7 +33,7 @@ export function Projects() {
       }
       stickyTop={90}
       stackOffset={16}
-      scrollPerCard={55}
+      scrollPerCard={36}
       perspective={1200}
       activeCardId={selectedId}
       onScrollDismiss={handleClose}

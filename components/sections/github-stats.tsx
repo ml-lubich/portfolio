@@ -550,22 +550,34 @@ export function GitHubStats() {
                     </div>
                 </AnimatedSection>
 
-                {/* Languages + Recent repos */}
-                <div className="grid gap-4 lg:grid-cols-2">
+                {/* Languages + Recent repos — min-w-0 so grid items can shrink on narrow viewports (avoids horizontal overflow) */}
+                <div className="grid min-w-0 gap-4 lg:grid-cols-2">
                     {/* Language breakdown */}
-                    <AnimatedSection delay={240}>
-                        <div className="relative h-full overflow-hidden rounded-2xl border border-white/[0.03] bg-white/[0.01] backdrop-blur-2xl p-5 sm:p-6 transition-all duration-500 hover:border-primary/20 hover:bg-white/[0.02] glass-card-3d">
+                    <AnimatedSection delay={240} className="min-w-0">
+                        <div className="relative h-full min-w-0 max-w-full overflow-hidden rounded-2xl border border-white/[0.03] bg-white/[0.01] backdrop-blur-2xl p-5 sm:p-6 transition-all duration-500 hover:border-primary/20 hover:bg-white/[0.02] glass-card-3d">
                             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/6 to-transparent" />
                             <h3 className="mb-5 flex items-center gap-2 text-lg font-bold text-foreground">
                                 <GitCommit className="h-4 w-4 text-primary" />
                                 Language Distribution
                             </h3>
-                            <div className="mb-6 flex h-3 overflow-hidden rounded-full bg-white/[0.02]">
+                            {/* flex + flex-grow ratios fit the row reliably; % widths inside flex often overflow without min-w-0 */}
+                            <div className="mb-6 flex h-3 w-full min-w-0 max-w-full overflow-hidden rounded-full bg-white/[0.02]">
                                 {languages.map((lang) => (
-                                    <div key={lang.name} className="transition-all duration-1000 ease-out first:rounded-l-full last:rounded-r-full" style={{ width: lang.percentage + "%", backgroundColor: lang.color, minWidth: lang.percentage > 0 ? "3px" : 0 }} title={lang.name + ": " + lang.percentage.toFixed(1) + "%"} />
+                                    <div
+                                        key={lang.name}
+                                        className="min-w-0 transition-all duration-1000 ease-out first:rounded-l-full last:rounded-r-full"
+                                        style={{
+                                            flexGrow: lang.percentage,
+                                            flexShrink: 1,
+                                            flexBasis: 0,
+                                            backgroundColor: lang.color,
+                                            minWidth: lang.percentage > 0 ? 2 : 0,
+                                        }}
+                                        title={lang.name + ": " + lang.percentage.toFixed(1) + "%"}
+                                    />
                                 ))}
                             </div>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-3 sm:gap-x-6 gap-y-2 sm:gap-y-3">
+                            <div className="grid min-w-0 grid-cols-1 gap-x-3 gap-y-2 sm:grid-cols-2 sm:gap-x-6 sm:gap-y-3">
                                 {languages.map((lang, idx) => (
                                     <div key={lang.name} className="flex items-center justify-between gap-2 animate-slide-up" style={{ animationDelay: idx * 60 + "ms", opacity: 0 }}>
                                         <div className="flex items-center gap-2 min-w-0">
@@ -584,8 +596,8 @@ export function GitHubStats() {
                     </AnimatedSection>
 
                     {/* Recent repos */}
-                    <AnimatedSection delay={320}>
-                        <div className="relative h-full overflow-hidden rounded-2xl border border-white/[0.03] bg-white/[0.01] backdrop-blur-2xl p-5 sm:p-6 transition-all duration-500 hover:border-primary/20 hover:bg-white/[0.02] glass-card-3d">
+                    <AnimatedSection delay={320} className="min-w-0">
+                        <div className="relative h-full min-w-0 max-w-full overflow-hidden rounded-2xl border border-white/[0.03] bg-white/[0.01] backdrop-blur-2xl p-5 sm:p-6 transition-all duration-500 hover:border-primary/20 hover:bg-white/[0.02] glass-card-3d">
                             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/6 to-transparent" />
                             <h3 className="mb-3 sm:mb-5 flex items-center gap-2 text-base sm:text-lg font-bold text-foreground">
                                 <Activity className="h-4 w-4 text-accent" />
@@ -593,29 +605,31 @@ export function GitHubStats() {
                             </h3>
                             <div className="space-y-2 sm:space-y-3">
                                 {topRepos.map((repo, idx) => (
-                                    <a key={repo.name} href={repo.html_url} target="_blank" rel="noopener noreferrer" className="group/repo flex items-start gap-2 sm:gap-3 rounded-xl border border-white/[0.02] bg-white/[0.01] p-2.5 sm:p-3.5 transition-all duration-300 hover:border-primary/20 hover:bg-white/[0.025] animate-slide-up" style={{ animationDelay: idx * 80 + "ms", opacity: 0 }}>
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex items-center gap-1.5 sm:gap-2">
-                                                <span className="truncate font-medium text-xs sm:text-sm text-foreground group-hover/repo:text-primary transition-colors">{repo.name}</span>
+                                    <a key={repo.name} href={repo.html_url} target="_blank" rel="noopener noreferrer" className="group/repo flex min-w-0 max-w-full items-start gap-2 sm:gap-3 rounded-xl border border-white/[0.02] bg-white/[0.01] p-2.5 sm:p-3.5 transition-all duration-300 hover:border-primary/20 hover:bg-white/[0.025] animate-slide-up" style={{ animationDelay: idx * 80 + "ms", opacity: 0 }}>
+                                        <div className="min-w-0 flex-1">
+                                            <div className="flex min-w-0 items-center gap-1.5 sm:gap-2">
+                                                <span className="min-w-0 truncate font-medium text-xs sm:text-sm text-foreground group-hover/repo:text-primary transition-colors">{repo.name}</span>
                                                 <ArrowUpRight className="h-3 w-3 flex-shrink-0 text-muted-foreground opacity-0 transition-all group-hover/repo:opacity-100 group-hover/repo:translate-x-0.5 group-hover/repo:-translate-y-0.5" />
                                             </div>
                                             {repo.description && <p className="mt-1 truncate text-[11px] sm:text-xs text-muted-foreground">{repo.description}</p>}
-                                            <div className="mt-1.5 sm:mt-2 flex flex-wrap items-center gap-2 sm:gap-3 text-[11px] sm:text-xs text-muted-foreground">
-                                                {repo.language && (
-                                                    <span className="flex items-center gap-1">
-                                                        <span className="inline-block h-2 w-2 rounded-full" style={{ backgroundColor: LANG_COLORS[repo.language] || "#8b8b8b" }} />
-                                                        {repo.language}
-                                                    </span>
-                                                )}
-                                                {repo.stargazers_count > 0 && <span className="flex items-center gap-1"><Star className="h-3 w-3" />{repo.stargazers_count}</span>}
-                                                {repo.forks_count > 0 && <span className="flex items-center gap-1"><GitFork className="h-3 w-3" />{repo.forks_count}</span>}
-                                                <span className="ml-auto">{timeAgo(repo.updated_at)}</span>
+                                            <div className="mt-1.5 grid min-w-0 max-w-full grid-cols-1 gap-x-2 gap-y-1 text-[11px] text-muted-foreground sm:mt-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:gap-x-3 sm:text-xs">
+                                                <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 sm:gap-x-3">
+                                                    {repo.language && (
+                                                        <span className="flex min-w-0 max-w-full items-center gap-1">
+                                                            <span className="inline-block h-2 w-2 flex-shrink-0 rounded-full" style={{ backgroundColor: LANG_COLORS[repo.language] || "#8b8b8b" }} />
+                                                            <span className="truncate">{repo.language}</span>
+                                                        </span>
+                                                    )}
+                                                    {repo.stargazers_count > 0 && <span className="flex flex-shrink-0 items-center gap-1"><Star className="h-3 w-3" />{repo.stargazers_count}</span>}
+                                                    {repo.forks_count > 0 && <span className="flex flex-shrink-0 items-center gap-1"><GitFork className="h-3 w-3" />{repo.forks_count}</span>}
+                                                </div>
+                                                <span className="flex-shrink-0 whitespace-nowrap text-left sm:text-right">{timeAgo(repo.updated_at)}</span>
                                             </div>
                                         </div>
                                     </a>
                                 ))}
                             </div>
-                            <a href={"https://github.com/" + GITHUB_USERNAME} target="_blank" rel="noopener noreferrer" className="mt-4 sm:mt-5 inline-flex items-center gap-1.5 sm:gap-2 rounded-lg border border-white/[0.03] bg-white/[0.015] px-3 sm:px-4 py-2 text-[11px] sm:text-xs font-medium text-muted-foreground transition-all duration-300 hover:border-primary/30 hover:text-foreground hover:bg-white/[0.03]">
+                            <a href={"https://github.com/" + GITHUB_USERNAME} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex max-w-full min-w-0 flex-wrap items-center gap-1.5 rounded-lg border border-white/[0.03] bg-white/[0.015] px-3 py-2 text-[11px] font-medium text-muted-foreground transition-all duration-300 hover:border-primary/30 hover:bg-white/[0.03] hover:text-foreground sm:mt-5 sm:gap-2 sm:px-4 sm:text-xs">
                                 <SiGithub className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                                 View all repos on GitHub
                                 <ExternalLink className="h-3 w-3" />

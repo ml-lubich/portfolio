@@ -194,6 +194,12 @@ describe("JSON-LD structured data", () => {
         expect(jsonLdSrc).toContain("WebSite")
     })
 
+    it("uses ItemList for site navigation (valid ListItem URLs)", () => {
+        expect(jsonLdSrc).toContain('"@type": "ItemList"')
+        expect(jsonLdSrc).toContain("Site navigation")
+        expect(jsonLdSrc).toContain("#research")
+    })
+
     it("references the correct base URL", () => {
         // Base URL may be inline or imported via SITE_URL
         expect(

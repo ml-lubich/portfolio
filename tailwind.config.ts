@@ -89,6 +89,11 @@ const config: Config = {
           '0%': { opacity: '0', transform: 'translateY(24px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
+        /** Transform-only — keeps text eligible for LCP (opacity 0 excludes element). */
+        'fade-in-up-subtle': {
+          '0%': { transform: 'translateY(14px)' },
+          '100%': { transform: 'translateY(0)' },
+        },
         'fade-in': {
           '0%': { opacity: '0' },
           '100%': { opacity: '1' },
@@ -169,6 +174,7 @@ const config: Config = {
         'accordion-down': 'accordion-down 0.3s ease-out',
         'accordion-up': 'accordion-up 0.3s ease-out',
         'fade-in-up': 'fade-in-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+        'fade-in-up-subtle': 'fade-in-up-subtle 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards',
         'fade-in': 'fade-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards',
         'slide-in-left': 'slide-in-left 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
         'slide-in-right': 'slide-in-right 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
