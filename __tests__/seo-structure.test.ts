@@ -144,9 +144,10 @@ describe("Robots config", () => {
         expect(robotsSrc).toContain('"/"')
     })
 
-    it("blocks _next and api routes", () => {
+    it("blocks only api and Next internals (public pages stay allowlisted via /)", () => {
         expect(robotsSrc).toContain('"/_next/"')
         expect(robotsSrc).toContain('"/api/"')
+        expect(robotsSrc).not.toContain('"/demo"')
     })
 
     it("references sitemap", () => {

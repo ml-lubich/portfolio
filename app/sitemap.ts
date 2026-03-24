@@ -10,7 +10,7 @@ import { SITE_URL } from "@/lib/site-config"
  * - Blog listing at 0.9 (content hub with frequent updates)
  * - Blog posts at 0.8 (individual content — the main SEO target)
  * - Blog category pages at 0.6 (thin content, mostly filters)
- * - RSS feed declared in robots.txt, not sitemap
+ * - RSS feed included in sitemap for discovery
  * - Hash anchors (#about etc) removed — Google ignores fragments
  * - Dates use actual content dates, not "now"
  */
@@ -37,6 +37,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: latestBlogDate,
       changeFrequency: "daily",
       priority: 0.9,
+    },
+    {
+      url: `${SITE_URL}/feed.xml`,
+      lastModified: latestBlogDate,
+      changeFrequency: "daily",
+      priority: 0.7,
     },
   ]
 
