@@ -11,7 +11,7 @@ import type { ScrollStackCardsProps, DragState } from "./types"
 import { SPRING, DAMPING, FLING_DECAY, DRAG_DEAD_ZONE, newDragState } from "./constants"
 import { GlowOverlay, ShineOverlay, ScanOverlay } from "./card-overlays"
 import { overlays, shadows } from "@/lib/theme"
-import { useIsMobile } from "@/hooks/use-mobile"
+import { useIsMobile, useReducedStackEffects } from "@/hooks/use-mobile"
 
 /** One shadow value during scroll — avoids interpolating box-shadow every frame (repaint-heavy). */
 const DESKTOP_SCROLL_STACK_SHADOW =
@@ -44,6 +44,7 @@ export function ScrollStackCards({
   detailContent,
 }: ScrollStackCardsProps) {
   const isMobile = useIsMobile()
+  const reducedStack = useReducedStackEffects()
 
   // Mobile-adjusted parameters for better small-viewport UX
   const effStickyTop = isMobile ? Math.min(stickyTop, 56) : stickyTop
@@ -81,6 +82,9 @@ export function ScrollStackCards({
   const expandedScrollY = useRef(0)
   const detailWrapperRef = useRef<HTMLDivElement>(null)
 
+  const reducedStackRef = useRef(reducedStack)
+  reducedStackRef.current = reducedStack
+
   // Ensure drag array is sized
   if (drags.current.length !== cards.length) {
     drags.current = cards.map(() => newDragState())
@@ -92,6 +96,16 @@ export function ScrollStackCards({
   const updateCards = useCallback(() => {
     const container = containerRef.current
     if (!container) return
+
+    const scrolling = isScrolling.current
+    const scrollAttr = scrolling ? "true" : "false"
+    if (container.getAttribute("data-stack-scrolling") !== scrollAttr) {
+      container.setAttribute("data-stack-scrolling", scrollAttr)
+    }
+    const reducedAttr = reducedStackRef.current ? "true" : "false"
+    if (container.getAttribute("data-stack-reduced") !== reducedAttr) {
+      container.setAttribute("data-stack-reduced", reducedAttr)
+    }
 
     const rect = container.getBoundingClientRect()
     const vh = window.innerHeight
@@ -112,7 +126,6 @@ export function ScrollStackCards({
       scrollMetricsRef.current = { enter: enterBuf, cover: coverBuf }
     }
 
-    const scrolling = isScrolling.current
     let tiltable = -1
 
     cardRefs.current.forEach((el, i) => {
@@ -143,17 +156,17 @@ export function ScrollStackCards({
       enterBuf[i] = enterProgress
       coverBuf[i] = coverProgress
 
-      // Softer transforms on mobile to keep cards readable
-      const mobile = isMobileRef.current
-      const scale = 1 - coverProgress * (mobile ? 0.03 : 0.06)
-      const translateZ = coverProgress * (mobile ? -25 : -60)
-      const rotateX = coverProgress * (mobile ? 0.8 : 2)
+      // Softer motion + 2D stack on phones / tablets (see useReducedStackEffects).
+      const reduced = reducedStackRef.current
+      const scale = 1 - coverProgress * (reduced ? 0.03 : 0.06)
+      const translateZ = coverProgress * (reduced ? -25 : -60)
+      const rotateX = coverProgress * (reduced ? 0.8 : 2)
       const borderRadius = 20 + coverProgress * 12
-      const slideUp = (1 - enterProgress) * (mobile ? 38 : 52)
+      const slideUp = (1 - enterProgress) * (reduced ? 38 : 52)
       const enterOpacity = Math.min(enterProgress * 4.25, 1)
       const stackedOpacity = 1 - coverProgress * 0.3
       /* Bake “brightness” into opacity on all viewports — filter:brightness() repaints during scroll. */
-      const dimFactor = mobile ? 1 - coverProgress * 0.18 : 1 - coverProgress * 0.2
+      const dimFactor = reduced ? 1 - coverProgress * 0.18 : 1 - coverProgress * 0.2
       const opacity = enterOpacity * stackedOpacity * dimFactor
       const shadowBlur = 30 + coverProgress * 20
       const shadowOpacity = 0.15 + coverProgress * 0.1
@@ -163,19 +176,27 @@ export function ScrollStackCards({
       const dragRotateY = d ? d.dx * 0.04 : 0
       const dragRotateX = d ? -d.dy * 0.04 : 0
 
-      const curPerspective = mobile ? Math.min(perspective, 800) : perspective
-      el.style.transform = [
-        `perspective(${curPerspective}px)`,
-        `rotateX(${rotateX + dragRotateX}deg)`,
-        `rotateY(${dragRotateY}deg)`,
-        `translateX(${dragX}px)`,
-        `translateY(${slideUp + dragY}%)`,
-        `translateZ(${translateZ}px)`,
-        `scale(${scale})`,
-      ].join(" ")
+      const curPerspective = reduced ? Math.min(perspective, 800) : perspective
+      /* Laptop/desktop: full 3D stack + tilt. Phones / iPad / touch tablets: 2D only. */
+      const useFlatStack = reduced
+      el.style.transform = useFlatStack
+        ? [
+            `translateX(${dragX}px)`,
+            `translateY(${slideUp + dragY}%)`,
+            `scale(${scale})`,
+          ].join(" ")
+        : [
+            `perspective(${curPerspective}px)`,
+            `rotateX(${rotateX + dragRotateX}deg)`,
+            `rotateY(${dragRotateY}deg)`,
+            `translateX(${dragX}px)`,
+            `translateY(${slideUp + dragY}%)`,
+            `translateZ(${translateZ}px)`,
+            `scale(${scale})`,
+          ].join(" ")
       el.style.opacity = `${opacity}`
       el.style.filter = ""
-      if (mobile) {
+      if (reduced) {
         el.style.boxShadow = "0 12px 28px -10px rgba(0,0,0,0.35)"
         el.style.backfaceVisibility = "hidden"
       } else if (scrolling) {
@@ -185,11 +206,12 @@ export function ScrollStackCards({
         el.style.boxShadow = `0 ${10 + coverProgress * 15}px ${shadowBlur}px -8px rgba(0,0,0,${shadowOpacity})`
         el.style.backfaceVisibility = ""
       }
-      el.style.borderRadius = `${borderRadius}px`
+      /* Lock radius when reduced; desktop keeps animated corners (backdrop is off while scrolling). */
+      el.style.borderRadius = reduced ? "20px" : `${borderRadius}px`
       el.style.pointerEvents = enterProgress < 0.28 ? "none" : "auto"
       el.style.transition = "none"
 
-      if (!scrolling) {
+      if (!scrolling && !reduced) {
         const glow = glowRefs.current[i]
         if (glow) {
           const glowOpacity = enterProgress > 0.32 ? (1 - coverProgress) * 0.6 : 0
@@ -219,10 +241,6 @@ export function ScrollStackCards({
     }
     tiltableIndexRef.current = tiltable
   }, [cards.length, perspective])
-
-  // Stable ref for isMobile so updateCards can read it without re-creating
-  const isMobileRef = useRef(isMobile)
-  isMobileRef.current = isMobile
 
   /* ================================================================== */
   /*  DRAG  —  pointer down / move / up + touch equivalents             */
@@ -268,17 +286,26 @@ export function ScrollStackCards({
     const lift = 40 + Math.min(Math.sqrt(d.dx * d.dx + d.dy * d.dy) * 0.15, 30)
     const dragScale = 1.03
 
-    el.style.transform = [
-      `perspective(${perspective}px)`,
-      `rotateX(${rotX}deg)`,
-      `rotateY(${rotY}deg)`,
-      `translateX(${d.dx}px)`,
-      `translateY(${d.dy}px)`,
-      `translateZ(${lift}px)`,
-      `scale(${dragScale})`,
-    ].join(" ")
-    el.style.filter = "brightness(1.1)"
-    el.style.boxShadow = shadows.cardDrag(d.dy)
+    const flatDrag = reducedStackRef.current
+    el.style.transform = flatDrag
+      ? [
+          `translateX(${d.dx}px)`,
+          `translateY(${d.dy}px)`,
+          `scale(${dragScale})`,
+        ].join(" ")
+      : [
+          `perspective(${perspective}px)`,
+          `rotateX(${rotX}deg)`,
+          `rotateY(${rotY}deg)`,
+          `translateX(${d.dx}px)`,
+          `translateY(${d.dy}px)`,
+          `translateZ(${lift}px)`,
+          `scale(${dragScale})`,
+        ].join(" ")
+    el.style.filter = flatDrag ? "" : "brightness(1.1)"
+    el.style.boxShadow = flatDrag
+      ? "0 16px 36px -12px rgba(0,0,0,0.4)"
+      : shadows.cardDrag(d.dy)
     el.style.transition = "none"
     el.style.cursor = "grabbing"
 
@@ -326,19 +353,26 @@ export function ScrollStackCards({
 
       const card = cardRefs.current[index]
       if (card) {
+        const flatFling = reducedStackRef.current
         const rotY = d.dx * 0.04
         const rotX = -d.dy * 0.04
-        card.style.transform = [
-          `perspective(${perspective}px)`,
-          `rotateX(${rotX}deg)`,
-          `rotateY(${rotY}deg)`,
-          `translateX(${d.dx}px)`,
-          `translateY(${d.dy}px)`,
-          `translateZ(10px)`,
-          `scale(1)`,
-        ].join(" ")
+        card.style.transform = flatFling
+          ? [
+              `translateX(${d.dx}px)`,
+              `translateY(${d.dy}px)`,
+              `scale(1)`,
+            ].join(" ")
+          : [
+              `perspective(${perspective}px)`,
+              `rotateX(${rotX}deg)`,
+              `rotateY(${rotY}deg)`,
+              `translateX(${d.dx}px)`,
+              `translateY(${d.dy}px)`,
+              `translateZ(10px)`,
+              `scale(1)`,
+            ].join(" ")
         card.style.transition = "none"
-        card.style.filter = `brightness(${1 + dist * 0.0003})`
+        card.style.filter = flatFling ? "" : `brightness(${1 + dist * 0.0003})`
       }
 
       requestAnimationFrame(animate)
@@ -365,6 +399,7 @@ export function ScrollStackCards({
     // Don't apply hover effects while scrolling / stacking or when panel is expanded
     if (isScrolling.current) return
     if (activeCardIdRef.current) return
+    if (reducedStackRef.current) return
 
     // Only the front (top) card runs tilt / shine — avoids extra layout + gradient work on the stack
     if (index !== tiltableIndexRef.current) return
@@ -578,6 +613,8 @@ export function ScrollStackCards({
       ro?.disconnect()
       window.removeEventListener("scroll", onScroll)
       window.removeEventListener("resize", onResize)
+      containerRef.current?.removeAttribute("data-stack-scrolling")
+      containerRef.current?.removeAttribute("data-stack-reduced")
     }
   }, [updateCards])
 
@@ -625,7 +662,7 @@ export function ScrollStackCards({
                   gridColumn: "1 / -1",
                   marginTop: `${i * effStackOffset}px`,
                   transformOrigin: "center top",
-                  transformStyle: "preserve-3d",
+                  transformStyle: reducedStack ? "flat" : "preserve-3d",
                   borderRadius: "20px",
                   overflow: "hidden",
                   cursor: isExpanded ? "pointer" : "grab",

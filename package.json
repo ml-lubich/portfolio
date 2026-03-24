@@ -12,7 +12,7 @@
   "packageManager": "bun@1.2.0",
   "scripts": {
     "prepare": "node scripts/install-hooks.js",
-    "dev": "next dev",
+    "dev": "next dev --webpack",
     "prebuild": "vitest run",
     "build": "next build",
     "start": "next start",

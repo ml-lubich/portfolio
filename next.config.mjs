@@ -4,9 +4,6 @@ const nextConfig = {
   poweredByHeader: false,
   // Enable React strict mode for catching bugs early
   reactStrictMode: true,
-  turbopack: {
-    root: process.cwd(),
-  },
   // TypeScript errors must be fixed — never ship with ignoreBuildErrors
   typescript: {
     ignoreBuildErrors: false,

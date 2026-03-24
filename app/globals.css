@@ -606,6 +606,22 @@ body {
     inset 0 1px 0 0 hsla(0, 0%, 100%, 0.06);
 }
 
+/*
+ * ScrollStackCards: backdrop-filter + scroll-driven transforms forces full-card
+ * recomposites every frame. Swap to opaque glass while the stack is scrolling.
+ */
+[data-stack-scrolling="true"] [data-stack-card] .glass-stack-card {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: hsla(220, 18%, 10%, 0.94);
+}
+
+/* Phones / iPad / touch tablets: lighter blur (stack is 2D; less compositing work). */
+[data-stack-reduced="true"] [data-stack-card] .glass-stack-card {
+  backdrop-filter: blur(10px) saturate(1.2);
+  -webkit-backdrop-filter: blur(10px) saturate(1.2);
+}
+
 /* ── 3D Glass Card effect ── */
 .glass-card-3d {
   position: relative;
