@@ -1,0 +1,90 @@
+---
+title: "MCP Won the Protocol War — Production Is the Only Fight Left"
+excerpt: "Model Context Protocol is the default shape for tools, data, and agents to talk. But 'works in Cursor on my laptop' is not the same as 'safe behind the corporate gateway at scale.' Here's the engineering checklist for MCP in real systems in 2026."
+date: "2026-03-29"
+category: "AI Architecture"
+tags: ["MCP", "API Design", "Security", "Agents", "Production"]
+coverImage: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=1200&h=630&fit=crop"
+---
+
+## We Can Stop Debating Whether MCP Matters
+
+If 2024 was the year engineers discovered MCP, and 2025 was the year every serious IDE and cloud vendor shipped a client, then 2026 is the year the argument shifted.
+
+The question is no longer "**will** we standardize tool exposure for LLMs?" It's "**how** do we run this protocol where money and compliance are on the line?"
+
+The public [2026 MCP roadmap](https://blog.modelcontextprotocol.io/posts/2026-mcp-roadmap/) reads like a grown-up platform agenda: transports that survive load balancers, clearer semantics around long tasks, gateways, observability. That's the right story — because **protocol adoption is winning**, and **operational maturity is lagging**.
+
+This post is my engineering-minded checklist for closing that lag.
+
+## Localhost MCP Is a Prototype, Not an Architecture
+
+On a developer machine, MCP feels magical: spawn a server, expose tools, wire up a client, iterate. In production, the same pattern collides with:
+
+- **Identity:** Who is calling which tool, on behalf of which user?
+- **Tenancy:** Which customer data can this session touch?
+- **Rate limits:** What happens when an agent loops and fans out tool calls?
+- **Version skew:** Client rev `n`, server rev `n-3`, chaos in the middle
+
+```mermaid
+{
+  "type": "comparison",
+  "left": {
+    "title": "Dev-time MCP",
+    "color": "green",
+    "steps": ["Single user", "stdio / local host", "Trust everyone", "Logs in terminal"]
+  },
+  "right": {
+    "title": "Production MCP",
+    "color": "amber",
+    "steps": ["OAuth / service auth", "Gateway + audit", "Least privilege", "Traces + alerts"]
+  }
+}
+```
+
+If your plan stops at the left column, you don't have a product integration. You have a demo.
+
+## Treat Tool Surfaces as **Adversarial**
+
+Anything an LLM can invoke is an **attack surface** multiplied by prompt injection, buggy planning, and accidental over-permissioning.
+
+Concrete practices that actually hold up:
+
+- **Narrow tools.** Prefer several specific primitives over one "do everything" endpoint.
+- **Server-side enforcement.** Never rely on the model to "choose" authorization boundaries; enforce them where the data lives.
+- **Idempotency and dry-runs** for destructive operations — where business rules allow it.
+- **Structured, machine-auditable logs** for tool name, arguments fingerprint, outcome, and correlation IDs.
+
+You already did this for REST and GraphQL. MCP is no exception.
+
+## Observability: MCP Sessions Are Distributed Systems
+
+An agent thread is a **distributed trace** whether you instrument it or not.
+
+If you can't answer:
+
+- Which tool failed, after how many retries?
+- What was the tail latency during a spike in token usage?
+- Which tenant triggered a rate limit?
+
+…then you're flying blind when leadership asks why the "AI feature" melted your database.
+
+Invest in tracing spans that cross model ↔ gateway ↔ tool server boundaries. The protocol is standardizing; **your dashboards shouldn't be artisanal**.
+
+## Gateway Patterns Are the Boring Center of the Story
+
+Enterprise rollouts converge on a small set of patterns:
+
+- A **corporate MCP gateway** that terminates TLS, enforces policy, and fans out to internal servers
+- **Pinned server versions** and compatibility tests in CI
+- **Kill switches** for individual tools when abuse or bugs appear
+
+That's not cynicism — it's how every mature integration platform survived its first five years.
+
+## Why I Still Bet on MCP (Despite the Plumbing Pain)
+
+Standards win when they reduce the **integration tax**. MCP did that for tools the same way container images did for deploy artifacts: imperfect, yet unavoidable.
+
+The engineering work left is unglamorous: auth, audit, scaling, and failure modes. The teams that treat that work as **first-class product engineering** — not a weekend hack between model releases — will ship the agents that survive contact with the real world.
+
+Everything else stays in the demo video.

@@ -50,6 +50,8 @@ const VIEW_COUNTS: Record<string, string> = {
     "claude-code-terminal-ai-that-works": "3k",
     "ai-evaluation-hardest-unsolved-problem": "1k",
     "vibe-coding-future-or-anti-pattern": "2k",
+    "agentic-coding-trust-gap-2026": "1k",
+    "mcp-production-engineering-2026": "1k",
 }
 
 /**

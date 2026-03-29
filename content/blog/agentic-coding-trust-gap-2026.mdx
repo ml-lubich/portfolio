@@ -1,0 +1,109 @@
+---
+title: "The Agentic Coding Trust Gap: Why You're Using AI 60% of the Time but Delegating Almost None of It"
+excerpt: "Industry reports and engineering threads in 2026 all say the same uncomfortable thing: coding agents are everywhere, yet teams still only fully hand off a tiny slice of work. Here's what that gap means for how we design reviews, harnesses, and careers."
+date: "2026-03-24"
+category: "Engineering Culture"
+tags: ["Agentic AI", "Claude", "Engineering Leadership", "AI Tools", "Process"]
+coverImage: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1200&h=630&fit=crop"
+---
+
+## The Headline That Broke Engineering Twitter
+
+If you've been anywhere near AI engineering discourse in early 2026, you've seen the pattern repeat: a vendor or research team publishes a report on **agentic coding**, the charts look hockey-stick shaped, and the comments split into two camps — "we're all obsolete" and "nothing has changed."
+
+The reality is messier and more interesting. [Anthropic's 2026 agentic coding trends report](https://resources.anthropic.com/2026-agentic-coding-trends-report) (and the discussion it kicked off across [Claude's blog](https://www.claude.com/blog/eight-trends-defining-how-software-gets-built-in-2026) and the engineering press) crystallizes something practitioners already felt in their bones:
+
+**Adoption is high, but blind delegation is not.**
+
+Teams are running agents in the loop for a large fraction of the day. Many organizations report developers leaning on AI for the majority of their workflow. Yet when you ask where humans are willing to **fully** delegate an outcome — not just draft code, but own the merge — the ceiling is still stubbornly low. The narrative isn't "robots replaced engineers"; it's "**engineers became supervisors of stochastic interns**."
+
+That mismatch is the **trust gap**. This post is about what to do with it.
+
+## What the Trust Gap Actually Measures
+
+The trust gap isn't a moral failing. It's a systems signal.
+
+When you delegate to a human junior, you rely on:
+
+- Shared context and taste
+- Predictable escalation when they're stuck
+- A career stake in not shipping nonsense
+
+When you delegate to an agent, you get:
+
+- Enormous breadth and speed
+- Occasional confident hallucinations
+- No skin in the game when production burns
+
+So rational teams compress delegation to the subset of tasks where **verification is cheap** and **blast radius is small**. Everything else becomes "AI drafts, human signs."
+
+That's the right default — unless your process pretends the opposite.
+
+## The Failure Mode: Vibe Merging
+
+The worst pattern I see in 2026 isn't "too little AI." It's **unreviewed agent output treated like a rubber stamp**.
+
+```mermaid
+{
+  "type": "pipeline",
+  "title": "Vibe Merge — How Trust Decays",
+  "steps": [
+    { "label": "Agent opens PR", "color": "blue" },
+    { "label": "Diff too large to read", "annotation": "rubber-stamp risk", "color": "amber" },
+    { "label": "Green CI", "annotation": "tests never covered edge case", "color": "amber" },
+    { "label": "Ship", "color": "red" },
+    { "label": "Incident", "annotation": "trust in agents collapses org-wide", "color": "red" }
+  ]
+}
+```
+
+One bad release can undo months of cultural progress. The fix isn't less automation — it's **automation with an explicit trust model**.
+
+## What High-Trust Teams Do Differently
+
+### 1. They classify work before it hits an agent
+
+Not every ticket is "agent-suitable." A useful internal rubric:
+
+- **Delegate-friendly:** mechanical refactors behind strict types, docs sync, boilerplate with golden tests
+- **Co-pilot territory:** new feature scaffolding, API exploration, draft implementations
+- **Human-owned:** authz changes, security-sensitive paths, cross-service invariants, anything with legal exposure
+
+If you don't label the class, every task defaults to "let the model try," and your reviewers burn out.
+
+### 2. They invest in harnesses, not prompts
+
+Long-running agent work needs **structure**: task boundaries, checkpoints, resumability, and clear handoff states. Anthropic has been explicit about [harness design for long-running application development](https://www.anthropic.com/engineering/harness-design-long-running-apps) — treating an agent less like a chat session and more like a **job runner** with observable state.
+
+If your harness is "a thread in Slack and hope," you don't have agentic engineering. You have expensive autocomplete.
+
+### 3. They scale review where it hurts
+
+The answer to cheap generation isn't "more senior eyeballs on every line." It's **risk-based review**:
+
+- Property tests / fuzzing on parsers and serializers
+- Contract tests between services
+- Automated security scanners tuned to your stack
+- ADRs for architectural moves initiated by agents
+
+When verification is automated, the trust gap closes without turning seniors into diff clerks.
+
+## What This Means for Your Career
+
+If you're early in your career and worried about agents: the winning move isn't competing on raw typing speed. It's competing on **taste, architecture, and verification**.
+
+The engineers who thrive are the ones who can:
+
+- Specify systems clearly enough that agents don't wander
+- Read diffs critically at speed
+- Know when a "reasonable-looking" change is catastrophically wrong
+
+That's not a consolation prize. That's the job many staff engineers were already doing — now with more leverage and more noise.
+
+## Closing the Gap
+
+The 2026 engineering threads aren't really about models. They're about **governance**.
+
+Agents will keep getting better. The organizations that pull ahead will be those that treat trust as an **engineering discipline**: explicit delegation boundaries, harnesses that match task duration, and review energy spent where risk lives.
+
+Everything else is just vibes — and vibes don't pass audits.
