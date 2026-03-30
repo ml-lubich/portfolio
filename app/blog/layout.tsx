@@ -3,7 +3,11 @@ import type { Metadata } from "next"
 import { BlogHeader } from "@/components/blog/blog-header"
 import { blogPosts } from "@/lib/blog-data"
 import { shadows } from "@/lib/theme"
-import { SITE_URL } from "@/lib/site-config"
+import {
+  SITE_URL,
+  SITE_DEFAULT_OG_IMAGE,
+  SITE_DEFAULT_OG_IMAGE_SIZE,
+} from "@/lib/site-config"
 
 const BASE_URL = SITE_URL
 
@@ -66,9 +70,9 @@ export const metadata: Metadata = {
       "Controversial takes and deep dives on modern AI engineering, LLMs, MLOps, and the future of software development. No hype — just what actually works in production.",
     images: [
       {
-        url: `${BASE_URL}/og-image.png`,
-        width: 1200,
-        height: 630,
+        url: SITE_DEFAULT_OG_IMAGE,
+        width: SITE_DEFAULT_OG_IMAGE_SIZE.width,
+        height: SITE_DEFAULT_OG_IMAGE_SIZE.height,
         alt: "Misha Lubich AI Engineering Blog — Perspectives on ML, LLMs & MLOps",
         type: "image/png",
       },
@@ -79,7 +83,7 @@ export const metadata: Metadata = {
     title: "AI Engineering Perspectives | Misha Lubich Blog",
     description:
       "Deep dives on AI engineering, LLMs, MLOps & production ML. Hard-won lessons from Apple, GitHub, and beyond.",
-    images: [{ url: `${BASE_URL}/og-image.png`, alt: "Misha Lubich AI Engineering Blog" }],
+    images: [{ url: SITE_DEFAULT_OG_IMAGE, alt: "Misha Lubich AI Engineering Blog" }],
     creator: "@mishalubich",
     site: "@mishalubich",
   },

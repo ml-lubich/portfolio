@@ -28,7 +28,11 @@ const cormorant = Cormorant_Garamond({
   display: 'swap',
 })
 
-import { SITE_URL } from "@/lib/site-config"
+import {
+  SITE_URL,
+  SITE_DEFAULT_OG_IMAGE,
+  SITE_DEFAULT_OG_IMAGE_SIZE,
+} from "@/lib/site-config"
 const BASE_URL = SITE_URL
 
 export const metadata: Metadata = {
@@ -93,9 +97,9 @@ export const metadata: Metadata = {
       "Senior AI Engineer building scalable ML systems at Apple, GitHub, and beyond. Explore innovative projects, research publications, and engineering insights.",
     images: [
       {
-        url: `${BASE_URL}/og-image.png`,
-        width: 1200,
-        height: 630,
+        url: SITE_DEFAULT_OG_IMAGE,
+        width: SITE_DEFAULT_OG_IMAGE_SIZE.width,
+        height: SITE_DEFAULT_OG_IMAGE_SIZE.height,
         alt: "Misha Lubich — AI Engineer & Technical Leader Portfolio",
         type: "image/png",
       },
@@ -108,7 +112,7 @@ export const metadata: Metadata = {
       "Senior AI Engineer building scalable ML systems at Apple, GitHub, and beyond. Projects, research & insights.",
     images: [
       {
-        url: `${BASE_URL}/og-image.png`,
+        url: SITE_DEFAULT_OG_IMAGE,
         alt: "Misha Lubich — AI Engineer & Technical Leader Portfolio",
       },
     ],
@@ -122,6 +126,7 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
+      { url: "/favicon.ico", sizes: "any" },
       { url: "/favicon/favicon.ico", sizes: "any" },
       { url: "/favicon/favicon-16x16.png", sizes: "16x16", type: "image/png" },
       { url: "/favicon/favicon-32x32.png", sizes: "32x32", type: "image/png" },
@@ -131,6 +136,7 @@ export const metadata: Metadata = {
     apple: [
       { url: "/favicon/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
     ],
+    shortcut: "/favicon.ico",
   },
   manifest: "/favicon/site.webmanifest",
 }
