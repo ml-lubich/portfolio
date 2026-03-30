@@ -7,6 +7,7 @@ import { AnimatedText } from "../animations/animated-text"
 
 const footerLinks = [
   { href: "/#about", label: "About" },
+  { href: "/#consulting", label: "Consulting" },
   { href: "/#projects", label: "Projects" },
   { href: "/#skills", label: "Skills" },
   { href: "/blog", label: "Blog" },

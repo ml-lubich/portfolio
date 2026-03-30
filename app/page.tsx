@@ -31,6 +31,10 @@ const About = dynamic(() => import("@/components/sections/about").then(m => m.Ab
 const Journey = dynamic(() => import("@/components/sections/journey").then(m => m.Journey), {
   loading: () => <SectionSkeleton />,
 })
+const ConsultingClients = dynamic(
+  () => import("@/components/sections/consulting-clients").then(m => m.ConsultingClients),
+  { loading: () => <SectionSkeleton /> },
+)
 const Projects = dynamic(() => import("@/components/sections/projects").then(m => m.Projects), {
   loading: () => <SectionSkeleton />,
 })
@@ -79,6 +83,9 @@ export default function Home() {
         <LazySection sectionId="journey">
           <Journey />
         </LazySection>
+        <LazySection sectionId="consulting">
+          <ConsultingClients />
+        </LazySection>
         <LazySection sectionId="projects">
           <Projects />
         </LazySection>
@@ -118,6 +125,7 @@ export default function Home() {
             <li><a href="#projects">AI & ML Projects</a></li>
             <li><a href="#skills">Technical Skills — Python, TypeScript, React, PyTorch, TensorFlow</a></li>
             <li><a href="#journey">Professional Experience — Apple, GitHub, Braintrust Data</a></li>
+            <li><a href="#consulting">Consulting — client sites and engagements</a></li>
             <li><a href="#research">Research Publications</a></li>
             <li><a href="#contact">Contact</a></li>
             <li><Link href="/blog">AI Engineering Blog — Perspectives on LLMs, MLOps & Production ML</Link></li>

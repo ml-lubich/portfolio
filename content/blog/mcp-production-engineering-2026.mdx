@@ -1,90 +1,82 @@
 ---
-title: "MCP Won the Protocol War — Production Is the Only Fight Left"
-excerpt: "Model Context Protocol is the default shape for tools, data, and agents to talk. But 'works in Cursor on my laptop' is not the same as 'safe behind the corporate gateway at scale.' Here's the engineering checklist for MCP in real systems in 2026."
+title: "MCP Felt Like Magic on My Laptop. Production Was a Different Animal."
+excerpt: "I wired up my first MCP server on a Sunday. By Tuesday I believed I'd solved tool calling forever. A month later I was drawing boxes on a whiteboard about auth, gateways, and who exactly gets sued if the agent deletes the wrong row."
 date: "2026-03-29"
 category: "AI Architecture"
 tags: ["MCP", "API Design", "Security", "Agents", "Production"]
 coverImage: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=1200&h=630&fit=crop"
 ---
 
-## We Can Stop Debating Whether MCP Matters
+I’m not going to waste your time arguing whether Model Context Protocol “won.” If you ship software in 2026, you’ve already felt it — tools showing up the same way across editors, vendors, little local servers that make your LLM suddenly *useful*.
 
-If 2024 was the year engineers discovered MCP, and 2025 was the year every serious IDE and cloud vendor shipped a client, then 2026 is the year the argument shifted.
+The interesting part starts the day someone says: *cool demo, can we put this behind SSO for twelve thousand people?*
 
-The question is no longer "**will** we standardize tool exposure for LLMs?" It's "**how** do we run this protocol where money and compliance are on the line?"
+That’s when the romance ends and the plumbing begins.
 
-The public [2026 MCP roadmap](https://blog.modelcontextprotocol.io/posts/2026-mcp-roadmap/) reads like a grown-up platform agenda: transports that survive load balancers, clearer semantics around long tasks, gateways, observability. That's the right story — because **protocol adoption is winning**, and **operational maturity is lagging**.
+## The year the conversation changed
 
-This post is my engineering-minded checklist for closing that lag.
+For a while it felt like the whole industry was arguing about standards the way we used to argue about JSON vs XML. Then the argument moved, almost without anyone announcing it.
 
-## Localhost MCP Is a Prototype, Not an Architecture
+The [public MCP roadmap for 2026](https://blog.modelcontextprotocol.io/posts/2026-mcp-roadmap/) isn’t poetry — it’s load balancers, session semantics, gateways, audit trails. Dry reading, honestly. Also the first sign that grown-ups showed up: the protocol isn’t a TikTok trend anymore; it’s infrastructure.
 
-On a developer machine, MCP feels magical: spawn a server, expose tools, wire up a client, iterate. In production, the same pattern collides with:
+I’m glad. Infrastructure is where my anxiety lives, and it should live there.
 
-- **Identity:** Who is calling which tool, on behalf of which user?
-- **Tenancy:** Which customer data can this session touch?
-- **Rate limits:** What happens when an agent loops and fans out tool calls?
-- **Version skew:** Client rev `n`, server rev `n-3`, chaos in the middle
+## Two different products with the same acronym
+
+On my machine, MCP is almost unfairly pleasant. Spin up a server, pipe stdio, watch the client light up. Tweak a tool schema, reload, repeat. The feedback loop feels like the early days of React — messy, sure, but *alive*.
+
+Production is the version where nobody cares how fast you iterated locally.
+
+Who is this session *as*? Which tenant’s rows can those tool calls touch? What happens when an agent loops and hammers your rate limit? What if the client updated Tuesday and the server didn’t?
 
 ```mermaid
 {
   "type": "comparison",
   "left": {
-    "title": "Dev-time MCP",
+    "title": "Sunday afternoon MCP",
     "color": "green",
-    "steps": ["Single user", "stdio / local host", "Trust everyone", "Logs in terminal"]
+    "steps": ["Just you", "Local host", "Trusted world", "printf debugging"]
   },
   "right": {
-    "title": "Production MCP",
+    "title": "Real company MCP",
     "color": "amber",
-    "steps": ["OAuth / service auth", "Gateway + audit", "Least privilege", "Traces + alerts"]
+    "steps": ["Real users", "OAuth / gateways", "Least privilege", "PagerDuty"]
   }
 }
 ```
 
-If your plan stops at the left column, you don't have a product integration. You have a demo.
+If your rollout plan only describes the left column, you don’t have a platform strategy. You have a neat party trick — and party tricks don’t survive compliance questionnaires.
 
-## Treat Tool Surfaces as **Adversarial**
+## The thing nobody wants to say at the showcase
 
-Anything an LLM can invoke is an **attack surface** multiplied by prompt injection, buggy planning, and accidental over-permissioning.
+Every tool an LLM can call is a little API someone can misuse — accidentally, maliciously, or *helpfully* in exactly the wrong way.
 
-Concrete practices that actually hold up:
+Prompt injection isn’t some academic scare story; it’s “the model did what the text told it, and the text wasn’t yours.” Add over-broad tool permissions and you’re one creative conversation away from a very exciting Monday.
 
-- **Narrow tools.** Prefer several specific primitives over one "do everything" endpoint.
-- **Server-side enforcement.** Never rely on the model to "choose" authorization boundaries; enforce them where the data lives.
-- **Idempotency and dry-runs** for destructive operations — where business rules allow it.
-- **Structured, machine-auditable logs** for tool name, arguments fingerprint, outcome, and correlation IDs.
+So the habits that felt obvious on REST suddenly matter again:
 
-You already did this for REST and GraphQL. MCP is no exception.
+Prefer small, boring tools over one “do it all” god-function. Enforce auth where the data lives, not in the model’s good intentions. When you can, make scary operations idempotent or reversible. Log the thing you wish you had in the postmortem — tool name, hashed args, correlation id, outcome.
 
-## Observability: MCP Sessions Are Distributed Systems
+None of this is MCP-specific. That’s the point. **New protocol, same adult table.**
 
-An agent thread is a **distributed trace** whether you instrument it or not.
+## If you can’t see it, you can’t own it
 
-If you can't answer:
+Here’s a quiet truth I’ve learned the hard way: an agent trace is a distributed system whether you instrument it or not.
 
-- Which tool failed, after how many retries?
-- What was the tail latency during a spike in token usage?
-- Which tenant triggered a rate limit?
+If you can’t answer “which tool flaked after how many retries,” or “which customer blew our budget,” you’re not going to defend the roadmap when finance shows up with graphs.
 
-…then you're flying blind when leadership asks why the "AI feature" melted your database.
+Draw the span across model, gateway, and server. Spend the afternoon. Future you owes you coffee.
 
-Invest in tracing spans that cross model ↔ gateway ↔ tool server boundaries. The protocol is standardizing; **your dashboards shouldn't be artisanal**.
+## Gateways are unsexy and that’s why they work
 
-## Gateway Patterns Are the Boring Center of the Story
+Almost every serious enterprise story I’ve heard converges on a handful of boring ideas: a hub that terminates TLS and applies policy, pinned server versions with CI checks, kill switches when a specific tool goes sideways.
 
-Enterprise rollouts converge on a small set of patterns:
+Not cynicism. Survivor bias.
 
-- A **corporate MCP gateway** that terminates TLS, enforces policy, and fans out to internal servers
-- **Pinned server versions** and compatibility tests in CI
-- **Kill switches** for individual tools when abuse or bugs appear
+## Why I’m still glad MCP exists
 
-That's not cynicism — it's how every mature integration platform survived its first five years.
+Standards are how we stop reinventing the same fragile glue for every product team. MCP did something genuinely useful: it made “expose capability to a model” feel normal.
 
-## Why I Still Bet on MCP (Despite the Plumbing Pain)
+The work that’s left isn’t a headline; it’s **auth, audit, scaling, failure**. The teams that treat that as product engineering — not a weekend hack squeezed between model launches — are the ones whose agents survive first contact with paying humans.
 
-Standards win when they reduce the **integration tax**. MCP did that for tools the same way container images did for deploy artifacts: imperfect, yet unavoidable.
-
-The engineering work left is unglamorous: auth, audit, scaling, and failure modes. The teams that treat that work as **first-class product engineering** — not a weekend hack between model releases — will ship the agents that survive contact with the real world.
-
-Everything else stays in the demo video.
+The rest stays in the demo video. You know the one.
