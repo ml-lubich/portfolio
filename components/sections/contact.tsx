@@ -40,20 +40,20 @@ const socialLinks = [
 
 export function Contact() {
   return (
-    <AnimatedSection id="contact" className="relative py-14 sm:py-20 overflow-hidden">
+    <AnimatedSection id="contact" className="relative py-9 md:py-14 lg:py-20 overflow-hidden">
       {/* 3D particle field background */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-15" aria-hidden="true">
         <ParticleField color="#a855f7" speed={0.08} />
       </div>
 
-      <div className="relative mx-auto max-w-4xl px-6">
+      <div className="relative mx-auto max-w-4xl px-3 md:px-6">
         <SectionHeader
           label="Let's Connect"
           title={<>Ready to collaborate on{" "}<span className="gradient-text">innovative projects</span></>}
           subtitle="Ready to collaborate on innovative projects and drive technical excellence"
         />
 
-        <div className="grid gap-6 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2 md:gap-6">
           {/* Contact info */}
           <AnimatedSection delay={100}>
             <div className="flex h-full flex-col gap-4 rounded-2xl border border-border bg-card p-6">

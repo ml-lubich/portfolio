@@ -1,5 +1,16 @@
+import path from "node:path"
+import { fileURLToPath } from "node:url"
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Lock workspace to this app when a parent directory has its own lockfile (avoids wrong root + hydration mismatches).
+  turbopack: {
+    root: __dirname,
+  },
+  // Webpack dev / output tracing uses this when multiple lockfiles exist (e.g. ~/package-lock.json + ./bun.lock).
+  outputFileTracingRoot: __dirname,
   // Hide X-Powered-By header for security
   poweredByHeader: false,
   // Enable React strict mode for catching bugs early
@@ -32,6 +43,13 @@ const nextConfig = {
       "@radix-ui/react-popover",
       "@radix-ui/react-tabs",
       "recharts",
+    ],
+    // LAN / alternate host dev (Next 16+); silences cross-origin _next warnings on local network.
+    allowedDevOrigins: [
+      "http://192.168.1.200:3000",
+      "http://192.168.1.200:3002",
+      "http://127.0.0.1:3000",
+      "http://127.0.0.1:3002",
     ],
   },
   // Cache static assets aggressively & add security/SEO headers

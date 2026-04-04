@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState, type ReactNode } from "react"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 interface AnimatedSectionProps {
   children: ReactNode
@@ -26,10 +27,12 @@ export function AnimatedSection({
   delay = 0,
   enable3D = true,
 }: AnimatedSectionProps) {
+  const isMobile = useIsMobile()
   const ref = useRef<HTMLElement>(null)
   const [isVisible, setIsVisible] = useState(false)
   const rafRef = useRef<number>(0)
   const revealDone = useRef(false)
+  const revealTailMs = isMobile ? 480 : 1200
 
   // One-shot IntersectionObserver for the initial reveal
   useEffect(() => {
@@ -41,14 +44,14 @@ export function AnimatedSection({
           setIsVisible(true)
           observer.unobserve(entry.target)
           // Allow the CSS reveal transition to finish, then switch to direct DOM parallax
-          setTimeout(() => { revealDone.current = true }, 1200 + delay)
+          setTimeout(() => { revealDone.current = true }, revealTailMs + delay)
         }
       },
       { threshold: 0.08 }
     )
     observer.observe(el)
     return () => observer.disconnect()
-  }, [delay])
+  }, [delay, revealTailMs])
 
   // Continuous scroll-driven parallax — skipped on small viewports (touch scroll cost).
   useEffect(() => {
@@ -77,8 +80,11 @@ export function AnimatedSection({
   }, [])
 
   // 3D perspective tilt amount (only during entrance, fades to 0)
-  const rotateX = enable3D && !isVisible ? 5 : 0
-  const scaleVal = isVisible ? 1 : 0.97
+  const rotateX = enable3D && !isVisible ? (isMobile ? 2 : 5) : 0
+  const scaleVal = isVisible ? 1 : (isMobile ? 0.99 : 0.97)
+  const enterY = isMobile ? 16 : 32
+  const durOpacity = isMobile ? "0.4s" : "1s"
+  const durTransform = isMobile ? "0.52s" : "1.2s"
 
   return (
     <section
@@ -87,11 +93,11 @@ export function AnimatedSection({
       className={`will-change-transform ${className}`}
       style={{
         opacity: isVisible ? 1 : 0,
-        transform: `perspective(1200px) translateY(${isVisible ? 0 : 32
+        transform: `perspective(1200px) translateY(${isVisible ? 0 : enterY
           }px) rotateX(${rotateX}deg) scale(${scaleVal})`,
         transformOrigin: "center bottom",
         transitionProperty: isVisible ? "opacity, transform" : "none",
-        transitionDuration: isVisible ? "1s, 1.2s" : "0s",
+        transitionDuration: isVisible ? `${durOpacity}, ${durTransform}` : "0s",
         transitionTimingFunction: isVisible ? "cubic-bezier(0.16, 1, 0.3, 1)" : "ease",
         transitionDelay: isVisible ? `${delay}ms` : "0ms",
       }}

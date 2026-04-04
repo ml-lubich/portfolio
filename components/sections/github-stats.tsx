@@ -373,7 +373,7 @@ export function GitHubStats() {
     if (loading) {
         return (
             <AnimatedSection id="github" className="relative py-10 sm:py-14 overflow-hidden">
-                <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
+                <div className="relative mx-auto max-w-7xl px-3 md:px-4 lg:px-6">
                     <div className="mb-10 text-center">
                         <div className="mx-auto h-4 w-32 animate-pulse rounded bg-muted" />
                         <div className="mx-auto mt-4 h-10 w-96 max-w-full animate-pulse rounded bg-muted" />
@@ -390,7 +390,7 @@ export function GitHubStats() {
     if (error) {
         return (
             <AnimatedSection id="github" className="relative py-10 sm:py-14 overflow-hidden">
-                <div className="relative mx-auto max-w-7xl px-4 sm:px-6 text-center">
+                <div className="relative mx-auto max-w-7xl px-3 text-center md:px-4 lg:px-6">
                     <p className="text-muted-foreground text-sm">{error}</p>
                 </div>
             </AnimatedSection>
@@ -409,7 +409,7 @@ export function GitHubStats() {
                 <div className="absolute left-1/2 top-0 h-[400px] w-[400px] -translate-x-1/2 rounded-full bg-primary/5 blur-[80px] translucent-glow" style={{ animationDelay: "4s" }} />
             </div>
 
-            <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
+            <div className="relative mx-auto max-w-7xl px-3 md:px-4 lg:px-6">
                 <SectionHeader
                     icon={<Activity className="h-3.5 w-3.5" />}
                     label="Open Source"

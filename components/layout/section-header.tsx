@@ -31,6 +31,8 @@ interface SectionHeaderProps {
   subtitle: string
   /** Optional icon rendered before the label */
   icon?: ReactNode
+  /** Optional row directly under the label (e.g. CTA link) — centered */
+  afterLabel?: ReactNode
   /** Additional / override Tailwind classes on the wrapper div */
   className?: string
 }
@@ -40,10 +42,11 @@ export function SectionHeader({
   title,
   subtitle,
   icon,
+  afterLabel,
   className,
 }: SectionHeaderProps) {
   return (
-    <div className={cn("mb-12 text-center", className)}>
+    <div className={cn("mb-7 text-center md:mb-12", className)}>
       <span
         className={cn(
           "font-mono text-xs uppercase tracking-widest text-primary",
@@ -54,13 +57,17 @@ export function SectionHeader({
         <AnimatedText text={label} variant="blur-slide" stagger={40} duration={600} />
       </span>
 
-      <h2 className="mt-4 font-display text-3xl font-light text-foreground sm:text-4xl lg:text-5xl text-balance">
+      {afterLabel != null && (
+        <div className="mt-2 flex justify-center md:mt-2.5">{afterLabel}</div>
+      )}
+
+      <h2 className="mt-3 font-display text-3xl font-light text-foreground sm:text-4xl lg:text-5xl text-balance md:mt-4">
         <AnimatedText variant="blur-slide" delay={150} stagger={55} duration={750}>
           {title}
         </AnimatedText>
       </h2>
 
-      <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground">
+      <p className="mx-auto mt-3 max-w-2xl text-base text-muted-foreground md:mt-4">
         <AnimatedText text={subtitle} variant="fade-up" delay={400} stagger={20} duration={600} />
       </p>
     </div>

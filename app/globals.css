@@ -61,6 +61,10 @@
 }
 
 @layer base {
+  html {
+    scroll-padding-top: 5.5rem;
+  }
+
   * {
     @apply border-border;
   }
@@ -440,13 +444,13 @@ body {
   box-shadow: 0 0 20px hsl(var(--accent) / 0.15), 0 0 60px hsl(var(--accent) / 0.05);
 }
 
-/* ── Navigation glass ─────────────────────────────────────────── */
+/* ── Navigation glass (menus / FAB) — matches main nav: frost, not opaque black ─ */
 .nav-glass {
-  background: hsl(var(--background) / 0.85);
+  background: hsl(0 0% 100% / 0.07);
   backdrop-filter: blur(24px) saturate(1.6);
   -webkit-backdrop-filter: blur(24px) saturate(1.6);
-  border-bottom: 1px solid hsl(var(--border) / 0.35);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4), 0 8px 32px rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid hsl(0 0% 100% / 0.1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12), 0 10px 28px rgba(0, 0, 0, 0.14);
 }
 
 @keyframes nav-pill-in {
@@ -1211,17 +1215,27 @@ strong:not(.no-metallic) {
   @apply text-base leading-relaxed text-muted-foreground mb-5;
 }
 
-.blog-prose strong {
+/* Opt out of global metallic bold (strong:not(.no-metallic)) — that uses
+   background-clip + transparent fill; inside article prose it often reads
+   as invisible, and nested <a> inherits the same fill. */
+.blog-prose strong,
+.blog-prose b {
   @apply font-semibold text-foreground;
+  background-image: none;
+  -webkit-background-clip: border-box;
+  background-clip: border-box;
+  -webkit-text-fill-color: currentColor;
 }
 
 .blog-prose em {
   @apply italic text-foreground/80;
 }
 
-.blog-prose a,
-.blog-prose a.blog-link {
-  @apply text-primary underline underline-offset-4 decoration-primary/30 transition-colors hover:decoration-primary cursor-pointer;
+/* High specificity so plugin-injected utility classes (e.g. text-muted-*) cannot
+   clobber link color; MDX merges className via cn() in mdx-components. */
+article .blog-prose a[href],
+.blog-prose a.blog-link[href] {
+  @apply text-foreground underline underline-offset-4 decoration-foreground/40 transition-colors hover:decoration-foreground/90 cursor-pointer;
   pointer-events: auto;
   position: relative;
   z-index: 1;
@@ -1250,7 +1264,7 @@ strong:not(.no-metallic) {
 }
 
 .blog-prose li {
-  @apply text-base leading-relaxed text-muted-foreground;
+  @apply text-base leading-relaxed text-foreground/85;
 }
 
 .blog-prose blockquote {
@@ -1616,10 +1630,5 @@ strong:not(.no-metallic) {
   }
 }
 
-/* Mobile: browser may skip layout/paint for sections that are off-screen */
-@media (max-width: 767px) {
-  .lazy-section-wrap[data-lazy-loaded="true"] {
-    content-visibility: auto;
-    contain-intrinsic-size: auto 50vh;
-  }
-}
+/* Lazy sections: avoid content-visibility here — fixed intrinsic heights caused
+   sections to visually crowd / “lose” vertical rhythm while scrolling on mobile. */

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useCallback } from "react"
+import Image from "next/image"
 import { Sparkles, ChevronRight, ArrowRight } from "lucide-react"
 import { DetailPanel } from "../detail-panel"
 import { ScrollStackSection } from "../layout/scroll-stack-section"
@@ -24,7 +25,7 @@ export function Projects() {
       label="Featured Projects"
       title={<>Innovative solutions that{" "}<span className="gradient-text">drive real-world impact</span></>}
       subtitle="Click any project to explore architecture, tech stack, and animated system diagrams."
-      className=""
+      className="scroll-mt-24"
       bgEffects={
         <>
           <div className="absolute left-1/4 top-20 h-[500px] w-[500px] rounded-full bg-accent/5 blur-[120px]" />
@@ -49,30 +50,44 @@ export function Projects() {
         children: (
           <button
             onClick={() => handleSelect(project.id)}
-            className={`glass-stack-card group relative w-full overflow-hidden rounded-2xl border text-left transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${selectedId === project.id
+            className={`glass-stack-card group relative w-full overflow-hidden rounded-2xl border text-left transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] md:duration-500 ${selectedId === project.id
               ? "border-primary/40 shadow-[0_0_40px_-8px] shadow-primary/20"
               : "border-white/[0.08] hover:border-primary/30"
               }`}
           >
             {/* Top gradient accent strip */}
-            <div className={`h-1 w-full bg-gradient-to-r ${project.gradient} ${selectedId === project.id ? "opacity-100" : "opacity-60 group-hover:opacity-90"} transition-opacity duration-500`} />
+            <div className={`h-1 w-full bg-gradient-to-r ${project.gradient} ${selectedId === project.id ? "opacity-100" : "opacity-60 group-hover:opacity-90"} transition-opacity duration-200 md:duration-500`} />
+
+            {project.coverImage != null && project.coverImage !== "" && (
+              <div className="relative z-[1] w-full overflow-hidden border-b border-white/[0.08] bg-black/20">
+                <Image
+                  src={project.coverImage}
+                  alt={`${project.name} — product preview`}
+                  width={1600}
+                  height={900}
+                  className="max-h-[200px] w-full object-cover object-top md:max-h-[240px]"
+                  sizes="(max-width: 768px) 100vw, 672px"
+                  loading="lazy"
+                />
+              </div>
+            )}
 
             {/* Ambient glow blobs */}
             <div
-              className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full opacity-[0.07] blur-3xl transition-opacity duration-700 group-hover:opacity-[0.18]"
+              className="pointer-events-none absolute -right-24 -top-24 z-0 h-72 w-72 rounded-full opacity-[0.07] blur-3xl transition-opacity duration-300 md:duration-700 group-hover:opacity-[0.18]"
               style={{ background: project.accent }}
             />
             <div
-              className="pointer-events-none absolute -left-16 bottom-0 h-48 w-48 rounded-full opacity-0 blur-3xl transition-opacity duration-700 group-hover:opacity-[0.08]"
+              className="pointer-events-none absolute -left-16 bottom-0 z-0 h-48 w-48 rounded-full opacity-0 blur-3xl transition-opacity duration-300 md:duration-700 group-hover:opacity-[0.08]"
               style={{ background: project.accent }}
             />
 
             {/* Frosted noise overlay */}
-            <div className="pointer-events-none absolute inset-0 opacity-[0.015] mix-blend-overlay" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")" }} />
+            <div className="pointer-events-none absolute inset-0 z-0 opacity-[0.02] mix-blend-overlay" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")" }} />
 
-            <div className="relative p-6 sm:p-8">
+            <div className="relative z-[2] p-4 md:p-6 lg:p-8">
               {/* Top row: number + name + metric */}
-              <div className="flex items-start gap-4 sm:gap-5">
+              <div className="flex items-start gap-3 md:gap-4 lg:gap-5">
                 {/* Large ghost number */}
                 <span
                   className="hidden shrink-0 select-none font-mono text-6xl font-black leading-none tracking-tighter opacity-[0.06] sm:block"
@@ -100,12 +115,12 @@ export function Projects() {
               </div>
 
               {/* Summary */}
-              <p className="mt-4 text-sm leading-relaxed text-muted-foreground/80 sm:text-[15px]">
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground/80 sm:mt-4 sm:text-[15px]">
                 {project.summary}
               </p>
 
               {/* Key highlights (first 3 from detail) */}
-              <div className="mt-4 space-y-2">
+              <div className="mt-3 space-y-1.5 sm:mt-4 sm:space-y-2">
                 {project.detail.highlights.slice(0, 3).map((h, i) => (
                   <div key={i} className="flex items-start gap-2.5">
                     <ArrowRight className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary/50" />
@@ -118,7 +133,7 @@ export function Projects() {
 
               {/* Metrics row */}
               {project.detail.metrics && (
-                <div className="mt-5 flex flex-wrap gap-3 sm:gap-4">
+                <div className="mt-4 flex flex-wrap gap-2 sm:mt-5 sm:gap-3 md:gap-4">
                   {project.detail.metrics.map((m) => (
                     <div key={m.label} className="rounded-lg border border-border/50 bg-secondary px-3 py-2">
                       <p className="text-xs text-muted-foreground/50">{m.label}</p>
@@ -129,7 +144,7 @@ export function Projects() {
               )}
 
               {/* Tags */}
-              <div className="mt-5 flex flex-wrap gap-1.5">
+              <div className="mt-4 flex flex-wrap gap-1.5 sm:mt-5">
                 {project.tags.map((tag) => (
                   <span
                     key={tag}
@@ -142,7 +157,7 @@ export function Projects() {
             </div>
 
             {/* Bottom edge gradient line */}
-            <div className={`h-px w-full bg-gradient-to-r ${project.gradient} opacity-0 transition-opacity duration-500 group-hover:opacity-30`} />
+            <div className={`h-px w-full bg-gradient-to-r ${project.gradient} opacity-0 transition-opacity duration-200 md:duration-500 group-hover:opacity-30`} />
           </button>
         ),
       }))}

@@ -132,13 +132,13 @@ const techBars: BarItem[] = [
 
 export function AIExpertise() {
   return (
-    <AnimatedSection id="ai-expertise" className="relative py-14 sm:py-20">
+    <AnimatedSection id="ai-expertise" className="relative py-9 md:py-14 lg:py-20">
       {/* Background effects */}
       <div className="absolute inset-0 dot-pattern opacity-30" aria-hidden="true" />
 
 
 
-      <div className="relative mx-auto max-w-7xl px-6">
+      <div className="relative mx-auto max-w-7xl px-3 md:px-6">
         <SectionHeader
           icon={<Brain className="h-4 w-4" />}
           label="AI/ML Expertise"
@@ -147,7 +147,7 @@ export function AIExpertise() {
         />
 
         {/* Terminal summary */}
-        <div className="mx-auto mb-10 max-w-3xl">
+        <div className="mx-auto mb-6 max-w-3xl md:mb-10">
           <TerminalReveal
             title="~/ai — stack.summary"
             prompt="$"

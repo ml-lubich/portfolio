@@ -80,7 +80,10 @@ export function Skills() {
   }, [])
 
   return (
-    <AnimatedSection id="skills" className="relative py-14 sm:py-20">
+    <AnimatedSection
+      id="skills"
+      className="relative scroll-mt-28 px-3 py-12 pb-16 md:px-6 md:py-20 md:pb-24 lg:py-28 lg:pb-32"
+    >
       {/* Ambient background orbs — constant, overlapping, smoothly drifting */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
         <div className="absolute -left-20 top-1/4 h-[32rem] w-[32rem] rounded-full bg-primary/[0.06] blur-[80px] translucent-glow" style={{ animationDelay: "-4s" }} />
@@ -93,62 +96,61 @@ export function Skills() {
         <ParticleField color={hex.primary} speed={0.1} />
       </div>
 
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
+      <div className="relative mx-auto max-w-7xl">
         <SectionHeader
           label="Technical Skills"
           title={<>Comprehensive expertise across the{" "}<span className="gradient-text">full technology stack</span></>}
           subtitle="Deep proficiency in modern AI/ML frameworks, cloud infrastructure, and full-stack development with a focus on building production-grade scalable systems."
         />
 
-        {/* Proficiency bars */}
-        <AnimatedSection delay={100} className="relative z-10">
-          <div className="mb-12 rounded-2xl border border-white/[0.04] bg-card/25 p-8 backdrop-blur-xl frosted-panel">
-            <h3 className="mb-6 text-lg font-bold text-foreground">Overall Proficiency</h3>
-            <AnimatedBars bars={proficiencyBars} duration={1600} stagger={120} />
-          </div>
-        </AnimatedSection>
+        {/* Proficiency + category cards: flex gap keeps rhythm (margins + lazy paint were crowding) */}
+        <div className="relative z-10 flex flex-col gap-12 md:gap-16 lg:gap-20">
+          <AnimatedSection delay={100} className="relative z-10">
+            <div className="rounded-2xl border border-white/[0.04] bg-card/25 p-8 backdrop-blur-xl frosted-panel md:p-9">
+              <h3 className="mb-6 text-lg font-bold text-foreground">Overall Proficiency</h3>
+              <AnimatedBars bars={proficiencyBars} duration={1600} stagger={120} />
+            </div>
+          </AnimatedSection>
 
-        {/* Skills grid — pop-out tilt + liquid glass on hover */}
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {skillCategories.map((cat, i) => (
-            <AnimatedSection key={cat.category} delay={i * 80}>
-              <TiltCard className="relative h-full">
-                <div className="group relative h-full overflow-hidden rounded-2xl border border-white/[0.06] bg-card/25 backdrop-blur-xl p-6 transition-all duration-300 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/15">
-                  {/* Top edge reflection */}
-                  <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
-                  {/* Gradient overlay on hover */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/0 via-accent/0 to-primary/0 opacity-0 transition-opacity duration-500 group-hover:from-primary/5 group-hover:via-accent/5 group-hover:to-primary/5 group-hover:opacity-100" />
-                  {/* Animated corner glow */}
-                  <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-primary/10 blur-2xl opacity-0 transition-all duration-500 group-hover:opacity-100 group-hover:scale-150" />
+          {/* Skills grid — pop-out tilt + liquid glass on hover */}
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {skillCategories.map((cat, i) => (
+              <AnimatedSection key={cat.category} delay={i * 80}>
+                <TiltCard className="relative h-full">
+                  <div className="group relative h-full overflow-hidden rounded-2xl border border-white/[0.06] bg-card/25 backdrop-blur-xl p-6 transition-all duration-300 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/15">
+                    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/0 via-accent/0 to-primary/0 opacity-0 transition-opacity duration-500 group-hover:from-primary/5 group-hover:via-accent/5 group-hover:to-primary/5 group-hover:opacity-100" />
+                    <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-primary/10 blur-2xl opacity-0 transition-all duration-500 group-hover:opacity-100 group-hover:scale-150" />
 
-                  <div className="relative">
-                    <h3 className="mb-5 text-base font-bold text-foreground transition-colors group-hover:text-primary sm:text-lg">
-                      {cat.category}
-                    </h3>
-
-                    <div className="flex flex-wrap gap-2">
-                      {cat.items.map((item, idx) => {
-                        const icon = getSkillIcon(item)
-                        return (
-                          <span
-                            key={item}
-                            className="group/tag relative inline-flex items-center gap-1.5 rounded-lg border border-border bg-secondary/50 px-3 py-1.5 font-mono text-xs text-muted-foreground transition-all duration-200 hover:border-primary/40 hover:bg-secondary hover:text-foreground hover:scale-105 hover:shadow-md hover:shadow-primary/10 cursor-default"
-                            style={{ animationDelay: `${idx * 40}ms` }}
-                          >
-                            {icon && <span className="opacity-60 group-hover/tag:opacity-100 transition-opacity">{icon}</span>}
-                            {item}
-                          </span>
-                        )
-                      })}
+                    <div className="relative">
+                      <h3 className="mb-5 text-base font-bold text-foreground transition-colors group-hover:text-primary sm:text-lg">
+                        {cat.category}
+                      </h3>
+                      <div className="flex flex-wrap gap-2">
+                        {cat.items.map((item, idx) => {
+                          const icon = getSkillIcon(item)
+                          return (
+                            <span
+                              key={item}
+                              className="group/tag relative inline-flex cursor-default items-center gap-1.5 rounded-lg border border-border bg-secondary/50 px-3 py-1.5 font-mono text-xs text-muted-foreground transition-all duration-200 hover:scale-105 hover:border-primary/40 hover:bg-secondary hover:text-foreground hover:shadow-md hover:shadow-primary/10"
+                              style={{ animationDelay: `${idx * 40}ms` }}
+                            >
+                              {icon && (
+                                <span className="opacity-60 transition-opacity group-hover/tag:opacity-100">{icon}</span>
+                              )}
+                              {item}
+                            </span>
+                          )
+                        })}
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Shimmer */}
-                  <div className="absolute inset-0 shimmer opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-                </div>
-              </TiltCard>
-            </AnimatedSection>
-          ))}
+                    <div className="absolute inset-0 shimmer opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                  </div>
+                </TiltCard>
+              </AnimatedSection>
+            ))}
+          </div>
         </div>
       </div>
 

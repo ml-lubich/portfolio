@@ -86,30 +86,30 @@ export function Publications() {
           children: (
             <button
               onClick={() => handleSelect(paper.id)}
-              className={`glass-stack-card group relative w-full overflow-hidden rounded-2xl border text-left transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${selectedId === paper.id
+              className={`glass-stack-card group relative w-full overflow-hidden rounded-2xl border text-left transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] md:duration-500 ${selectedId === paper.id
                 ? "border-primary/40 bg-card shadow-[0_0_40px_-8px] shadow-primary/20"
                 : "border-border/40 bg-card hover:border-primary/30"
                 }`}
             >
               {/* Top gradient accent strip */}
-              <div className={`h-1 w-full bg-gradient-to-r ${gradient} ${selectedId === paper.id ? "opacity-100" : "opacity-60 group-hover:opacity-90"} transition-opacity duration-500`} />
+              <div className={`h-1 w-full bg-gradient-to-r ${gradient} ${selectedId === paper.id ? "opacity-100" : "opacity-60 group-hover:opacity-90"} transition-opacity duration-200 md:duration-500`} />
 
               {/* Ambient glow blobs */}
               <div
-                className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full opacity-[0.07] blur-3xl transition-opacity duration-700 group-hover:opacity-[0.18]"
+                className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full opacity-[0.07] blur-3xl transition-opacity duration-300 md:duration-700 group-hover:opacity-[0.18]"
                 style={{ background: accent }}
               />
               <div
-                className="pointer-events-none absolute -left-16 bottom-0 h-48 w-48 rounded-full opacity-0 blur-3xl transition-opacity duration-700 group-hover:opacity-[0.08]"
+                className="pointer-events-none absolute -left-16 bottom-0 h-48 w-48 rounded-full opacity-0 blur-3xl transition-opacity duration-300 md:duration-700 group-hover:opacity-[0.08]"
                 style={{ background: accent }}
               />
 
               {/* Frosted noise overlay */}
               <div className="pointer-events-none absolute inset-0 opacity-[0.015] mix-blend-overlay" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")" }} />
 
-              <div className="relative p-6 sm:p-8">
+              <div className="relative p-4 md:p-6 lg:p-8">
                 {/* Top row: number + type badge + venue */}
-                <div className="flex items-start gap-4 sm:gap-5">
+                <div className="flex items-start gap-3 md:gap-4 lg:gap-5">
                   {/* Large ghost number */}
                   <span
                     className="hidden shrink-0 select-none font-mono text-6xl font-black leading-none tracking-tighter opacity-[0.06] sm:block"
@@ -136,7 +136,7 @@ export function Publications() {
                     </p>
 
                     {/* First 2 insight labels as preview */}
-                    <div className="mt-4 space-y-2">
+                    <div className="mt-3 space-y-1.5 sm:mt-4 sm:space-y-2">
                       {paper.insights.slice(0, 2).map((step, idx) => (
                         <div key={idx} className="flex items-start gap-2.5">
                           <ArrowRight className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary/50" />
@@ -148,7 +148,7 @@ export function Publications() {
                     </div>
 
                     {/* Tags */}
-                    <div className="mt-5 flex flex-wrap gap-1.5">
+                    <div className="mt-4 flex flex-wrap gap-1.5 sm:mt-5">
                       {paper.tags.map((tag) => (
                         <span
                           key={tag}
@@ -170,15 +170,15 @@ export function Publications() {
               </div>
 
               {/* Bottom edge gradient line */}
-              <div className={`h-px w-full bg-gradient-to-r ${gradient} opacity-0 transition-opacity duration-500 group-hover:opacity-30`} />
+              <div className={`h-px w-full bg-gradient-to-r ${gradient} opacity-0 transition-opacity duration-200 md:duration-500 group-hover:opacity-30`} />
             </button>
           ),
         }
       })}
     >
       {/* Google Scholar link */}
-      <div className="relative mx-auto max-w-5xl px-4 sm:px-6">
-        <AnimatedSection delay={600} className="mt-10 text-center">
+      <div className="relative mx-auto max-w-5xl px-3 md:px-4 lg:px-6">
+        <AnimatedSection delay={600} className="mt-6 text-center md:mt-10">
           <a
             href="https://scholar.google.com/citations?hl=en&user=Be6ZA78AAAAJ"
             target="_blank"

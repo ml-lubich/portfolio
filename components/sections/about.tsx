@@ -134,7 +134,7 @@ const highlights = [
 
 export function About() {
   return (
-    <AnimatedSection id="about" className="relative py-14 sm:py-20 overflow-hidden">
+    <AnimatedSection id="about" className="relative py-9 md:py-14 lg:py-20 overflow-hidden">
       {/* Ambient background orbs — constant, overlapping, smoothly drifting */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
         <div className="absolute right-1/4 top-1/4 h-[32rem] w-[32rem] rounded-full bg-primary/[0.06] blur-[80px] translucent-glow" style={{ animationDelay: "-3s" }} />
@@ -147,15 +147,15 @@ export function About() {
         <ParticleField color={hex.primary} speed={0.12} />
       </div>
 
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
+      <div className="relative mx-auto max-w-7xl px-3 md:px-4 lg:px-6">
         <SectionHeader
           label="About Me"
           title={<>Building at the intersection of{" "}<span className="gradient-text">AI and Engineering</span></>}
           subtitle="Senior Software Engineer specializing in AI-driven, cloud-native applications. Led the design and deployment of a production AI platform with multi-agent orchestration and RAG pipelines, achieving sub-second latency for millions of users."
         />
 
-        {/* Bio — terminal style */}
-        <div className="mx-auto mb-10 max-w-4xl">
+        {/* Bio — terminal (OpenClaw + claw live under #consulting) */}
+        <div className="relative mx-auto mb-10 max-w-4xl">
           <TerminalReveal
             title="~/about — misha.bio"
             prompt=">"

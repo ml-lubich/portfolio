@@ -166,12 +166,14 @@ const siteNavigationSchema = {
   itemListElement: [
     { "@type": "ListItem", position: 1, name: "Home", item: BASE_URL },
     { "@type": "ListItem", position: 2, name: "About", item: `${BASE_URL}/#about` },
-    { "@type": "ListItem", position: 3, name: "Projects", item: `${BASE_URL}/#projects` },
-    { "@type": "ListItem", position: 4, name: "Skills", item: `${BASE_URL}/#skills` },
-    { "@type": "ListItem", position: 5, name: "Experience", item: `${BASE_URL}/#journey` },
-    { "@type": "ListItem", position: 6, name: "Publications", item: `${BASE_URL}/#research` },
-    { "@type": "ListItem", position: 7, name: "Blog", item: `${BASE_URL}/blog` },
-    { "@type": "ListItem", position: 8, name: "Contact", item: `${BASE_URL}/#contact` },
+    { "@type": "ListItem", position: 3, name: "Experience", item: `${BASE_URL}/#journey` },
+    { "@type": "ListItem", position: 4, name: "Consulting", item: `${BASE_URL}/#consulting` },
+    { "@type": "ListItem", position: 5, name: "Clients", item: `${BASE_URL}/#testimonials` },
+    { "@type": "ListItem", position: 6, name: "Projects", item: `${BASE_URL}/#projects` },
+    { "@type": "ListItem", position: 7, name: "Skills", item: `${BASE_URL}/#skills` },
+    { "@type": "ListItem", position: 8, name: "Publications", item: `${BASE_URL}/#research` },
+    { "@type": "ListItem", position: 9, name: "Blog", item: `${BASE_URL}/blog` },
+    { "@type": "ListItem", position: 10, name: "Contact", item: `${BASE_URL}/#contact` },
   ],
 }
 

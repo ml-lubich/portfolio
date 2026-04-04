@@ -223,10 +223,12 @@ export default function BlogLayout({
                 blog.mishalubich.com
               </a>
             </div>
-            <nav aria-label="Blog footer navigation" className="flex items-center gap-4">
+            <nav aria-label="Blog footer navigation" className="flex flex-wrap items-center justify-center gap-4">
               <a href={BASE_URL} className="text-xs text-muted-foreground hover:text-foreground transition-colors">Portfolio</a>
               <a href={`${BASE_URL}/blog`} className="text-xs text-muted-foreground hover:text-foreground transition-colors">All Posts</a>
               <a href={`${BASE_URL}/feed.xml`} className="text-xs text-muted-foreground hover:text-foreground transition-colors" title="RSS Feed">RSS</a>
+              <a href={`${BASE_URL}/privacy`} className="text-xs text-muted-foreground hover:text-foreground transition-colors">Privacy</a>
+              <a href={`${BASE_URL}/terms`} className="text-xs text-muted-foreground hover:text-foreground transition-colors">Terms</a>
             </nav>
             <p className="text-xs text-muted-foreground">
               &copy; {new Date().getFullYear()} Misha Lubich. Opinions are my own. Built with Next.js &amp; Tailwind CSS.

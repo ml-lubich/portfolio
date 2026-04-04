@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useEffect, useState } from "react"
 import {
   PieChart as RechartsPie,
   Pie,
@@ -290,29 +290,60 @@ function TreeRenderer({ chart }: { chart: TreeChart }) {
 
 /* ── Main renderer ──────────────────────────────────────────────── */
 
+const shellClassName = (extra: string) =>
+  `mb-8 mt-0 rounded-xl border border-white/[0.06] bg-[hsl(220_20%_6%)] px-6 pb-6 pt-0 [&>:first-child]:pt-2 ${extra}`.trim()
+
+const titleClassName =
+  "no-metallic mb-4 !mt-0 text-center text-sm font-semibold text-white/60"
+
 export function BlogChart({ json, className = "" }: { json: string; className?: string }) {
-  let chart: BlogChart
+  const [hydrated, setHydrated] = useState(false)
+  useEffect(() => {
+    setHydrated(true)
+  }, [])
+
+  let chart: BlogChart | null = null
+  let parseError: string | undefined
 
   try {
     chart = JSON.parse(json) as BlogChart
   } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e)
+    parseError = e instanceof Error ? e.message : String(e)
+  }
+
+  if (parseError !== undefined) {
     return (
       <div className={`rounded-xl border border-red-500/20 bg-red-500/5 p-4 text-sm text-red-400 ${className}`}>
-        Invalid chart JSON: {msg}
+        Invalid chart JSON: {parseError}
+      </div>
+    )
+  }
+
+  if (chart === null) {
+    return null
+  }
+
+  const titleBlock =
+    chart.title != null && chart.title !== "" ? (
+      <h3 className={titleClassName}>{chart.title}</h3>
+    ) : null
+
+  /* SSR + first client paint: shell only so markup never depends on stale SSR/client chart chunks. */
+  if (!hydrated) {
+    return (
+      <div className={shellClassName(className)}>
+        {titleBlock}
+        <div
+          className="min-h-[180px] animate-pulse rounded-lg border border-white/[0.04] bg-white/[0.03]"
+          aria-hidden="true"
+        />
       </div>
     )
   }
 
   return (
-    <div
-      className={`mb-8 mt-0 rounded-xl border border-white/[0.06] bg-[hsl(220_20%_6%)] px-6 pb-6 pt-0 [&>:first-child]:pt-2 ${className}`}
-    >
-      {chart.title && (
-        <h3 className="no-metallic mb-4 !mt-0 text-center text-sm font-semibold text-white/60">
-          {chart.title}
-        </h3>
-      )}
+    <div className={shellClassName(className)}>
+      {titleBlock}
       {chart.type === "pipeline" && <PipelineRenderer chart={chart} />}
       {chart.type === "comparison" && <ComparisonRenderer chart={chart} />}
       {chart.type === "pie" && <PieRenderer chart={chart} />}

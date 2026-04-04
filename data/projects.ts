@@ -17,6 +17,8 @@ export interface Project {
     accent: string
     number: string
     detail: DetailPanelData
+    /** Optional hero screenshot on the featured-project card (`public/` path) */
+    coverImage?: string
 }
 
 export const projects: Project[] = [
@@ -242,6 +244,84 @@ export const projects: Project[] = [
             diagramType: "microservices",
             gradient: g.cyanToPrimary,
             accent: accentCycle[2],
+        },
+    },
+    {
+        id: "enrichdata",
+        name: "EnrichData",
+        metric: "320+ enrichment fields live",
+        coverImage: "/images/projects/enrichdata-hero.png",
+        summary:
+            "Live EnrichData marketing and product story—custom CRM enrichment that fills contact gaps, surfaces job changes, and keeps data fresh; built for teams and lean orgs who want serious data tooling without bloated vendor contracts.",
+        tags: ["CRM", "Data Enrichment", "B2B", "Web"],
+        gradient: g.primaryToMagenta,
+        accent: accentCycle[3],
+        number: "07",
+        detail: {
+            title: "EnrichData",
+            subtitle: "Custom CRM data enrichment (live site)",
+            description:
+                "Shipped the public EnrichData experience at enrichdata.net: a custom CRM enrichment narrative—real-time-style data fills, job-change tracking, and quality maintenance—aimed at buyers who want outcomes over shelf-ware. Hero, social proof, pricing story, and the enriched-table demo are all part of the same cohesive pitch.",
+            highlights: [
+                "Hero and funnel copy around tailored enrichment systems, job-change awareness, and honest pricing tied to real requirements",
+                "Product storytelling with the interactive CRM table visualization and green emphasis on enriched cells",
+                "Contact and firmographic positioning: phones, emails, titles, dedupe, and CRM handoff without forcing a rip-and-replace",
+                "Field catalog narrative (320+ points) and savings framing versus overbuilt enterprise data stacks",
+            ],
+            architecture: [
+                { label: "Enrichment Engine", icon: "cpu", description: "Contact and company pipelines with validation and CRM handoff" },
+                { label: "Integrations", icon: "server", description: "Works with existing CRMs—no forced migration" },
+                { label: "Monitoring", icon: "zap", description: "Job-change detection and alert delivery" },
+                { label: "Data Catalog", icon: "database", description: "Wide field catalog (contacts, companies, financials, technologies)" },
+            ],
+            techStack: ["TypeScript", "Next.js", "React", "Tailwind CSS"],
+            metrics: [
+                { label: "Data fields", value: "320+" },
+                { label: "Status", value: "Live" },
+            ],
+            diagramType: "pipeline",
+            gradient: g.primaryToMagenta,
+            accent: accentCycle[3],
+            link: { label: "enrichdata.net", url: "https://www.enrichdata.net/" },
+        },
+    },
+    {
+        id: "lupfr",
+        name: "LUPFR Entertainment",
+        metric: "Bay Area events & artist platform",
+        coverImage: "/images/projects/lupfr-hero.png",
+        summary:
+            "Consulting and build for LUPFR\u2019s public web presence\u2014nightlife-forward brand, event storytelling, bookings narrative, and a hero experience that matches their live San Francisco music scene.",
+        tags: ["Web", "Events", "Next.js"],
+        gradient: g.primaryToAccent,
+        accent: accentCycle[0],
+        number: "08",
+        detail: {
+            title: "LUPFR Entertainment",
+            subtitle: "Music events & talent (live site)",
+            description:
+                "Partnered on web presence and digital experience for a San Francisco music events and talent platform: event pages, bookings flow, and brand storytelling aligned with their live scene and artist roster.",
+            highlights: [
+                "Hero and visual language tuned for nightlife: bold typography, gold accents, and full-bleed event photography",
+                "Clear paths to book events and explore services, artists, and the LUPFR story",
+                "Responsive layout and performance so marketing pages stay fast on mobile-first audiences",
+                "Ongoing iteration with the team as the calendar and offerings evolve",
+            ],
+            architecture: [
+                { label: "Marketing site", icon: "layers", description: "Next.js pages for events, services, artists, and contact" },
+                { label: "Content", icon: "server", description: "Structured sections for promos, reels, and CTAs" },
+                { label: "Brand", icon: "zap", description: "Design system aligned with in-venue and social presence" },
+                { label: "Deploy", icon: "git", description: "Production hosting with CI-friendly releases" },
+            ],
+            techStack: ["TypeScript", "Next.js", "React", "Tailwind CSS"],
+            metrics: [
+                { label: "Focus", value: "Events / Web" },
+                { label: "Status", value: "Live" },
+            ],
+            diagramType: "fullstack",
+            gradient: g.primaryToAccent,
+            accent: accentCycle[0],
+            link: { label: "lupfr.com", url: "https://lupfr.com/" },
         },
     },
 ]

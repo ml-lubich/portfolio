@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useEffect, useRef, useCallback, useMemo } from "react"
-import Image from "next/image"
+import { useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo } from "react"
+import { SiteLogoMark } from "@/components/site-logo-mark"
 import { Menu, X, ChevronUp } from "lucide-react"
 import { navLinks } from "./nav-links"
 import { wooshScrollTo, navigateTo, isProgrammaticScroll } from "./woosh-scroll"
@@ -105,13 +105,25 @@ function BackToTopButton() {
    Navigation Component
    ══════════════════════════════════════════════════════════════════ */
 
+/** Stable SSR/first-paint class string; scroll/hide state is applied via ref + layout effect / scroll handler so React never patches a divergent className. */
+const NAV_FIXED =
+  "fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
+const NAV_VISIBLE = "translate-y-0 opacity-100"
+const NAV_HIDDEN = "-translate-y-full opacity-0"
+/** Light frost + saturation so hero gradient reads through — not a solid dark bar */
+const NAV_SURFACE_TOP =
+  "border-b border-white/[0.08] bg-white/[0.05] py-4 backdrop-blur-xl backdrop-saturate-150"
+const NAV_SURFACE_SCROLLED =
+  "border-b border-white/[0.10] bg-white/[0.08] py-2.5 shadow-[0_12px_40px_-20px_rgba(0,0,0,0.22)] backdrop-blur-2xl backdrop-saturate-150"
+
+const NAV_SSR_CLASS = [NAV_FIXED, NAV_VISIBLE, NAV_SURFACE_TOP].join(" ")
+
 export function Navigation() {
-  const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
-  const [hideNav, setHideNav] = useState(false)
   const lastScrollY = useRef(0)
   const navRef = useRef<HTMLElement>(null)
   const linkRefs = useRef<Map<string, HTMLAnchorElement>>(new Map())
+  const navSurfaceRef = useRef({ scrolled: false, hideNav: false })
 
   const sectionIds = useMemo(
     () => navLinks.filter((l) => !l.href.startsWith("/")).map((l) => l.href.replace("#", "")),
@@ -119,6 +131,33 @@ export function Navigation() {
   )
   const activeSection = useActiveSection(sectionIds)
   const scrolledPastHeroRef = useRef(false)
+
+  const applyNavSurface = useCallback(() => {
+    const nav = navRef.current
+    if (!nav) return
+    const { scrolled, hideNav } = navSurfaceRef.current
+    nav.className = [
+      NAV_FIXED,
+      hideNav ? NAV_HIDDEN : NAV_VISIBLE,
+      scrolled ? NAV_SURFACE_SCROLLED : NAV_SURFACE_TOP,
+    ].join(" ")
+  }, [])
+
+  /* After paint: align with restored scroll + re-apply when React resets className on re-render. */
+  /* Re-apply surface after React commits (resets className to NAV_SSR_CLASS); do not touch lastScrollY here. */
+  useLayoutEffect(() => {
+    applyNavSurface()
+  }, [applyNavSurface, mobileOpen, activeSection])
+
+  /* Once: align scrolled flag + lastScrollY with restored scroll without clobbering direction tracking on later renders. */
+  useLayoutEffect(() => {
+    const y = window.scrollY
+    const nextScrolled = y > 50
+    scrolledPastHeroRef.current = nextScrolled
+    navSurfaceRef.current.scrolled = nextScrolled
+    lastScrollY.current = y
+    applyNavSurface()
+  }, [applyNavSurface])
 
   /* Hide navbar on scroll-down, reveal on scroll-up */
   useEffect(() => {
@@ -130,26 +169,34 @@ export function Navigation() {
         const nextScrolled = y > 50
         if (nextScrolled !== scrolledPastHeroRef.current) {
           scrolledPastHeroRef.current = nextScrolled
-          setScrolled(nextScrolled)
+          navSurfaceRef.current.scrolled = nextScrolled
+          applyNavSurface()
         }
         // Skip hide/show logic during programmatic (navbar-initiated) scrolls
         // to prevent the nav from flickering away mid-animation
         if (!isProgrammaticScroll) {
           if (y > 300 && y > lastScrollY.current + 8) {
-            setHideNav(true)
+            if (!navSurfaceRef.current.hideNav) {
+              navSurfaceRef.current.hideNav = true
+              applyNavSurface()
+            }
           } else if (y < lastScrollY.current - 4) {
-            setHideNav(false)
+            if (navSurfaceRef.current.hideNav) {
+              navSurfaceRef.current.hideNav = false
+              applyNavSurface()
+            }
           }
         }
         lastScrollY.current = y
       })
     }
     window.addEventListener("scroll", handleScroll, { passive: true })
+    handleScroll()
     return () => {
       window.removeEventListener("scroll", handleScroll)
       cancelAnimationFrame(rafId)
     }
-  }, [])
+  }, [applyNavSurface])
 
   /* Keyboard anchor navigation */
   const handleKeyNav = useCallback(
@@ -170,10 +217,11 @@ export function Navigation() {
     (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
       e.preventDefault()
       // Ensure navbar stays visible during the scroll animation
-      setHideNav(false)
+      navSurfaceRef.current.hideNav = false
+      applyNavSurface()
       navigateTo(href, () => setMobileOpen(false))
     },
-    [],
+    [applyNavSurface],
   )
 
   return (
@@ -183,12 +231,8 @@ export function Navigation() {
       <nav
         ref={navRef}
         onKeyDown={handleKeyNav}
-        className={[
-          "fixed top-0 left-0 right-0 z-50",
-          "transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]",
-          hideNav ? "-translate-y-full opacity-0" : "translate-y-0 opacity-100",
-          scrolled ? "bg-transparent py-2.5" : "bg-transparent py-5",
-        ].join(" ")}
+        className={NAV_SSR_CLASS}
+        suppressHydrationWarning
       >
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6">
           {/* Logo */}
@@ -197,7 +241,8 @@ export function Navigation() {
             onClick={(e) => {
               e.preventDefault()
               e.stopPropagation()
-              setHideNav(false)
+              navSurfaceRef.current.hideNav = false
+              applyNavSurface()
               wooshScrollTo(0)
               history.replaceState(null, "", window.location.pathname)
               setMobileOpen(false)
@@ -216,7 +261,13 @@ export function Navigation() {
                 e.currentTarget.classList.remove('is-flipping')
               }}
             >
-              <Image src="/logo.png" alt="ML" width={64} height={64} sizes="64px" className="h-full w-full object-cover" />
+              <SiteLogoMark
+                width={64}
+                height={64}
+                sizes="64px"
+                alt="Misha Lubich logo"
+                suppressHydrationWarning
+              />
             </div>
           </a>
 
@@ -241,12 +292,7 @@ export function Navigation() {
                       : "text-muted-foreground hover:text-foreground",
                   ].join(" ")}
                 >
-                  {isActive && (
-                    <span className="absolute inset-0 rounded-full bg-white/[0.04] border border-white/[0.03] animate-nav-pill-in" />
-                  )}
-                  <span className="relative z-10">
-                    <ExpandingText text={link.label} />
-                  </span>
+                  <ExpandingText text={link.label} />
                 </a>
               )
             })}
@@ -298,8 +344,8 @@ export function Navigation() {
                     className={[
                       "group/link rounded-xl px-4 py-3 text-sm transition-all duration-300",
                       isActive
-                        ? "text-foreground font-medium bg-white/[0.03] border-l-2 border-primary"
-                        : "text-muted-foreground hover:text-foreground hover:bg-white/[0.02]",
+                        ? "text-foreground font-medium border-l-2 border-primary"
+                        : "text-muted-foreground hover:text-foreground",
                     ].join(" ")}
                   >
                     <ExpandingText text={link.label} />

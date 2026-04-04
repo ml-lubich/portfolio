@@ -114,6 +114,16 @@ function internalPageExists(urlPath: string): boolean {
   // Strip hash fragments (e.g. "/#about" → "/")
   const pathOnly = urlPath.split("#")[0].split("?")[0]
   const stripped = pathOnly === "/" ? "" : pathOnly.replace(/^\//, "")
+
+  // /blog/:slug → app/blog/[slug]/page.tsx + content/blog/:slug.mdx
+  const blogPost = /^blog\/([a-zA-Z0-9_-]+)$/.exec(stripped)
+  if (blogPost) {
+    const slug = blogPost[1]
+    const dynamicBlogPage = path.join(APP_DIR, "blog", "[slug]", "page.tsx")
+    const mdx = path.join(ROOT, "content", "blog", `${slug}.mdx`)
+    return fs.existsSync(dynamicBlogPage) && fs.existsSync(mdx)
+  }
+
   const dir = path.join(APP_DIR, stripped)
   if (!fs.existsSync(dir)) return false
   return (

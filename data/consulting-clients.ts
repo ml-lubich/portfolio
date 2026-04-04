@@ -15,13 +15,27 @@ export interface ConsultingClient {
     tags: string[]
     gradient: string
     accent: string
+    /** Optional card hero under `public/` (e.g. `/images/projects/lupfr-hero.png`) */
+    coverImage?: string
 }
 
 export const consultingClients: ConsultingClient[] = [
     {
+        id: "enrichdata",
+        name: "EnrichData",
+        href: "https://www.enrichdata.net/",
+        coverImage: "/images/projects/enrichdata-hero.png",
+        summary:
+            "Public marketing and product story for a custom CRM enrichment offering—real-time-style data fills, job-change tracking, and quality maintenance for teams that want outcomes without bloated vendor contracts.",
+        tags: ["Web", "CRM", "Next.js"],
+        gradient: g.accentToCyan,
+        accent: accentCycle[1],
+    },
+    {
         id: "lupfr",
         name: "LUPFR Entertainment",
         href: "https://lupfr.com",
+        coverImage: "/images/projects/lupfr-hero.png",
         summary:
             "Consulting on web presence and digital experience for a San Francisco music events and talent platform — event pages, bookings flow, and brand storytelling online.",
         tags: ["Web", "Events", "Next.js"],

@@ -45,11 +45,14 @@ export function ScrollStackCards({
 }: ScrollStackCardsProps) {
   const isMobile = useIsMobile()
   const reducedStack = useReducedStackEffects()
+  const isMobileRef = useRef(isMobile)
+  isMobileRef.current = isMobile
 
-  // Mobile-adjusted parameters for better small-viewport UX
-  const effStickyTop = isMobile ? Math.min(stickyTop, 56) : stickyTop
-  const effStackOffset = isMobile ? Math.min(stackOffset, 8) : stackOffset
-  const effScrollPerCard = isMobile ? Math.min(scrollPerCard, 28) : scrollPerCard
+  // Mobile: minimal stack peek, short scroll runway — laptop uses caller props unchanged.
+  /** Keep sticky headers below fixed nav (min 72px); capping at 48 caused overlap. */
+  const effStickyTop = isMobile ? Math.max(72, Math.min(stickyTop, 96)) : stickyTop
+  const effStackOffset = isMobile ? 0 : stackOffset
+  const effScrollPerCard = isMobile ? Math.min(scrollPerCard, 14) : scrollPerCard
   const effPerspective = isMobile ? Math.min(perspective, 800) : perspective
 
   const containerRef = useRef<HTMLDivElement>(null)
@@ -145,25 +148,31 @@ export function ScrollStackCards({
       const enterStart = Math.max(0, arriveAt - step)
       const rawEnter =
         i === 0 ? 1 : Math.min(Math.max((totalProgress - enterStart) / step, 0), 1)
-      const enterProgress = i === 0 ? 1 : snapScrollProgress(rawEnter, 2.55)
+      const mobileTight = isMobileRef.current
+      const enterPow = mobileTight ? 1.28 : 2.55
+      const coverPow = mobileTight ? 1.22 : 2.45
+      const enterProgress = i === 0 ? 1 : snapScrollProgress(rawEnter, enterPow)
 
       let rawCover = 0
       if (i < n - 1) {
         rawCover = Math.min(Math.max((totalProgress - arriveAt) / step, 0), 1)
       }
-      const coverProgress = snapScrollProgress(rawCover, 2.45)
+      const coverProgress = snapScrollProgress(rawCover, coverPow)
 
       enterBuf[i] = enterProgress
       coverBuf[i] = coverProgress
 
       // Softer motion + 2D stack on phones / tablets (see useReducedStackEffects).
       const reduced = reducedStackRef.current
-      const scale = 1 - coverProgress * (reduced ? 0.03 : 0.06)
+      const slideMult = mobileTight ? 0.48 : 1
+      const scaleMult = mobileTight ? 0.45 : 1
+      const scale = 1 - coverProgress * (reduced ? 0.03 : 0.06) * scaleMult
       const translateZ = coverProgress * (reduced ? -25 : -60)
       const rotateX = coverProgress * (reduced ? 0.8 : 2)
       const borderRadius = 20 + coverProgress * 12
-      const slideUp = (1 - enterProgress) * (reduced ? 38 : 52)
-      const enterOpacity = Math.min(enterProgress * 4.25, 1)
+      const slideUp =
+        (1 - enterProgress) * (reduced ? 38 : 52) * slideMult
+      const enterOpacity = Math.min(enterProgress * (mobileTight ? 7.5 : 4.25), 1)
       const stackedOpacity = 1 - coverProgress * 0.3
       /* Bake “brightness” into opacity on all viewports — filter:brightness() repaints during scroll. */
       const dimFactor = reduced ? 1 - coverProgress * 0.18 : 1 - coverProgress * 0.2
@@ -383,6 +392,7 @@ export function ScrollStackCards({
 
   /* ── Mouse handlers ─────────────────────────────────────────────────── */
   const handleMouseDown = useCallback((e: ReactMouseEvent<HTMLDivElement>, index: number) => {
+    if (isMobileRef.current) return
     if ((e.target as HTMLElement).closest("a, button")) return
     if (activeCardIdRef.current) return // No drag while panel is open
     e.preventDefault()
@@ -469,6 +479,7 @@ export function ScrollStackCards({
   const lastTouchTime = useRef(0)
 
   const handleTouchStart = useCallback((e: ReactTouchEvent<HTMLDivElement>, index: number) => {
+    if (isMobileRef.current) return
     if ((e.target as HTMLElement).closest("a, button")) return
     if (activeCardIdRef.current) return // No drag while panel is open
     lastTouchTime.current = Date.now()
@@ -648,7 +659,9 @@ export function ScrollStackCards({
                 ? "translateX(-15%) scale(0.85)"
                 : "translateX(0) scale(1)",
               transformOrigin: "left top",
-              transition: "transform 0.65s cubic-bezier(0.16, 1, 0.3, 1)",
+              transition: isMobile
+                ? "transform 0.32s cubic-bezier(0.16, 1, 0.3, 1)"
+                : "transform 0.65s cubic-bezier(0.16, 1, 0.3, 1)",
             }}
           >
             {cards.map((card, i) => (
@@ -665,7 +678,7 @@ export function ScrollStackCards({
                   transformStyle: reducedStack ? "flat" : "preserve-3d",
                   borderRadius: "20px",
                   overflow: "hidden",
-                  cursor: isExpanded ? "pointer" : "grab",
+                  cursor: isExpanded ? "pointer" : isMobile ? "default" : "grab",
                   zIndex: i + 1,
                   opacity: i === 0 ? 1 : 0,
                 }}
@@ -694,7 +707,9 @@ export function ScrollStackCards({
               style={{
                 transform: isExpanded ? "translateX(0)" : "translateX(110%)",
                 opacity: isExpanded ? 1 : 0,
-                transition: "transform 0.65s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease",
+                transition: isMobile
+                  ? "transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.22s ease"
+                  : "transform 0.65s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease",
                 pointerEvents: isExpanded ? "auto" : "none",
                 zIndex: cards.length + 20,
               }}

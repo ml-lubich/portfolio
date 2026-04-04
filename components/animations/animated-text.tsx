@@ -12,6 +12,7 @@ import {
     type ReactElement,
 } from "react"
 import { cn } from "@/lib/utils"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 /* ─────────────────────────────────────────────────────────────────
  *  AnimatedText — Anthropic-style text reveal animation.
@@ -64,6 +65,11 @@ export function AnimatedText({
     threshold = 0.15,
     replay = false,
 }: AnimatedTextProps) {
+    const isMobile = useIsMobile()
+    const effDuration = isMobile ? Math.round(duration * 0.5) : duration
+    const effDelay = isMobile ? Math.round(delay * 0.55) : delay
+    const effStagger = isMobile ? Math.round(stagger * 0.55) : stagger
+
     const containerRef = useRef<HTMLElement>(null)
     const [isVisible, setIsVisible] = useState(false)
     const hasAnimated = useRef(false)
@@ -98,7 +104,7 @@ export function AnimatedText({
         <Tag
             ref={containerRef as React.RefObject<never>}
             className={cn("animated-text-root", className)}
-            style={{ "--at-duration": `${duration}ms` } as CSSProperties}
+            style={{ "--at-duration": `${effDuration}ms` } as CSSProperties}
         >
             {(() => {
                 let wordIdx = 0
@@ -112,7 +118,7 @@ export function AnimatedText({
                     }
 
                     const idx = wordIdx++
-                    const wordDelay = delay + idx * stagger
+                    const wordDelay = effDelay + idx * effStagger
                     return (
                         <span
                             key={i}

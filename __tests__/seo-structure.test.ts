@@ -27,6 +27,8 @@ describe("App routes exist", () => {
         { route: "/blog/[slug]", desc: "blog post (dynamic)" },
         { route: "/demo", desc: "demo page" },
         { route: "/feed.xml", desc: "RSS feed" },
+        { route: "/privacy", desc: "privacy policy" },
+        { route: "/terms", desc: "terms of use" },
     ]
 
     for (const { route, desc } of expectedRoutes) {

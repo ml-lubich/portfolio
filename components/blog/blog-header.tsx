@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react"
 import Link from "next/link"
-import Image from "next/image"
+import { SiteLogoMark } from "@/components/site-logo-mark"
 import { usePathname, useSearchParams } from "next/navigation"
 import { Menu, X } from "lucide-react"
 
@@ -74,14 +74,7 @@ export function BlogHeader() {
               e.currentTarget.classList.remove('is-flipping')
             }}
           >
-            <Image
-              src="/logo.png"
-              alt="Misha Lubich logo"
-              width={64}
-              height={64}
-              sizes="64px"
-              className="h-full w-full object-contain"
-            />
+            <SiteLogoMark width={64} height={64} sizes="64px" />
           </div>
         </Link>
 

@@ -106,7 +106,7 @@ export function BackgroundOrbs() {
               willChange: useLightAnimation ? "transform" : "filter",
               transform: "translate(-50%, -50%)",
               animationName,
-              animationDuration: `${orb.dur}s`,
+              animationDuration: `${isMobile ? orb.dur * 0.55 : orb.dur}s`,
               animationTimingFunction: "ease-in-out",
               animationIterationCount: "infinite",
               animationPlayState: playState,

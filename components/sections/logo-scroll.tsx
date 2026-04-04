@@ -194,7 +194,7 @@ export function LogoScroll() {
         <section
             ref={sectionRef}
             id="partners"
-            className="relative w-full overflow-hidden border-b border-border/40 bg-background/40 py-6 sm:py-8 md:backdrop-blur-sm"
+            className="relative w-full overflow-hidden border-b border-border/40 bg-background/40 py-4 md:py-6 lg:py-8 md:backdrop-blur-sm"
             aria-label="Companies and institutions"
         >
             {/* Heading */}

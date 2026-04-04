@@ -1,6 +1,8 @@
 export { About } from "./about"
 export { AIExpertise } from "./ai-expertise"
 export { ConsultingClients } from "./consulting-clients"
+export { ClientTestimonials } from "./client-testimonials"
+export { WorkMarquee } from "./work-marquee"
 export { Contact } from "./contact"
 export { GitHubStats } from "./github-stats"
 export { Journey } from "./journey"

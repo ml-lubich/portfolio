@@ -2,7 +2,7 @@ import dynamic from "next/dynamic"
 import Link from "next/link"
 import { Navigation } from "@/components/nav"
 import { Hero } from "@/components/hero"
-import { ProfileIntro } from "@/components/sections"
+import { ProfileIntro, LogoScroll, WorkMarquee } from "@/components/sections"
 import { LazySection } from "@/components/layout"
 
 /* ── Skeleton placeholder while chunks load ─────────────────────────── */
@@ -35,6 +35,10 @@ const ConsultingClients = dynamic(
   () => import("@/components/sections/consulting-clients").then(m => m.ConsultingClients),
   { loading: () => <SectionSkeleton /> },
 )
+const ClientTestimonials = dynamic(
+  () => import("@/components/sections/client-testimonials").then(m => m.ClientTestimonials),
+  { loading: () => <SectionSkeleton /> },
+)
 const Projects = dynamic(() => import("@/components/sections/projects").then(m => m.Projects), {
   loading: () => <SectionSkeleton />,
 })
@@ -53,10 +57,8 @@ const Contact = dynamic(() => import("@/components/sections/contact").then(m => 
 const Footer = dynamic(() => import("@/components/sections/footer").then(m => m.Footer), {
   loading: () => <SectionSkeleton height="10vh" />,
 })
-const LogoScroll = dynamic(
-  () => import("@/components/sections/logo-scroll").then(m => ({ default: m.LogoScroll })),
-  { loading: () => <div className="h-24" aria-hidden="true" /> }
-)
+/** Same top rhythm as consulting LazySection — separates lazy-mounted sections while scrolling */
+const LAZY_SECTION_TOP = "pt-10 md:pt-14 lg:pt-20"
 
 export default function Home() {
   return (
@@ -74,31 +76,41 @@ export default function Home() {
           <LiveTerminal />
         </LazySection>
         <ProfileIntro />
-        <LazySection>
+        <LazySection className={LAZY_SECTION_TOP}>
           <AIExpertise />
         </LazySection>
-        <LazySection sectionId="about">
+        <LazySection sectionId="about" className={LAZY_SECTION_TOP}>
           <About />
         </LazySection>
-        <LazySection sectionId="journey">
+        <LazySection
+          sectionId="journey"
+          className={`${LAZY_SECTION_TOP} mb-12 md:mb-16 lg:mb-20`}
+        >
           <Journey />
         </LazySection>
-        <LazySection sectionId="consulting">
+        <LazySection sectionId="consulting" className={LAZY_SECTION_TOP}>
           <ConsultingClients />
         </LazySection>
-        <LazySection sectionId="projects">
+        <WorkMarquee />
+        <LazySection sectionId="testimonials" className={LAZY_SECTION_TOP}>
+          <ClientTestimonials />
+        </LazySection>
+        <LazySection
+          sectionId="projects"
+          className={`mt-8 border-t border-white/[0.06] md:mt-12 lg:mt-16 ${LAZY_SECTION_TOP}`}
+        >
           <Projects />
         </LazySection>
-        <LazySection sectionId="skills">
+        <LazySection sectionId="skills" className={LAZY_SECTION_TOP}>
           <Skills />
         </LazySection>
-        <LazySection>
+        <LazySection className={LAZY_SECTION_TOP}>
           <GitHubStats />
         </LazySection>
-        <LazySection sectionId="research">
+        <LazySection sectionId="research" className={LAZY_SECTION_TOP}>
           <Publications />
         </LazySection>
-        <LazySection sectionId="contact" minHeight="30vh">
+        <LazySection sectionId="contact" minHeight="30vh" className={LAZY_SECTION_TOP}>
           <Contact />
         </LazySection>
         <Footer />
@@ -126,6 +138,7 @@ export default function Home() {
             <li><a href="#skills">Technical Skills — Python, TypeScript, React, PyTorch, TensorFlow</a></li>
             <li><a href="#journey">Professional Experience — Apple, GitHub, Braintrust Data</a></li>
             <li><a href="#consulting">Consulting — client sites and engagements</a></li>
+            <li><a href="#testimonials">Client feedback — past consulting engagements</a></li>
             <li><a href="#research">Research Publications</a></li>
             <li><a href="#contact">Contact</a></li>
             <li><Link href="/blog">AI Engineering Blog — Perspectives on LLMs, MLOps & Production ML</Link></li>

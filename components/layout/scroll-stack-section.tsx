@@ -104,7 +104,7 @@ export function ScrollStackSection({
   return (
     <section
       id={id}
-      className={`relative py-14 sm:py-20 ${className}`}
+      className={`relative py-9 md:py-14 lg:py-20 ${className}`}
     >
       {/* Background FX (optional) */}
       {bgEffects && (
@@ -116,7 +116,7 @@ export function ScrollStackSection({
         </div>
       )}
 
-      <div className={`relative mx-auto ${maxWidth} px-4 sm:px-6`}>
+      <div className={`relative mx-auto ${maxWidth} px-3 md:px-4 lg:px-6`}>
         {/* Stacking glass cards with anchored section header */}
         <ScrollStackCards
           header={

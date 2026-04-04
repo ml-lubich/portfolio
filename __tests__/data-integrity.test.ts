@@ -13,6 +13,8 @@ import { describe, it, expect } from "vitest"
 import { experiences } from "@/data/experiences"
 import { projects } from "@/data/projects"
 import { consultingClients } from "@/data/consulting-clients"
+import { clientTestimonials } from "@/data/client-testimonials"
+import { workMarqueeSegments } from "@/data/work-marquee"
 import { papers } from "@/data/publications"
 import { skillCategories, proficiencyBars } from "@/data/skills"
 import { blogPosts, BLOG_CATEGORIES, getPostBySlug, getReadingTime } from "@/lib/blog-data"
@@ -77,6 +79,51 @@ describe("Projects data", () => {
                 expect(proj.detail.title).toBeTruthy()
                 expect(proj.detail.description).toBeTruthy()
                 expect(proj.detail.techStack?.length).toBeGreaterThan(0)
+            })
+        })
+    }
+})
+
+// ── Work marquee (consulting scope strip) ─────────────────────────────────────
+
+describe("Work marquee data", () => {
+    it("has a modest number of segments", () => {
+        expect(workMarqueeSegments.length).toBeGreaterThanOrEqual(6)
+        expect(workMarqueeSegments.length).toBeLessThanOrEqual(24)
+    })
+
+    it("has no empty labels", () => {
+        for (const s of workMarqueeSegments) {
+            expect(s.trim().length).toBeGreaterThan(0)
+        }
+    })
+})
+
+// ── Client testimonials ─────────────────────────────────────────────────────────
+
+describe("Client testimonials data", () => {
+    it("should have at least one testimonial", () => {
+        expect(clientTestimonials.length).toBeGreaterThan(0)
+    })
+
+    it("should have no duplicate IDs", () => {
+        const ids = clientTestimonials.map((t) => t.id)
+        expect(new Set(ids).size).toBe(ids.length)
+    })
+
+    for (const t of clientTestimonials) {
+        describe(`testimonial: ${t.id}`, () => {
+            it("has required fields", () => {
+                expect(t.quote.length).toBeGreaterThan(20)
+                expect(t.name).toBeTruthy()
+                expect(t.title).toBeTruthy()
+                expect(t.organization).toBeTruthy()
+                expect([4, 4.5, 5]).toContain(t.rating)
+            })
+
+            it("avatar path is empty or starts with /images/", () => {
+                if (t.avatarSrc == null || t.avatarSrc === "") return
+                expect(t.avatarSrc.startsWith("/images/")).toBe(true)
             })
         })
     }

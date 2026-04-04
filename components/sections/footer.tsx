@@ -8,6 +8,7 @@ import { AnimatedText } from "../animations/animated-text"
 const footerLinks = [
   { href: "/#about", label: "About" },
   { href: "/#consulting", label: "Consulting" },
+  { href: "/#testimonials", label: "Clients" },
   { href: "/#projects", label: "Projects" },
   { href: "/#skills", label: "Skills" },
   { href: "/blog", label: "Blog" },
@@ -69,9 +70,20 @@ export function Footer() {
         </AnimatedSection>
 
         <AnimatedSection delay={200}>
-          <div className="mt-8 flex flex-col items-center justify-between gap-2 border-t border-white/[0.04] pt-6 sm:flex-row">
+          <div className="mt-8 flex flex-col items-center justify-between gap-4 border-t border-white/[0.04] pt-6 sm:flex-row sm:flex-wrap">
             <p className="text-xs text-muted-foreground">
               <AnimatedText text={`© ${new Date().getFullYear()} Misha Lubich. All rights reserved.`} variant="fade-up" stagger={15} duration={500} />
+            </p>
+            <p className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs text-muted-foreground sm:justify-start">
+              <Link href="/privacy" className="transition-colors hover:text-white">
+                Privacy Policy
+              </Link>
+              <span className="text-border" aria-hidden="true">
+                ·
+              </span>
+              <Link href="/terms" className="transition-colors hover:text-white">
+                Terms of Use
+              </Link>
             </p>
             <p className="text-xs text-muted-foreground">
               <AnimatedText text="Built with Next.js & Tailwind CSS" variant="fade-up" delay={100} stagger={20} duration={500} />

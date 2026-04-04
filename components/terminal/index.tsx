@@ -189,7 +189,7 @@ export function LiveTerminal() {
   }, [])
 
   return (
-    <AnimatedSection id="terminal" className="pt-8 pb-16 sm:pt-12 sm:pb-20 px-4 sm:px-6 relative overflow-hidden">
+    <AnimatedSection id="terminal" className="relative overflow-hidden px-3 pb-12 pt-6 md:px-6 md:pb-16 md:pt-8 lg:pb-20">
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/[0.03] rounded-full blur-[100px]" />
       </div>

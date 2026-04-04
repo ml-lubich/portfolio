@@ -44,7 +44,7 @@ export function Hero() {
   const brainRevealGate = nameRevealStarted || idleBrain
 
   return (
-    <section id="hero" className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden pb-24 pt-24 [clip-path:inset(0)]">
+    <section id="hero" className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden pb-16 pt-16 [clip-path:inset(0)] md:pb-24 md:pt-24">
       {/* Spectrum lives only in this section (not fixed to viewport) — avoids mobile scroll seam / mask repaint */}
       <BackgroundOrbs />
       <ParticleCanvas className="z-[1]" />
@@ -77,7 +77,7 @@ export function Hero() {
       />
 
       {/* Content */}
-      <div className="relative z-10 mx-auto w-full max-w-6xl px-4 text-center sm:px-6 pointer-events-none">
+      <div className="relative z-10 mx-auto w-full max-w-6xl px-3 text-center pointer-events-none md:px-6">
         <RoleRotator onNameRevealStart={() => setNameRevealStarted(true)} />
         <HeroSubtitle />
         <HeroCTAs />

@@ -4,6 +4,7 @@ import React from "react"
 import Image from "next/image"
 import { MermaidDiagram } from "@/components/blog/mermaid-diagram"
 import { ChartFence } from "@/components/blog/chart-fence"
+import { cn } from "@/lib/utils"
 
 /* ──────────────────────────────────────────────────────────────────────
  *  Custom MDX Components — drop-in rich elements for blog posts.
@@ -306,12 +307,15 @@ export const mdxComponents = {
     p: (props: React.HTMLAttributes<HTMLParagraphElement>) => (
         <p className="mb-4 text-base leading-relaxed text-foreground/85" {...props} />
     ),
-    a: (props: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
+    a: ({ className, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
         <a
-            className="text-primary underline decoration-primary/30 underline-offset-4 transition-colors hover:decoration-primary/60"
+            {...props}
+            className={cn(
+                "text-foreground underline underline-offset-4 decoration-foreground/40 transition-colors hover:decoration-foreground/90",
+                className,
+            )}
             target="_blank"
             rel="noopener noreferrer"
-            {...props}
         />
     ),
     ul: (props: React.HTMLAttributes<HTMLUListElement>) => (
@@ -447,8 +451,11 @@ export const mdxComponents = {
             />
         )
     },
-    strong: (props: React.HTMLAttributes<HTMLElement>) => (
-        <strong className="font-semibold text-foreground" {...props} />
+    strong: ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => (
+        <strong
+            {...props}
+            className={cn("no-metallic font-semibold text-foreground", className)}
+        />
     ),
     em: (props: React.HTMLAttributes<HTMLElement>) => (
         <em className="italic text-foreground/80" {...props} />

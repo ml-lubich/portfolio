@@ -105,12 +105,19 @@ function collectSectionIds(files) {
 
 /** Check whether an internal page path like /blog or / maps to an app/ route. */
 function internalPageExists(urlPath) {
-  // "/" → app/page.tsx
-  // "/blog" → app/blog/page.tsx
-  const stripped = urlPath === "/" ? "" : urlPath.replace(/^\//, "")
+  const pathOnly = urlPath.split("#")[0].split("?")[0]
+  const stripped = pathOnly === "/" ? "" : pathOnly.replace(/^\//, "")
+
+  const blogPost = /^blog\/([a-zA-Z0-9_-]+)$/.exec(stripped)
+  if (blogPost) {
+    const slug = blogPost[1]
+    const dynamicBlogPage = path.join(APP_DIR, "blog", "[slug]", "page.tsx")
+    const mdx = path.join(ROOT, "content", "blog", `${slug}.mdx`)
+    return fs.existsSync(dynamicBlogPage) && fs.existsSync(mdx)
+  }
+
   const dir = path.join(APP_DIR, stripped)
   if (!fs.existsSync(dir)) return false
-  // Must contain a page.tsx (or page.ts)
   return (
     fs.existsSync(path.join(dir, "page.tsx")) ||
     fs.existsSync(path.join(dir, "page.ts"))
