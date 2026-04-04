@@ -1,8 +1,8 @@
 import React, { Suspense } from "react"
 import type { Metadata } from "next"
+import Image from "next/image"
 import { BlogHeader } from "@/components/blog/blog-header"
 import { blogPosts } from "@/lib/blog-data"
-import { shadows } from "@/lib/theme"
 import {
   SITE_URL,
   SITE_DEFAULT_OG_IMAGE,
@@ -209,8 +209,15 @@ export default function BlogLayout({
         <div className="mx-auto max-w-6xl px-6">
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
             <div className="flex items-center gap-2">
-              <div className={`flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-br from-primary to-accent shadow-[${shadows.blogAvatar.replace('20px', '12px')}]`}>
-                <span className="text-xs font-bold text-primary-foreground">ML</span>
+              <div className="relative flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-md bg-white/[0.06]">
+                <Image
+                  src="/logo.png"
+                  alt="Misha Lubich logo"
+                  width={28}
+                  height={28}
+                  sizes="28px"
+                  className="h-full w-full object-contain"
+                />
               </div>
               <a href={`${BASE_URL}/blog`} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
                 blog.mishalubich.com

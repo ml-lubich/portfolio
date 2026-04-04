@@ -5,19 +5,19 @@ import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import type { Components } from "react-markdown"
 import { BlogChart } from "@/components/blog/charts/blog-chart"
+import { splitMarkdownByBlogChartFences } from "@/lib/mdx-chart-fences"
 
 interface BlogContentProps {
   content: string
 }
 
 /**
- * Renders blog post content, splitting markdown text from ```chart blocks.
- * Chart blocks contain JSON matching the BlogChart schema and are rendered
- * as interactive visualisations. Everything else is rendered as proper
- * Markdown via react-markdown with GFM (tables, strikethrough, etc.).
+ * Renders blog post content, splitting markdown from ```mermaid / ```chart /
+ * chart-shaped ```json blocks (BlogChart: pipeline, comparison, pie, tree).
+ * Everything else is Markdown via react-markdown with GFM.
  */
 export function BlogContent({ content }: BlogContentProps) {
-  const parts = parseContent(content)
+  const parts = splitMarkdownByBlogChartFences(content)
 
   return (
     <div className="blog-prose">
@@ -44,8 +44,12 @@ export function BlogContent({ content }: BlogContentProps) {
 
 const mdComponents: Components = {
   // Tables
-  table: ({ children, ...props }) => (
-    <table className="blog-table" {...props}>{children}</table>
+  table: ({ children, className, ...props }) => (
+    <div className="blog-table-wrap">
+      <table className={`blog-table ${className ?? ""}`.trim()} {...props}>
+        {children}
+      </table>
+    </div>
   ),
   thead: ({ children, ...props }) => <thead {...props}>{children}</thead>,
   tbody: ({ children, ...props }) => <tbody {...props}>{children}</tbody>,
@@ -110,33 +114,3 @@ const mdComponents: Components = {
   ),
 }
 
-/* ── Content parser — splits chart blocks from markdown ────────── */
-
-interface ContentPart {
-  type: "text" | "chart"
-  content: string
-}
-
-function parseContent(content: string): ContentPart[] {
-  const parts: ContentPart[] = []
-  const chartRegex = /```chart\n([\s\S]*?)```/g
-  let lastIndex = 0
-  let match
-
-  while ((match = chartRegex.exec(content)) !== null) {
-    // Text before chart block
-    if (match.index > lastIndex) {
-      const text = content.slice(lastIndex, match.index).trim()
-      if (text) parts.push({ type: "text", content: text })
-    }
-    // Chart block
-    parts.push({ type: "chart", content: match[1].trim() })
-    lastIndex = match.index + match[0].length
-  }
-
-  // Remaining text
-  const remaining = content.slice(lastIndex).trim()
-  if (remaining) parts.push({ type: "text", content: remaining })
-
-  return parts
-}

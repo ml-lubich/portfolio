@@ -5,7 +5,14 @@ import { notFound } from "next/navigation"
 import type { Metadata } from "next"
 import { MDXRemote } from "next-mdx-remote/rsc"
 import { mdxComponents } from "@/components/blog/mdx-components"
-import { SITE_URL } from "@/lib/site-config"
+import { ChartFence } from "@/components/blog/chart-fence"
+import { transformChartFences } from "@/lib/mdx-chart-fences"
+import remarkGfm from "remark-gfm"
+import {
+  SITE_URL,
+  SITE_DEFAULT_OG_IMAGE,
+  SITE_DEFAULT_OG_IMAGE_SIZE,
+} from "@/lib/site-config"
 
 interface PageProps {
   params: Promise<{ slug: string }>
@@ -143,7 +150,9 @@ function BlogPostJsonLd({ slug }: { slug: string }) {
       url: SITE_URL,
       logo: {
         "@type": "ImageObject",
-        url: `${SITE_URL}/logo.png`,
+        url: `${SITE_URL}${SITE_DEFAULT_OG_IMAGE}`,
+        width: SITE_DEFAULT_OG_IMAGE_SIZE.width,
+        height: SITE_DEFAULT_OG_IMAGE_SIZE.height,
       },
     },
     keywords: post.tags.join(", "),
@@ -252,7 +261,15 @@ export default async function BlogPostPage({ params }: PageProps) {
       <BlogPostJsonLd slug={slug} />
       <BlogPostView post={post} relatedPosts={relatedPosts}>
         <div className="blog-prose mdx-content">
-          <MDXRemote source={post.content} components={mdxComponents} />
+          <MDXRemote
+            source={transformChartFences(post.content)}
+            components={{ ...mdxComponents, ChartFence }}
+            options={{
+              mdxOptions: {
+                remarkPlugins: [remarkGfm],
+              },
+            }}
+          />
         </div>
       </BlogPostView>
     </>

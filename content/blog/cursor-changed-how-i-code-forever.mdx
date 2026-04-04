@@ -1,6 +1,6 @@
 ---
 title: "Cursor Changed How I Code Forever — And I'm Not Going Back to VS Code"
-excerpt: "After 6 months of using Cursor as my primary IDE, my velocity has tripled. Here's my setup, workflows, and the features that make traditional editors feel broken."
+excerpt: "After 6 months of using Cursor as my primary IDE, my velocity has tripled. Agentic workflows—not comment-driven inline gen—are what actually moved the needle."
 date: "2026-02-05"
 category: "AI Products"
 tags: ["Cursor", "AI Coding", "Developer Tools", "IDE", "Productivity"]
@@ -17,16 +17,12 @@ This isn't a sponsored post. I'm paying full price like everyone else. I'm writi
 
 ## My Daily Workflow
 
-Here's what a typical feature implementation looks like in Cursor:
+I rarely lean on big block comments or "write a paragraph above the function and hit Cmd+K." That pattern demos well in tweets; in real work it is too slow and too local. **What I actually use is agentic coding:** one clear goal in chat, the agent reads the repo, touches multiple files, runs checks, and I review diffs before merge.
+
+A typical slice looks like: *"Add a FastAPI upload endpoint for PDFs—PyMuPDF extract, 512-token chunks with 50 overlap, OpenAI embed, store in pgvector; match existing `DocumentChunk` patterns."* The agent proposes the route, wiring, and tests; I fix the one or two places where context was thin. Naming and imports stay consistent because the tool is scoped to the codebase, not a blank file.
 
 ```python
-# I write a comment describing what I want:
-# Create a FastAPI endpoint that accepts a PDF upload,
-# extracts text with PyMuPDF, chunks it into 512-token
-# segments with 50-token overlap, embeds with OpenAI,
-# and stores in our Postgres pgvector table.
-
-# Then I hit Cmd+K and Cursor generates:
+# What I end up shipping (after review)—not written line-by-line by hand:
 @app.post("/api/documents/upload")
 async def upload_document(
     file: UploadFile = File(...),
@@ -34,26 +30,26 @@ async def upload_document(
 ):
     if file.content_type != "application/pdf":
         raise HTTPException(400, "Only PDF files accepted")
-    
+
     content = await file.read()
     doc = fitz.open(stream=content, filetype="pdf")
     text = "".join(page.get_text() for page in doc)
-    
+
     chunks = chunk_text(text, max_tokens=512, overlap=50)
     embeddings = await embed_batch(chunks)
-    
+
     for chunk, embedding in zip(chunks, embeddings):
-        db.add(DocumentChunk(
-            content=chunk,
-            embedding=embedding,
-            filename=file.filename,
-        ))
-    
+        db.add(
+            DocumentChunk(
+                content=chunk,
+                embedding=embedding,
+                filename=file.filename,
+            )
+        )
+
     await db.commit()
     return {"chunks": len(chunks), "filename": file.filename}
 ```
-
-That's production-quality code generated in 3 seconds. No hallucinated imports. No wrong API signatures. It even matched our project's naming conventions because Cursor indexes the entire codebase.
 
 ```mermaid
 {
@@ -64,19 +60,19 @@ That's production-quality code generated in 3 seconds. No hallucinated imports. 
     "steps": ["Think", "Google / Docs", "Type Code", "Debug", "~45 min"]
   },
   "right": {
-    "title": "Cursor Workflow",
+    "title": "Agentic Cursor Workflow",
     "color": "green",
-    "steps": ["Think", "Describe in Comment", "Cmd+K Generate", "Review & Ship", "~8 min"]
+    "steps": ["Goal in chat", "Agent explores repo", "Multi-file diff", "Review & ship", "~few min active"]
   }
 }
 ```
 
 ## The Features That Matter
 
-1. **Codebase-aware completions.** Tab completions that understand your project's patterns, not just the language.
-2. **Multi-file editing.** "Refactor this auth flow across all 12 files" works shockingly well.
-3. **Chat with your codebase.** Ask "where is the rate limiting middleware?" and get the exact file and line.
-4. **Inline diffs.** Every AI edit shows you exactly what changed before you accept.
+1. **Agents with repo context.** They search, edit across files, and run commands—closer to a patient junior than a single-line completer.
+2. **Codebase-aware completions.** Tab still matters for the last 20% when you are already in flow.
+3. **Multi-file refactors.** "Fix this auth flow across all 12 files" is an agent-shaped task, not a keystroke contest.
+4. **Inline diffs.** Every change is reviewable before it lands; that is non-negotiable for agent output.
 
 ## The Honest Downsides
 
@@ -84,4 +80,4 @@ That's production-quality code generated in 3 seconds. No hallucinated imports. 
 - **Sometimes confidently wrong.** Particularly with newer libraries or custom abstractions.
 - **Privacy concerns.** Your code is sent to cloud models. Not ideal for every company.
 
-But the productivity gain outweighs all of these. If you're still writing every line by hand in 2026, you're the developer equivalent of someone refusing to use autocomplete.
+But the productivity gain outweighs all of these. If you are still treating the editor like a typewriter in 2026—no agent loop, no structured review—you are leaving most of the leverage on the table.

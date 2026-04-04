@@ -17,7 +17,13 @@ import type { BlogPost } from "./blog-shared"
 
 // ── Re-export client-safe types & utilities from blog-shared ───────
 export type { BlogPost } from "./blog-shared"
-export { BLOG_CATEGORIES, AUTHOR, getReadingTime, getTagsFromPosts } from "./blog-shared"
+export {
+  BLOG_CATEGORIES,
+  AUTHOR,
+  getReadingTime,
+  getTagsFromPosts,
+  normalizeBlogCategoryFromParam,
+} from "./blog-shared"
 
 // ── Data ───────────────────────────────────────────────────────────
 

@@ -52,6 +52,7 @@ const VIEW_COUNTS: Record<string, string> = {
     "vibe-coding-future-or-anti-pattern": "2k",
     "agentic-coding-trust-gap-2026": "1k",
     "mcp-production-engineering-2026": "1k",
+    "openclaw-good-bad-ugly-2026": "1k",
 }
 
 /**

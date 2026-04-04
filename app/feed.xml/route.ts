@@ -1,6 +1,10 @@
 import { blogPosts, getReadingTime, AUTHOR } from "@/lib/blog-data"
 
-import { SITE_URL } from "@/lib/site-config"
+import {
+  SITE_URL,
+  SITE_DEFAULT_OG_IMAGE,
+  SITE_DEFAULT_OG_IMAGE_SIZE,
+} from "@/lib/site-config"
 
 const BASE_URL = SITE_URL
 
@@ -70,11 +74,11 @@ ${post.tags.map((tag) => `      <category>${escapeXml(tag)}</category>`).join("\
     <docs>https://www.rssboard.org/rss-specification</docs>
     <ttl>60</ttl>
     <image>
-      <url>${BASE_URL}/logo.png</url>
+      <url>${BASE_URL}${SITE_DEFAULT_OG_IMAGE}</url>
       <title>AI Engineering Perspectives — Misha Lubich</title>
       <link>${BASE_URL}/blog</link>
-      <width>144</width>
-      <height>144</height>
+      <width>${SITE_DEFAULT_OG_IMAGE_SIZE.width}</width>
+      <height>${SITE_DEFAULT_OG_IMAGE_SIZE.height}</height>
     </image>
     <atom:link href="${BASE_URL}/feed.xml" rel="self" type="application/rss+xml" />
 ${rssItems}

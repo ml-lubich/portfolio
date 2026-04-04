@@ -3,6 +3,7 @@
 import React from "react"
 import Image from "next/image"
 import { MermaidDiagram } from "@/components/blog/mermaid-diagram"
+import { ChartFence } from "@/components/blog/chart-fence"
 
 /* ──────────────────────────────────────────────────────────────────────
  *  Custom MDX Components — drop-in rich elements for blog posts.
@@ -289,6 +290,7 @@ export const mdxComponents = {
     Steps,
     Step,
     Mermaid,
+    ChartFence,
     Collapsible,
 
     // Override default HTML elements for beautiful prose styling
@@ -328,9 +330,9 @@ export const mdxComponents = {
         />
     ),
     hr: () => <hr className="my-10 border-white/[0.06]" />,
-    table: (props: React.HTMLAttributes<HTMLTableElement>) => (
-        <div className="my-6 overflow-x-auto rounded-xl border border-white/[0.06]">
-            <table className="w-full text-sm" {...props} />
+    table: ({ className, ...props }: React.HTMLAttributes<HTMLTableElement>) => (
+        <div className="blog-table-wrap">
+            <table className={`blog-table ${className ?? ""}`.trim()} {...props} />
         </div>
     ),
     th: (props: React.HTMLAttributes<HTMLTableCellElement>) => (
@@ -353,23 +355,83 @@ export const mdxComponents = {
         return <code className={props.className} {...props} />
     },
     pre: (props: React.HTMLAttributes<HTMLPreElement> & { children?: React.ReactNode }) => {
-        // Intercept ```mermaid code fences → render as charts
-        const child = React.Children.only(props.children) as React.ReactElement<{
+        // Intercept fenced chart JSON (```mermaid / ```chart). MDX may emit extra text
+        // nodes beside <code>, so never use Children.only — it throws and skips charts.
+        const normalizeCodeBlockText = (value: React.ReactNode): string => {
+            if (value == null || typeof value === "boolean") return ""
+            if (typeof value === "string" || typeof value === "number") return String(value)
+            if (Array.isArray(value)) return value.map(normalizeCodeBlockText).join("")
+            if (React.isValidElement(value)) {
+                return normalizeCodeBlockText(
+                    (value.props as { children?: React.ReactNode }).children
+                )
+            }
+            return ""
+        }
+
+        const findCodeChild = (
+            nodes: React.ReactNode
+        ): React.ReactElement<{
             className?: string
-            children?: string
-        }> | undefined
+            children?: React.ReactNode
+        }> | undefined => {
+            for (const c of React.Children.toArray(nodes)) {
+                if (!React.isValidElement(c)) continue
+                if (typeof c.type === "string" && c.type === "code") {
+                    return c as React.ReactElement<{
+                        className?: string
+                        children?: React.ReactNode
+                    }>
+                }
+                const inner = (c.props as { children?: React.ReactNode }).children
+                const nested = findCodeChild(inner)
+                if (nested) return nested
+            }
+            return undefined
+        }
 
-        const childClassName = React.isValidElement(child)
-            ? (child.props as { className?: string })?.className
+        const chartFenceLang = (className: string | undefined): boolean =>
+            typeof className === "string" &&
+            /language-(?:mermaid|chart)(?:\s|$)/.test(className)
+
+        const isBlogChartPayload = (text: string): boolean => {
+            const t = text.trim()
+            if (!t.startsWith("{")) return false
+            try {
+                const obj = JSON.parse(t) as { type?: string }
+                return (
+                    obj.type === "pipeline" ||
+                    obj.type === "comparison" ||
+                    obj.type === "pie" ||
+                    obj.type === "tree"
+                )
+            } catch {
+                return false
+            }
+        }
+
+        const codeChild = findCodeChild(props.children)
+        const childClassName = codeChild
+            ? (codeChild.props as { className?: string }).className
             : undefined
+        const blockText = codeChild
+            ? normalizeCodeBlockText(
+                (codeChild.props as { children?: React.ReactNode }).children
+            )
+            : normalizeCodeBlockText(props.children)
 
-        if (
-            React.isValidElement(child) &&
-            typeof childClassName === "string" &&
-            childClassName.includes("language-mermaid")
-        ) {
-            const chartJson = typeof (child.props as { children?: string }).children === "string" ? (child.props as { children?: string }).children : ""
-            return <MermaidDiagram chart={chartJson || ""} />
+        const payloadFallbackLang = (className: string | undefined): boolean => {
+            if (className == null || className === "") return true
+            return /language-(json|text|txt|plaintext)(?:\s|$)/.test(className)
+        }
+
+        const shouldRenderChart =
+            blockText.trim().length > 0 &&
+            isBlogChartPayload(blockText) &&
+            (chartFenceLang(childClassName) || payloadFallbackLang(childClassName))
+
+        if (shouldRenderChart) {
+            return <MermaidDiagram chart={blockText} />
         }
 
         // Extract language for label badge

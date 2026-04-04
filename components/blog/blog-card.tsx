@@ -128,6 +128,7 @@ export function BlogCard({ post, featured = false, onTagClick }: BlogCardProps) 
 
   return (
     <div
+      className="h-full"
       ref={cardRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
@@ -138,7 +139,7 @@ export function BlogCard({ post, featured = false, onTagClick }: BlogCardProps) 
       }}
     >
       <Link href={`/blog/${post.slug}`} className="group block cursor-pointer h-full">
-        <article className={`blog-glass-card flex h-full flex-col overflow-hidden rounded-xl transition-all duration-500 hover:shadow-[${shadows.blogCardSmall}]`}>
+        <article className={`blog-glass-card flex h-full min-h-[430px] flex-col overflow-hidden rounded-xl transition-all duration-500 hover:shadow-[${shadows.blogCardSmall}]`}>
           {/* Glare overlay */}
           <div
             className="pointer-events-none absolute inset-0 z-20 rounded-xl"

@@ -11,7 +11,11 @@ interface BlogFilterProps {
 
 export function BlogFilter({ activeCategory, onCategoryChange }: BlogFilterProps) {
   return (
-    <div className="flex flex-wrap gap-2" role="tablist" aria-label="Filter posts by category">
+    <div
+      className="-mx-1 flex flex-nowrap gap-2 overflow-x-auto overscroll-x-contain px-1 py-0.5 [scrollbar-width:none] sm:-mx-0 sm:flex-wrap sm:overflow-visible [&::-webkit-scrollbar]:hidden"
+      role="tablist"
+      aria-label="Filter posts by category"
+    >
       {BLOG_CATEGORIES.map((cat) => (
         <button
           key={cat}
@@ -19,7 +23,7 @@ export function BlogFilter({ activeCategory, onCategoryChange }: BlogFilterProps
           role="tab"
           aria-selected={activeCategory === cat}
           aria-label={`Filter by ${cat}`}
-          className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all duration-300 ${activeCategory === cat
+          className={`shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-all duration-300 ${activeCategory === cat
             ? `bg-primary text-primary-foreground shadow-[${shadows.filterActive}]`
             : "border border-white/[0.06] bg-white/[0.03] text-muted-foreground backdrop-blur-sm hover:border-primary/30 hover:text-foreground hover:bg-white/[0.06]"
             }`}
@@ -89,7 +93,7 @@ export function BlogSearch({ value, onChange }: BlogSearchProps) {
         value={value}
         onChange={(e) => onChange(e.target.value)}
         aria-label="Search blog articles"
-        className="w-full rounded-xl border border-white/[0.06] bg-white/[0.03] py-2.5 pl-10 pr-4 text-sm text-foreground backdrop-blur-sm placeholder:text-muted-foreground focus:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
+        className="h-10 w-full rounded-xl border border-white/[0.06] bg-white/[0.03] py-2 pl-10 pr-4 text-sm text-foreground backdrop-blur-sm placeholder:text-muted-foreground focus:border-primary/40 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all"
       />
     </div>
   )

@@ -99,8 +99,8 @@ function Node({
   return (
     <div
       className={`
-        rounded-lg border-l-[3px] px-4 py-2.5
-        text-sm text-white/90 font-medium
+        w-full max-w-xs rounded-lg border-l-[3px] px-4 py-2.5
+        text-center text-sm leading-snug text-balance text-white/90 font-medium
         ${BORDER[color]} ${BG[color]}
       `}
     >
@@ -131,13 +131,13 @@ function ComparisonRenderer({ chart }: { chart: ComparisonChart }) {
   const rightColor = c(chart.right.color)
 
   return (
-    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+    <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:items-start">
       {/* Left side */}
-      <div>
+      <div className="flex min-w-0 flex-col items-center">
         <h4 className={`mb-3 text-center text-sm font-semibold ${TEXT_ACCENT[leftColor]}`}>
           {chart.left.title}
         </h4>
-        <div className="flex flex-col items-center">
+        <div className="flex w-full max-w-sm flex-col items-center">
           {chart.left.steps.map((step, i) => (
             <React.Fragment key={i}>
               {i > 0 && <Arrow />}
@@ -147,11 +147,11 @@ function ComparisonRenderer({ chart }: { chart: ComparisonChart }) {
         </div>
       </div>
       {/* Right side */}
-      <div>
+      <div className="flex min-w-0 flex-col items-center">
         <h4 className={`mb-3 text-center text-sm font-semibold ${TEXT_ACCENT[rightColor]}`}>
           {chart.right.title}
         </h4>
-        <div className="flex flex-col items-center">
+        <div className="flex w-full max-w-sm flex-col items-center">
           {chart.right.steps.map((step, i) => (
             <React.Fragment key={i}>
               {i > 0 && <Arrow />}
@@ -295,20 +295,21 @@ export function BlogChart({ json, className = "" }: { json: string; className?: 
 
   try {
     chart = JSON.parse(json) as BlogChart
-  } catch {
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e)
     return (
       <div className={`rounded-xl border border-red-500/20 bg-red-500/5 p-4 text-sm text-red-400 ${className}`}>
-        Invalid chart JSON
+        Invalid chart JSON: {msg}
       </div>
     )
   }
 
   return (
     <div
-      className={`my-8 rounded-xl border border-white/[0.06] bg-[hsl(220_20%_6%)] p-6 ${className}`}
+      className={`mb-8 mt-0 rounded-xl border border-white/[0.06] bg-[hsl(220_20%_6%)] px-6 pb-6 pt-0 [&>:first-child]:pt-2 ${className}`}
     >
       {chart.title && (
-        <h3 className="mb-5 text-center text-sm font-semibold text-white/60">
+        <h3 className="no-metallic mb-4 !mt-0 text-center text-sm font-semibold text-white/60">
           {chart.title}
         </h3>
       )}

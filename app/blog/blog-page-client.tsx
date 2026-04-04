@@ -2,31 +2,49 @@
 
 import React, { useState, useMemo, useCallback, useEffect, Suspense } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
-import { motion, AnimatePresence } from "framer-motion"
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion"
 import type { BlogPost } from "@/lib/blog-shared"
-import { getTagsFromPosts } from "@/lib/blog-shared"
+import { getTagsFromPosts, normalizeBlogCategoryFromParam } from "@/lib/blog-shared"
 import { BlogCard } from "@/components/blog/blog-card"
 import { BlogFilter, BlogSearch, BlogTagFilter } from "@/components/blog/blog-filter"
-import { ArrowUpDown, ArrowUp, ArrowDown, Eye } from "lucide-react"
+import { ArrowUp, ArrowDown, Eye } from "lucide-react"
 
 type SortOrder = "newest" | "oldest" | "popular"
 
-function BlogPageInner({ blogPosts, totalViews }: { blogPosts: BlogPost[]; totalViews: string }) {
+/** Top N posts (after filters/sort) rotate through the featured hero. */
+const FEATURED_CAROUSEL_MAX = 5
+const FEATURED_CAROUSEL_MS = 8000
+
+function BlogPageInner({
+    blogPosts,
+    totalViews,
+    initialCategory,
+}: {
+    blogPosts: BlogPost[]
+    totalViews: string
+    initialCategory: string
+}) {
     const searchParams = useSearchParams()
     const router = useRouter()
+    const prefersReducedMotion = useReducedMotion()
+    const [motionPrefsHydrated, setMotionPrefsHydrated] = useState(false)
+    useEffect(() => setMotionPrefsHydrated(true), [])
+    const useReducedMotionForAnimate =
+        motionPrefsHydrated && (prefersReducedMotion ?? false)
 
-    // Read category from URL (synced with BlogHeader nav links)
-    const urlCategory = searchParams.get("category") ?? "All"
-    const [category, setCategory] = useState(urlCategory)
+    // Must match server first paint (app/blog/page.tsx searchParams).
+    const [category, setCategory] = useState(initialCategory)
     const [search, setSearch] = useState("")
     const [activeTags, setActiveTags] = useState<string[]>([])
     const [showTags, setShowTags] = useState(false)
     const [sortOrder, setSortOrder] = useState<SortOrder>("newest")
 
-    // Sync category from URL when nav links are clicked
+    const categoryParam = searchParams.get("category")
+
+    // Sync category on client navigations and when URL changes (same source as SSR initialCategory).
     useEffect(() => {
-        setCategory(urlCategory)
-    }, [urlCategory])
+        setCategory(normalizeBlogCategoryFromParam(categoryParam))
+    }, [categoryParam])
 
     // Update URL when category changes from the inline filter
     const handleCategoryChange = useCallback((cat: string) => {
@@ -86,7 +104,38 @@ function BlogPageInner({ blogPosts, totalViews }: { blogPosts: BlogPost[]; total
         return posts
     }, [category, search, activeTags, sortOrder])
 
-    const [featured, ...remainingPosts] = filtered
+    const featuredCarouselPosts = useMemo(
+        () => filtered.slice(0, Math.min(FEATURED_CAROUSEL_MAX, filtered.length)),
+        [filtered]
+    )
+    const carouselKey = featuredCarouselPosts.map((p) => p.slug).join("|")
+
+    const [carouselIndex, setCarouselIndex] = useState(0)
+    const [pauseFeaturedCarousel, setPauseFeaturedCarousel] = useState(false)
+
+    useEffect(() => {
+        setCarouselIndex(0)
+    }, [carouselKey])
+
+    useEffect(() => {
+        if (
+            useReducedMotionForAnimate ||
+            pauseFeaturedCarousel ||
+            featuredCarouselPosts.length < 2
+        ) {
+            return
+        }
+        const id = window.setInterval(() => {
+            setCarouselIndex((i) => (i + 1) % featuredCarouselPosts.length)
+        }, FEATURED_CAROUSEL_MS)
+        return () => window.clearInterval(id)
+    }, [carouselKey, featuredCarouselPosts.length, pauseFeaturedCarousel, useReducedMotionForAnimate])
+
+    const currentFeatured = featuredCarouselPosts[carouselIndex] ?? null
+    const remainingPosts = useMemo(() => {
+        if (!currentFeatured) return filtered
+        return filtered.filter((p) => p.slug !== currentFeatured.slug)
+    }, [filtered, currentFeatured?.slug])
 
     const sortLabel = sortOrder === "newest" ? "Newest first" : sortOrder === "oldest" ? "Oldest first" : "Most popular"
     const SortIcon = sortOrder === "newest" ? ArrowDown : sortOrder === "oldest" ? ArrowUp : Eye
@@ -127,117 +176,136 @@ function BlogPageInner({ blogPosts, totalViews }: { blogPosts: BlogPost[]; total
                     </p>
                 </motion.div>
 
-                {/* Controls */}
+                {/* Filters + search (single toolbar) */}
                 <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3, delay: 0.05 }}
-                    className="mb-6"
+                    className="mb-10"
                 >
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                        <BlogFilter activeCategory={category} onCategoryChange={handleCategoryChange} />
-                        <div className="flex items-center gap-2">
-                            <button
-                                onClick={cycleSortOrder}
-                                className="inline-flex items-center gap-2 rounded-lg border border-white/[0.06] bg-white/[0.03] px-3 py-2 text-xs font-medium text-muted-foreground backdrop-blur-sm transition-all hover:border-primary/20 hover:text-foreground"
-                                aria-label={`Sort: ${sortLabel}`}
-                            >
-                                <SortIcon className="h-3.5 w-3.5" />
-                                <span className="hidden sm:inline">{sortLabel}</span>
-                            </button>
-                            <div className="w-full sm:w-64">
-                                <BlogSearch value={search} onChange={setSearch} />
+                    <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4 backdrop-blur-md sm:p-5">
+                        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between lg:gap-6">
+                            <div className="min-w-0 flex-1 lg:pt-0.5">
+                                <BlogFilter activeCategory={category} onCategoryChange={handleCategoryChange} />
+                            </div>
+                            <div className="flex w-full shrink-0 flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end sm:gap-2 lg:w-auto">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowTags(!showTags)}
+                                    className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-xl border border-white/[0.06] bg-white/[0.03] px-3.5 text-xs font-medium text-muted-foreground backdrop-blur-sm transition-all hover:border-accent/20 hover:text-foreground sm:justify-center"
+                                    aria-expanded={showTags}
+                                    aria-controls="tag-filters"
+                                >
+                                    <svg className="h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                                    </svg>
+                                    <span className="whitespace-nowrap">Filter by Tags</span>
+                                    {activeTags.length > 0 && (
+                                        <span className="rounded-full bg-accent/20 px-2 py-0.5 text-xs text-accent">
+                                            {activeTags.length}
+                                        </span>
+                                    )}
+                                    <svg
+                                        className={`h-3 w-3 shrink-0 transition-transform duration-200 ${showTags ? "rotate-180" : ""}`}
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                        aria-hidden="true"
+                                    >
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={cycleSortOrder}
+                                    className="inline-flex h-10 shrink-0 items-center gap-2 rounded-xl border border-white/[0.06] bg-white/[0.03] px-3.5 text-xs font-medium text-muted-foreground backdrop-blur-sm transition-all hover:border-primary/20 hover:text-foreground"
+                                    aria-label={`Sort: ${sortLabel}`}
+                                >
+                                    <SortIcon className="h-3.5 w-3.5 shrink-0" />
+                                    <span className="hidden sm:inline">{sortLabel}</span>
+                                </button>
+                                <div className="min-w-0 flex-1 sm:min-w-[220px] sm:max-w-md sm:flex-initial lg:w-64">
+                                    <BlogSearch value={search} onChange={setSearch} />
+                                </div>
                             </div>
                         </div>
+
+                        <AnimatePresence>
+                            {showTags && (
+                                <motion.div
+                                    id="tag-filters"
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: "auto" }}
+                                    exit={{ opacity: 0, height: 0 }}
+                                    transition={{ duration: 0.3 }}
+                                    className="overflow-hidden"
+                                >
+                                    <div className="mt-4 border-t border-white/[0.06] pt-4">
+                                        <BlogTagFilter activeTags={activeTags} onTagToggle={handleTagToggle} allTags={getTagsFromPosts(blogPosts)} />
+                                        {activeTags.length > 0 && (
+                                            <button
+                                                type="button"
+                                                onClick={() => setActiveTags([])}
+                                                className="mt-3 text-xs text-muted-foreground transition-colors hover:text-foreground"
+                                            >
+                                                Clear all tags
+                                            </button>
+                                        )}
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </div>
                 </motion.div>
 
-                {/* Tag toggle & filter */}
-                <motion.div
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.25, delay: 0.1 }}
+                {/* Featured post — auto-rotates with cross-fade / swoosh (pauses on hover; respects reduced motion). */}
+                <div
                     className="mb-10"
+                    onMouseEnter={() => setPauseFeaturedCarousel(true)}
+                    onMouseLeave={() => setPauseFeaturedCarousel(false)}
                 >
-                    <button
-                        onClick={() => setShowTags(!showTags)}
-                        className="mb-3 inline-flex items-center gap-2 rounded-lg border border-white/[0.06] bg-white/[0.03] px-4 py-2 text-xs font-medium text-muted-foreground backdrop-blur-sm transition-all hover:border-accent/20 hover:text-foreground"
-                        aria-expanded={showTags}
-                        aria-controls="tag-filters"
-                    >
-                        <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                        </svg>
-                        Filter by Tags
-                        {activeTags.length > 0 && (
-                            <span className="rounded-full bg-accent/20 px-2 py-0.5 text-xs text-accent">
-                                {activeTags.length}
-                            </span>
-                        )}
-                        <svg
-                            className={`h-3 w-3 transition-transform duration-200 ${showTags ? "rotate-180" : ""}`}
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            aria-hidden="true"
-                        >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </button>
-
-                    <AnimatePresence>
-                        {showTags && (
+                    <AnimatePresence mode="wait">
+                        {currentFeatured && (
                             <motion.div
-                                id="tag-filters"
-                                initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: "auto" }}
-                                exit={{ opacity: 0, height: 0 }}
-                                transition={{ duration: 0.3 }}
-                                className="overflow-hidden"
+                                key={currentFeatured.slug}
+                                initial={
+                                    useReducedMotionForAnimate
+                                        ? { opacity: 0 }
+                                        : { opacity: 0, x: 28, scale: 0.985 }
+                                }
+                                animate={
+                                    useReducedMotionForAnimate
+                                        ? { opacity: 1 }
+                                        : { opacity: 1, x: 0, scale: 1 }
+                                }
+                                exit={
+                                    useReducedMotionForAnimate
+                                        ? { opacity: 0 }
+                                        : { opacity: 0, x: -28, scale: 0.985 }
+                                }
+                                transition={{
+                                    duration: useReducedMotionForAnimate ? 0.2 : 0.5,
+                                    ease: [0.22, 1, 0.36, 1],
+                                }}
                             >
-                                <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 backdrop-blur-md">
-                                    <BlogTagFilter activeTags={activeTags} onTagToggle={handleTagToggle} allTags={getTagsFromPosts(blogPosts)} />
-                                    {activeTags.length > 0 && (
-                                        <button
-                                            onClick={() => setActiveTags([])}
-                                            className="mt-3 text-xs text-muted-foreground hover:text-foreground transition-colors"
-                                        >
-                                            Clear all tags
-                                        </button>
-                                    )}
-                                </div>
+                                <BlogCard post={currentFeatured} featured />
                             </motion.div>
                         )}
                     </AnimatePresence>
-                </motion.div>
-
-                {/* Featured post */}
-                <AnimatePresence mode="wait">
-                    {featured && (
-                        <motion.div
-                            key={featured.slug}
-                            initial={{ opacity: 0, y: 10, scale: 0.99 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: -5, scale: 0.99 }}
-                            transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-                            className="mb-10"
-                        >
-                            <BlogCard post={featured} featured />
-                        </motion.div>
-                    )}
-                </AnimatePresence>
+                </div>
 
                 {/* Grid */}
                 {remainingPosts.length > 0 && (
                     <motion.div
                         layout
-                        className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+                        className="grid auto-rows-fr gap-6 sm:grid-cols-2 lg:grid-cols-3"
                     >
                         <AnimatePresence mode="popLayout">
                             {remainingPosts.map((post, i) => (
                                 <motion.div
                                     key={post.slug}
                                     layout
+                                    className="h-full"
                                     initial={{ opacity: 0, y: 12, scale: 0.97 }}
                                     animate={{ opacity: 1, y: 0, scale: 1 }}
                                     exit={{ opacity: 0, scale: 0.95 }}
@@ -303,10 +371,22 @@ function BlogPageInner({ blogPosts, totalViews }: { blogPosts: BlogPost[]; total
     )
 }
 
-export function BlogPageClient({ blogPosts, totalViews }: { blogPosts: BlogPost[]; totalViews: string }) {
+export function BlogPageClient({
+    blogPosts,
+    totalViews,
+    initialCategory,
+}: {
+    blogPosts: BlogPost[]
+    totalViews: string
+    initialCategory: string
+}) {
     return (
         <Suspense fallback={<div className="min-h-screen" />}>
-            <BlogPageInner blogPosts={blogPosts} totalViews={totalViews} />
+            <BlogPageInner
+                blogPosts={blogPosts}
+                totalViews={totalViews}
+                initialCategory={initialCategory}
+            />
         </Suspense>
     )
 }

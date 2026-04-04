@@ -1,0 +1,50 @@
+---
+title: "If You Don't Run Evals Before Launch, You Don't Have a Product"
+excerpt: "The fastest way to lose trust in an AI feature is shipping it with vibes and no evaluation harness. In 2026, release quality is mostly decided before launch day."
+date: "2026-04-01"
+category: "AI Architecture"
+tags: ["AI Evaluation", "LLM", "Quality", "Testing", "Production"]
+coverImage: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1200&h=630&fit=crop"
+---
+
+I keep hearing the same thing from teams rushing AI launches: *we'll tighten quality after we get users in*.  
+
+That plan sounds pragmatic until you realize user trust is front-loaded. First impressions on AI products are brutally sticky. If your assistant hallucinates in week one, nobody comes back in week three to celebrate your improved prompt.
+
+## Why "we'll fix it later" keeps failing
+
+Traditional bugs are often deterministic. You can patch, redeploy, and move on.
+
+LLM failures are different. They are probabilistic, context-sensitive, and expensive to triage after the fact. What looked "fine" in a happy-path demo can collapse under real prompts, real language, real constraints, and real people.
+
+The painful part is that teams usually discover this only after launch when support tickets become your de facto test suite.
+
+## Evals are not a research luxury anymore
+
+In 2026, a production AI feature without evals is basically an API with no monitoring.
+
+You need at least three layers:
+
+1. **Capability checks**: can the model do the task on representative inputs?
+2. **Policy checks**: does it avoid disallowed output under adversarial prompts?
+3. **Regression checks**: did this prompt/model/tool change break known-good behavior?
+
+If one of these layers is missing, launch risk is still mostly guesswork.
+
+## The minimum harness that actually works
+
+You do not need a giant platform team to start.
+
+Build a test set from your own real requests. Label expected outcomes clearly. Version the dataset next to code. Run it in CI on every significant change. Gate release candidates on pass thresholds your team can defend.
+
+This is boring work. That is exactly why it compounds.
+
+## A practical release rule
+
+Here is the rule I recommend to every team I advise:
+
+> No eval baseline, no launch date.
+
+Not because process is sacred. Because quality debt in LLM systems grows faster than feature velocity, and you pay that debt publicly.
+
+You can still ship fast. Just stop treating evaluation as optional ceremony. It is the product.

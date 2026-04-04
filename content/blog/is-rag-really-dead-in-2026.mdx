@@ -77,7 +77,7 @@ The RAG that "died" was the naive 2023 version. What replaced it barely resemble
 }
 ```
 
-The key shifts:
+### The key shifts
 
 1. **Hybrid search is the default** — [BM25](https://en.wikipedia.org/wiki/Okapi_BM25) + semantic, always. Vector-only search was the real crime. BM25 has been quietly excellent for 30 years. Respect your elders.
 2. **Reranking is non-negotiable** — [Cohere Rerank](https://cohere.com/rerank) or a fine-tuned cross-encoder after initial retrieval. Top-K results from vector search alone are garbage 30% of the time.
@@ -104,6 +104,15 @@ Here's the honest framework I use in 2026:
 
 **Use both (hybrid) when:**
 - You're building production systems at scale — retrieve first to narrow context, then use long-context models on the filtered set
+
+## What To Use Instead
+
+Just write code. Seriously. Here's my stack for production AI systems in 2026:
+
+- **Direct SDK calls** — OpenAI, Anthropic, and Google all have excellent SDKs with streaming, tool calling, and structured output built in.
+- **Instructor** — For structured output with validation. One library, does one thing perfectly. Jason Liu understands that good libraries are small.
+- **Pydantic** — For your data models. You already use it. Your LLM responses should be Pydantic models.
+- **Your own thin wrapper** — 200 lines of code that does exactly what your app needs. Retry logic, model fallback, logging. That's it.
 
 This isn't sexy. "It depends" doesn't get engagement on Twitter. But it's how the best teams are actually building.
 

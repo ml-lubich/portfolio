@@ -1,6 +1,12 @@
 import React from "react"
 import Link from "next/link"
-import { blogPosts, getReadingTime, BLOG_CATEGORIES, AUTHOR } from "@/lib/blog-data"
+import {
+  blogPosts,
+  getReadingTime,
+  BLOG_CATEGORIES,
+  AUTHOR,
+  normalizeBlogCategoryFromParam,
+} from "@/lib/blog-data"
 import { BlogPageClient } from "./blog-page-client"
 import { SITE_URL } from "@/lib/site-config"
 
@@ -17,7 +23,14 @@ import { SITE_URL } from "@/lib/site-config"
  * The interactive filtering UI still works for real users via
  * the BlogPageClient component.
  */
-export default function BlogPage() {
+export default async function BlogPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ category?: string | string[] }>
+}) {
+  const sp = await searchParams
+  const initialCategory = normalizeBlogCategoryFromParam(sp.category)
+
   // Sort posts newest first for the crawler-visible list
   const sortedPosts = [...blogPosts].sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
@@ -29,7 +42,11 @@ export default function BlogPage() {
   return (
     <>
       {/* Interactive client-side blog page for users */}
-      <BlogPageClient blogPosts={blogPosts} totalViews={totalViews} />
+      <BlogPageClient
+        blogPosts={blogPosts}
+        totalViews={totalViews}
+        initialCategory={initialCategory}
+      />
 
       {/* ── Server-rendered SEO content ────────────────────────────
        *  This section is visually hidden but in the DOM for crawlers.

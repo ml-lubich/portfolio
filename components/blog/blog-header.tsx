@@ -74,7 +74,14 @@ export function BlogHeader() {
               e.currentTarget.classList.remove('is-flipping')
             }}
           >
-            <Image src="/logo.png" alt="ML" width={64} height={64} sizes="64px" className="h-full w-full object-cover" />
+            <Image
+              src="/logo.png"
+              alt="Misha Lubich logo"
+              width={64}
+              height={64}
+              sizes="64px"
+              className="h-full w-full object-contain"
+            />
           </div>
         </Link>
 

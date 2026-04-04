@@ -25,6 +25,15 @@ export const BLOG_CATEGORIES = [
   "Hot Takes",
 ] as const
 
+/** Normalize URL `category` query to a known blog category (SSR + client must match). */
+export function normalizeBlogCategoryFromParam(
+  raw: string | string[] | undefined | null
+): string {
+  const v = Array.isArray(raw) ? raw[0] : raw
+  if (v === undefined || v === null || v === "") return "All"
+  return (BLOG_CATEGORIES as readonly string[]).includes(v) ? v : "All"
+}
+
 export const AUTHOR = {
   name: "Misha Lubich",
   role: "AI Engineer & Technical Leader",
