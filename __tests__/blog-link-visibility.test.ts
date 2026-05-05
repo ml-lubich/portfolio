@@ -47,10 +47,12 @@ describe("blog link visibility", () => {
     expect(css).toContain("outline: 2px solid hsl(var(--chart-3) / 0.75)")
   })
 
-  it("routes MDX anchors through the shared blog-link class", () => {
-    const source = readProjectFile("components/blog/mdx-components.tsx")
+  it("covers classless MDX anchors and the shared markdown blog-link path", () => {
+    const css = readProjectFile("app/globals.css")
+    const markdownSource = readProjectFile("components/blog/blog-content.tsx")
 
-    expect(source).toContain('"blog-link"')
-    expect(source).not.toContain("decoration-foreground/40")
+    expect(css).toContain("article .blog-prose a[href]")
+    expect(css).toContain(".blog-prose a.blog-link[href]")
+    expect(markdownSource).toContain('className="blog-link"')
   })
 })

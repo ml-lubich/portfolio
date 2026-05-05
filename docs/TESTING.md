@@ -65,4 +65,4 @@ No automated visual regression for WebGL is required unless a dedicated snapshot
 
 ## Automated: blog link visibility
 
-- `__tests__/blog-link-visibility.test.ts` — guards article prose links against dark-on-dark regressions by requiring the shared `.blog-link` path, visible accent color, thicker underline, hover color, and keyboard focus outline.
+- `__tests__/blog-link-visibility.test.ts` — guards article prose links against dark-on-dark regressions by requiring classless MDX anchor coverage, the shared `.blog-link` markdown path, visible accent color, thicker underline, hover color, and keyboard focus outline.
