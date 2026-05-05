@@ -62,3 +62,7 @@ No automated visual regression for WebGL is required unless a dedicated snapshot
 ## Automated: blog hydration regression
 
 - `__tests__/blog-hydration-regression.test.ts` — blog render paths must use `formatBlogDate`, which formats date-only post metadata in UTC and prevents server/client text drift that can surface as minified React hydration error #418.
+
+## Automated: blog link visibility
+
+- `__tests__/blog-link-visibility.test.ts` — guards article prose links against dark-on-dark regressions by requiring the shared `.blog-link` path, visible accent color, thicker underline, hover color, and keyboard focus outline.

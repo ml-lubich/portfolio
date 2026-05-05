@@ -311,7 +311,7 @@ export const mdxComponents = {
         <a
             {...props}
             className={cn(
-                "text-foreground underline underline-offset-4 decoration-foreground/40 transition-colors hover:decoration-foreground/90",
+                "blog-link",
                 className,
             )}
             target="_blank"

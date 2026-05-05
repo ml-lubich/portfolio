@@ -63,4 +63,14 @@ describe("Navigation wiring (regression)", () => {
     expect(navSrc).toMatch(/backdrop-blur-none/)
     expect(navSrc).toMatch(/backdrop-blur-2xl/)
   })
+
+  it("mobile menu keeps Contact as the CTA instead of duplicating it in the link list", () => {
+    const navSrc = fs.readFileSync(
+      path.join(ROOT, "components/nav/index.tsx"),
+      "utf8",
+    )
+    expect(navSrc).toContain('link.href !== "#contact"')
+    expect(navSrc).toContain('href="#contact"')
+    expect(navSrc).toContain("Get In Touch")
+  })
 })

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo } from "react"
 import { SiteLogoMark } from "@/components/site-logo-mark"
-import { Menu, X, ChevronUp } from "lucide-react"
+import { Menu, X, ChevronUp, ArrowRight } from "lucide-react"
 import { navLinks } from "./nav-links"
 import { wooshScrollTo, navigateTo, isProgrammaticScroll } from "./woosh-scroll"
 import { useActiveSection } from "./use-nav-hooks"
@@ -137,6 +137,10 @@ export function Navigation() {
 
   const sectionIds = useMemo(
     () => navLinks.filter((l) => !l.href.startsWith("/")).map((l) => l.href.replace("#", "")),
+    [],
+  )
+  const mobileNavLinks = useMemo(
+    () => navLinks.filter((link) => link.href !== "#contact"),
     [],
   )
   const activeSection = useActiveSection(sectionIds)
@@ -305,6 +309,8 @@ export function Navigation() {
               setMobileOpen(false)
             }}
             className="group flex items-center gap-2"
+            aria-label="Back to top"
+            title="Back to top"
           >
             <div
               className="logo-flip-hover relative flex h-12 w-12 sm:h-16 sm:w-16 items-center justify-center rounded-[9px] overflow-hidden"
@@ -342,6 +348,7 @@ export function Navigation() {
                   }}
                   href={link.href}
                   onClick={(e) => handleLinkClick(e, link.href)}
+                  title={link.label}
                   className={[
                     "group/link relative whitespace-nowrap rounded-full px-2.5 py-1.5 text-[13px] xl:px-3.5 xl:text-[14px] tracking-wide transition-all duration-300",
                     isActive
@@ -357,6 +364,7 @@ export function Navigation() {
               href="#contact"
               onClick={(e) => handleLinkClick(e, "#contact")}
               aria-label="Get In Touch"
+              title="Get In Touch"
               className="group/link ml-2 xl:ml-3 whitespace-nowrap rounded-full bg-primary px-3 py-1.5 text-[13px] xl:px-4 xl:text-[14px] font-medium text-primary-foreground transition-all duration-300 hover:shadow-lg hover:shadow-primary/25 hover:scale-[1.03] active:scale-[0.97]"
             >
               <ExpandingText text="Get In Touch" />
@@ -368,7 +376,7 @@ export function Navigation() {
             type="button"
             onClick={() => setMobileOpen((o) => !o)}
             className="rounded-lg p-3 min-h-[48px] min-w-[48px] flex items-center justify-center text-muted-foreground transition-colors hover:text-foreground lg:hidden"
-            aria-expanded={mobileOpen}
+            aria-expanded={mobileOpen ? "true" : "false"}
             aria-controls="mobile-nav-overlay"
             aria-label="Toggle menu"
           >
@@ -397,37 +405,47 @@ export function Navigation() {
           <button
             type="button"
             aria-label="Close menu"
-            className="absolute inset-0 bg-background/90 backdrop-blur-xl supports-[backdrop-filter]:bg-background/80"
+            className="absolute inset-0 bg-background/95 backdrop-blur-2xl supports-[backdrop-filter]:bg-background/85"
             onClick={() => setMobileOpen(false)}
           />
-          <div className="relative z-[1] flex min-h-0 flex-1 flex-col overflow-hidden px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(5.75rem,calc(env(safe-area-inset-top,0px)+4.5rem))]">
-            <div className="nav-glass flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain rounded-2xl border border-white/[0.06] p-3">
-              <div className="flex flex-col gap-0.5">
-                {navLinks.map((link) => {
-                  const isActive = activeSection === link.href.replace("#", "")
+          <div className="relative z-[1] flex min-h-dvh items-start justify-center overflow-y-auto overscroll-contain px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(5.75rem,calc(env(safe-area-inset-top,0px)+4.5rem))] sm:px-6">
+            <div className="w-full max-w-[46rem] overflow-hidden rounded-[1.35rem] border border-white/[0.10] bg-background/90 shadow-[0_28px_90px_-32px_rgba(0,0,0,0.85),inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-2xl backdrop-saturate-150">
+              <div className="grid gap-2 p-3 sm:grid-cols-2 sm:p-4">
+                {mobileNavLinks.map((link) => {
+                  const isInternalSection = !link.href.startsWith("/")
+                  const isActive = isInternalSection && activeSection === link.href.replace("#", "")
                   return (
                     <a
                       key={link.href}
                       href={link.href}
                       onClick={(e) => handleLinkClick(e, link.href)}
                       aria-label={link.label}
+                      title={link.label}
                       className={[
-                        "group/link rounded-xl px-4 py-3 text-sm transition-all duration-300",
+                        "group/link relative flex min-h-[56px] items-center overflow-hidden rounded-2xl border px-4 text-[15px] transition-all duration-300",
                         isActive
-                          ? "border-l-2 border-primary font-medium text-foreground"
-                          : "text-muted-foreground hover:text-foreground",
+                          ? "border-white/[0.16] bg-white/[0.11] font-medium text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
+                          : "border-white/[0.055] bg-white/[0.035] text-foreground/68 hover:border-white/[0.12] hover:bg-white/[0.075] hover:text-foreground",
                       ].join(" ")}
                     >
+                      {isActive ? (
+                        <span className="absolute inset-y-3 left-0 w-[3px] rounded-r-full bg-foreground" aria-hidden="true" />
+                      ) : null}
                       <ExpandingText text={link.label} />
                     </a>
                   )
                 })}
+              </div>
+              <div className="border-t border-white/[0.08] p-3 pt-0 sm:p-4 sm:pt-0">
                 <a
                   href="#contact"
                   onClick={(e) => handleLinkClick(e, "#contact")}
-                  className="mt-2 rounded-xl bg-primary px-4 py-3 text-center text-sm font-medium text-primary-foreground"
+                  aria-label="Get In Touch"
+                  title="Get In Touch"
+                  className="group/link flex min-h-[54px] items-center justify-center gap-2 rounded-2xl bg-foreground px-4 text-[15px] font-medium text-background shadow-[0_18px_46px_-26px_rgba(255,255,255,0.75)] transition-all duration-300 hover:bg-foreground/90 active:scale-[0.99]"
                 >
-                  Get In Touch
+                  <span>Get In Touch</span>
+                  <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover/link:translate-x-0.5" aria-hidden="true" />
                 </a>
               </div>
             </div>

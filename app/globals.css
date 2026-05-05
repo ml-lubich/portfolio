@@ -1236,10 +1236,45 @@ strong:not(.no-metallic) {
    clobber link color; MDX merges className via cn() in mdx-components. */
 article .blog-prose a[href],
 .blog-prose a.blog-link[href] {
-  @apply text-foreground underline underline-offset-4 decoration-foreground/40 transition-colors hover:decoration-foreground/90 cursor-pointer;
+  color: hsl(var(--chart-3));
+  cursor: pointer;
+  font-weight: 600;
   pointer-events: auto;
   position: relative;
+  text-decoration-color: hsl(var(--chart-3) / 0.72);
+  text-decoration-line: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.22em;
+  transition-duration: 150ms;
+  transition-property: color, text-decoration-color, outline-color;
+  transition-timing-function: ease;
+  -webkit-text-fill-color: currentColor;
   z-index: 1;
+}
+
+article .blog-prose a[href]:visited,
+.blog-prose a.blog-link[href]:visited {
+  color: hsl(var(--chart-3));
+}
+
+article .blog-prose a[href]:hover,
+.blog-prose a.blog-link[href]:hover {
+  color: hsl(var(--chart-5));
+  text-decoration-color: hsl(var(--chart-5) / 0.86);
+}
+
+article .blog-prose a[href]:focus-visible,
+.blog-prose a.blog-link[href]:focus-visible {
+  border-radius: 2px;
+  outline: 2px solid hsl(var(--chart-3) / 0.75);
+  outline-offset: 3px;
+}
+
+article .blog-prose strong a[href],
+article .blog-prose b a[href],
+.blog-prose strong a.blog-link[href],
+.blog-prose b a.blog-link[href] {
+  -webkit-text-fill-color: currentColor;
 }
 
 .blog-prose code {
