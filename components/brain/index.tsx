@@ -34,8 +34,9 @@ class WebGLErrorBoundary extends Component<
 
 function getInitialCam() {
   const w = typeof window !== "undefined" ? window.innerWidth : 1200
-  if (w < 480) return { z: 1.8, fov: 42 }
-  if (w < 640) return { z: 1.9, fov: 42 }
+  /* Tighter z + slightly wider FOV on phones so the mesh fills the hero square. */
+  if (w < 480) return { z: 1.62, fov: 46 }
+  if (w < 640) return { z: 1.72, fov: 45 }
   if (w < 1024) return { z: 2.0, fov: 44 }
   return { z: 1.85, fov: 42 }
 }

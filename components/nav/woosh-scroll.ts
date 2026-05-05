@@ -81,6 +81,7 @@ export function wooshScrollTo(targetY: number) {
  */
 export function navigateTo(href: string, callback?: () => void) {
   if (href.startsWith("/")) {
+    callback?.()
     window.location.href = href
     return
   }

@@ -38,7 +38,7 @@ export function ProfileIntro() {
     }, [])
 
     return (
-        <section id="profile" className="relative py-16 sm:py-24 overflow-hidden">
+        <section id="profile" className="relative py-10 sm:py-24 overflow-hidden">
             <div className="mx-auto max-w-3xl px-3 md:px-6">
                 <AnimatedSection>
                     {/* Floating liquid-glass card with 3D tilt */}
@@ -48,7 +48,7 @@ export function ProfileIntro() {
                         onMouseEnter={handleMouseEnter}
                         onMouseLeave={handleMouseLeave}
                         onTouchEnd={handleTouchEnd}
-                        className="group relative overflow-hidden rounded-3xl p-8 sm:p-10 md:p-12 will-change-transform"
+                        className="group relative overflow-hidden rounded-3xl p-6 sm:p-10 md:p-12 will-change-transform"
                         style={{
                             transform: `perspective(800px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) translateY(${isHovered ? -8 : 0}px) scale(${isHovered ? 1.015 : 1})`,
                             transition: "transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1)",

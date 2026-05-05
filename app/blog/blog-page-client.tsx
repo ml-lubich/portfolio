@@ -3,10 +3,11 @@
 import React, { useState, useMemo, useCallback, useEffect, Suspense } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion"
-import type { BlogPost } from "@/lib/blog-shared"
+import type { BlogPostListItem } from "@/lib/blog-shared"
 import { getTagsFromPosts, normalizeBlogCategoryFromParam } from "@/lib/blog-shared"
 import { BlogCard } from "@/components/blog/blog-card"
 import { BlogFilter, BlogSearch, BlogTagFilter } from "@/components/blog/blog-filter"
+import { getBlogPublicLabel } from "@/lib/site-config"
 import { ArrowUp, ArrowDown, Eye } from "lucide-react"
 
 type SortOrder = "newest" | "oldest" | "popular"
@@ -20,7 +21,7 @@ function BlogPageInner({
     totalViews,
     initialCategory,
 }: {
-    blogPosts: BlogPost[]
+    blogPosts: BlogPostListItem[]
     totalViews: string
     initialCategory: string
 }) {
@@ -159,7 +160,7 @@ function BlogPageInner({
                     <div className="flex flex-wrap items-center gap-3">
                         <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm text-primary backdrop-blur-sm">
                             <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" aria-hidden="true" />
-                            blog.mishalubich.com
+                            {getBlogPublicLabel()}
                         </div>
                         <div className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.06] bg-white/[0.03] px-3 py-1.5 text-xs text-muted-foreground backdrop-blur-sm">
                             <Eye className="h-3 w-3" aria-hidden="true" />
@@ -288,7 +289,7 @@ function BlogPageInner({
                                     ease: [0.22, 1, 0.36, 1],
                                 }}
                             >
-                                <BlogCard post={currentFeatured} featured />
+                                <BlogCard post={currentFeatured} featured imagePriority={carouselIndex === 0} />
                             </motion.div>
                         )}
                     </AnimatePresence>
@@ -296,30 +297,27 @@ function BlogPageInner({
 
                 {/* Grid */}
                 {remainingPosts.length > 0 && (
-                    <motion.div
-                        layout
-                        className="grid auto-rows-fr gap-6 sm:grid-cols-2 lg:grid-cols-3"
-                    >
-                        <AnimatePresence mode="popLayout">
-                            {remainingPosts.map((post, i) => (
-                                <motion.div
-                                    key={post.slug}
-                                    layout
-                                    className="h-full"
-                                    initial={{ opacity: 0, y: 12, scale: 0.97 }}
-                                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                                    exit={{ opacity: 0, scale: 0.95 }}
-                                    transition={{
-                                        duration: 0.2,
-                                        delay: i * 0.03,
-                                        ease: [0.22, 1, 0.36, 1],
-                                    }}
-                                >
-                                    <BlogCard post={post} onTagClick={handleTagToggle} />
-                                </motion.div>
-                            ))}
-                        </AnimatePresence>
-                    </motion.div>
+                    <div className="grid auto-rows-fr gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                        {remainingPosts.map((post, i) => (
+                            <motion.div
+                                key={post.slug}
+                                className="h-full"
+                                initial={
+                                    useReducedMotionForAnimate
+                                        ? { opacity: 0 }
+                                        : { opacity: 0, y: 8 }
+                                }
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{
+                                    duration: useReducedMotionForAnimate ? 0.12 : 0.18,
+                                    delay: useReducedMotionForAnimate ? 0 : Math.min(i, 8) * 0.02,
+                                    ease: [0.22, 1, 0.36, 1],
+                                }}
+                            >
+                                <BlogCard post={post} onTagClick={handleTagToggle} />
+                            </motion.div>
+                        ))}
+                    </div>
                 )}
 
                 {/* Empty state */}
@@ -376,7 +374,7 @@ export function BlogPageClient({
     totalViews,
     initialCategory,
 }: {
-    blogPosts: BlogPost[]
+    blogPosts: BlogPostListItem[]
     totalViews: string
     initialCategory: string
 }) {

@@ -10,6 +10,11 @@ export interface ScrollStackCardsProps {
   className?: string
   /** Optional header content rendered inside the sticky frame above the cards */
   header?: ReactNode
+  /**
+   * `grid` — fixed side-by-side cards (responsive 1→2 columns), no scroll stacking.
+   * Default / omitted — sticky scroll-stack on desktop, simple column on narrow viewports.
+   */
+  layout?: "stack" | "grid"
   /** Distance from top of viewport where cards stick (px). Default: 80 */
   stickyTop?: number
   /** Extra vertical offset per card so you see the stack peek (px). Default: 20 */

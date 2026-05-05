@@ -1,0 +1,27 @@
+---
+title: "From Playground to Prod: A 2026 Checklist That Survives Finance"
+excerpt: "Demos optimize for applause. Production optimizes for margin, rollback, and an angry user with a spreadsheet. Here is the checklist I use before calling something shipped."
+date: "2026-04-05"
+category: "AI Products"
+tags: ["Product", "Launch", "LLMOps", "Governance", "Checklist"]
+---
+
+## Before you name a release date
+
+**Unit economics first.** Model cost per successful outcome, p95 latency, and human-escalation rate belong in the same slide as accuracy. If finance cannot stress-test the curves, you are still in research.
+
+**Eval gates.** Offline suites, shadow traffic, and a handful of golden cases that block deploys. "We eyeballed it" is not a release criterion in 2026.
+
+**Operational ownership.** On-call, runbooks, kill switches, and a flagged rollback that does not require a repo rebuild at midnight.
+
+## What demos skip on purpose
+
+Playgrounds hide session churn, partial failures, and the user who pastes four thousand tokens of messy PDF text. Prod sees all three before lunch. Budget time to harden parsers, constrain uploads, and degrade gracefully instead of creatively.
+
+## After launch
+
+Watch **outcome metrics**, not just model scores. Did tickets close faster? Did chargebacks drop? Did support volume shift the way you predicted? Map those to model versions so you can bisect regressions without theology.
+
+## Takeaway
+
+Shipping AI is not a model drop—it is a product and reliability milestone. Treat the checklist as part of the definition of done, not paperwork after the fact.

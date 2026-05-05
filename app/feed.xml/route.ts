@@ -1,4 +1,4 @@
-import { blogPosts, getReadingTime, AUTHOR } from "@/lib/blog-data"
+import { blogPosts, AUTHOR } from "@/lib/blog-data"
 
 import {
   SITE_URL,
@@ -35,7 +35,6 @@ export async function GET() {
 
   const rssItems = posts
     .map((post) => {
-      const readingTime = getReadingTime(post.content)
       const url = `${BASE_URL}/blog/${post.slug}`
       // Strip markdown for a plain-text excerpt
       const plainExcerpt = post.excerpt.replace(/[#*`>|\-\[\]()]/g, "").trim()

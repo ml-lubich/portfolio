@@ -71,7 +71,8 @@ export function BackgroundOrbs() {
   return (
     <div
       ref={rootRef}
-      className="absolute inset-0 z-0 min-h-full pointer-events-none overflow-hidden"
+      className="absolute inset-0 z-0 min-h-full pointer-events-none overflow-hidden isolate"
+      style={{ transform: "translateZ(0)" }}
       aria-hidden="true"
     >
       {orbsToRender.map((orb, i) => {

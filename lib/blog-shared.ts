@@ -13,7 +13,12 @@ export interface BlogPost {
   coverImage: string
   content: string
   views: string
+  /** Precomputed from MDX source (reading-time); use instead of parsing `content` on the client. */
+  readingTime: number
 }
+
+/** Listing / card payload: never ship full MDX bodies to the browser. */
+export type BlogPostListItem = Omit<BlogPost, "content">
 
 export const BLOG_CATEGORIES = [
   "All",
@@ -58,7 +63,7 @@ export function getReadingTime(content: string): number {
 /**
  * Extract all unique tags from a list of blog posts.
  */
-export function getTagsFromPosts(posts: BlogPost[]): string[] {
+export function getTagsFromPosts(posts: readonly { tags: string[] }[]): string[] {
   const tagSet = new Set<string>()
   posts.forEach((p) => p.tags.forEach((t) => tagSet.add(t)))
   return Array.from(tagSet).sort()

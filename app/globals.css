@@ -638,7 +638,8 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  z-index: 10;
+  /* Below label/icon layers (z-10+) so Lucide SVGs never paint under a solid sweep. */
+  z-index: 1;
   pointer-events: none;
   border-radius: inherit;
   background: linear-gradient(105deg,

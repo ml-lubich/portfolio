@@ -132,7 +132,7 @@ export function RotatingStats() {
                 key={`counter-${i}-${counterKeys[i]}`}
                 value={stat.value}
                 duration={1800}
-                className="text-xl font-display font-light gradient-text sm:text-2xl lg:text-3xl"
+                className="text-2xl font-display font-light gradient-text sm:text-3xl lg:text-4xl"
               />
               <div className="mt-1 text-[11px] font-medium text-muted-foreground sm:text-xs">
                 {stat.label}

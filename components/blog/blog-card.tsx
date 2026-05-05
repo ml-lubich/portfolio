@@ -1,19 +1,89 @@
 "use client"
 
-import React, { useRef, useState, useCallback } from "react"
+import React, { useRef, useCallback, useEffect } from "react"
 import Link from "next/link"
-import type { BlogPost } from "@/lib/blog-shared"
-import { getReadingTime } from "@/lib/blog-shared"
+import Image from "next/image"
+import { useRouter } from "next/navigation"
+import type { BlogPostListItem } from "@/lib/blog-shared"
 import { overlays, shadows, blogBg } from "@/lib/theme"
 
 interface BlogCardProps {
-  post: BlogPost
+  post: BlogPostListItem
   featured?: boolean
   onTagClick?: (tag: string) => void
+  /** Featured hero only: preload this cover when it is the visible slide (LCP). */
+  imagePriority?: boolean
 }
 
-export function BlogCard({ post, featured = false, onTagClick }: BlogCardProps) {
-  const readingTime = getReadingTime(post.content)
+function useBlogCardTiltGlare(
+  cardRef: React.RefObject<HTMLDivElement | null>,
+  glareRef: React.RefObject<HTMLDivElement | null>,
+  perspectivePx: number,
+  tiltMaxDeg: number
+) {
+  const lastTouchAtRef = useRef(0)
+  const rafRef = useRef<number | null>(null)
+  const pendingRef = useRef<{ cx: number; cy: number } | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (rafRef.current != null) cancelAnimationFrame(rafRef.current)
+    }
+  }, [])
+
+  const resetTiltGlare = useCallback(() => {
+    const card = cardRef.current
+    const glareEl = glareRef.current
+    if (card) card.style.transform = ""
+    if (glareEl) glareEl.style.background = overlays.blogGlare(50, 50, 0)
+  }, [cardRef, glareRef])
+
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (Date.now() - lastTouchAtRef.current < 500) return
+      const el = cardRef.current
+      if (!el) return
+      const rect = el.getBoundingClientRect()
+      const cx = (e.clientX - rect.left) / rect.width
+      const cy = (e.clientY - rect.top) / rect.height
+      pendingRef.current = { cx, cy }
+
+      if (rafRef.current != null) return
+      rafRef.current = requestAnimationFrame(() => {
+        rafRef.current = null
+        const p = pendingRef.current
+        const card = cardRef.current
+        const glareEl = glareRef.current
+        if (!p || !card || !glareEl) return
+        const rx = (p.cy - 0.5) * -tiltMaxDeg
+        const ry = (p.cx - 0.5) * tiltMaxDeg
+        card.style.transform = `perspective(${perspectivePx}px) rotateX(${rx}deg) rotateY(${ry}deg)`
+        glareEl.style.background = overlays.blogGlare(p.cx * 100, p.cy * 100, 0.12)
+      })
+    },
+    [cardRef, glareRef, perspectivePx, tiltMaxDeg]
+  )
+
+  const handleMouseLeave = useCallback(() => {
+    resetTiltGlare()
+  }, [resetTiltGlare])
+
+  const handleTouchEnd = useCallback(() => {
+    lastTouchAtRef.current = Date.now()
+    resetTiltGlare()
+  }, [resetTiltGlare])
+
+  return { handleMouseMove, handleMouseLeave, handleTouchEnd }
+}
+
+export function BlogCard({
+  post,
+  featured = false,
+  onTagClick,
+  imagePriority = false,
+}: BlogCardProps) {
+  const router = useRouter()
+  const readingTime = post.readingTime
   const formattedDate = new Date(post.date).toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
@@ -21,64 +91,64 @@ export function BlogCard({ post, featured = false, onTagClick }: BlogCardProps) 
   })
 
   const cardRef = useRef<HTMLDivElement>(null)
-  const [tilt, setTilt] = useState({ x: 0, y: 0 })
-  const [glare, setGlare] = useState({ x: 50, y: 50, opacity: 0 })
+  const glareRef = useRef<HTMLDivElement>(null)
 
-  const lastTouchRef = useRef(0)
+  const perspectivePx = featured ? 800 : 600
+  const tiltMaxDeg = 8
+  const { handleMouseMove, handleMouseLeave, handleTouchEnd } = useBlogCardTiltGlare(
+    cardRef,
+    glareRef,
+    perspectivePx,
+    tiltMaxDeg
+  )
 
-  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    // Suppress synthetic mouse events fired after a touch tap
-    if (Date.now() - lastTouchRef.current < 500) return
-    if (!cardRef.current) return
-    const rect = cardRef.current.getBoundingClientRect()
-    const x = (e.clientX - rect.left) / rect.width
-    const y = (e.clientY - rect.top) / rect.height
-    setTilt({ x: (y - 0.5) * -8, y: (x - 0.5) * 8 })
-    setGlare({ x: x * 100, y: y * 100, opacity: 0.12 })
-  }, [])
+  const postHref = `/blog/${post.slug}`
+  const warmRoute = useCallback(() => {
+    router.prefetch(postHref)
+  }, [router, postHref])
 
-  const handleMouseLeave = useCallback(() => {
-    setTilt({ x: 0, y: 0 })
-    setGlare({ x: 50, y: 50, opacity: 0 })
-  }, [])
+  const linkWarmHandlers = {
+    prefetch: false as const,
+    onMouseEnter: warmRoute,
+    onFocus: warmRoute,
+    onTouchStart: warmRoute,
+  }
 
-  const handleTouchEnd = useCallback(() => {
-    lastTouchRef.current = Date.now()
-    setTilt({ x: 0, y: 0 })
-    setGlare({ x: 50, y: 50, opacity: 0 })
-  }, [])
+  const cardMotionStyle: React.CSSProperties = {
+    transition: "transform 0.15s ease-out",
+  }
+
+  const glareBaseStyle: React.CSSProperties = {
+    background: overlays.blogGlare(50, 50, 0),
+    transition: "opacity 0.2s",
+  }
 
   if (featured) {
     return (
-      <Link href={`/blog/${post.slug}`} className="group block cursor-pointer">
+      <Link href={postHref} className="group block cursor-pointer" {...linkWarmHandlers}>
         <div
           ref={cardRef}
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
           onTouchEnd={handleTouchEnd}
-          style={{
-            transform: `perspective(800px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
-            transition: "transform 0.15s ease-out",
-          }}
+          style={cardMotionStyle}
         >
           <article className={`blog-glass-card relative overflow-hidden rounded-2xl transition-all duration-500 hover:shadow-[${shadows.blogCardFeatured}]`}>
-            {/* Glare overlay */}
             <div
+              ref={glareRef}
               className="pointer-events-none absolute inset-0 z-20 rounded-2xl"
-              style={{
-                background: overlays.blogGlare(glare.x, glare.y, glare.opacity),
-                transition: "opacity 0.2s",
-              }}
+              style={glareBaseStyle}
               aria-hidden="true"
             />
 
-            {/* Cover image */}
             <div className="relative h-[320px] overflow-hidden">
-              <img
+              <Image
                 src={post.coverImage}
                 alt=""
-                loading="eager"
-                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+                fill
+                priority={imagePriority}
+                sizes="(max-width: 768px) 100vw, 896px"
+                className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
               />
               <div className={`absolute inset-0 bg-gradient-to-t ${blogBg.fade} ${blogBg.fadeSemi} to-transparent pointer-events-none`} />
               <div className="absolute left-6 top-6 flex gap-2">
@@ -91,16 +161,12 @@ export function BlogCard({ post, featured = false, onTagClick }: BlogCardProps) 
               </div>
             </div>
 
-            {/* Content */}
             <div className="relative -mt-20 px-8 pb-8">
               <h2 className="no-metallic text-2xl font-semibold leading-tight text-foreground transition-colors group-hover:text-primary md:text-3xl">
                 {post.title}
               </h2>
-              <p className="mt-3 line-clamp-2 text-base text-muted-foreground">
-                {post.excerpt}
-              </p>
+              <p className="mt-3 line-clamp-2 text-base text-muted-foreground">{post.excerpt}</p>
 
-              {/* Tags */}
               <div className="mt-4 flex flex-wrap gap-1.5">
                 {post.tags.map((tag) => (
                   <span
@@ -133,35 +199,28 @@ export function BlogCard({ post, featured = false, onTagClick }: BlogCardProps) 
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       onTouchEnd={handleTouchEnd}
-      style={{
-        transform: `perspective(600px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)`,
-        transition: "transform 0.15s ease-out",
-      }}
+      style={cardMotionStyle}
     >
-      <Link href={`/blog/${post.slug}`} className="group block cursor-pointer h-full">
+      <Link href={postHref} className="group block h-full cursor-pointer" {...linkWarmHandlers}>
         <article className={`blog-glass-card flex h-full min-h-[430px] flex-col overflow-hidden rounded-xl transition-all duration-500 hover:shadow-[${shadows.blogCardSmall}]`}>
-          {/* Glare overlay */}
           <div
+            ref={glareRef}
             className="pointer-events-none absolute inset-0 z-20 rounded-xl"
-            style={{
-              background: overlays.blogGlare(glare.x, glare.y, glare.opacity),
-              transition: "opacity 0.2s",
-            }}
+            style={glareBaseStyle}
             aria-hidden="true"
           />
 
-          {/* Cover image */}
           <div className="relative h-[200px] overflow-hidden">
-            <img
+            <Image
               src={post.coverImage}
               alt=""
-              loading="lazy"
-              className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 320px"
+              className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
             />
             <div className={`absolute inset-0 bg-gradient-to-t ${blogBg.fade} via-transparent to-transparent pointer-events-none`} />
           </div>
 
-          {/* Content */}
           <div className="flex flex-1 flex-col px-6 pb-6 pt-4">
             <div className="flex items-center gap-3">
               <span className="inline-flex items-center rounded-full border border-primary/20 bg-primary/5 px-2.5 py-0.5 text-xs font-medium text-primary backdrop-blur-sm">
@@ -175,15 +234,13 @@ export function BlogCard({ post, featured = false, onTagClick }: BlogCardProps) 
               {post.title}
             </h3>
 
-            <p className="mt-2 line-clamp-2 flex-1 text-sm text-muted-foreground">
-              {post.excerpt}
-            </p>
+            <p className="mt-2 line-clamp-2 flex-1 text-sm text-muted-foreground">{post.excerpt}</p>
 
-            {/* Tags — clickable */}
             <div className="mt-3 flex flex-wrap gap-1">
               {post.tags.slice(0, 3).map((tag) => (
                 <button
                   key={tag}
+                  type="button"
                   onClick={(e) => {
                     if (onTagClick) {
                       e.preventDefault()
@@ -206,7 +263,7 @@ export function BlogCard({ post, featured = false, onTagClick }: BlogCardProps) 
               <time dateTime={post.date} className="text-xs text-muted-foreground">
                 {formattedDate}
               </time>
-              <span className="text-xs font-medium text-primary opacity-0 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-1">
+              <span className="text-xs font-medium text-primary opacity-0 transition-all duration-300 group-hover:translate-x-1 group-hover:opacity-100">
                 Read more →
               </span>
             </div>

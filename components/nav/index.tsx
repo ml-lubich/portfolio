@@ -7,6 +7,7 @@ import { navLinks } from "./nav-links"
 import { wooshScrollTo, navigateTo, isProgrammaticScroll } from "./woosh-scroll"
 import { useActiveSection } from "./use-nav-hooks"
 import { ExpandingText } from "./expanding-text"
+import { computeNavPastHero } from "@/lib/nav-hero-surface"
 
 /* ── Isolated scroll-driven micro-components ─────────────────────────
    Each manages its own scroll listener and state, so the parent
@@ -106,20 +107,29 @@ function BackToTopButton() {
    ══════════════════════════════════════════════════════════════════ */
 
 /** Stable SSR/first-paint class string; scroll/hide state is applied via ref + layout effect / scroll handler so React never patches a divergent className. */
-const NAV_FIXED =
-  "fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
+const NAV_FIXED_BASE =
+  "fixed top-0 left-0 right-0 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
 const NAV_VISIBLE = "translate-y-0 opacity-100"
 const NAV_HIDDEN = "-translate-y-full opacity-0"
-/** Light frost + saturation so hero gradient reads through — not a solid dark bar */
-const NAV_SURFACE_TOP =
-  "border-b border-white/[0.08] bg-white/[0.05] py-4 backdrop-blur-xl backdrop-saturate-150"
+/** Over hero: fully transparent — no blur (avoids cutting off the brain graphic). */
+const NAV_SURFACE_HERO =
+  "border-b border-transparent bg-transparent py-4 shadow-none backdrop-blur-none backdrop-saturate-100"
+/** Scrolled: frosted bar for readability over page content. */
 const NAV_SURFACE_SCROLLED =
   "border-b border-white/[0.10] bg-white/[0.08] py-2.5 shadow-[0_12px_40px_-20px_rgba(0,0,0,0.22)] backdrop-blur-2xl backdrop-saturate-150"
 
-const NAV_SSR_CLASS = [NAV_FIXED, NAV_VISIBLE, NAV_SURFACE_TOP].join(" ")
+const NAV_SSR_CLASS = [NAV_FIXED_BASE, "z-50", NAV_VISIBLE, NAV_SURFACE_HERO].join(" ")
+
+/** Frosted bar only after `#hero` has fully left the viewport (bottom edge at or above viewport top). */
+function isPastHero(): boolean {
+  if (typeof document === "undefined") return false
+  const hero = document.getElementById("hero")
+  return computeNavPastHero(hero, window.scrollY)
+}
 
 export function Navigation() {
   const [mobileOpen, setMobileOpen] = useState(false)
+  const mobileOpenRef = useRef(false)
   const lastScrollY = useRef(0)
   const navRef = useRef<HTMLElement>(null)
   const linkRefs = useRef<Map<string, HTMLAnchorElement>>(new Map())
@@ -136,10 +146,12 @@ export function Navigation() {
     const nav = navRef.current
     if (!nav) return
     const { scrolled, hideNav } = navSurfaceRef.current
+    const z = mobileOpenRef.current ? "z-[200]" : "z-50"
     nav.className = [
-      NAV_FIXED,
+      NAV_FIXED_BASE,
+      z,
       hideNav ? NAV_HIDDEN : NAV_VISIBLE,
-      scrolled ? NAV_SURFACE_SCROLLED : NAV_SURFACE_TOP,
+      scrolled ? NAV_SURFACE_SCROLLED : NAV_SURFACE_HERO,
     ].join(" ")
   }, [])
 
@@ -152,7 +164,7 @@ export function Navigation() {
   /* Once: align scrolled flag + lastScrollY with restored scroll without clobbering direction tracking on later renders. */
   useLayoutEffect(() => {
     const y = window.scrollY
-    const nextScrolled = y > 50
+    const nextScrolled = isPastHero()
     scrolledPastHeroRef.current = nextScrolled
     navSurfaceRef.current.scrolled = nextScrolled
     lastScrollY.current = y
@@ -166,7 +178,7 @@ export function Navigation() {
       cancelAnimationFrame(rafId)
       rafId = requestAnimationFrame(() => {
         const y = window.scrollY
-        const nextScrolled = y > 50
+        const nextScrolled = isPastHero()
         if (nextScrolled !== scrolledPastHeroRef.current) {
           scrolledPastHeroRef.current = nextScrolled
           navSurfaceRef.current.scrolled = nextScrolled
@@ -174,7 +186,7 @@ export function Navigation() {
         }
         // Skip hide/show logic during programmatic (navbar-initiated) scrolls
         // to prevent the nav from flickering away mid-animation
-        if (!isProgrammaticScroll) {
+        if (!isProgrammaticScroll && !mobileOpenRef.current) {
           if (y > 300 && y > lastScrollY.current + 8) {
             if (!navSurfaceRef.current.hideNav) {
               navSurfaceRef.current.hideNav = true
@@ -198,6 +210,44 @@ export function Navigation() {
     }
   }, [applyNavSurface])
 
+  useEffect(() => {
+    function onResize() {
+      const next = isPastHero()
+      scrolledPastHeroRef.current = next
+      navSurfaceRef.current.scrolled = next
+      applyNavSurface()
+    }
+    window.addEventListener("resize", onResize, { passive: true })
+    onResize()
+    return () => window.removeEventListener("resize", onResize)
+  }, [applyNavSurface])
+
+  useEffect(() => {
+    mobileOpenRef.current = mobileOpen
+    if (mobileOpen) {
+      navSurfaceRef.current.hideNav = false
+    }
+    applyNavSurface()
+  }, [mobileOpen, applyNavSurface])
+
+  useEffect(() => {
+    if (!mobileOpen) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = "hidden"
+    return () => {
+      document.body.style.overflow = prev
+    }
+  }, [mobileOpen])
+
+  useEffect(() => {
+    if (!mobileOpen) return
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setMobileOpen(false)
+    }
+    window.addEventListener("keydown", onKey)
+    return () => window.removeEventListener("keydown", onKey)
+  }, [mobileOpen])
+
   /* Keyboard anchor navigation */
   const handleKeyNav = useCallback(
     (e: React.KeyboardEvent) => {
@@ -219,7 +269,9 @@ export function Navigation() {
       // Ensure navbar stays visible during the scroll animation
       navSurfaceRef.current.hideNav = false
       applyNavSurface()
-      navigateTo(href, () => setMobileOpen(false))
+      // Close overlay immediately: navigateTo may defer work (lazy sections) or skip callback (/blog).
+      setMobileOpen(false)
+      navigateTo(href)
     },
     [applyNavSurface],
   )
@@ -234,7 +286,12 @@ export function Navigation() {
         className={NAV_SSR_CLASS}
         suppressHydrationWarning
       >
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6">
+        <div
+          className={[
+            "mx-auto flex max-w-6xl items-center justify-between px-6",
+            mobileOpen ? "relative z-[110]" : "",
+          ].join(" ")}
+        >
           {/* Logo */}
           <a
             href="#hero"
@@ -250,7 +307,7 @@ export function Navigation() {
             className="group flex items-center gap-2"
           >
             <div
-              className="logo-flip-hover relative flex h-16 w-16 items-center justify-center rounded-[9px] overflow-hidden"
+              className="logo-flip-hover relative flex h-12 w-12 sm:h-16 sm:w-16 items-center justify-center rounded-[9px] overflow-hidden"
               onMouseEnter={(e) => {
                 const el = e.currentTarget
                 if (!el.classList.contains('is-flipping')) {
@@ -264,7 +321,7 @@ export function Navigation() {
               <SiteLogoMark
                 width={64}
                 height={64}
-                sizes="64px"
+                sizes="(max-width: 639px) 48px, 64px"
                 alt="Misha Lubich logo"
                 suppressHydrationWarning
               />
@@ -309,8 +366,10 @@ export function Navigation() {
           {/* Mobile toggle — min 48px touch target for accessibility */}
           <button
             type="button"
-            onClick={() => setMobileOpen(!mobileOpen)}
+            onClick={() => setMobileOpen((o) => !o)}
             className="rounded-lg p-3 min-h-[48px] min-w-[48px] flex items-center justify-center text-muted-foreground transition-colors hover:text-foreground lg:hidden"
+            aria-expanded={mobileOpen}
+            aria-controls="mobile-nav-overlay"
             aria-label="Toggle menu"
           >
             <div className="relative h-5 w-5">
@@ -323,46 +382,58 @@ export function Navigation() {
             </div>
           </button>
         </div>
+      </nav>
 
-        {/* Mobile menu */}
+      {/* Sibling of <nav>: fixed overlay must NOT sit under a transformed ancestor (nav uses translate for hide/show),
+          or inset-0 only covers the header box and hero/WebGL paint on top. */}
+      {mobileOpen ? (
         <div
-          className={[
-            "lg:hidden overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]",
-            mobileOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0",
-          ].join(" ")}
+          id="mobile-nav-overlay"
+          className="fixed inset-0 z-[180] flex flex-col lg:hidden"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Site navigation"
         >
-          <div className="nav-glass mx-4 mt-2 rounded-2xl p-3 border border-white/[0.03]">
-            <div className="flex flex-col gap-0.5">
-              {navLinks.map((link) => {
-                const isActive = activeSection === link.href.replace("#", "")
-                return (
-                  <a
-                    key={link.href}
-                    href={link.href}
-                    onClick={(e) => handleLinkClick(e, link.href)}
-                    aria-label={link.label}
-                    className={[
-                      "group/link rounded-xl px-4 py-3 text-sm transition-all duration-300",
-                      isActive
-                        ? "text-foreground font-medium border-l-2 border-primary"
-                        : "text-muted-foreground hover:text-foreground",
-                    ].join(" ")}
-                  >
-                    <ExpandingText text={link.label} />
-                  </a>
-                )
-              })}
-              <a
-                href="#contact"
-                onClick={(e) => handleLinkClick(e, "#contact")}
-                className="mt-2 rounded-xl bg-primary px-4 py-3 text-center text-sm font-medium text-primary-foreground"
-              >
-                Get In Touch
-              </a>
+          <button
+            type="button"
+            aria-label="Close menu"
+            className="absolute inset-0 bg-background/90 backdrop-blur-xl supports-[backdrop-filter]:bg-background/80"
+            onClick={() => setMobileOpen(false)}
+          />
+          <div className="relative z-[1] flex min-h-0 flex-1 flex-col overflow-hidden px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(5.75rem,calc(env(safe-area-inset-top,0px)+4.5rem))]">
+            <div className="nav-glass flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain rounded-2xl border border-white/[0.06] p-3">
+              <div className="flex flex-col gap-0.5">
+                {navLinks.map((link) => {
+                  const isActive = activeSection === link.href.replace("#", "")
+                  return (
+                    <a
+                      key={link.href}
+                      href={link.href}
+                      onClick={(e) => handleLinkClick(e, link.href)}
+                      aria-label={link.label}
+                      className={[
+                        "group/link rounded-xl px-4 py-3 text-sm transition-all duration-300",
+                        isActive
+                          ? "border-l-2 border-primary font-medium text-foreground"
+                          : "text-muted-foreground hover:text-foreground",
+                      ].join(" ")}
+                    >
+                      <ExpandingText text={link.label} />
+                    </a>
+                  )
+                })}
+                <a
+                  href="#contact"
+                  onClick={(e) => handleLinkClick(e, "#contact")}
+                  className="mt-2 rounded-xl bg-primary px-4 py-3 text-center text-sm font-medium text-primary-foreground"
+                >
+                  Get In Touch
+                </a>
+              </div>
             </div>
           </div>
         </div>
-      </nav>
+      ) : null}
 
       <BackToTopButton />
     </>

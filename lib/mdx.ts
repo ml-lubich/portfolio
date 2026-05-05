@@ -1,7 +1,6 @@
 // ──────────────────────────────────────────────────────────────────────
-//  MDX content loader — reads .mdx files from content/blog/
-//  Keeps content DECOUPLED from code. To add a blog post, just drop
-//  a new .mdx file — no TypeScript changes needed.
+//  MDX content loader — body in content/blog/*.mdx; listing metadata
+//  (cover art, view labels) in data/blog/post-meta.json.
 // ──────────────────────────────────────────────────────────────────────
 
 import fs from "fs"
@@ -10,6 +9,7 @@ import matter from "gray-matter"
 import readingTime from "reading-time"
 
 const CONTENT_DIR = path.join(process.cwd(), "content/blog")
+const POST_META_PATH = path.join(process.cwd(), "data/blog/post-meta.json")
 
 export interface BlogPostMeta {
     slug: string
@@ -28,30 +28,30 @@ export interface BlogPostFull extends BlogPostMeta {
     content: string
 }
 
-// Approximate view counts (could later come from analytics)
-const VIEW_COUNTS: Record<string, string> = {
-    "is-rag-really-dead-in-2026": "2k",
-    "langchain-considered-harmful": "3k",
-    "crewai-multi-agent-reality-check": "1k",
-    "agents-are-all-you-need": "2k",
-    "prompt-engineering-is-not-engineering": "4k",
-    "ai-code-generation-killing-junior-devs": "3k",
-    "open-source-models-bet-and-won": "1k",
-    "great-ai-hiring-scam": "3k",
-    "ml-pipeline-technical-debt": "1k",
-    "mcp-protocol-will-make-langchain-obsolete": "2k",
-    "microservices-mistake-ml-systems": "1k",
-    "uncomfortable-truth-ai-safety": "2k",
-    "stop-building-ai-products-nobody-wants": "2k",
-    "fine-tuning-new-prompt-engineering": "1k",
-    "next-model-wont-save-you-architecture-matters": "1k",
-    "cursor-changed-how-i-code-forever": "4k",
-    "reasoning-models-o3-deepseek-change-everything": "3k",
-    "claude-code-terminal-ai-that-works": "3k",
-    "ai-evaluation-hardest-unsolved-problem": "1k",
-    "vibe-coding-future-or-anti-pattern": "2k",
-    "agentic-coding-trust-gap-2026": "1k",
-    "mcp-production-engineering-2026": "1k",
+interface PostMetaOverride {
+    views?: string
+    coverImage?: string
+}
+
+interface PostMetaFileShape {
+    version?: number
+    bySlug: Record<string, PostMetaOverride>
+}
+
+let _postMetaBySlug: Record<string, PostMetaOverride> | null = null
+
+function loadPostMetaBySlug(): Record<string, PostMetaOverride> {
+    if (_postMetaBySlug) return _postMetaBySlug
+
+    if (!fs.existsSync(POST_META_PATH)) {
+        _postMetaBySlug = {}
+        return _postMetaBySlug
+    }
+
+    const raw = fs.readFileSync(POST_META_PATH, "utf-8")
+    const parsed = JSON.parse(raw) as PostMetaFileShape
+    _postMetaBySlug = parsed.bySlug ?? {}
+    return _postMetaBySlug
 }
 
 /**
@@ -77,6 +77,8 @@ function readMdxFile(slug: string): { meta: BlogPostMeta; content: string } | nu
     const { data, content } = matter(raw)
 
     const rt = readingTime(content)
+    const listing = loadPostMetaBySlug()[slug] ?? {}
+    const coverFromMatter = typeof data.coverImage === "string" ? data.coverImage : ""
 
     return {
         meta: {
@@ -86,8 +88,8 @@ function readMdxFile(slug: string): { meta: BlogPostMeta; content: string } | nu
             date: data.date ?? "",
             category: data.category ?? "",
             tags: data.tags ?? [],
-            coverImage: data.coverImage ?? "",
-            views: VIEW_COUNTS[slug] ?? "1k",
+            coverImage: listing.coverImage ?? coverFromMatter,
+            views: listing.views ?? "1k",
             readingTime: Math.max(1, Math.ceil(rt.minutes)),
         },
         content,

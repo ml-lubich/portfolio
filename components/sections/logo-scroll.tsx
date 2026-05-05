@@ -194,11 +194,11 @@ export function LogoScroll() {
         <section
             ref={sectionRef}
             id="partners"
-            className="relative w-full overflow-hidden border-b border-border/40 bg-background/40 py-4 md:py-6 lg:py-8 md:backdrop-blur-sm"
+            className="relative w-full overflow-hidden border-b border-border/40 bg-background/40 py-3 md:py-6 lg:py-8 md:backdrop-blur-sm"
             aria-label="Companies and institutions"
         >
             {/* Heading */}
-            <p className="mb-5 text-center text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground/50 sm:text-sm">
+            <p className="mb-3 text-center text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground/50 sm:mb-5 sm:text-sm">
                 <AnimatedText text="Trusted & partnered with:" variant="blur-slide" stagger={40} duration={600} />
             </p>
 

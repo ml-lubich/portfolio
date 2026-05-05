@@ -48,6 +48,8 @@ interface ScrollStackSectionProps {
   cards: { id: string; children: ReactNode }[]
 
   /* ── ScrollStackCards tunables ──────────────────────────────────────── */
+  /** `grid` = responsive two-column, no stack. Omit = stack on wide desktop only. */
+  layout?: "stack" | "grid"
   /** Distance from viewport top where cards stick (px). Default: 90 */
   stickyTop?: number
   /** Extra vertical offset per card so the stack peeks (px). Default: 16 */
@@ -87,8 +89,9 @@ export function ScrollStackSection({
   title,
   subtitle,
   icon,
-  headerClassName = "mb-8",
+  headerClassName = "mb-5 md:mb-8",
   cards,
+  layout,
   stickyTop = 90,
   stackOffset = 16,
   scrollPerCard = 38,
@@ -104,7 +107,7 @@ export function ScrollStackSection({
   return (
     <section
       id={id}
-      className={`relative py-9 md:py-14 lg:py-20 ${className}`}
+      className={`relative py-5 md:py-14 lg:py-20 ${className}`}
     >
       {/* Background FX (optional) */}
       {bgEffects && (
@@ -129,6 +132,7 @@ export function ScrollStackSection({
             />
           }
           cards={cards}
+          layout={layout}
           stickyTop={stickyTop}
           stackOffset={stackOffset}
           scrollPerCard={scrollPerCard}

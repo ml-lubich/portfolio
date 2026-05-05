@@ -12,7 +12,7 @@ export function ConsultingClients() {
   return (
     <AnimatedSection
       id="consulting"
-      className="relative mx-auto max-w-6xl scroll-mt-28 px-3 py-12 pb-16 md:px-6 md:py-20 md:pb-24 lg:py-28 lg:pb-32"
+      className="relative mx-auto max-w-6xl scroll-mt-28 px-3 py-8 pb-10 md:px-6 md:py-20 md:pb-24 lg:py-28 lg:pb-32"
     >
       <div className="pointer-events-none absolute left-1/4 top-10 h-[420px] w-[420px] rounded-full bg-accent/5 blur-[100px]" aria-hidden />
       <div className="pointer-events-none absolute bottom-10 right-1/4 h-[360px] w-[360px] rounded-full bg-primary/5 blur-[90px]" aria-hidden />
@@ -115,7 +115,7 @@ export function ConsultingClients() {
                   aria-hidden
                 >
                   <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground/45">
-                    Site preview soon
+                    Preview unavailable
                   </span>
                 </div>
               )}
@@ -154,7 +154,7 @@ export function ConsultingClients() {
                     </span>
                   ) : (
                     <span className="inline-flex shrink-0 rounded-lg border border-border/50 bg-secondary px-3 py-1.5 text-xs font-medium text-muted-foreground">
-                      Ask for details
+                      Contact
                     </span>
                   )}
                 </div>

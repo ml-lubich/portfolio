@@ -44,17 +44,21 @@ export function Hero() {
   const brainRevealGate = nameRevealStarted || idleBrain
 
   return (
-    <section id="hero" className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden pb-16 pt-16 [clip-path:inset(0)] md:pb-24 md:pt-24">
+    <section
+      id="hero"
+      className="relative flex min-h-[90dvh] flex-col items-center justify-center overflow-hidden pb-16 max-sm:pt-[8.75rem] sm:pt-16 md:min-h-screen md:pb-24 md:pt-24"
+    >
       {/* Spectrum lives only in this section (not fixed to viewport) — avoids mobile scroll seam / mask repaint */}
       <BackgroundOrbs />
       <ParticleCanvas className="z-[1]" />
 
       {/* 3D Brain — deferred for LCP; fades in via CSS (opacity-only, compositor) for performance */}
       <div
-        className="pointer-events-none absolute inset-0 z-[3] flex items-center justify-center"
+        className="pointer-events-none absolute inset-0 z-[3] flex items-center justify-center max-sm:items-start max-sm:justify-center max-sm:pt-[min(12vh,5.25rem)] sm:pt-0"
         aria-hidden="true"
       >
-        <div className="h-[115vw] w-[115vw] -translate-y-[45%] sm:translate-y-0 sm:h-full sm:w-full">
+        {/* Mobile: large square viewport (was ~94vw/440px cap — too small on phones); sm+ fills layer. */}
+        <div className="aspect-square shrink-0 max-sm:size-[min(96vw,36rem)] max-sm:translate-y-[min(9vh,3.25rem)] sm:h-full sm:w-full sm:translate-y-0">
           {showBrain && (
             <div className="h-full w-full">
               <Brain3D
@@ -86,7 +90,7 @@ export function Hero() {
       </div>
 
       {/* Scroll indicator — flex centering avoids transform clash with animate-fade-in-up-subtle (which overwrites translate-x) */}
-      <div className="pointer-events-none absolute bottom-8 left-0 right-0 z-10 flex justify-center sm:bottom-10">
+      <div className="pointer-events-none absolute bottom-5 left-0 right-0 z-10 flex justify-center sm:bottom-10">
         <div
           className="pointer-events-auto animate-fade-in-up-subtle"
           style={{ animationDelay: "0.55s" }}

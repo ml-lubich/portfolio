@@ -2,7 +2,7 @@ import React from "react"
 import Link from "next/link"
 import {
   blogPosts,
-  getReadingTime,
+  toBlogPostListItems,
   BLOG_CATEGORIES,
   AUTHOR,
   normalizeBlogCategoryFromParam,
@@ -38,12 +38,13 @@ export default async function BlogPage({
 
   // Compute total views on the server so client & server always match
   const totalViews = `${blogPosts.reduce((sum, p) => sum + parseInt(p.views), 0)}k`
+  const blogPostsForClient = toBlogPostListItems(sortedPosts)
 
   return (
     <>
       {/* Interactive client-side blog page for users */}
       <BlogPageClient
-        blogPosts={blogPosts}
+        blogPosts={blogPostsForClient}
         totalViews={totalViews}
         initialCategory={initialCategory}
       />
@@ -84,7 +85,7 @@ export default async function BlogPage({
         {/* Full blog post listing — every post gets a crawlable link */}
         <div>
           {sortedPosts.map((post) => {
-            const readingTime = getReadingTime(post.content)
+            const readingTime = post.readingTime
             return (
               <article key={post.slug}>
                 <h3>

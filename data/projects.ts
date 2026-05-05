@@ -324,4 +324,43 @@ export const projects: Project[] = [
             link: { label: "lupfr.com", url: "https://lupfr.com/" },
         },
     },
+    {
+        id: "w3sourcing",
+        name: "W3 Sourcing",
+        metric: "Global executive search live site",
+        coverImage: "/images/projects/w3sourcing-hero.png",
+        summary:
+            "Public web experience for W3 Sourcing—principal-led executive search across VC-backed technology, legal, and finance markets with a polished founder-market hiring narrative.",
+        tags: ["Web", "Executive Search", "Next.js", "B2B"],
+        gradient: g.primaryToCyan,
+        accent: accentCycle[2],
+        number: "09",
+        detail: {
+            title: "W3 Sourcing",
+            subtitle: "Executive search website (live site)",
+            description:
+                "Built the public W3 Sourcing experience at w3sourcing.com: a refined, trust-forward site for principal-led recruitment across VC-backed technology leadership, legal, and banking and finance. The site frames the difference between automation-assisted sourcing and human judgment for senior, sensitive, and cross-border hiring mandates.",
+            highlights: [
+                "Hero and messaging system centered on founder-market search, discretion, and accountable executive hiring",
+                "Structured practice-area storytelling for technology, legal, and finance recruitment audiences",
+                "Interactive methodology, comparison, results, testimonials, and FAQ sections tuned for high-trust B2B conversion",
+                "Global positioning across the US, UK, EU, UAE, and Asia with clear email and LinkedIn paths",
+            ],
+            architecture: [
+                { label: "Marketing site", icon: "layers", description: "Next.js public experience with section-driven conversion flow" },
+                { label: "Content model", icon: "server", description: "Structured practice, process, results, comparison, and FAQ sections" },
+                { label: "Visual system", icon: "zap", description: "Dark executive-search interface with cyan accents and product-style pipeline preview" },
+                { label: "Trust signals", icon: "shield", description: "Leadership, testimonials, office details, and compliance-oriented public pages" },
+            ],
+            techStack: ["TypeScript", "Next.js", "React", "Tailwind CSS"],
+            metrics: [
+                { label: "Markets", value: "5+ regions" },
+                { label: "Status", value: "Live" },
+            ],
+            diagramType: "fullstack",
+            gradient: g.primaryToCyan,
+            accent: accentCycle[2],
+            link: { label: "w3sourcing.com", url: "https://www.w3sourcing.com/" },
+        },
+    },
 ]

@@ -1,7 +1,7 @@
 // ──────────────────────────────────────────────────────────────────────
 //  Blog data — compatibility layer
-//  Content lives in content/blog/*.mdx files (decoupled from code).
-//  This module re-exports everything consumers expect, reading from MDX.
+//  MDX bodies: content/blog/*.mdx
+//  Listing metadata (covers, view labels): data/blog/post-meta.json
 // ──────────────────────────────────────────────────────────────────────
 
 import {
@@ -13,10 +13,10 @@ import {
     getPostsByTag as _getPostsByTag,
 } from "./mdx"
 
-import type { BlogPost } from "./blog-shared"
+import type { BlogPost, BlogPostListItem } from "./blog-shared"
 
 // ── Re-export client-safe types & utilities from blog-shared ───────
-export type { BlogPost } from "./blog-shared"
+export type { BlogPost, BlogPostListItem } from "./blog-shared"
 export {
   BLOG_CATEGORIES,
   AUTHOR,
@@ -29,6 +29,11 @@ export {
 
 /** All blog posts, sorted newest-first. Content loaded from MDX files. */
 export const blogPosts = getAllPosts()
+
+/** Strip MDX bodies for the listing page client bundle (payload can be MB+ otherwise). */
+export function toBlogPostListItems(posts: BlogPost[]): BlogPostListItem[] {
+  return posts.map(({ content: _omit, ...rest }) => rest)
+}
 
 export function getPostBySlug(slug: string): BlogPost | undefined {
     return _getPostBySlug(slug)

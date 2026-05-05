@@ -22,7 +22,7 @@ const socialLinks = [
 
 export function Footer() {
   return (
-    <footer role="contentinfo" aria-label="Site footer" className="border-t border-border py-10">
+    <footer role="contentinfo" aria-label="Site footer" className="border-t border-border py-8 md:py-10">
       <div className="mx-auto max-w-6xl px-6">
         <AnimatedSection>
           <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">

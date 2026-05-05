@@ -24,7 +24,7 @@ export function Journey() {
       label="Experience"
       title={<>From Braintrust to Apple, delivering{" "}<span className="gradient-text">impactful solutions</span></>}
       subtitle="Click any role to explore architecture details, tech stack, and system diagrams."
-      className="scroll-mt-24 pb-6 md:pb-10 lg:pb-14"
+      className="scroll-mt-24 pb-4 md:pb-10 lg:pb-14"
       bgEffects={
         <>
           <div className="absolute left-1/2 top-1/4 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-primary/5 blur-[120px]" />

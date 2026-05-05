@@ -1,31 +1,68 @@
 "use client"
 
-import * as React from 'react'
+import * as React from "react"
+import {
+  MOBILE_SCROLL_STACK_BREAKPOINT_PX,
+  shouldUseCompactScrollStackViewport,
+  type ScrollStackViewportSignals,
+} from "@/lib/scroll-stack-layout"
 
-const MOBILE_BREAKPOINT = 768
-/** Viewports up to this width use reduced stack effects (phones + small tablets). */
-const STACK_REDUCED_NARROW_PX = 1023
-/** iPad / large tablets in landscape stay under this width; touch devices get flat 2D stack. */
-const STACK_REDUCED_TOUCH_MAX_PX = 1366
+const MOBILE_BREAKPOINT = MOBILE_SCROLL_STACK_BREAKPOINT_PX
+
+function readScrollStackViewportSignals(): ScrollStackViewportSignals {
+  return {
+    innerWidth: window.innerWidth,
+    pointerCoarse: window.matchMedia("(pointer: coarse)").matches,
+    hoverNone: window.matchMedia("(hover: none)").matches,
+    maxTouchPoints: navigator.maxTouchPoints,
+    prefersReducedMotion: window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches,
+    hardwareConcurrency: navigator.hardwareConcurrency,
+  }
+}
 
 /**
- * True for phones, iPads, and other tablets where 3D stack + hover tilt + heavy glass hurt scroll perf.
- * Laptops and desktop browsers keep full 3D / tilt (no coarse pointer, width above touch-tablet cap).
+ * True when scroll-stack sections should use the vertical column (no sticky runway / rAF stack).
+ * Subscribes to resize + relevant media queries so iPad / tablet class devices stay off the heavy path.
+ */
+export function useScrollStackCompactViewport(): boolean {
+  return React.useSyncExternalStore(
+    (onStoreChange) => {
+      const onChange = () => onStoreChange()
+      const mqlCoarse = window.matchMedia("(pointer: coarse)")
+      const mqlHover = window.matchMedia("(hover: none)")
+      const mqlMotion = window.matchMedia("(prefers-reduced-motion: reduce)")
+      mqlCoarse.addEventListener("change", onChange)
+      mqlHover.addEventListener("change", onChange)
+      mqlMotion.addEventListener("change", onChange)
+      window.addEventListener("resize", onChange, { passive: true })
+      return () => {
+        mqlCoarse.removeEventListener("change", onChange)
+        mqlHover.removeEventListener("change", onChange)
+        mqlMotion.removeEventListener("change", onChange)
+        window.removeEventListener("resize", onChange)
+      }
+    },
+    () => shouldUseCompactScrollStackViewport(readScrollStackViewportSignals()),
+    () => false,
+  )
+}
+
+function computeReducedStackEffects(): boolean {
+  if (typeof window === "undefined") return false
+  return window.matchMedia("(pointer: coarse)").matches
+}
+
+/**
+ * True when the desktop stack should use softer 2D motion (coarse pointer / touchpad edge cases).
+ * Narrow tablets route to `useScrollStackCompactViewport` instead of the desktop stack.
  */
 export function useReducedStackEffects() {
   const [reduced, setReduced] = React.useState(false)
 
   React.useEffect(() => {
-    const compute = () => {
-      const w = window.innerWidth
-      const narrow = w <= STACK_REDUCED_NARROW_PX
-      const coarsePointer = window.matchMedia("(pointer: coarse)").matches
-      const touchTablet =
-        w > STACK_REDUCED_NARROW_PX &&
-        w <= STACK_REDUCED_TOUCH_MAX_PX &&
-        navigator.maxTouchPoints > 0
-      setReduced(narrow || coarsePointer || touchTablet)
-    }
+    const compute = () => setReduced(computeReducedStackEffects())
 
     compute()
     const mqlCoarse = window.matchMedia("(pointer: coarse)")
@@ -41,17 +78,16 @@ export function useReducedStackEffects() {
 }
 
 export function useIsMobile() {
-  const [isMobile, setIsMobile] = React.useState<boolean | undefined>(undefined)
+  const [isMobile, setIsMobile] = React.useState(false)
 
-  React.useEffect(() => {
-    const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
-    const onChange = () => {
-      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
-    }
-    mql.addEventListener('change', onChange)
-    setIsMobile(window.innerWidth < MOBILE_BREAKPOINT)
-    return () => mql.removeEventListener('change', onChange)
+  React.useLayoutEffect(() => {
+    const query = `(max-width: ${MOBILE_BREAKPOINT - 1}px)`
+    const mql = window.matchMedia(query)
+    const syncMobile = () => setIsMobile(mql.matches)
+    syncMobile()
+    mql.addEventListener("change", syncMobile)
+    return () => mql.removeEventListener("change", syncMobile)
   }, [])
 
-  return !!isMobile
+  return isMobile
 }

@@ -46,10 +46,7 @@ export function AnimatedName({
   const [hasBeenVisible, setHasBeenVisible] = useState(false)
   const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // Split name into characters, preserving spaces
-  const chars = name.split("")
-  const totalChars = chars.length
-  const midpoint = (totalChars - 1) / 2
+  const words = name.trim().split(/\s+/).filter(Boolean)
 
   // On mount trigger — play once when the element enters the viewport
   useEffect(() => {
@@ -93,11 +90,11 @@ export function AnimatedName({
   }, [])
 
   return (
-    <span className={`relative inline-block ${className}`}>
+    <span className={`relative inline-block max-w-full ${className}`}>
       <span className="sr-only">{name}</span>
       <span
         ref={containerRef}
-        className={`animated-name-root${metallic ? " animated-name-metallic" : ""}`}
+        className="flex flex-wrap justify-center gap-x-[0.35em] gap-y-1.5 px-1 sm:gap-y-1"
         aria-hidden="true"
         onMouseEnter={handleMouseEnter}
         style={
@@ -106,34 +103,38 @@ export function AnimatedName({
           } as React.CSSProperties
         }
       >
-      {chars.map((char, i) => {
-        // Distance from center: -1 (far left) to +1 (far right)
-        const normalizedOffset = (i - midpoint) / midpoint || 0
-        // Collapse amount: how far (in em) the letter moves toward center
-        // Outer letters move more, inner letters barely move
-        const collapseDistance = normalizedOffset * -0.55
-        // Stagger: letters further from center animate slightly later
-        const staggerDelay = Math.abs(normalizedOffset) * 80 // 0-80ms
-
-        const isSpace = char === " "
-
-        return (
-          <span
-            key={`${char}-${i}`}
-            className="animated-name-char"
-            style={
-              {
-                "--collapse-x": `${collapseDistance}em`,
-                "--stagger": `${staggerDelay}ms`,
-                ...(isSpace ? { width: "0.3em", display: "inline-block" } : {}),
-              } as React.CSSProperties
-            }
-            data-expanded={expanded ? "true" : "false"}
-          >
-            {char}
-          </span>
-        )
-      })}
+        {words.map((word, wi) => {
+          const chars = word.split("")
+          const totalChars = chars.length
+          const midpoint = (totalChars - 1) / 2
+          return (
+            <span
+              key={`${word}-${wi}`}
+              className={`animated-name-root${metallic ? " animated-name-metallic" : ""}`}
+            >
+              {chars.map((char, i) => {
+                const normalizedOffset = (i - midpoint) / midpoint || 0
+                const collapseDistance = normalizedOffset * -0.55
+                const staggerDelay = Math.abs(normalizedOffset) * 80
+                return (
+                  <span
+                    key={`${wi}-${char}-${i}`}
+                    className="animated-name-char"
+                    style={
+                      {
+                        "--collapse-x": `${collapseDistance}em`,
+                        "--stagger": `${staggerDelay}ms`,
+                      } as React.CSSProperties
+                    }
+                    data-expanded={expanded ? "true" : "false"}
+                  >
+                    {char}
+                  </span>
+                )
+              })}
+            </span>
+          )
+        })}
       </span>
     </span>
   )

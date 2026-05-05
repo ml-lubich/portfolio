@@ -172,7 +172,7 @@ export function ClientTestimonials() {
   return (
     <AnimatedSection
       id="testimonials"
-      className="relative scroll-mt-28 px-3 py-12 pb-16 md:px-6 md:py-20 md:pb-24 lg:py-28 lg:pb-32"
+      className="relative scroll-mt-28 px-3 py-8 pb-10 md:px-6 md:py-20 md:pb-24 lg:py-28 lg:pb-32"
     >
       <div className="pointer-events-none absolute left-1/3 top-1/4 h-72 w-72 rounded-full bg-primary/[0.05] blur-[90px]" aria-hidden />
       <div className="pointer-events-none absolute bottom-1/4 right-1/4 h-64 w-64 rounded-full bg-accent/[0.05] blur-[80px]" aria-hidden />
@@ -191,7 +191,7 @@ export function ClientTestimonials() {
         />
 
         <div
-          className="relative px-10 sm:px-14 md:px-16"
+          className="relative px-4 sm:px-14 md:px-16"
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
           onFocusCapture={() => setPaused(true)}
@@ -221,7 +221,7 @@ export function ClientTestimonials() {
                 >
                   <figure
                     className={cn(
-                      "flex h-full min-h-[300px] flex-col rounded-2xl border border-white/[0.1] bg-gradient-to-b from-card/40 to-card/[0.12] p-6 shadow-[0_20px_50px_-24px_rgba(0,0,0,0.65)] backdrop-blur-xl transition-[border-color,box-shadow] duration-300 sm:min-h-[340px] sm:p-8",
+                      "flex h-full min-h-[240px] flex-col rounded-2xl border border-white/[0.1] bg-gradient-to-b from-card/40 to-card/[0.12] p-5 shadow-[0_20px_50px_-24px_rgba(0,0,0,0.65)] backdrop-blur-xl transition-[border-color,box-shadow] duration-300 sm:min-h-[340px] sm:p-8",
                       "hover:border-primary/25 hover:shadow-[0_24px_60px_-20px_hsl(var(--primary)/0.12)]",
                     )}
                   >

@@ -29,7 +29,7 @@ interface LazySectionProps {
 export function LazySection({
   children,
   rootMargin = "400px",
-  minHeight = "50vh",
+  minHeight = "min(38dvh, 320px)",
   className = "",
   sectionId,
 }: LazySectionProps) {

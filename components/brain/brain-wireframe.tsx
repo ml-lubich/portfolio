@@ -4,37 +4,34 @@ import React, { useRef, useMemo } from "react"
 import { useFrame } from "@react-three/fiber"
 import * as THREE from "three"
 import { useBrainData } from "./use-brain-data"
+import {
+  ORB_COUNT_CAP,
+  getBrainMeshViewportScale,
+  getBrainOrbViewportTier,
+} from "./constants"
 import { createPullUniforms, injectPull, makeOrbMaterial } from "./materials"
 import { NeuralOrbs } from "./neural-orbs"
 import { hexNum } from "@/lib/theme"
 
 /* ── Rotating wireframe brain with neural orb effects ──────────────── */
 
-/* ── Scale set once on mount so the brain never shrinks on mobile when resize fires during touch/rotate ──────────── */
 function useInitialScale() {
   const scaleRef = React.useRef<number | null>(null)
   if (scaleRef.current === null && typeof window !== "undefined") {
-    const w = window.innerWidth
-    if (w < 480) scaleRef.current = 0.46
-    else if (w < 640) scaleRef.current = 0.48
-    else if (w < 1024) scaleRef.current = 0.48
-    else scaleRef.current = 0.54
+    scaleRef.current = getBrainMeshViewportScale(window.innerWidth)
   }
-  return scaleRef.current ?? 0.54
+  return scaleRef.current ?? getBrainMeshViewportScale(1280)
 }
 
 export function BrainWireframe() {
   const groupRef = useRef<THREE.Group>(null!)
-  const orbGeoRef = useRef<THREE.BufferGeometry>(null!)
   const hitRef = useRef<THREE.Mesh>(null!)
   const result = useBrainData()
   const brainScale = useInitialScale()
 
-  // Shared pull-deform uniforms
   const pull = useMemo(() => createPullUniforms(), [])
   const pullTarget = useRef(0)
 
-  // Base wireframe material (dim blue)
   const material = React.useMemo(() => {
     const m = new THREE.LineBasicMaterial({
       color: hexNum.wireBase,
@@ -46,7 +43,6 @@ export function BrainWireframe() {
     return m
   }, [pull])
 
-  // Outer glow wireframe
   const glowMaterial = React.useMemo(() => {
     const m = new THREE.LineBasicMaterial({
       color: hexNum.wireGlow,
@@ -58,7 +54,6 @@ export function BrainWireframe() {
     return m
   }, [pull])
 
-  // Signal overlay material
   const signalMaterial = React.useMemo(() => {
     const m = new THREE.LineBasicMaterial({
       vertexColors: true,
@@ -71,19 +66,19 @@ export function BrainWireframe() {
     return m
   }, [pull])
 
-  // Orb shader material
   const orbMaterial = useMemo(() => makeOrbMaterial(pull), [pull])
 
-  // Orb size set once on mount so it doesn’t change on resize (avoids brain “shrinking” on mobile during spin)
   React.useEffect(() => {
-    const w = typeof window !== "undefined" ? window.innerWidth : 1024
-    if (w < 480) orbMaterial.uniforms.uSizeMul.value = 520
-    else if (w < 640) orbMaterial.uniforms.uSizeMul.value = 460
-    else if (w < 1024) orbMaterial.uniforms.uSizeMul.value = 420
-    else orbMaterial.uniforms.uSizeMul.value = 380
+    const apply = () => {
+      const tier = getBrainOrbViewportTier(window.innerWidth)
+      orbMaterial.uniforms.uSizeMul.value = tier.uSizeMul
+      orbMaterial.uniforms.uPointGlowMul.value = tier.pointGlowMul
+    }
+    apply()
+    window.addEventListener("resize", apply, { passive: true })
+    return () => window.removeEventListener("resize", apply)
   }, [orbMaterial])
 
-  // Build signal geometry
   const signalGeo = useMemo(() => {
     if (!result) return null
     const g = new THREE.BufferGeometry()
@@ -98,36 +93,44 @@ export function BrainWireframe() {
     return { geometry: g, colorAttr }
   }, [result])
 
-  // Accumulated elapsed time (avoids deprecated THREE.Clock)
-  const elapsedRef = useRef(0)
+  /**
+   * Orb buffers created synchronously with geometry so R3F never mounts an empty
+   * `<bufferGeometry ref>` and races NeuralOrbs’ attribute install.
+   */
+  const orbBundle = useMemo(() => {
+    if (!result) return null
+    const positions = new Float32Array(ORB_COUNT_CAP * 3)
+    const sizes = new Float32Array(ORB_COUNT_CAP)
+    const colors = new Float32Array(ORB_COUNT_CAP * 3)
+    const geometry = new THREE.BufferGeometry()
+    geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3))
+    geometry.setAttribute("size", new THREE.BufferAttribute(sizes, 1))
+    geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3))
+    const tier = getBrainOrbViewportTier(
+      typeof window !== "undefined" ? window.innerWidth : 1280
+    )
+    geometry.setDrawRange(0, tier.activeOrbCount)
+    return { positions, sizes, colors, geometry }
+  }, [result])
 
-  // Fade-in factor: ramps from 0 → 1 over ~1.5s after data loads
-  const fadeRef = useRef(0)
+  const elapsedRef = useRef(0)
 
   useFrame((_state, delta) => {
     elapsedRef.current += delta
     const t = elapsedRef.current
-
-    // Smooth fade-in for orbs
-    if (fadeRef.current < 1) {
-      fadeRef.current = Math.min(1, fadeRef.current + delta / 1.5)
-      const ease = fadeRef.current * fadeRef.current * (3 - 2 * fadeRef.current) // smoothstep
-      orbMaterial.uniforms.uFade.value = ease
-    }
-
+    orbMaterial.uniforms.uFade.value = 1
     orbMaterial.uniforms.uTime.value = t
     pull.uPullStrength.value +=
       (pullTarget.current - pull.uPullStrength.value) * Math.min(1, delta * 8)
   })
 
-  if (!result || !signalGeo) return null
+  if (!result || !signalGeo || !orbBundle) return null
 
   const { geo, brainData } = result
 
   return (
     <group ref={groupRef} scale={brainScale} rotation={[0, Math.PI * 0.5, 0]}>
       <group rotation={[-Math.PI * 0.5 + Math.PI * 0.08, 0, 0]}>
-        {/* Invisible sphere for pull interaction */}
         <mesh
           ref={hitRef}
           onPointerMove={(e) => {
@@ -138,25 +141,24 @@ export function BrainWireframe() {
             }
             pullTarget.current = 1
           }}
-          onPointerLeave={() => { pullTarget.current = 0 }}
+          onPointerLeave={() => {
+            pullTarget.current = 0
+          }}
         >
           <sphereGeometry args={[1.35, 32, 16]} />
           <meshBasicMaterial transparent opacity={0} depthWrite={false} />
         </mesh>
-        {/* Base wireframe */}
         <lineSegments geometry={geo} material={material} />
         <lineSegments geometry={geo} material={glowMaterial} scale={1.02} />
-        {/* Signal overlay */}
         <lineSegments geometry={signalGeo.geometry} material={signalMaterial} />
-        {/* Orb point sprites */}
-        <points material={orbMaterial}>
-          <bufferGeometry ref={orbGeoRef} />
-        </points>
-        {/* Neural orb logic */}
+        <points geometry={orbBundle.geometry} material={orbMaterial} />
         <NeuralOrbs
           brainData={brainData}
           colorAttr={signalGeo.colorAttr}
-          orbGeoRef={orbGeoRef}
+          orbGeometry={orbBundle.geometry}
+          orbPositions={orbBundle.positions}
+          orbSizes={orbBundle.sizes}
+          orbColors={orbBundle.colors}
         />
       </group>
     </group>

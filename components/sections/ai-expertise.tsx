@@ -132,7 +132,7 @@ const techBars: BarItem[] = [
 
 export function AIExpertise() {
   return (
-    <AnimatedSection id="ai-expertise" className="relative py-9 md:py-14 lg:py-20">
+    <AnimatedSection id="ai-expertise" className="relative py-6 md:py-14 lg:py-20">
       {/* Background effects */}
       <div className="absolute inset-0 dot-pattern opacity-30" aria-hidden="true" />
 
@@ -147,7 +147,7 @@ export function AIExpertise() {
         />
 
         {/* Terminal summary */}
-        <div className="mx-auto mb-6 max-w-3xl md:mb-10">
+        <div className="mx-auto mb-4 max-w-3xl md:mb-10">
           <TerminalReveal
             title="~/ai — stack.summary"
             prompt="$"
@@ -167,10 +167,10 @@ export function AIExpertise() {
         </div>
 
         {/* Metrics grid — rolling numbers + mini bar */}
-        <div className="mb-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mb-6 grid gap-3 sm:grid-cols-2 sm:gap-4 md:mb-10 lg:grid-cols-4">
           {metrics.map((metric, i) => (
             <AnimatedSection key={metric.label} delay={i * 100}>
-              <div className="group relative overflow-hidden rounded-2xl border border-white/[0.04] bg-card/30 p-6 backdrop-blur-xl transition-all duration-500 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/15 glass-card-3d spotlight">
+                <div className="group relative overflow-hidden rounded-2xl border border-white/[0.04] bg-card/30 p-5 backdrop-blur-xl transition-all duration-500 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/15 glass-card-3d spotlight sm:p-6">
                 {/* Top edge light */}
                 <div className="absolute inset-x-0 top-0 h-px bg-white/[0.06]" />
                 <div className="absolute inset-0 rounded-2xl bg-primary/[0.03] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
@@ -190,8 +190,8 @@ export function AIExpertise() {
 
         {/* Proficiency bars */}
         <AnimatedSection delay={200} className="relative z-10">
-          <div className="mb-16 rounded-2xl border border-white/[0.04] bg-card/25 p-8 backdrop-blur-xl frosted-panel">
-            <h3 className="mb-6 text-lg font-bold text-foreground">Core Proficiency</h3>
+          <div className="mb-10 rounded-2xl border border-white/[0.04] bg-card/25 p-5 backdrop-blur-xl frosted-panel md:mb-16 md:p-8">
+            <h3 className="mb-4 text-lg font-bold text-foreground md:mb-6">Core Proficiency</h3>
             <AnimatedBars bars={techBars} duration={1600} stagger={150} />
           </div>
         </AnimatedSection>
@@ -201,7 +201,7 @@ export function AIExpertise() {
           {/* Vertical connector line (visible on lg) */}
           <div className="absolute left-1/2 top-0 bottom-0 hidden w-px -translate-x-1/2 bg-primary/20 lg:block" aria-hidden="true" />
 
-          <div className="grid gap-8 lg:grid-cols-2">
+          <div className="grid gap-5 md:gap-8 lg:grid-cols-2">
             {aiDomains.map((domain, i) => (
               <AnimatedSection key={domain.title} delay={i * 150}>
                 <div className="group relative h-full overflow-hidden rounded-2xl border border-white/[0.04] bg-card/30 backdrop-blur-xl transition-all duration-500 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/15 glass-card-3d spotlight">
@@ -213,7 +213,7 @@ export function AIExpertise() {
                   {/* Top accent */}
                   <div className={`h-1 w-full bg-primary`} />
 
-                  <div className="relative p-8">
+                  <div className="relative p-5 md:p-8">
                     {/* Step number + icon header */}
                     <div className="flex items-start gap-4">
                       <div className="relative">

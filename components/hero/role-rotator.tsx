@@ -38,10 +38,10 @@ export function RoleRotator({
 
   return (
     <h1
-      className="animate-fade-in-up-subtle font-display tracking-tight text-foreground"
-      style={{ animationDelay: "0.1s", lineHeight: 1.1 }}
+      className="animate-fade-in-up-subtle mx-auto w-full max-w-[min(100%,42rem)] px-1 font-display tracking-tight text-foreground"
+      style={{ animationDelay: "0.1s", lineHeight: 1.15 }}
     >
-      <span className="block text-balance text-4xl font-semibold sm:text-5xl md:text-6xl lg:text-7xl">
+      <span className="block text-pretty text-4xl font-semibold sm:text-5xl md:text-6xl lg:text-7xl">
         <AnimatedName
           name="Misha Lubich"
           trigger="mount"
@@ -51,7 +51,7 @@ export function RoleRotator({
           onReveal={onNameRevealStart}
         />
       </span>
-      <span className="relative mt-3 block h-[2rem] sm:h-[2.4rem] md:h-[3rem] lg:h-[3.6rem] overflow-hidden">
+      <span className="relative mt-2 block min-h-[4.25rem] w-full overflow-hidden sm:min-h-[2.4rem] md:min-h-[3rem] lg:min-h-[3.6rem]">
         {roles.map((role, i) => {
           const isActive = i === roleIndex
           const isLeaving = i === prevRoleIndex && isTransitioning
@@ -83,7 +83,7 @@ export function RoleRotator({
               }}
               aria-hidden={!isActive}
             >
-              <span className="gradient-text whitespace-nowrap text-2xl font-light sm:text-3xl md:text-4xl lg:text-5xl">
+              <span className="gradient-text mx-auto max-w-[min(calc(100vw-1.5rem),36rem)] px-2 text-center text-pretty text-2xl font-light whitespace-normal sm:text-3xl md:text-4xl lg:text-5xl">
                 {role}
               </span>
             </span>
@@ -99,7 +99,7 @@ export function RoleRotator({
 
 export function HeroSubtitle() {
   return (
-    <p className="mx-auto mt-14 max-w-3xl text-sm leading-relaxed text-white/95 sm:text-base md:text-lg">
+    <p className="mx-auto mt-5 max-w-3xl text-pretty text-sm leading-relaxed text-white/95 sm:mt-6 sm:text-base md:mt-7 md:text-lg">
       <AnimatedText variant="blur-slide" delay={1200} stagger={30} duration={650}>
         {"Senior Software Engineer specializing in "}
         <span className="font-semibold text-foreground">AI-driven, cloud-native applications</span>

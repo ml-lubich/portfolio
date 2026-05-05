@@ -146,9 +146,10 @@ describe("Robots config", () => {
         expect(robotsSrc).toContain('"/"')
     })
 
-    it("blocks only api and Next internals (public pages stay allowlisted via /)", () => {
+    it("blocks api, Next internals, and /docs (specs are not public routes)", () => {
         expect(robotsSrc).toContain('"/_next/"')
         expect(robotsSrc).toContain('"/api/"')
+        expect(robotsSrc).toContain('"/docs/"')
         expect(robotsSrc).not.toContain('"/demo"')
     })
 

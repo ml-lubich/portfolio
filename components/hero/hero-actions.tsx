@@ -25,19 +25,19 @@ export function HeroCTAs() {
       <button
         type="button"
         onClick={() => navigateTo("#ai-expertise")}
-        className="rounded-xl border border-white/[0.12] bg-white/[0.06] px-6 py-3 text-sm font-medium text-foreground backdrop-blur-sm transition-all hover:border-white/25 hover:bg-white/[0.1] hover-lift sm:px-8 sm:py-3.5 cursor-pointer"
+        className="group relative inline-flex cursor-pointer items-center gap-2 overflow-hidden rounded-xl border border-white/[0.10] bg-card/30 px-6 py-3 text-sm font-semibold text-foreground shadow-[inset_0_1px_0_0_hsla(0,0%,100%,0.1)] shadow-sm shadow-black/25 ring-1 ring-inset ring-white/[0.06] backdrop-blur-xl backdrop-saturate-150 transition-all duration-300 hover:border-primary/35 hover:bg-white/[0.08] hover:shadow-lg hover:shadow-primary/15 glass-card-3d spotlight hover-lift sm:px-8 sm:py-3.5"
       >
-        <Sparkles className="mr-2 inline-block h-4 w-4" />
-        View AI Expertise
+        <Sparkles className="relative z-10 h-4 w-4 shrink-0 text-primary" aria-hidden />
+        <span className="relative z-10">View AI Expertise</span>
       </button>
       <a
         href="https://cal.com/misha-lubich"
         target="_blank"
         rel="noopener noreferrer"
-        className="rounded-xl border border-white/[0.12] bg-white/[0.06] px-6 py-3 text-sm font-medium text-foreground backdrop-blur-sm transition-all hover:border-white/25 hover:bg-white/[0.1] hover-lift sm:px-8 sm:py-3.5"
+        className="group relative inline-flex items-center gap-2 overflow-hidden rounded-xl border border-white/[0.10] bg-card/30 px-6 py-3 text-sm font-semibold text-foreground shadow-[inset_0_1px_0_0_hsla(0,0%,100%,0.1)] shadow-sm shadow-black/25 ring-1 ring-inset ring-white/[0.06] backdrop-blur-xl backdrop-saturate-150 transition-all duration-300 hover:border-primary/35 hover:bg-white/[0.08] hover:shadow-lg hover:shadow-primary/15 glass-card-3d spotlight hover-lift sm:px-8 sm:py-3.5"
       >
-        <Phone className="mr-2 inline-block h-4 w-4" />
-        Schedule Call
+        <Phone className="relative z-10 h-4 w-4 shrink-0 text-primary" aria-hidden />
+        <span className="relative z-10">Schedule Call</span>
       </a>
     </div>
   )

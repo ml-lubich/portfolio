@@ -4,20 +4,20 @@ import React from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { motion } from "framer-motion"
-import type { BlogPost } from "@/lib/blog-shared"
-import { getReadingTime, AUTHOR } from "@/lib/blog-shared"
+import type { BlogPost, BlogPostListItem } from "@/lib/blog-shared"
+import { AUTHOR } from "@/lib/blog-shared"
 import { BlogCard } from "@/components/blog/blog-card"
 import { shadows } from "@/lib/theme"
 import { SITE_URL } from "@/lib/site-config"
 
 interface BlogPostViewProps {
   post: BlogPost
-  relatedPosts: BlogPost[]
+  relatedPosts: BlogPostListItem[]
   children: React.ReactNode
 }
 
 export function BlogPostView({ post, relatedPosts, children }: BlogPostViewProps) {
-  const readingTime = getReadingTime(post.content)
+  const readingTime = post.readingTime
   const formattedDate = new Date(post.date).toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",

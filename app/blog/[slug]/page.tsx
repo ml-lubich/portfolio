@@ -1,5 +1,11 @@
 import React from "react"
-import { blogPosts, getPostBySlug, getReadingTime, getRelatedPosts, AUTHOR } from "@/lib/blog-data"
+import {
+  blogPosts,
+  getPostBySlug,
+  getRelatedPosts,
+  toBlogPostListItems,
+  AUTHOR,
+} from "@/lib/blog-data"
 import { BlogPostView } from "./blog-post-view"
 import { notFound } from "next/navigation"
 import type { Metadata } from "next"
@@ -28,7 +34,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!post) return { title: "Post Not Found", robots: { index: false } }
 
   const canonicalUrl = `${SITE_URL}/blog/${post.slug}`
-  const readingTime = getReadingTime(post.content)
 
   return {
     title: post.title,
@@ -107,7 +112,7 @@ function BlogPostJsonLd({ slug }: { slug: string }) {
   const post = getPostBySlug(slug)
   if (!post) return null
 
-  const readingTime = getReadingTime(post.content)
+  const readingTime = post.readingTime
   const wordCount = post.content.split(/\s+/).filter(Boolean).length
   const canonicalUrl = `${SITE_URL}/blog/${post.slug}`
   const related = getRelatedPosts(post.slug, 3)
@@ -259,7 +264,7 @@ export default async function BlogPostPage({ params }: PageProps) {
   return (
     <>
       <BlogPostJsonLd slug={slug} />
-      <BlogPostView post={post} relatedPosts={relatedPosts}>
+      <BlogPostView post={post} relatedPosts={toBlogPostListItems(relatedPosts)}>
         <div className="blog-prose mdx-content">
           <MDXRemote
             source={transformChartFences(post.content)}

@@ -1,0 +1,29 @@
+---
+title: "Your Context Window Is Not a Memory System"
+excerpt: "Long-context models tempt teams to treat the prompt as a database. That works until you need auditable state, incremental updates, and retrieval that survives a page refresh."
+date: "2026-04-06"
+category: "AI Architecture"
+tags: ["Context Windows", "RAG", "State", "LLM", "Architecture"]
+---
+
+## The convenience trap
+
+When you can paste thirty pages into a single request, it feels like the model "remembers" your world. In reality it remembers **one transcript-shaped snapshot**, with no first-class identity for facts, no versioning, and no guarantee the same information will surface on the next turn.
+
+Production features need **durable memory**: what changed, when, and why. That is a storage and indexing problem, not a token-budget problem.
+
+## What actually belongs in context
+
+Use the window for **task-local coherence**: the current goal, a tight set of constraints, and retrieved evidence that is small enough to verify. Push everything else to explicit stores—vector DB, OLTP, object storage, feature flags—and design APIs so the agent fetches **just enough** to decide the next action.
+
+## Red flags in design reviews
+
+- Summarizing the entire product state into a "mega prompt" each call  
+- No schema for user-visible facts versus model-internal scratchpad  
+- Evaluations that only run on canned chats instead of multi-session workflows  
+
+If those show up, you do not have architecture—you have a demo with amnesia wearing an expensive disguise.
+
+## Takeaway
+
+Context windows are a **transport layer** for evidence and instructions. Treat them that way, and you stop paying for redundant tokens while your real memory system does the job.

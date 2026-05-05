@@ -43,14 +43,14 @@ export const consultingClients: ConsultingClient[] = [
         accent: accentCycle[0],
     },
     {
-        id: "going",
-        name: "Going",
-        href: null,
-        statusLabel: "Site launching soon",
+        id: "w3sourcing",
+        name: "W3 Sourcing",
+        href: "https://www.w3sourcing.com/",
+        coverImage: "/images/projects/w3sourcing-hero.png",
         summary:
-            "Active consulting engagement — product web experience, performance, and integrations. Public URL will be linked here once the build is live.",
-        tags: ["Consulting", "Web", "In progress"],
-        gradient: g.accentToCyan,
+            "Public web experience for a principal-led executive search firm serving VC-backed technology, legal, and finance leadership markets across the US, UK, EU, UAE, and Asia.",
+        tags: ["Web", "Recruiting", "Next.js"],
+        gradient: g.primaryToCyan,
         accent: accentCycle[2],
     },
 ]

@@ -1,0 +1,27 @@
+---
+title: "Silent Tool Failures Are the Quiet Killer of Agent Reliability"
+excerpt: "The model says the row was updated. The audit log disagrees. Until you treat tool I/O like distributed systems, agents will keep shipping confident lies."
+date: "2026-04-05"
+category: "MLOps"
+tags: ["Agents", "Tool Calling", "Reliability", "Observability", "Production"]
+---
+
+## When the happy path lies
+
+Tool-calling stacks often **assume success** because the HTTP status was 200 and the JSON parsed. The database can still reject the write, the idempotent key can collide, or the side effect can land in the wrong tenant. The LLM layers a plausible narrative on top either way.
+
+That is not "hallucination" in the poetic sense—it is **missing contracts** between the model and the outside world.
+
+## What production teams do differently
+
+They make every tool return a **structured outcome**: intent, entity ids, mutation receipts, and explicit failure modes the model is allowed to reason about. Retries are timed and bounded. Idempotency tokens propagate across steps. Traces link a user-visible answer to raw tool payloads, not just to the assistant's polished summary.
+
+## Instrumentation you cannot skip
+
+- Per-tool latency and error rate SLOs  
+- Schema validation on responses **before** they enter the model again  
+- Canary prompts that assert dangerous operations are impossible without a human gate  
+
+## Takeaway
+
+If you would not ship a microservice without tracing, do not ship an agent without it. Silent tool failures are how AI features earn trust—and quietly lose it.

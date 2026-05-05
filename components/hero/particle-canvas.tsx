@@ -89,8 +89,8 @@ export function ParticleCanvas({ className }: { className?: string }) {
         y: Math.random() * canvas.height,
         vx: (Math.random() - 0.5) * 0.2,
         vy: (Math.random() - 0.5) * 0.2,
-        size: Math.random() * 2 + 0.5,
-        opacity: Math.random() * 0.4 + 0.1,
+        size: Math.random() * 1.1 + 0.35,
+        opacity: Math.random() * 0.22 + 0.06,
       })
     }
 
@@ -119,7 +119,7 @@ export function ParticleCanvas({ className }: { className?: string }) {
             ctx.beginPath()
             ctx.moveTo(p.x, p.y)
             ctx.lineTo(particles[j].x, particles[j].y)
-            ctx.strokeStyle = particleStroke(0.06 * (1 - dist / 150))
+            ctx.strokeStyle = particleStroke(0.035 * (1 - dist / 150))
             ctx.lineWidth = 0.5
             ctx.stroke()
           }

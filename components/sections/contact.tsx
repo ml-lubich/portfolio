@@ -40,7 +40,7 @@ const socialLinks = [
 
 export function Contact() {
   return (
-    <AnimatedSection id="contact" className="relative py-9 md:py-14 lg:py-20 overflow-hidden">
+    <AnimatedSection id="contact" className="relative py-6 md:py-14 lg:py-20 overflow-hidden">
       {/* 3D particle field background */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-15" aria-hidden="true">
         <ParticleField color="#a855f7" speed={0.08} />

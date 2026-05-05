@@ -17,7 +17,7 @@ import { clientTestimonials } from "@/data/client-testimonials"
 import { workMarqueeSegments } from "@/data/work-marquee"
 import { papers } from "@/data/publications"
 import { skillCategories, proficiencyBars } from "@/data/skills"
-import { blogPosts, BLOG_CATEGORIES, getPostBySlug, getReadingTime } from "@/lib/blog-data"
+import { blogPosts, BLOG_CATEGORIES, getPostBySlug } from "@/lib/blog-data"
 import { navLinks } from "@/components/nav/nav-links"
 
 // ── Experiences ────────────────────────────────────────────────────────────────
@@ -79,6 +79,17 @@ describe("Projects data", () => {
                 expect(proj.detail.title).toBeTruthy()
                 expect(proj.detail.description).toBeTruthy()
                 expect(proj.detail.techStack?.length).toBeGreaterThan(0)
+            })
+
+            it("has valid optional project media and links", () => {
+                if (proj.coverImage != null && proj.coverImage !== "") {
+                    expect(proj.coverImage).toMatch(/^\/images\//)
+                }
+
+                if (proj.detail.link != null) {
+                    expect(proj.detail.link.label).toBeTruthy()
+                    expect(proj.detail.link.url).toMatch(/^https:\/\//)
+                }
             })
         })
     }
@@ -227,6 +238,18 @@ describe("Blog posts data", () => {
         expect(new Set(slugs).size).toBe(slugs.length)
     })
 
+    it("should use a distinct cover image per post", () => {
+        const urls = blogPosts.map((p) => p.coverImage)
+        const normalized = urls.map((u) => u.split("?")[0])
+        expect(new Set(normalized).size).toBe(normalized.length)
+    })
+
+    it("should have HTTPS cover URLs for every post", () => {
+        for (const post of blogPosts) {
+            expect(post.coverImage).toMatch(/^https:\/\//)
+        }
+    })
+
     for (const post of blogPosts) {
         describe(`post: ${post.slug}`, () => {
             it("has required fields", () => {
@@ -258,8 +281,8 @@ describe("Blog posts data", () => {
                 expect(found!.title).toBe(post.title)
             })
 
-            it("has a positive reading time", () => {
-                expect(getReadingTime(post.content)).toBeGreaterThan(0)
+            it("has a positive reading time from frontmatter loader", () => {
+                expect(post.readingTime).toBeGreaterThan(0)
             })
         })
     }

@@ -1,18 +1,27 @@
 "use client"
 
 import { useEffect, useRef } from "react"
-import { X, ArrowRight, ExternalLink } from "lucide-react"
+import { X, ArrowLeft, ArrowRight, ExternalLink } from "lucide-react"
 import type { DetailPanelData } from "./types"
 import { iconMap } from "./types"
 import { ArchitectureDiagram } from "./architecture-diagram"
+
+export type DetailPanelCloseStyle = "dismiss" | "back"
 
 interface DetailPanelProps {
   data: DetailPanelData | null
   isOpen: boolean
   onClose: () => void
+  /** `back` = leading arrow (mobile full-screen overlay). `dismiss` = trailing X (desktop / inline). */
+  closeButtonStyle?: DetailPanelCloseStyle
 }
 
-export function DetailPanel({ data, isOpen, onClose }: DetailPanelProps) {
+export function DetailPanel({
+  data,
+  isOpen,
+  onClose,
+  closeButtonStyle = "dismiss",
+}: DetailPanelProps) {
   const panelRef = useRef<HTMLDivElement>(null)
 
   // Close on Escape
@@ -57,16 +66,35 @@ export function DetailPanel({ data, isOpen, onClose }: DetailPanelProps) {
       {/* Gradient accent line */}
       <div className={`absolute left-0 top-0 h-full w-[3px] rounded-l-[28px] bg-gradient-to-b ${data.gradient}`} />
 
-      {/* Close button — pinned outside scroll area */}
-      <button
-        onClick={onClose}
-        className="group absolute right-6 top-6 z-20 flex h-9 w-9 items-center justify-center rounded-[14px] border border-white/[0.10] bg-white/[0.05] backdrop-blur-xl transition-all duration-200 hover:border-white/[0.18] hover:bg-white/[0.10] shadow-sm shadow-black/10"
-        aria-label="Close panel"
-      >
-        <X className="h-4 w-4 text-muted-foreground transition-colors group-hover:text-primary" />
-      </button>
+      {/* Close / back — pinned outside scroll area */}
+      {closeButtonStyle === "back" ? (
+        <button
+          type="button"
+          onClick={onClose}
+          className="group absolute left-6 top-6 z-20 flex h-9 w-9 items-center justify-center rounded-[14px] border border-white/[0.10] bg-white/[0.05] backdrop-blur-xl transition-all duration-200 hover:border-white/[0.18] hover:bg-white/[0.10] shadow-sm shadow-black/10"
+          aria-label="Back"
+        >
+          <ArrowLeft className="h-4 w-4 text-muted-foreground transition-colors group-hover:text-primary" />
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={onClose}
+          className="group absolute right-6 top-6 z-20 flex h-9 w-9 items-center justify-center rounded-[14px] border border-white/[0.10] bg-white/[0.05] backdrop-blur-xl transition-all duration-200 hover:border-white/[0.18] hover:bg-white/[0.10] shadow-sm shadow-black/10"
+          aria-label="Close panel"
+        >
+          <X className="h-4 w-4 text-muted-foreground transition-colors group-hover:text-primary" />
+        </button>
+      )}
 
-      <div className="detail-panel-scroll relative flex-1 overflow-y-auto overscroll-contain px-5 py-5 sm:px-8 sm:py-7" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.15) transparent' }}>
+      <div
+        className={`detail-panel-scroll relative flex-1 overflow-y-auto overscroll-contain py-5 sm:py-7 ${
+          closeButtonStyle === "back"
+            ? "pl-[calc(1.5rem+2.25rem+0.75rem)] pr-5 sm:pr-8"
+            : "px-5 sm:px-8"
+        }`}
+        style={{ scrollbarWidth: "thin", scrollbarColor: "rgba(255,255,255,0.15) transparent" }}
+      >
         {/* Header */}
         <div className="panel-stagger pr-12">
           {data.period && (

@@ -4,18 +4,288 @@ import {
   useCallback,
   useEffect,
   useRef,
+  cloneElement,
+  isValidElement,
+  type ReactElement,
+  type ReactNode,
   type MouseEvent as ReactMouseEvent,
   type TouchEvent as ReactTouchEvent,
 } from "react"
+import { createPortal } from "react-dom"
+import type { DetailPanelCloseStyle } from "@/components/detail-panel"
 import type { ScrollStackCardsProps, DragState } from "./types"
 import { SPRING, DAMPING, FLING_DECAY, DRAG_DEAD_ZONE, newDragState } from "./constants"
 import { GlowOverlay, ShineOverlay, ScanOverlay } from "./card-overlays"
 import { overlays, shadows } from "@/lib/theme"
-import { useIsMobile, useReducedStackEffects } from "@/hooks/use-mobile"
+import { resolveScrollStackVariant } from "@/lib/scroll-stack-layout"
+import {
+  useIsMobile,
+  useReducedStackEffects,
+  useScrollStackCompactViewport,
+} from "@/hooks/use-mobile"
 
 /** One shadow value during scroll — avoids interpolating box-shadow every frame (repaint-heavy). */
 const DESKTOP_SCROLL_STACK_SHADOW =
   "0 22px 50px -12px rgba(0,0,0,0.32), 0 0 0 1px rgba(255,255,255,0.03)"
+
+/** Hash / scrollIntoView / bringing the detail row into view must not instantly trigger scroll-dismiss. */
+const DETAIL_SCROLL_DISMISS_GRACE_MS = 550
+
+function withPhoneDetailBackButton(node: ReactNode): ReactNode {
+  if (!isValidElement(node)) return node
+  return cloneElement(node as ReactElement<{ closeButtonStyle?: DetailPanelCloseStyle }>, {
+    closeButtonStyle: "back",
+  })
+}
+
+/** `useIsMobile` (<768): full-viewport detail + body scroll lock. Above `z-50` nav. */
+function ScrollStackPhoneDetailLayer({
+  open,
+  detailContent,
+}: {
+  open: boolean
+  detailContent: ReactNode
+}) {
+  useEffect(() => {
+    if (!open) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = "hidden"
+    return () => {
+      document.body.style.overflow = prev
+    }
+  }, [open])
+
+  if (!open || typeof document === "undefined") return null
+
+  return createPortal(
+    <div
+      className="fixed inset-0 z-[100] flex flex-col bg-background/95 backdrop-blur-xl supports-[backdrop-filter]:bg-background/85"
+      style={{
+        paddingTop: "env(safe-area-inset-top, 0px)",
+        paddingBottom: "env(safe-area-inset-bottom, 0px)",
+      }}
+    >
+      <div className="flex min-h-0 flex-1 flex-col px-2 pb-2 pt-1">
+        <div className="min-h-0 flex-1 overflow-hidden [&>div]:h-full">
+          {withPhoneDetailBackButton(detailContent)}
+        </div>
+      </div>
+    </div>,
+    document.body,
+  )
+}
+
+/** Phones, tablets, and coarse-pointer viewports: plain column — no sticky scroll-stack runway. */
+function ScrollStackCardsMobile({
+  cards,
+  className = "",
+  header,
+  activeCardId = null,
+  onScrollDismiss,
+  detailContent,
+}: ScrollStackCardsProps) {
+  const isPhone = useIsMobile()
+  const isExpanded = !!activeCardId
+  const phoneFullscreenOpen = isPhone && isExpanded && !!detailContent
+  const phoneFullscreenRef = useRef(phoneFullscreenOpen)
+  phoneFullscreenRef.current = phoneFullscreenOpen
+
+  const activeCardIdRef = useRef(activeCardId)
+  activeCardIdRef.current = activeCardId
+  const onScrollDismissRef = useRef(onScrollDismiss)
+  onScrollDismissRef.current = onScrollDismiss
+  const expandedScrollY = useRef(0)
+  const detailOpenedAtRef = useRef(0)
+  const detailWrapperRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (activeCardId) {
+      detailOpenedAtRef.current = Date.now()
+      expandedScrollY.current = window.scrollY
+      const t = window.setTimeout(() => {
+        expandedScrollY.current = window.scrollY
+      }, DETAIL_SCROLL_DISMISS_GRACE_MS)
+      return () => clearTimeout(t)
+    }
+  }, [activeCardId])
+
+  useEffect(() => {
+    const onScroll = () => {
+      if (phoneFullscreenRef.current) return
+      if (activeCardIdRef.current && onScrollDismissRef.current) {
+        if (Date.now() - detailOpenedAtRef.current < DETAIL_SCROLL_DISMISS_GRACE_MS) return
+        const delta = Math.abs(window.scrollY - expandedScrollY.current)
+        if (delta > 25) {
+          onScrollDismissRef.current()
+        }
+      }
+    }
+    window.addEventListener("scroll", onScroll, { passive: true })
+    return () => window.removeEventListener("scroll", onScroll)
+  }, [])
+
+  useEffect(() => {
+    if (phoneFullscreenOpen) return
+    const el = detailWrapperRef.current
+    if (!el || !isExpanded) return
+
+    const recalcHeight = () => {
+      const top = el.getBoundingClientRect().top
+      const available = window.innerHeight - top - 24
+      const h = `${Math.max(200, available)}px`
+      el.style.height = h
+      el.style.maxHeight = h
+    }
+
+    requestAnimationFrame(() => requestAnimationFrame(recalcHeight))
+    window.addEventListener("resize", recalcHeight, { passive: true })
+    return () => window.removeEventListener("resize", recalcHeight)
+  }, [isExpanded, phoneFullscreenOpen])
+
+  useEffect(() => {
+    if (phoneFullscreenOpen) return
+    if (!activeCardId || !detailWrapperRef.current) return
+    const el = detailWrapperRef.current
+    const id = requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        el.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" })
+      })
+    })
+    return () => cancelAnimationFrame(id)
+  }, [activeCardId, phoneFullscreenOpen])
+
+  return (
+    <div className={className || undefined}>
+      {header}
+      <div className="flex flex-col gap-3 md:gap-6">
+        {cards.map((card) => (
+          <div key={card.id} id={card.id} className="min-h-0 w-full">
+            {card.children}
+          </div>
+        ))}
+      </div>
+      {!phoneFullscreenOpen && detailContent ? (
+        <div
+          ref={detailWrapperRef}
+          className={
+            isExpanded
+              ? "mt-6 w-full min-h-0 overflow-hidden rounded-[28px]"
+              : "hidden h-0 overflow-hidden"
+          }
+        >
+          {detailContent}
+        </div>
+      ) : null}
+      <ScrollStackPhoneDetailLayer open={phoneFullscreenOpen} detailContent={detailContent ?? null} />
+    </div>
+  )
+}
+
+/** Two-up grid: no sticky runway, no overlapping stack. */
+function ScrollStackCardsGrid({
+  cards,
+  className = "",
+  header,
+  activeCardId = null,
+  onScrollDismiss,
+  detailContent,
+}: ScrollStackCardsProps) {
+  const isPhone = useIsMobile()
+  const isExpanded = !!activeCardId
+  const phoneFullscreenOpen = isPhone && isExpanded && !!detailContent
+  const phoneFullscreenRef = useRef(phoneFullscreenOpen)
+  phoneFullscreenRef.current = phoneFullscreenOpen
+
+  const activeCardIdRef = useRef(activeCardId)
+  activeCardIdRef.current = activeCardId
+  const onScrollDismissRef = useRef(onScrollDismiss)
+  onScrollDismissRef.current = onScrollDismiss
+  const expandedScrollY = useRef(0)
+  const detailOpenedAtRef = useRef(0)
+  const detailWrapperRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (activeCardId) {
+      detailOpenedAtRef.current = Date.now()
+      expandedScrollY.current = window.scrollY
+      const t = window.setTimeout(() => {
+        expandedScrollY.current = window.scrollY
+      }, DETAIL_SCROLL_DISMISS_GRACE_MS)
+      return () => clearTimeout(t)
+    }
+  }, [activeCardId])
+
+  useEffect(() => {
+    const onScroll = () => {
+      if (phoneFullscreenRef.current) return
+      if (activeCardIdRef.current && onScrollDismissRef.current) {
+        if (Date.now() - detailOpenedAtRef.current < DETAIL_SCROLL_DISMISS_GRACE_MS) return
+        const delta = Math.abs(window.scrollY - expandedScrollY.current)
+        if (delta > 25) {
+          onScrollDismissRef.current()
+        }
+      }
+    }
+    window.addEventListener("scroll", onScroll, { passive: true })
+    return () => window.removeEventListener("scroll", onScroll)
+  }, [])
+
+  useEffect(() => {
+    if (phoneFullscreenOpen) return
+    const el = detailWrapperRef.current
+    if (!el || !isExpanded) return
+
+    const recalcHeight = () => {
+      const top = el.getBoundingClientRect().top
+      const available = window.innerHeight - top - 24
+      const h = `${Math.max(200, available)}px`
+      el.style.height = h
+      el.style.maxHeight = h
+    }
+
+    requestAnimationFrame(() => requestAnimationFrame(recalcHeight))
+    window.addEventListener("resize", recalcHeight, { passive: true })
+    return () => window.removeEventListener("resize", recalcHeight)
+  }, [isExpanded, phoneFullscreenOpen])
+
+  useEffect(() => {
+    if (phoneFullscreenOpen) return
+    if (!activeCardId || !detailWrapperRef.current) return
+    const el = detailWrapperRef.current
+    const id = requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        el.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" })
+      })
+    })
+    return () => cancelAnimationFrame(id)
+  }, [activeCardId, phoneFullscreenOpen])
+
+  return (
+    <div className={className || undefined}>
+      {header}
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2 md:items-stretch md:gap-6 lg:gap-8">
+        {cards.map((card) => (
+          <div key={card.id} id={card.id} className="flex min-h-0 h-full w-full flex-col">
+            {card.children}
+          </div>
+        ))}
+      </div>
+      {!phoneFullscreenOpen && detailContent ? (
+        <div
+          ref={detailWrapperRef}
+          className={
+            isExpanded
+              ? "mt-6 w-full min-h-0 overflow-hidden rounded-[28px]"
+              : "hidden h-0 overflow-hidden"
+          }
+        >
+          {detailContent}
+        </div>
+      ) : null}
+      <ScrollStackPhoneDetailLayer open={phoneFullscreenOpen} detailContent={detailContent ?? null} />
+    </div>
+  )
+}
 
 /** Bias linear scroll progress so most motion happens in the first part of each card segment (snappier). */
 function snapScrollProgress(t: number, power: number): number {
@@ -31,7 +301,7 @@ function snapScrollProgress(t: number, power: number): number {
  * your pointer with 3D rotation derived from drag velocity, then flings and
  * springs back with momentum when you release.
  */
-export function ScrollStackCards({
+function ScrollStackCardsDesktop({
   cards,
   className = "",
   header,
@@ -43,17 +313,11 @@ export function ScrollStackCards({
   onScrollDismiss,
   detailContent,
 }: ScrollStackCardsProps) {
-  const isMobile = useIsMobile()
   const reducedStack = useReducedStackEffects()
-  const isMobileRef = useRef(isMobile)
-  isMobileRef.current = isMobile
 
-  // Mobile: minimal stack peek, short scroll runway — laptop uses caller props unchanged.
-  /** Keep sticky headers below fixed nav (min 72px); capping at 48 caused overlap. */
-  const effStickyTop = isMobile ? Math.max(72, Math.min(stickyTop, 96)) : stickyTop
-  const effStackOffset = isMobile ? 0 : stackOffset
-  const effScrollPerCard = isMobile ? Math.min(scrollPerCard, 14) : scrollPerCard
-  const effPerspective = isMobile ? Math.min(perspective, 800) : perspective
+  const effStickyTop = stickyTop
+  const effStackOffset = stackOffset
+  const effScrollPerCard = scrollPerCard
 
   const containerRef = useRef<HTMLDivElement>(null)
   const cardRefs = useRef<(HTMLDivElement | null)[]>([])
@@ -83,6 +347,7 @@ export function ScrollStackCards({
   const onScrollDismissRef = useRef(onScrollDismiss)
   onScrollDismissRef.current = onScrollDismiss
   const expandedScrollY = useRef(0)
+  const detailOpenedAtRef = useRef(0)
   const detailWrapperRef = useRef<HTMLDivElement>(null)
 
   const reducedStackRef = useRef(reducedStack)
@@ -148,9 +413,8 @@ export function ScrollStackCards({
       const enterStart = Math.max(0, arriveAt - step)
       const rawEnter =
         i === 0 ? 1 : Math.min(Math.max((totalProgress - enterStart) / step, 0), 1)
-      const mobileTight = isMobileRef.current
-      const enterPow = mobileTight ? 1.28 : 2.55
-      const coverPow = mobileTight ? 1.22 : 2.45
+      const enterPow = 2.55
+      const coverPow = 2.45
       const enterProgress = i === 0 ? 1 : snapScrollProgress(rawEnter, enterPow)
 
       let rawCover = 0
@@ -162,17 +426,17 @@ export function ScrollStackCards({
       enterBuf[i] = enterProgress
       coverBuf[i] = coverProgress
 
-      // Softer motion + 2D stack on phones / tablets (see useReducedStackEffects).
+      // Softer motion + 2D stack on reduced viewports (see useReducedStackEffects).
       const reduced = reducedStackRef.current
-      const slideMult = mobileTight ? 0.48 : 1
-      const scaleMult = mobileTight ? 0.45 : 1
+      const slideMult = 1
+      const scaleMult = 1
       const scale = 1 - coverProgress * (reduced ? 0.03 : 0.06) * scaleMult
       const translateZ = coverProgress * (reduced ? -25 : -60)
       const rotateX = coverProgress * (reduced ? 0.8 : 2)
       const borderRadius = 20 + coverProgress * 12
       const slideUp =
         (1 - enterProgress) * (reduced ? 38 : 52) * slideMult
-      const enterOpacity = Math.min(enterProgress * (mobileTight ? 7.5 : 4.25), 1)
+      const enterOpacity = Math.min(enterProgress * 4.25, 1)
       const stackedOpacity = 1 - coverProgress * 0.3
       /* Bake “brightness” into opacity on all viewports — filter:brightness() repaints during scroll. */
       const dimFactor = reduced ? 1 - coverProgress * 0.18 : 1 - coverProgress * 0.2
@@ -392,7 +656,6 @@ export function ScrollStackCards({
 
   /* ── Mouse handlers ─────────────────────────────────────────────────── */
   const handleMouseDown = useCallback((e: ReactMouseEvent<HTMLDivElement>, index: number) => {
-    if (isMobileRef.current) return
     if ((e.target as HTMLElement).closest("a, button")) return
     if (activeCardIdRef.current) return // No drag while panel is open
     e.preventDefault()
@@ -479,7 +742,6 @@ export function ScrollStackCards({
   const lastTouchTime = useRef(0)
 
   const handleTouchStart = useCallback((e: ReactTouchEvent<HTMLDivElement>, index: number) => {
-    if (isMobileRef.current) return
     if ((e.target as HTMLElement).closest("a, button")) return
     if (activeCardIdRef.current) return // No drag while panel is open
     lastTouchTime.current = Date.now()
@@ -545,7 +807,7 @@ export function ScrollStackCards({
 
     const recalcHeight = () => {
       const top = el.getBoundingClientRect().top
-      const available = window.innerHeight - top - 16
+      const available = window.innerHeight - top - 24
       const h = `${Math.max(200, available)}px`
       el.style.height = h
       el.style.maxHeight = h
@@ -561,7 +823,12 @@ export function ScrollStackCards({
   /* ── Record scroll position when panel expands ────────────────────── */
   useEffect(() => {
     if (activeCardId) {
+      detailOpenedAtRef.current = Date.now()
       expandedScrollY.current = window.scrollY
+      const t = window.setTimeout(() => {
+        expandedScrollY.current = window.scrollY
+      }, DETAIL_SCROLL_DISMISS_GRACE_MS)
+      return () => clearTimeout(t)
     }
   }, [activeCardId])
 
@@ -573,7 +840,11 @@ export function ScrollStackCards({
     let scrollRafId = 0
     const onScroll = () => {
       // Auto-dismiss detail panel on meaningful scroll (> 25px)
-      if (activeCardIdRef.current && onScrollDismissRef.current) {
+      if (
+        activeCardIdRef.current &&
+        onScrollDismissRef.current &&
+        Date.now() - detailOpenedAtRef.current >= DETAIL_SCROLL_DISMISS_GRACE_MS
+      ) {
         const delta = Math.abs(window.scrollY - expandedScrollY.current)
         if (delta > 25) {
           onScrollDismissRef.current()
@@ -629,7 +900,11 @@ export function ScrollStackCards({
     }
   }, [updateCards])
 
-  const runwayHeight = `${(cards.length - 1) * effScrollPerCard + 64}vh`
+  const scrollSpanVh = (cards.length - 1) * effScrollPerCard
+  const padVh = 64
+  const runwayVh =
+    cards.length <= 1 ? scrollSpanVh + padVh : Math.max(scrollSpanVh + padVh, 108)
+  const runwayHeight = `${runwayVh}vh`
 
   return (
     <div
@@ -654,19 +929,20 @@ export function ScrollStackCards({
             style={{
               display: "grid",
               gridTemplateColumns: "1fr",
-              gridTemplateRows: "1fr",
+              gridTemplateRows: "max-content",
+              alignItems: "start",
+              justifyItems: "stretch",
               transform: isExpanded
                 ? "translateX(-15%) scale(0.85)"
                 : "translateX(0) scale(1)",
               transformOrigin: "left top",
-              transition: isMobile
-                ? "transform 0.32s cubic-bezier(0.16, 1, 0.3, 1)"
-                : "transform 0.65s cubic-bezier(0.16, 1, 0.3, 1)",
+              transition: "transform 0.65s cubic-bezier(0.16, 1, 0.3, 1)",
             }}
           >
             {cards.map((card, i) => (
               <div
                 key={card.id}
+                id={card.id}
                 ref={(el) => { cardRefs.current[i] = el }}
                 data-stack-card
                 className="will-change-transform select-none"
@@ -674,11 +950,14 @@ export function ScrollStackCards({
                   gridRow: "1 / -1",
                   gridColumn: "1 / -1",
                   marginTop: `${i * effStackOffset}px`,
+                  height: "max-content",
+                  alignSelf: "start",
+                  justifySelf: "stretch",
                   transformOrigin: "center top",
                   transformStyle: reducedStack ? "flat" : "preserve-3d",
                   borderRadius: "20px",
                   overflow: "hidden",
-                  cursor: isExpanded ? "pointer" : isMobile ? "default" : "grab",
+                  cursor: isExpanded ? "pointer" : "grab",
                   zIndex: i + 1,
                   opacity: i === 0 ? 1 : 0,
                 }}
@@ -703,13 +982,12 @@ export function ScrollStackCards({
           {detailContent && (
             <div
               ref={detailWrapperRef}
-              className="absolute top-0 right-0 w-[92%] sm:w-[56%] lg:w-[52%]"
+              className="absolute top-0 right-0 min-h-0 w-[92%] sm:w-[56%] lg:w-[52%]"
               style={{
                 transform: isExpanded ? "translateX(0)" : "translateX(110%)",
                 opacity: isExpanded ? 1 : 0,
-                transition: isMobile
-                  ? "transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.22s ease"
-                  : "transform 0.65s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease",
+                transition:
+                  "transform 0.65s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease",
                 pointerEvents: isExpanded ? "auto" : "none",
                 zIndex: cards.length + 20,
               }}
@@ -721,4 +999,17 @@ export function ScrollStackCards({
       </div>
     </div>
   )
+}
+
+export function ScrollStackCards(props: ScrollStackCardsProps) {
+  const compactViewport = useScrollStackCompactViewport()
+  const variant = resolveScrollStackVariant(props.layout, compactViewport)
+
+  if (variant === "grid") {
+    return <ScrollStackCardsGrid {...props} />
+  }
+  if (variant === "compact") {
+    return <ScrollStackCardsMobile {...props} />
+  }
+  return <ScrollStackCardsDesktop {...props} />
 }

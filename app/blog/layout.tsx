@@ -7,6 +7,8 @@ import {
   SITE_URL,
   SITE_DEFAULT_OG_IMAGE,
   SITE_DEFAULT_OG_IMAGE_SIZE,
+  getBlogCanonicalUrl,
+  getBlogPublicLabel,
 } from "@/lib/site-config"
 
 const BASE_URL = SITE_URL
@@ -219,8 +221,8 @@ export default function BlogLayout({
                   className="h-full w-full object-contain"
                 />
               </div>
-              <a href={`${BASE_URL}/blog`} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
-                blog.mishalubich.com
+              <a href={getBlogCanonicalUrl()} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
+                {getBlogPublicLabel()}
               </a>
             </div>
             <nav aria-label="Blog footer navigation" className="flex flex-wrap items-center justify-center gap-4">

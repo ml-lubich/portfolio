@@ -6,7 +6,7 @@ import { ProfileIntro, LogoScroll, WorkMarquee } from "@/components/sections"
 import { LazySection } from "@/components/layout"
 
 /* ── Skeleton placeholder while chunks load ─────────────────────────── */
-function SectionSkeleton({ height = "40vh" }: { height?: string }) {
+function SectionSkeleton({ height = "30vh" }: { height?: string }) {
   return (
     <div
       className="flex items-center justify-center"
@@ -20,7 +20,7 @@ function SectionSkeleton({ height = "40vh" }: { height?: string }) {
 
 /* ── Below-fold sections: code-split & deferred ─────────────────────── */
 const LiveTerminal = dynamic(() => import("@/components/terminal").then(m => m.LiveTerminal), {
-  loading: () => <SectionSkeleton height="50vh" />,
+  loading: () => <SectionSkeleton height="36vh" />,
 })
 const AIExpertise = dynamic(() => import("@/components/sections/ai-expertise").then(m => m.AIExpertise), {
   loading: () => <SectionSkeleton />,
@@ -58,12 +58,14 @@ const Footer = dynamic(() => import("@/components/sections/footer").then(m => m.
   loading: () => <SectionSkeleton height="10vh" />,
 })
 /** Same top rhythm as consulting LazySection — separates lazy-mounted sections while scrolling */
-const LAZY_SECTION_TOP = "pt-10 md:pt-14 lg:pt-20"
+const LAZY_SECTION_TOP = "pt-6 md:pt-14 lg:pt-20"
 
 export default function Home() {
   return (
-    <main id="main-content" className="relative z-10 min-h-screen max-w-full" role="main">
+    <>
+      {/* Outside <main> so fixed nav + mobile overlay stack above hero/WebGL (main is z-10). */}
       <Navigation />
+      <main id="main-content" className="relative z-10 min-h-screen max-w-full" role="main">
       <Hero />
 
       {/* Below hero: solid page bg. Rainbow orbs render only inside <Hero> (not fixed), so fast scroll doesn’t drag a full-viewport effect. */}
@@ -84,7 +86,7 @@ export default function Home() {
         </LazySection>
         <LazySection
           sectionId="journey"
-          className={`${LAZY_SECTION_TOP} mb-12 md:mb-16 lg:mb-20`}
+          className={`${LAZY_SECTION_TOP} mb-8 md:mb-16 lg:mb-20`}
         >
           <Journey />
         </LazySection>
@@ -97,7 +99,7 @@ export default function Home() {
         </LazySection>
         <LazySection
           sectionId="projects"
-          className={`mt-8 border-t border-white/[0.06] md:mt-12 lg:mt-16 ${LAZY_SECTION_TOP}`}
+          className={`mt-5 border-t border-white/[0.06] md:mt-12 lg:mt-16 ${LAZY_SECTION_TOP}`}
         >
           <Projects />
         </LazySection>
@@ -110,7 +112,11 @@ export default function Home() {
         <LazySection sectionId="research" className={LAZY_SECTION_TOP}>
           <Publications />
         </LazySection>
-        <LazySection sectionId="contact" minHeight="30vh" className={LAZY_SECTION_TOP}>
+        <LazySection
+          sectionId="contact"
+          minHeight="min(28dvh, 260px)"
+          className={LAZY_SECTION_TOP}
+        >
           <Contact />
         </LazySection>
         <Footer />
@@ -145,6 +151,7 @@ export default function Home() {
           </ul>
         </nav>
       </section>
-    </main>
+      </main>
+    </>
   )
 }
