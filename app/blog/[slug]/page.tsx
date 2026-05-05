@@ -19,6 +19,7 @@ import {
   SITE_DEFAULT_OG_IMAGE,
   SITE_DEFAULT_OG_IMAGE_SIZE,
 } from "@/lib/site-config"
+import { getBlogDateYear } from "@/lib/blog-format"
 
 interface PageProps {
   params: Promise<{ slug: string }>
@@ -173,7 +174,7 @@ function BlogPostJsonLd({ slug }: { slug: string }) {
       url: `${SITE_URL}/blog`,
     },
     url: canonicalUrl,
-    copyrightYear: new Date(post.date).getFullYear(),
+    copyrightYear: getBlogDateYear(post.date),
     copyrightHolder: {
       "@type": "Person",
       name: AUTHOR.name,

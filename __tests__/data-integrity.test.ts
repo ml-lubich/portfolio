@@ -18,6 +18,7 @@ import { workMarqueeSegments } from "@/data/work-marquee"
 import { papers } from "@/data/publications"
 import { skillCategories, proficiencyBars } from "@/data/skills"
 import { blogPosts, BLOG_CATEGORIES, getPostBySlug } from "@/lib/blog-data"
+import { getBlogDateEpochMs } from "@/lib/blog-format"
 import { navLinks } from "@/components/nav/nav-links"
 
 // ── Experiences ────────────────────────────────────────────────────────────────
@@ -266,8 +267,8 @@ describe("Blog posts data", () => {
             })
 
             it("has a valid date", () => {
-                const d = new Date(post.date)
-                expect(d.toString()).not.toBe("Invalid Date")
+                expect(post.date).toMatch(/^\d{4}-\d{2}-\d{2}$/u)
+                expect(getBlogDateEpochMs(post.date)).toBeGreaterThan(0)
             })
 
             it("belongs to a known category", () => {

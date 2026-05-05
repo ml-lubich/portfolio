@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils"
  *
  *    <Callout type="warning">Watch out for this!</Callout>
  *    <Video src="https://youtube.com/embed/..." />
- *    <Figure src="/images/diagram.png" alt="Architecture" caption="System overview" />
+ *    <Figure src="/images/projects/enrichdata-hero.png" alt="Project screenshot" caption="System overview" />
  *    <CodeSandbox id="abc123" />
  *
  *  These map to beautiful, animated components automatically.

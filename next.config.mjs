@@ -30,6 +30,13 @@ const nextConfig = {
     ],
   },
   devIndicators: false,
+  // LAN / alternate host dev (Next 16+); silences cross-origin _next warnings on local network.
+  allowedDevOrigins: [
+    "http://192.168.1.200:3000",
+    "http://192.168.1.200:3002",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:3002",
+  ],
   // Aggressive chunking — puts Three.js / heavy libs in their own chunk
   experimental: {
     optimizePackageImports: [
@@ -43,13 +50,6 @@ const nextConfig = {
       "@radix-ui/react-popover",
       "@radix-ui/react-tabs",
       "recharts",
-    ],
-    // LAN / alternate host dev (Next 16+); silences cross-origin _next warnings on local network.
-    allowedDevOrigins: [
-      "http://192.168.1.200:3000",
-      "http://192.168.1.200:3002",
-      "http://127.0.0.1:3000",
-      "http://127.0.0.1:3002",
     ],
   },
   // Cache static assets aggressively & add security/SEO headers

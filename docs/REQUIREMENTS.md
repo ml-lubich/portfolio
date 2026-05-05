@@ -10,3 +10,7 @@
 ## Amendments
 
 Append new constraints or decisions as new bullets or dated subsections; do not delete historical requirements without a recorded reason.
+
+### 2026-05-05 — Terminal Snake Mode
+
+- The homepage terminal includes a playable Snake mode from the existing terminal surface; it must support laptop keyboard input through arrow keys and WASD, expose visible start/pause/reset controls, and keep gameplay local to the browser.

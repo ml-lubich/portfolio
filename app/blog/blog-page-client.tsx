@@ -8,6 +8,7 @@ import { getTagsFromPosts, normalizeBlogCategoryFromParam } from "@/lib/blog-sha
 import { BlogCard } from "@/components/blog/blog-card"
 import { BlogFilter, BlogSearch, BlogTagFilter } from "@/components/blog/blog-filter"
 import { getBlogPublicLabel } from "@/lib/site-config"
+import { getBlogDateEpochMs } from "@/lib/blog-format"
 import { ArrowUp, ArrowDown, Eye } from "lucide-react"
 
 type SortOrder = "newest" | "oldest" | "popular"
@@ -95,9 +96,9 @@ function BlogPageInner({
 
         // Sort
         if (sortOrder === "newest") {
-            posts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+            posts.sort((a, b) => getBlogDateEpochMs(b.date) - getBlogDateEpochMs(a.date))
         } else if (sortOrder === "oldest") {
-            posts.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+            posts.sort((a, b) => getBlogDateEpochMs(a.date) - getBlogDateEpochMs(b.date))
         } else if (sortOrder === "popular") {
             posts.sort((a, b) => parseInt(b.views) - parseInt(a.views))
         }

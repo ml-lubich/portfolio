@@ -3,17 +3,20 @@
 import React, { useEffect, useRef, useState, useCallback } from "react"
 import { AnimatedSection } from "../animations/animated-section"
 import { AnimatedText } from "../animations/animated-text"
-import { Terminal, Clock, Zap, Activity, Play } from "lucide-react"
+import { Terminal, Clock, Zap, Activity, Play, Gamepad2 } from "lucide-react"
 import { sessions } from "./session-data"
 import { highlight } from "./syntax-highlight"
+import { SnakeTerminal } from "./snake-terminal"
 import type { DisplayLine } from "./types"
 import { terminalChrome } from "@/lib/theme"
 
 const S = sessions
+type TerminalMode = "live" | "snake"
 
 export function LiveTerminal() {
   const [lines, setLines] = useState<DisplayLine[]>([])
   const [activeSession, setActiveSession] = useState(0)
+  const [terminalMode, setTerminalMode] = useState<TerminalMode>("live")
   const [totalChars, setTotalChars] = useState(0)
   const [linesCount, setLinesCount] = useState(0)
   const [visible, setVisible] = useState(false)
@@ -44,12 +47,13 @@ export function LiveTerminal() {
 
   // Jump handler
   const jumpTo = useCallback((idx: number) => {
+    setTerminalMode("live")
     jumpRef.current = idx
   }, [])
 
   // Engine — single rAF loop
   useEffect(() => {
-    if (!visible) return
+    if (!visible || terminalMode !== "live") return
 
     let order = shuffle()
     let orderPos = 0
@@ -142,7 +146,7 @@ export function LiveTerminal() {
     }, 500)
 
     return () => { cancelAnimationFrame(rafRef.current); clearInterval(iv) }
-  }, [visible, shuffle])
+  }, [visible, terminalMode, shuffle])
 
   // Auto-scroll
   useEffect(() => {
@@ -151,6 +155,7 @@ export function LiveTerminal() {
   }, [lines])
 
   const cur = S[activeSession]
+  const isSnakeMode = terminalMode === "snake"
 
   const renderLine = useCallback((dl: DisplayLine, idx: number, last: boolean) => {
     const ld = S[dl.si]?.lines[dl.li]
@@ -231,6 +236,22 @@ export function LiveTerminal() {
               <span className="hidden sm:inline">{s.time}</span>
             </button>
           ))}
+          <button
+            type="button"
+            onClick={() => setTerminalMode("snake")}
+            className={`
+              flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium
+              transition-all duration-150 whitespace-nowrap cursor-pointer
+              hover:bg-primary/10 hover:text-primary active:scale-95
+              ${isSnakeMode
+                ? "bg-primary/15 text-primary border border-primary/30 shadow-sm shadow-primary/10"
+                : "text-muted-foreground/50 border border-transparent hover:border-primary/20"
+              }
+            `}
+          >
+            <Gamepad2 className="h-3.5 w-3.5" />
+            <span>Snake</span>
+          </button>
         </div>
 
         {/* Terminal window */}
@@ -248,7 +269,7 @@ export function LiveTerminal() {
                   <div className={`w-3 h-3 rounded-full bg-[${terminalChrome.dotExpand}]`} />
                 </div>
                 <span className="ml-3 text-xs text-muted-foreground/50 font-mono truncate min-w-0">
-                  misha@dev ~ {cur?.label}
+                  misha@dev ~ {isSnakeMode ? "snake.play" : cur?.label}
                 </span>
               </div>
               <div className="flex items-center gap-3 text-[11px] shrink-0">
@@ -275,7 +296,7 @@ export function LiveTerminal() {
                   <div className={`w-2.5 h-2.5 rounded-full bg-[${terminalChrome.dotExpand}]`} />
                 </div>
                 <span className="ml-1 text-[10px] text-muted-foreground/50 font-mono min-w-0">
-                  misha@dev ~ {cur?.label}
+                  misha@dev ~ {isSnakeMode ? "snake.play" : cur?.label}
                 </span>
               </div>
               <div className="flex items-center gap-3 mt-1.5 ml-[calc(3*0.625rem+0.375rem+0.5rem)] text-[10px]">
@@ -299,32 +320,42 @@ export function LiveTerminal() {
           <div className="px-2.5 sm:px-4 py-1 bg-white/[0.02] border-b border-white/[0.04] flex items-center justify-between gap-2 min-w-0">
             <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-[11px] min-w-0">
               <Clock className="w-3 h-3 text-primary/30 shrink-0" />
-              <span className="font-mono text-foreground/50 truncate min-w-0">{cur?.icon} {cur?.time} — {cur?.label}</span>
+              <span className="font-mono text-foreground/50 truncate min-w-0">
+                {isSnakeMode ? "snake --play" : `${cur?.icon} ${cur?.time} — ${cur?.label}`}
+              </span>
             </div>
-            <span className="text-[10px] font-mono text-muted-foreground/25 shrink-0">{linesCount} lines</span>
+            <span className="text-[10px] font-mono text-muted-foreground/25 shrink-0">
+              {isSnakeMode ? "keyboard ready" : `${linesCount} lines`}
+            </span>
           </div>
 
           {/* Body */}
           <div
             ref={scrollRef}
-            className="p-2.5 sm:p-4 font-mono text-[11px] sm:text-[13px] leading-relaxed h-[320px] sm:h-[380px] overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-border/40 scrollbar-track-transparent"
+            className={`p-2.5 sm:p-4 font-mono text-[11px] sm:text-[13px] leading-relaxed ${isSnakeMode ? "h-[460px] sm:h-[420px]" : "h-[320px] sm:h-[380px]"} overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-border/40 scrollbar-track-transparent`}
           >
-            {lines.length === 0 && visible && (
-              <div className="text-muted-foreground/20 animate-pulse flex items-center gap-2">
-                <Play className="w-3 h-3" /> Loading session...
-              </div>
+            {isSnakeMode ? (
+              <SnakeTerminal />
+            ) : (
+              <>
+                {lines.length === 0 && visible && (
+                  <div className="text-muted-foreground/20 animate-pulse flex items-center gap-2">
+                    <Play className="w-3 h-3" /> Loading session...
+                  </div>
+                )}
+                {lines.map((dl, idx) => (
+                  <div key={`${dl.si}-${dl.li}-${idx}`}>
+                    {renderLine(dl, idx, idx === lines.length - 1)}
+                  </div>
+                ))}
+              </>
             )}
-            {lines.map((dl, idx) => (
-              <div key={`${dl.si}-${dl.li}-${idx}`}>
-                {renderLine(dl, idx, idx === lines.length - 1)}
-              </div>
-            ))}
           </div>
 
           {/* Footer */}
           <div className={`px-2.5 sm:px-4 py-1 bg-[${terminalChrome.footerBg}] border-t border-white/[0.04] flex items-center justify-between text-[10px] font-mono text-muted-foreground/25`}>
             <span>SESSION {activeSession + 1}/{S.length}</span>
-            <span>zsh — 80×24</span>
+            <span>{isSnakeMode ? "snake — local" : "zsh — 80×24"}</span>
           </div>
         </div>
       </div>

@@ -46,6 +46,16 @@ describe("brain orb regression guards", () => {
     }
   })
 
+  it("makeOrbMaterial: exposes viewport-tuned point glow as a shader uniform", () => {
+    const mat = makeOrbMaterial(createPullUniforms())
+
+    expect(mat.uniforms.uPointGlowMul?.value).toBe(1)
+    expect(declaredUniformNames(mat.fragmentShader).has("uPointGlowMul")).toBe(
+      true,
+    )
+    expect(mat.fragmentShader).toContain("intensity *= uPointGlowMul")
+  })
+
   it("constants: ORB_COUNT_CAP stays a positive pool size for neural orbs", () => {
     expect(Number.isFinite(ORB_COUNT_CAP)).toBe(true)
     expect(ORB_COUNT_CAP).toBeGreaterThanOrEqual(8)
@@ -72,6 +82,7 @@ describe("brain orb regression guards", () => {
     expect(src).toContain("getBrainOrbViewportTier")
     expect(src).toContain("orbBundle")
     expect(src).toContain("orbMaterial.uniforms.uFade.value = 1")
+    expect(src).toContain("orbMaterial.uniforms.uPointGlowMul.value")
     expect(src).toMatch(/<points\b/)
     expect(src).not.toMatch(/<bufferGeometry\s+ref=\{\s*orbGeoRef\s*\}/)
   })

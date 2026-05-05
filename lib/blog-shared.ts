@@ -42,8 +42,10 @@ export function normalizeBlogCategoryFromParam(
 export const AUTHOR = {
   name: "Misha Lubich",
   role: "AI Engineer & Technical Leader",
-  avatar: "/ml-avatar.jpg",
+  avatar: "/profile_blog.png",
 }
+
+export { formatBlogDate } from "./blog-format"
 
 /**
  * Calculate reading time from content string.

@@ -7,6 +7,7 @@ import fs from "fs"
 import path from "path"
 import matter from "gray-matter"
 import readingTime from "reading-time"
+import { getBlogDateEpochMs } from "@/lib/blog-format"
 
 const CONTENT_DIR = path.join(process.cwd(), "content/blog")
 const POST_META_PATH = path.join(process.cwd(), "data/blog/post-meta.json")
@@ -114,7 +115,7 @@ function loadAllPosts(): BlogPostFull[] {
     }
 
     // Sort by date descending (newest first)
-    posts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    posts.sort((a, b) => getBlogDateEpochMs(b.date) - getBlogDateEpochMs(a.date))
 
     _allPosts = posts
     return posts
@@ -170,5 +171,5 @@ export function getAllCategories(): string[] {
 export const AUTHOR = {
     name: "Misha Lubich",
     role: "AI Engineer & Technical Leader",
-    avatar: "/ml-avatar.jpg",
+    avatar: "/profile_blog.png",
 }

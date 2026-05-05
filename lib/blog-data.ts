@@ -20,6 +20,7 @@ export type { BlogPost, BlogPostListItem } from "./blog-shared"
 export {
   BLOG_CATEGORIES,
   AUTHOR,
+  formatBlogDate,
   getReadingTime,
   getTagsFromPosts,
   normalizeBlogCategoryFromParam,

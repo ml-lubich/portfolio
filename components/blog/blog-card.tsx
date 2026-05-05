@@ -4,7 +4,7 @@ import React, { useRef, useCallback, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
-import type { BlogPostListItem } from "@/lib/blog-shared"
+import { formatBlogDate, type BlogPostListItem } from "@/lib/blog-shared"
 import { overlays, shadows, blogBg } from "@/lib/theme"
 
 interface BlogCardProps {
@@ -84,11 +84,7 @@ export function BlogCard({
 }: BlogCardProps) {
   const router = useRouter()
   const readingTime = post.readingTime
-  const formattedDate = new Date(post.date).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  })
+  const formattedDate = formatBlogDate(post.date)
 
   const cardRef = useRef<HTMLDivElement>(null)
   const glareRef = useRef<HTMLDivElement>(null)

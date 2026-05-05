@@ -9,6 +9,7 @@ import {
 } from "@/lib/blog-data"
 import { BlogPageClient } from "./blog-page-client"
 import { SITE_URL } from "@/lib/site-config"
+import { formatBlogDate, getBlogDateEpochMs } from "@/lib/blog-format"
 
 /**
  * Server-rendered blog listing page.
@@ -33,7 +34,7 @@ export default async function BlogPage({
 
   // Sort posts newest first for the crawler-visible list
   const sortedPosts = [...blogPosts].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    (a, b) => getBlogDateEpochMs(b.date) - getBlogDateEpochMs(a.date)
   )
 
   // Compute total views on the server so client & server always match
@@ -97,11 +98,7 @@ export default async function BlogPage({
                   Tags: {post.tags.join(", ")}
                 </p>
                 <time dateTime={post.date}>
-                  {new Date(post.date).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
+                  {formatBlogDate(post.date)}
                 </time>
                 <p>By {AUTHOR.name}</p>
               </article>

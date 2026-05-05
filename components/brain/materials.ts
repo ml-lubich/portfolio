@@ -15,7 +15,7 @@ export function createPullUniforms(): PullUniforms {
 /* ── Inject GPU pull-displacement into Three.js material ──────────── */
 
 export function injectPull(mat: THREE.Material, u: PullUniforms) {
-  ; (mat as any).onBeforeCompile = (shader: any) => {
+  mat.onBeforeCompile = (shader) => {
     shader.uniforms.uPullPoint = u.uPullPoint
     shader.uniforms.uPullStrength = u.uPullStrength
     shader.uniforms.uPullRadius = u.uPullRadius
@@ -55,6 +55,7 @@ export function makeOrbMaterial(pull?: PullUniforms) {
       uTime: { value: 0 },
       uFade: { value: 0 },
       uSizeMul: { value: 380.0 },
+      uPointGlowMul: { value: 1.0 },
       uPullPoint: pull?.uPullPoint ?? { value: new THREE.Vector3() },
       uPullStrength: pull?.uPullStrength ?? { value: 0 },
       uPullRadius: pull?.uPullRadius ?? { value: 0.35 },
@@ -85,6 +86,7 @@ export function makeOrbMaterial(pull?: PullUniforms) {
     fragmentShader: /* glsl */ `
       uniform float uTime;
       uniform float uFade;
+      uniform float uPointGlowMul;
       varying vec3 vColor;
       void main() {
         float d = length(gl_PointCoord - vec2(0.5));
@@ -102,6 +104,7 @@ export function makeOrbMaterial(pull?: PullUniforms) {
         intensity *= smoothstep(0.5, 0.25, d);
         intensity *= 0.88 + 0.12 * sin(uTime * 5.0);
         intensity *= uFade;
+        intensity *= uPointGlowMul;
 
         vec3 color = ${glsl.glowColor} * fringe
                    + vec3(0.35, 0.65, 0.88) * (outer + mid)

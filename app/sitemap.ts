@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next"
 import { blogPosts, BLOG_CATEGORIES } from "@/lib/blog-data"
 import { SITE_URL } from "@/lib/site-config"
+import { getBlogDateEpochMs } from "@/lib/blog-format"
 
 /**
  * Dynamic sitemap generation.
@@ -20,7 +21,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // Get the most recent blog post date for the blog listing page
   const latestBlogDate = blogPosts.length > 0
     ? new Date(
-        Math.max(...blogPosts.map((p) => new Date(p.date).getTime()))
+        Math.max(...blogPosts.map((p) => getBlogDateEpochMs(p.date)))
       ).toISOString()
     : now
 
@@ -70,10 +71,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   /* ── Blog posts — highest-value pages for SEO ─────────────── */
   const blogPages: MetadataRoute.Sitemap = blogPosts
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .sort((a, b) => getBlogDateEpochMs(b.date) - getBlogDateEpochMs(a.date))
     .map((post) => ({
       url: `${SITE_URL}/blog/${post.slug}`,
-      lastModified: new Date(post.date).toISOString(),
+      lastModified: new Date(getBlogDateEpochMs(post.date)).toISOString(),
       changeFrequency: "monthly" as const,
       priority: 0.8,
     }))

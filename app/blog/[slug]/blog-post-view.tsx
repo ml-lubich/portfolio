@@ -4,8 +4,7 @@ import React from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { motion } from "framer-motion"
-import type { BlogPost, BlogPostListItem } from "@/lib/blog-shared"
-import { AUTHOR } from "@/lib/blog-shared"
+import { AUTHOR, formatBlogDate, type BlogPost, type BlogPostListItem } from "@/lib/blog-shared"
 import { BlogCard } from "@/components/blog/blog-card"
 import { shadows } from "@/lib/theme"
 import { SITE_URL } from "@/lib/site-config"
@@ -18,11 +17,7 @@ interface BlogPostViewProps {
 
 export function BlogPostView({ post, relatedPosts, children }: BlogPostViewProps) {
   const readingTime = post.readingTime
-  const formattedDate = new Date(post.date).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  })
+  const formattedDate = formatBlogDate(post.date)
 
   const related = relatedPosts
 

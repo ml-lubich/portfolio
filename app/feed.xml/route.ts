@@ -5,6 +5,7 @@ import {
   SITE_DEFAULT_OG_IMAGE,
   SITE_DEFAULT_OG_IMAGE_SIZE,
 } from "@/lib/site-config"
+import { formatBlogDateUtc, getBlogDateEpochMs } from "@/lib/blog-format"
 
 const BASE_URL = SITE_URL
 
@@ -18,11 +19,11 @@ const BASE_URL = SITE_URL
  */
 export async function GET() {
   const posts = [...blogPosts].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    (a, b) => getBlogDateEpochMs(b.date) - getBlogDateEpochMs(a.date)
   )
 
   const latestDate = posts[0]?.date
-    ? new Date(posts[0].date).toUTCString()
+    ? formatBlogDateUtc(posts[0].date)
     : new Date().toUTCString()
 
   const escapeXml = (str: string) =>
@@ -44,7 +45,7 @@ export async function GET() {
       <link>${url}</link>
       <guid isPermaLink="true">${url}</guid>
       <description>${escapeXml(plainExcerpt)}</description>
-      <pubDate>${new Date(post.date).toUTCString()}</pubDate>
+      <pubDate>${formatBlogDateUtc(post.date)}</pubDate>
       <author>misha@mishalubich.com (${AUTHOR.name})</author>
       <category>${escapeXml(post.category)}</category>
 ${post.tags.map((tag) => `      <category>${escapeXml(tag)}</category>`).join("\n")}

@@ -5,13 +5,13 @@
 | Concern | Where it lives | What to tune |
 |--------|----------------|--------------|
 | **Whole brain size** (mesh + lines + hit sphere) | `components/brain/brain-wireframe.tsx` — `useInitialScale()` | Breakpoints `0.46` / `0.48` / `0.54` by initial `innerWidth` (frozen after first read). |
-| **Neural orb sprites** (glowing dots only) | `brain-wireframe.tsx` — `ShaderMaterial` + `uSizeMul` on mount (`520` / `460` / `420` / `380` by width). `neural-orbs.tsx` fills point buffers; count = `ORB_COUNT` in `constants.ts`. |
+| **Neural orb sprites** (glowing dots only) | `components/brain/constants.ts` — `getBrainOrbViewportTier()` controls active count, `sizeBase` / `sizeAmp`, `uSizeMul`, `trailGlowMul`, and `pointGlowMul`. `brain-wireframe.tsx` applies `uSizeMul` + `uPointGlowMul`; `neural-orbs.tsx` fills point buffers and applies active count + trail glow. |
 | **Camera framing** | `components/brain/index.tsx` — `getInitialCam()` | Initial `z` / `fov` (set on mount). |
 | **Orb motion / graph** | `components/brain/constants.ts` | `ORB_COUNT`, `ORB_SPEED`, `CHAIN_*`, `TRAIL_LENGTH`. |
 
 ## Invariant
 
-Do **not** confuse `useInitialScale()` with `uSizeMul`. Lowering `uSizeMul` shrinks only the sprite glow; changing `useInitialScale()` shrinks the entire brain asset.
+Do **not** confuse `useInitialScale()` with `uSizeMul` / `uPointGlowMul`. Lowering `uSizeMul` shrinks only the sprite glow; lowering `uPointGlowMul` dims only point-sprite intensity; changing `useInitialScale()` shrinks the entire brain asset.
 
 ## Background spectrum (page)
 

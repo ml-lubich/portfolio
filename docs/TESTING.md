@@ -9,6 +9,14 @@
 
 - `__tests__/data-integrity.test.ts` — under "Blog posts data": every post has an HTTPS `coverImage`, and cover URLs are **pairwise distinct** (enforces `data/blog/post-meta.json` staying in sync with unique art per slug).
 
+## Automated: media references
+
+- `__tests__/media-references.test.ts` — walks `app/`, `components/`, `content/`, `data/`, `lib/`, `styles/`, and text manifests under `public/` for image/media/static resource references. Local URLs must resolve to existing files under `public/` or a valid relative file, remote media URLs must return HTTP 2xx/3xx, and remote blog cover hosts must be present in `next.config.mjs` image remote patterns.
+
+## Automated: blog hydration dates
+
+- `__tests__/blog-hydration-regression.test.ts` — guards blog render paths against timezone-sensitive date rendering by requiring the shared deterministic formatter. Blog post dates must stay as `YYYY-MM-DD` so server and browser text do not drift by timezone.
+
 ## Automated: portfolio project data
 
 - `__tests__/data-integrity.test.ts` — under "Projects data": every project has required public card/detail fields; optional project cover images must point under `/images/`, and optional detail links must be HTTPS with a non-empty label.
@@ -19,11 +27,15 @@
 
 ## Automated: hero brain neural orbs
 
-- `__tests__/brain-orb-regression.test.ts` — `makeOrbMaterial()` uniform declarations match shader usage; `neural-orbs.tsx` uses `getBrainOrbViewportTier` + `setDrawRange` with shared `orbGeometry` buffers (no R3F `bufferGeometry ref` race); `brain-wireframe.tsx` builds `orbBundle` and mounts `<points geometry={…}>`; `ORB_COUNT_CAP` stays bounded (8–64).
+- `__tests__/brain-orb-regression.test.ts` — `makeOrbMaterial()` uniform declarations match shader usage and exposes the viewport-tuned `uPointGlowMul` shader uniform; `neural-orbs.tsx` uses `getBrainOrbViewportTier` + `setDrawRange` with shared `orbGeometry` buffers (no R3F `bufferGeometry ref` race); `brain-wireframe.tsx` builds `orbBundle`, mounts `<points geometry={…}>`, and applies tier uniforms on resize; `ORB_COUNT_CAP` stays bounded (8–64).
 
 ## Automated: navbar surface over hero
 
 - `__tests__/nav-hero-surface.test.ts` — `computeNavPastHero` in `lib/nav-hero-surface.ts`: frosted mode only when `#hero`’s `getBoundingClientRect().bottom <= 0`; transparent while any part of the hero remains below the viewport top. Includes a shallow guard that `components/nav/index.tsx` still calls `computeNavPastHero` and retains blur-off vs blur-on class tokens.
+
+## Automated: terminal snake game
+
+- `__tests__/snake-game.test.ts` — `lib/snake-game.ts`: verifies initial board placement, laptop keyboard direction mapping, reversal prevention, food growth/scoring, and wall collision loss state.
 
 ## Manual: hero brain
 
@@ -42,3 +54,11 @@ No automated visual regression for WebGL is required unless a dedicated snapshot
 1. Run `bun run build` and confirm the route table lists `● /blog/[slug]` (SSG via `generateStaticParams`), not server-only rendering for posts.
 2. Optional local timing after `bun run start`: request one `/blog/<slug>` from loopback; TTFB should stay low because the HTML is pre-rendered. The `/blog` index may show `ƒ` (dynamic) in the build output because of `searchParams`; that affects first paint of the listing, not SSG post payloads.
 3. In the browser on `/blog`: moving the mouse over cards must not cause visible jank on click — `components/blog/blog-card.tsx` applies tilt/glare via `requestAnimationFrame` + direct DOM updates (no `setState` on `mousemove`), and card links use `prefetch={false}` with `router.prefetch` on hover/focus/touch so the client does not prefetch every post in the viewport at once.
+
+## Automated: resource references
+
+- `__tests__/resource-references.test.ts` — scans app, component, content, data, lib, style, and public metadata text files for local image, media, font, manifest, and binary asset references. Absolute local references must resolve under `public/`; bare relative media strings in app/content/data fail so they cannot ship as runtime 404s.
+
+## Automated: blog hydration regression
+
+- `__tests__/blog-hydration-regression.test.ts` — blog render paths must use `formatBlogDate`, which formats date-only post metadata in UTC and prevents server/client text drift that can surface as minified React hydration error #418.
