@@ -44,6 +44,7 @@ flowchart LR
 - [Project layout](#project-layout)
 - [Performance](#performance)
 - [What's next](#whats-next)
+- [🗺️ Repository map](#️-repository-map)
 
 ## Request lifecycle (sequence)
 
@@ -189,3 +190,66 @@ docs/               # Project docs
 ---
 
 Thanks for visiting! Feedback, questions, or collab ideas welcome. 🚀
+
+
+## 🗺️ Repository map
+
+Top-level layout of `portfolio` rendered as a Mermaid mindmap (auto-generated from the on-disk tree).
+
+```mermaid
+mindmap
+  root((portfolio))
+    __tests__/
+      blog-hydration-regression.test.ts
+      blog-link-visibility.test.ts
+      blog-mdx-chart-content.test.ts
+      blog-routes-smoke.test.ts
+      brain-orb-regression.test.ts
+      brain-orb-viewport-tier.test.ts
+    app/
+      blog
+      demo
+      error.tsx
+      feed.xml
+      globals.css
+      layout.tsx
+    components/
+      animations
+      background-orbs.tsx
+      blog
+      brain
+      cards
+      detail-panel
+    content/
+      blog
+    data/
+      blog
+      client-testimonials.ts
+      consulting-clients.ts
+      experiences.ts
+      index.ts
+      projects.ts
+    docs/
+      ARCHITECTURE.md
+      DESIGN.md
+      OVERVIEW.md
+      REQUIREMENTS.md
+      TESTING.md
+    hooks/
+      use-mobile.tsx
+      use-scroll-progress.ts
+      use-toast.ts
+    lib/
+      blog-chart-schema.ts
+      blog-data.ts
+      blog-format.ts
+      blog-shared.ts
+      data
+      mdx-chart-fences.ts
+    files
+      README.md
+      next.config.mjs
+      package.json
+      tailwind.config.ts
+      tsconfig.json
+```
