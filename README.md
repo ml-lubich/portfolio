@@ -39,10 +39,40 @@ flowchart LR
 - [Features](#features)
 - [Tech stack](#tech-stack)
 - [Architecture at a glance](#architecture-at-a-glance)
+- [Request lifecycle (sequence)](#request-lifecycle-sequence)
 - [Development](#development)
 - [Project layout](#project-layout)
 - [Performance](#performance)
 - [What's next](#whats-next)
+
+## Request lifecycle (sequence)
+
+```mermaid
+sequenceDiagram
+    participant V as visitor
+    participant N as Next.js (RSC)
+    participant L as lib/blog-data
+    participant MDX as content/*.mdx
+    participant D as data/*.ts
+    participant T as Three.js / Canvas
+
+    V->>N: GET /
+    N->>D: load experience + projects
+    D-->>N: typed records
+    N-->>V: HTML shell + RSC payload
+    V->>T: hydrate brain hero
+    T-->>V: animated WebGL
+    V->>N: GET /blog/[slug]
+    N->>L: getPost(slug)
+    L->>MDX: read + compile
+    MDX-->>L: React tree
+    L-->>N: post + chart schema
+    N-->>V: rendered post
+    V->>N: GET /feed.xml
+    N->>L: list posts
+    L-->>N: xml
+    N-->>V: RSS feed
+```
 
 ## My thought process
 
