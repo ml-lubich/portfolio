@@ -45,6 +45,7 @@ flowchart LR
 - [Performance](#performance)
 - [What's next](#whats-next)
 - [🗺️ Repository map](#️-repository-map)
+- [📊 Code composition](#-code-composition)
 
 ## Request lifecycle (sequence)
 
@@ -252,4 +253,21 @@ mindmap
       package.json
       tailwind.config.ts
       tsconfig.json
+```
+
+
+## 📊 Code composition
+
+File-type breakdown of source under this repo (skips `.git`, `node_modules`, build caches, lockfiles).
+
+```mermaid
+pie showData title File-type composition of portfolio (272 files)
+    "TypeScript" : 200
+    "Markdown" : 34
+    "Image" : 16
+    "JavaScript" : 11
+    "Other" : 5
+    "JSON" : 4
+    "CSS" : 1
+    "Python" : 1
 ```
