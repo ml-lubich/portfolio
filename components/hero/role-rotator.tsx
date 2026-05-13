@@ -51,7 +51,7 @@ export function RoleRotator({
           onReveal={onNameRevealStart}
         />
       </span>
-      <span className="relative mt-2 block min-h-[4.25rem] w-full overflow-hidden sm:min-h-[2.4rem] md:min-h-[3rem] lg:min-h-[3.6rem]">
+      <span className="relative mt-2 block min-h-[2rem] w-full overflow-hidden sm:min-h-[2.4rem] md:min-h-[3rem] lg:min-h-[3.6rem]">
         {roles.map((role, i) => {
           const isActive = i === roleIndex
           const isLeaving = i === prevRoleIndex && isTransitioning
@@ -83,7 +83,7 @@ export function RoleRotator({
               }}
               aria-hidden={!isActive}
             >
-              <span className="gradient-text mx-auto max-w-[min(calc(100vw-1.5rem),36rem)] px-2 text-center text-pretty text-2xl font-light whitespace-normal sm:text-3xl md:text-4xl lg:text-5xl">
+              <span className="gradient-text mx-auto px-2 text-center text-pretty font-light whitespace-nowrap text-[clamp(0.95rem,4.2vw,1.5rem)] sm:text-3xl md:text-4xl lg:text-5xl">
                 {role}
               </span>
             </span>
