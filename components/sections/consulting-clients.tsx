@@ -22,7 +22,7 @@ export function ConsultingClients() {
         label="Consulting"
         afterLabel={
           <a
-            href="https://cal.com/misha-lubich"
+            href="https://calendar.app.google/T2VGkBsBAUzGABRB7"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 rounded-full border border-primary/25 bg-primary/[0.06] px-3 py-1.5 font-mono text-[11px] font-semibold uppercase tracking-wider text-primary transition-colors hover:border-primary/45 hover:bg-primary/10 hover:text-foreground"
@@ -54,7 +54,7 @@ export function ConsultingClients() {
             You heard the hype. I help people and organizations install, configure, and operate their own OpenClawinstances—channels, skills, updates, and ongoing maintenance—so your agent stack stays under your control. Competitive and affordable rates for you or your business 100% gauranteed or a refund on us!
           </p>
           <a
-            href="https://cal.com/misha-lubich"
+            href="https://calendar.app.google/T2VGkBsBAUzGABRB7"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 text-xs font-medium text-primary underline decoration-primary/35 underline-offset-[6px] transition-colors hover:decoration-primary/70 sm:text-sm"
@@ -72,7 +72,7 @@ export function ConsultingClients() {
           for consulting, builds, IT, and automations—done-for-you, customized to SMBs, orgs, or solo operators who need reliable help without enterprise price tags.
         </p>
         <a
-          href="https://cal.com/misha-lubich"
+          href="https://calendar.app.google/T2VGkBsBAUzGABRB7"
           target="_blank"
           rel="noopener noreferrer"
           className="mt-4 inline-flex items-center justify-center gap-2 rounded-full border border-primary/30 bg-primary/[0.08] px-5 py-2.5 font-mono text-[11px] font-semibold uppercase tracking-wider text-primary transition-colors hover:border-primary/50 hover:bg-primary/12 hover:text-foreground"

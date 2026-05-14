@@ -31,7 +31,7 @@ export function HeroCTAs() {
         <span className="relative z-10">View AI Expertise</span>
       </button>
       <a
-        href="https://cal.com/misha-lubich"
+        href="https://calendar.app.google/T2VGkBsBAUzGABRB7"
         target="_blank"
         rel="noopener noreferrer"
         className="group relative inline-flex items-center gap-2 overflow-hidden rounded-xl border border-white/[0.10] bg-card/30 px-6 py-3 text-sm font-semibold text-foreground shadow-[inset_0_1px_0_0_hsla(0,0%,100%,0.1)] shadow-sm shadow-black/25 ring-1 ring-inset ring-white/[0.06] backdrop-blur-xl backdrop-saturate-150 transition-all duration-300 hover:border-primary/35 hover:bg-white/[0.08] hover:shadow-lg hover:shadow-primary/15 glass-card-3d spotlight hover-lift sm:px-8 sm:py-3.5"
