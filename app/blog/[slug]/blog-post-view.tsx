@@ -3,7 +3,6 @@
 import React from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { motion } from "framer-motion"
 import { AUTHOR, formatBlogDate, type BlogPost, type BlogPostListItem } from "@/lib/blog-shared"
 import { BlogCard } from "@/components/blog/blog-card"
 import { shadows } from "@/lib/theme"
@@ -32,10 +31,7 @@ export function BlogPostView({ post, relatedPosts, children }: BlogPostViewProps
 
         <div className="relative z-10">
           {/* Breadcrumb */}
-          <motion.nav
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.2 }}
+          <nav
             className="mb-8 flex items-center gap-2 text-sm text-muted-foreground"
             aria-label="Breadcrumb"
           >
@@ -44,15 +40,10 @@ export function BlogPostView({ post, relatedPosts, children }: BlogPostViewProps
             </Link>
             <span aria-hidden="true">/</span>
             <span className="text-foreground/60 truncate max-w-[300px]">{post.title}</span>
-          </motion.nav>
+          </nav>
 
           {/* Header */}
-          <motion.header
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            className="mb-10"
-          >
+          <header className="mb-10">
             <div className="flex flex-wrap items-center gap-2 mb-4">
               <span className="inline-flex items-center rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-medium text-primary backdrop-blur-sm" itemProp="articleSection">
                 {post.category}
@@ -72,19 +63,12 @@ export function BlogPostView({ post, relatedPosts, children }: BlogPostViewProps
               {post.title}
             </h1>
 
-            <motion.p
-              initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
-              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              transition={{
-                duration: 0.4,
-                delay: 0.15,
-                ease: [0.22, 1, 0.36, 1],
-              }}
+            <p
               className="mt-4 text-lg text-muted-foreground leading-relaxed"
               itemProp="description"
             >
               {post.excerpt}
-            </motion.p>
+            </p>
 
             <div className="mt-6 flex items-center gap-4" itemProp="author" itemScope itemType="https://schema.org/Person">
               <div className={`relative h-10 w-10 overflow-hidden rounded-full ring-2 ring-primary/20 shadow-[${shadows.blogAvatar}]`}>
@@ -105,15 +89,10 @@ export function BlogPostView({ post, relatedPosts, children }: BlogPostViewProps
                 </div>
               </div>
             </div>
-          </motion.header>
+          </header>
 
           {/* Cover image */}
-          <motion.div
-            initial={{ opacity: 0, y: 10, scale: 0.99 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.3, delay: 0.05 }}
-            className="relative mb-12 overflow-hidden rounded-2xl border border-white/[0.06]"
-          >
+          <div className="relative mb-12 overflow-hidden rounded-2xl border border-white/[0.06]">
             <Image
               src={post.coverImage}
               alt={post.title}
@@ -124,26 +103,18 @@ export function BlogPostView({ post, relatedPosts, children }: BlogPostViewProps
               priority
             />
             <div className="absolute inset-0 bg-gradient-to-t from-background/40 to-transparent" />
-          </motion.div>
+          </div>
 
           {/* Content */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.1 }}
+          <div
             className="blog-content"
             itemProp="articleBody"
           >
             {children}
-          </motion.div>
+          </div>
 
           {/* Tags */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.15 }}
-            className="mt-16 flex flex-wrap gap-2 border-t border-white/[0.06] pt-8"
-          >
+          <div className="mt-16 flex flex-wrap gap-2 border-t border-white/[0.06] pt-8">
             {post.tags.map((tag) => (
               <Link
                 key={tag}
@@ -153,7 +124,7 @@ export function BlogPostView({ post, relatedPosts, children }: BlogPostViewProps
                 #{tag}
               </Link>
             ))}
-          </motion.div>
+          </div>
 
           {/* Share & back */}
           <div className="mt-8 flex items-center justify-between border-t border-white/[0.06] pt-8">
@@ -193,10 +164,7 @@ export function BlogPostView({ post, relatedPosts, children }: BlogPostViewProps
 
           {/* Related posts */}
           {related.length > 0 && (
-            <motion.section
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: 0.2 }}
+            <section
               className="mt-16"
               aria-label="Related articles"
             >
@@ -206,7 +174,7 @@ export function BlogPostView({ post, relatedPosts, children }: BlogPostViewProps
                   <BlogCard key={p.slug} post={p} />
                 ))}
               </div>
-            </motion.section>
+            </section>
           )}
         </div>
       </article>

@@ -55,6 +55,16 @@ const skillAliases: Record<string, string[]> = {
     "C++": ["C++", "C"],
     SQL: ["SQL", "PostgreSQL", "MySQL", "Oracle", "RDS", "SQLite"],
     YAML: ["Terraform", "Docker", "Kubernetes", "Ansible", "GitHub Actions"],
+
+    // Enterprise AI delivery → wire to LLM / agent / cloud stacks
+    "Customer Discovery": ["CrewAI", "LangGraph", "FastAPI"],
+    "Solution Scoping": ["CrewAI", "LangGraph", "FastAPI", "Next.js"],
+    "Production Rollouts": ["AWS", "Kubernetes", "Docker", "Terraform", "ECS", "Lambda"],
+    "Agent Skills & Sub-Agents": ["CrewAI", "LangGraph", "MCP"],
+    "Eval-Driven Iteration": ["LangSmith", "Prometheus", "Grafana", "MLflow"],
+    "Stakeholder Communication": [],
+    "White-Glove Deployment": ["AWS", "Azure", "Terraform", "Kubernetes"],
+    "Reference Architectures": ["CrewAI", "LangGraph", "FastAPI", "AWS", "Terraform"],
 }
 
 /* ── Result types ─────────────────────────────────────────────────── */

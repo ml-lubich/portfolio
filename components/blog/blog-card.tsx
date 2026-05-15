@@ -107,7 +107,6 @@ export function BlogCard({
     prefetch: false as const,
     onMouseEnter: warmRoute,
     onFocus: warmRoute,
-    onTouchStart: warmRoute,
   }
 
   const cardMotionStyle: React.CSSProperties = {

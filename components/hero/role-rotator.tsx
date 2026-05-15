@@ -99,7 +99,7 @@ export function RoleRotator({
 
 export function HeroSubtitle() {
   return (
-    <p className="mx-auto mt-5 max-w-3xl text-pretty text-sm leading-relaxed text-white/95 sm:mt-6 sm:text-base md:mt-7 md:text-lg">
+    <p className="hero-subtitle mx-auto mt-5 max-w-3xl text-pretty text-sm leading-relaxed text-white/95 sm:mt-6 sm:text-base md:mt-7 md:text-lg">
       <AnimatedText variant="blur-slide" delay={1200} stagger={30} duration={650}>
         {"Senior Software Engineer specializing in "}
         <span className="font-semibold text-foreground">AI-driven, cloud-native applications</span>

@@ -47,7 +47,12 @@ export function LazySection({
           observer.disconnect()
         }
       },
-      { rootMargin }
+      {
+        rootMargin:
+          rootMargin === "400px" && window.matchMedia("(max-width: 767px)").matches
+            ? "120px"
+            : rootMargin,
+      }
     )
     observer.observe(el)
     return () => observer.disconnect()

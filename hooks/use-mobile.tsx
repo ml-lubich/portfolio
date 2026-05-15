@@ -6,6 +6,7 @@ import {
   shouldUseCompactScrollStackViewport,
   type ScrollStackViewportSignals,
 } from "@/lib/scroll-stack-layout"
+import { subscribeWidthResize } from "@/lib/viewport-resize"
 
 const MOBILE_BREAKPOINT = MOBILE_SCROLL_STACK_BREAKPOINT_PX
 
@@ -24,7 +25,11 @@ function readScrollStackViewportSignals(): ScrollStackViewportSignals {
 
 /**
  * True when scroll-stack sections should use the vertical column (no sticky runway / rAF stack).
- * Subscribes to resize + relevant media queries so iPad / tablet class devices stay off the heavy path.
+ * Subscribes to width-only resize + relevant media queries so iPad / tablet class devices stay off the heavy path.
+ *
+ * iOS Safari fires `resize` whenever its URL bar collapses on scroll, which previously
+ * caused this hook to flip and re-render the entire scroll stack — visible as flicker.
+ * `subscribeWidthResize` ignores those height-only events.
  */
 export function useScrollStackCompactViewport(): boolean {
   return React.useSyncExternalStore(
@@ -36,12 +41,12 @@ export function useScrollStackCompactViewport(): boolean {
       mqlCoarse.addEventListener("change", onChange)
       mqlHover.addEventListener("change", onChange)
       mqlMotion.addEventListener("change", onChange)
-      window.addEventListener("resize", onChange, { passive: true })
+      const unsubscribeWidth = subscribeWidthResize(onChange)
       return () => {
         mqlCoarse.removeEventListener("change", onChange)
         mqlHover.removeEventListener("change", onChange)
         mqlMotion.removeEventListener("change", onChange)
-        window.removeEventListener("resize", onChange)
+        unsubscribeWidth()
       }
     },
     () => shouldUseCompactScrollStackViewport(readScrollStackViewportSignals()),
@@ -67,10 +72,10 @@ export function useReducedStackEffects() {
     compute()
     const mqlCoarse = window.matchMedia("(pointer: coarse)")
     mqlCoarse.addEventListener("change", compute)
-    window.addEventListener("resize", compute, { passive: true })
+    const unsubscribeWidth = subscribeWidthResize(compute)
     return () => {
       mqlCoarse.removeEventListener("change", compute)
-      window.removeEventListener("resize", compute)
+      unsubscribeWidth()
     }
   }, [])
 

@@ -43,9 +43,13 @@ export const experiences: Experience[] = [
                 "Led the architecture and deployment of a production AI platform powering multi-agent orchestration, real-time RAG pipelines, and full-stack AI experiences \u2014 all maintained at sub-second P95 latency serving enterprise customers.",
             highlights: [
                 "Architected multi-agent orchestration with CrewAI + LangGraph, RAG pipeline (pgvector, FAISS), real-time streaming \u2014 sub-second P95 latency",
+                "Embedded with strategic enterprise customers end-to-end \u2014 discovery, scoping, build, and white-glove production rollout inside their environments",
+                "Shipped reusable agent skills, MCP tool servers, and sub-agents that customer engineering teams adopted into their own production workflows",
                 "Built full-stack AI apps using React/Next.js, TypeScript, FastAPI, Tailwind CSS with MCP tool server integration and WebSocket streaming",
                 "Designed self-improving agentic systems with feedback loops, adaptive chunking, multi-model routing (GPT-4o, Claude Sonnet 4, Gemini 2.0)",
                 "Implemented LLM observability stack with LangSmith, Prometheus, Grafana and custom guardrails for prompt injection / bias detection",
+                "Stood up eval-driven iteration loops (RAGAS, DeepEval, custom harnesses) that fed signal back into prompts, tools, and model selection",
+                "Codified repeatable deployment patterns into playbooks and reference architectures so other engineers could replicate customer wins",
                 "Led migration from monolith to event-driven microservices on AWS (ECS, Lambda, RDS, S3, Bedrock) using Terraform IaC",
                 "Mentored 5 engineers on AI engineering patterns \u2014 code quality scores improved from 6.2 \u2192 8.9/10",
             ],

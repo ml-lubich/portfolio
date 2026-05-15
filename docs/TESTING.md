@@ -49,6 +49,10 @@ No automated visual regression for WebGL is required unless a dedicated snapshot
 
 - `app/blog/page.tsx` passes `toBlogPostListItems(sortedPosts)` into `BlogPageClient` so the browser never hydrates with full MDX bodies (cards use `readingTime` from the MDX loader). Regression: listing interactivity must not require `post.content` on the client.
 
+## Automated: mobile performance guardrails
+
+- `__tests__/mobile-performance-regression.test.ts` — guards that blog listing/article client code does not import Framer Motion, blog card touch taps do not trigger route prefetch, and the homepage keeps mobile performance mode for delayed WebGL, skipped particle canvas, and tighter lazy-section preload margins.
+
 ## Manual: blog card → article (performance)
 
 1. Run `bun run build` and confirm the route table lists `● /blog/[slug]` (SSG via `generateStaticParams`), not server-only rendering for posts.

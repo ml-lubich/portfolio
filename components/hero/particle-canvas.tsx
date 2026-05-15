@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react"
 import { cn } from "@/lib/utils"
 import { particleFill, particleStroke } from "@/lib/theme"
+import { subscribeWidthResize } from "@/lib/viewport-resize"
 
 const DESKTOP_PARTICLE_COUNT = 35
 const MOBILE_PARTICLE_COUNT = 18
@@ -42,11 +43,16 @@ export function ParticleCanvas({ className }: { className?: string }) {
       const section = canvas.closest("section")
       const w = section?.clientWidth ?? window.innerWidth
       const h = section?.clientHeight ?? window.innerHeight
+      // Skip no-op resizes — assigning to canvas.width/height clears the canvas
+      // and causes a visible flash on iOS Safari every time the URL bar collapses.
+      if (canvas.width === w && canvas.height === h) return
       canvas.width = w
       canvas.height = h
     }
     resize()
-    window.addEventListener("resize", resize)
+    // Width-only resize listener: ignores iOS URL-bar show/hide events.
+    // Height-driven changes still come through the section's ResizeObserver below.
+    const unsubscribeWidthResize = subscribeWidthResize(resize)
     const section = canvas.closest("section")
     const ro =
       section &&
@@ -131,7 +137,7 @@ export function ParticleCanvas({ className }: { className?: string }) {
 
     return () => {
       cancelAnimationFrame(animationId)
-      window.removeEventListener("resize", resize)
+      unsubscribeWidthResize()
       ro?.disconnect()
       heroIo?.disconnect()
       document.removeEventListener("visibilitychange", visibilityHandler)

@@ -23,8 +23,17 @@ Rainbow wash orbs are **not** part of the WebGL brain. They live in `components/
 |--------|-----------|
 | **Client payload** | `app/blog/page.tsx` builds `blogPostsForClient = toBlogPostListItems(sortedPosts)` for `BlogPageClient` so MDX bodies are not serialized to the browser. |
 | **Cover images** | Listing cards use `next/image` with responsive `sizes` and `priority` only for the visible featured carousel slide. |
-| **Motion** | Grid cards avoid `layout` / `popLayout` animations to reduce main-thread layout work on mobile. |
+| **Motion** | Blog listing and article routes avoid Framer Motion; route-level animation is plain CSS/markup so mobile hydration does not pull in the animation runtime. Grid cards avoid `layout` / `popLayout` animations to reduce main-thread layout work on mobile. |
+| **Route prefetch** | Blog cards prefetch on hover/focus only. Touch start does not trigger prefetch, so a mobile tap is not competing with navigation image/JS fetches. |
 | **Canonical vs subdomain** | SEO canonicals and UI labels use apex + path (`getBlogCanonicalUrl()`, `getBlogPublicLabel()` from `lib/site-config.ts`). `blog.*` hosts rewrite to `/blog/*` via `proxy.ts` only. |
+
+## Mobile homepage performance
+
+| Concern | Decision |
+|--------|----------|
+| **Hero WebGL** | `components/hero/index.tsx` defaults to mobile performance mode on first paint and loads `Brain3D` on mobile only after idle. Desktop can still sync the brain reveal with the name animation. |
+| **Hero particles** | `ParticleCanvas` is skipped while mobile performance mode is active; the spectrum background remains as the lightweight visual layer. |
+| **Lazy sections** | `components/layout/lazy-section.tsx` keeps the desktop `400px` preload margin but uses a tighter `120px` default margin on mobile so below-fold chunks mount closer to the viewport. |
 
 ## Blog content
 

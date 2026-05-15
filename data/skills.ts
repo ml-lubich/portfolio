@@ -75,6 +75,25 @@ export const skillCategories: SkillCategory[] = [
             "Domain-Driven Design — bounded contexts, aggregates, and ubiquitous language",
         ],
     },
+    {
+        category: "Enterprise AI Delivery",
+        items: [
+            "Customer Discovery",
+            "Solution Scoping",
+            "Production Rollouts",
+            "Agent Skills & Sub-Agents",
+            "Eval-Driven Iteration",
+            "Stakeholder Communication",
+            "White-Glove Deployment",
+            "Reference Architectures",
+        ],
+        backDetails: [
+            "Embedded with strategic customer engineering teams to scope, build, and ship LLM-powered workflows end-to-end",
+            "Translate ambiguous business problems into technical artifacts — MCP servers, sub-agents, and reusable agent skills",
+            "Eval-driven iteration: build offline + online evals, feed signal back into prompts, tools, and model selection",
+            "Codify repeatable deployment patterns into playbooks, reference architectures, and internal building blocks",
+        ],
+    },
 ]
 
 export const proficiencyBars: BarItem[] = [
@@ -237,4 +256,14 @@ export const skillDescriptions: Record<string, string> = {
     Jest: "JavaScript/TypeScript testing with snapshot tests, mocking, and code coverage reporting.",
     Selenium: "End-to-end browser automation with Page Object patterns and cross-browser test matrices.",
     SonarQube: "Static analysis dashboards for code quality, security vulnerabilities, and technical debt tracking.",
+
+    /* ── Enterprise AI Delivery ─────────────── */
+    "Customer Discovery": "Embedded discovery with engineering and domain stakeholders to map workflows, constraints, and success metrics.",
+    "Solution Scoping": "Translating ambiguous business problems into sequenced technical scope, trade-offs, and delivery milestones.",
+    "Production Rollouts": "End-to-end ownership from prototype to stable production — phased rollout, SLOs, on-call, and rollback playbooks.",
+    "Agent Skills & Sub-Agents": "Reusable agent skills, MCP servers, and sub-agents wired into customer systems for repeatable workflows.",
+    "Eval-Driven Iteration": "Offline + online eval harnesses (RAGAS, DeepEval, custom) feeding signal back into prompts, tools, and model selection.",
+    "Stakeholder Communication": "Translating model behavior and trade-offs for executives, product, and engineering — low ego, high clarity.",
+    "White-Glove Deployment": "Hands-on deployment support inside customer environments with strict security, IT, and compliance constraints.",
+    "Reference Architectures": "Codifying repeatable deployment patterns into playbooks, building blocks, and internal reference architectures.",
 }

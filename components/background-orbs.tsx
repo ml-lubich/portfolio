@@ -27,12 +27,12 @@ const ORBS = [
 
 const MOBILE_BREAKPOINT = 768
 /** Fewer orbs on small screens to reduce composite layers and GPU cost */
-const MOBILE_ORB_COUNT = 5
+const MOBILE_ORB_COUNT = 4
 
 export function BackgroundOrbs() {
   const rootRef = useRef<HTMLDivElement>(null)
   const [inView, setInView] = useState(true)
-  const [isMobile, setIsMobile] = useState(false)
+  const [isMobile, setIsMobile] = useState(true)
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
 
   useEffect(() => {
@@ -79,7 +79,7 @@ export function BackgroundOrbs() {
         const h = orb.hue
         const h2 = (h + 35) % 360
 
-        const blur = useLightAnimation ? "blur(7vmax)" : "blur(10vmax)"
+        const blur = useLightAnimation ? "blur(36px)" : "blur(10vmax)"
         const animationName = useLightAnimation
           ? `spectrum-drift-mobile-${orb.dir > 0 ? "a" : "b"}`
           : `spectrum-drift-${orb.dir > 0 ? "a" : "b"}`

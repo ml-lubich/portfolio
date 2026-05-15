@@ -402,52 +402,85 @@ export function Navigation() {
           aria-modal="true"
           aria-label="Site navigation"
         >
+          {/* Backdrop: deep black with a subtle radial glow accent (matches hero spectrum vibe). */}
           <button
             type="button"
             aria-label="Close menu"
-            className="absolute inset-0 bg-background/95 backdrop-blur-2xl supports-[backdrop-filter]:bg-background/85"
+            className="absolute inset-0 bg-black/95 backdrop-blur-2xl supports-[backdrop-filter]:bg-black/80"
             onClick={() => setMobileOpen(false)}
+            style={{
+              backgroundImage:
+                "radial-gradient(60% 50% at 80% 0%, hsl(280 65% 58% / 0.10), transparent 70%), radial-gradient(50% 40% at 0% 100%, hsl(220 70% 55% / 0.10), transparent 70%)",
+            }}
           />
-          <div className="relative z-[1] flex min-h-dvh items-start justify-center overflow-y-auto overscroll-contain px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-[max(5.75rem,calc(env(safe-area-inset-top,0px)+4.5rem))] sm:px-6">
-            <div className="w-full max-w-[46rem] overflow-hidden rounded-[1.35rem] border border-white/[0.10] bg-background/90 shadow-[0_28px_90px_-32px_rgba(0,0,0,0.85),inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-2xl backdrop-saturate-150">
-              <div className="grid gap-2 p-3 sm:grid-cols-2 sm:p-4">
-                {mobileNavLinks.map((link) => {
-                  const isInternalSection = !link.href.startsWith("/")
-                  const isActive = isInternalSection && activeSection === link.href.replace("#", "")
-                  return (
-                    <a
-                      key={link.href}
-                      href={link.href}
-                      onClick={(e) => handleLinkClick(e, link.href)}
-                      aria-label={link.label}
-                      title={link.label}
+          <div className="relative z-[1] flex min-h-dvh flex-col overflow-y-auto overscroll-contain px-6 pb-[max(2rem,env(safe-area-inset-bottom))] pt-[max(6.5rem,calc(env(safe-area-inset-top,0px)+5rem))]">
+            <nav aria-label="Primary" className="mobile-nav-list flex flex-col">
+              {mobileNavLinks.map((link, i) => {
+                const isInternalSection = !link.href.startsWith("/")
+                const isActive = isInternalSection && activeSection === link.href.replace("#", "")
+                const num = String(i + 1).padStart(2, "0")
+                return (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    onClick={(e) => handleLinkClick(e, link.href)}
+                    aria-label={link.label}
+                    aria-current={isActive ? "page" : undefined}
+                    title={link.label}
+                    className={[
+                      "mobile-nav-item group/link relative flex items-baseline gap-4 py-4",
+                      "border-b border-white/[0.06] last:border-b-0",
+                      "transition-colors duration-300",
+                    ].join(" ")}
+                    style={{ animationDelay: `${60 + i * 45}ms` }}
+                  >
+                    <span
+                      aria-hidden="true"
                       className={[
-                        "group/link relative flex min-h-[56px] items-center overflow-hidden rounded-2xl border px-4 text-[15px] transition-all duration-300",
-                        isActive
-                          ? "border-white/[0.16] bg-white/[0.11] font-medium text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
-                          : "border-white/[0.055] bg-white/[0.035] text-foreground/68 hover:border-white/[0.12] hover:bg-white/[0.075] hover:text-foreground",
+                        "font-mono text-[11px] tracking-[0.18em] tabular-nums transition-colors duration-300",
+                        isActive ? "text-foreground/70" : "text-muted-foreground/45 group-hover/link:text-foreground/60",
                       ].join(" ")}
                     >
-                      {isActive ? (
-                        <span className="absolute inset-y-3 left-0 w-[3px] rounded-r-full bg-foreground" aria-hidden="true" />
-                      ) : null}
-                      <ExpandingText text={link.label} />
-                    </a>
-                  )
-                })}
-              </div>
-              <div className="border-t border-white/[0.08] p-3 pt-0 sm:p-4 sm:pt-0">
-                <a
-                  href="#contact"
-                  onClick={(e) => handleLinkClick(e, "#contact")}
-                  aria-label="Get In Touch"
-                  title="Get In Touch"
-                  className="group/link flex min-h-[54px] items-center justify-center gap-2 rounded-2xl bg-foreground px-4 text-[15px] font-medium text-background shadow-[0_18px_46px_-26px_rgba(255,255,255,0.75)] transition-all duration-300 hover:bg-foreground/90 active:scale-[0.99]"
-                >
-                  <span>Get In Touch</span>
-                  <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover/link:translate-x-0.5" aria-hidden="true" />
-                </a>
-              </div>
+                      {num}
+                    </span>
+                    <span
+                      className={[
+                        "font-display text-[2rem] font-light leading-[1.05] tracking-tight transition-all duration-300",
+                        isActive
+                          ? "gradient-text"
+                          : "text-foreground/85 group-hover/link:text-foreground group-hover/link:translate-x-1",
+                      ].join(" ")}
+                    >
+                      {link.label}
+                    </span>
+                    <ArrowRight
+                      aria-hidden="true"
+                      className={[
+                        "ml-auto h-4 w-4 self-center transition-all duration-300",
+                        isActive
+                          ? "translate-x-0 text-foreground/80 opacity-100"
+                          : "-translate-x-2 text-foreground/0 opacity-0 group-hover/link:translate-x-0 group-hover/link:text-foreground/70 group-hover/link:opacity-100",
+                      ].join(" ")}
+                    />
+                  </a>
+                )
+              })}
+            </nav>
+
+            <div className="mobile-nav-cta mt-8 flex flex-col gap-3">
+              <a
+                href="#contact"
+                onClick={(e) => handleLinkClick(e, "#contact")}
+                aria-label="Get In Touch"
+                title="Get In Touch"
+                className="group/cta relative flex min-h-[54px] items-center justify-center gap-2 overflow-hidden rounded-full bg-primary px-6 text-[14px] font-medium tracking-wide text-primary-foreground transition-all duration-300 hover:shadow-[0_18px_46px_-18px_hsl(var(--primary)/0.6)] active:scale-[0.99]"
+              >
+                <span>Get In Touch</span>
+                <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover/cta:translate-x-0.5" aria-hidden="true" />
+              </a>
+              <p className="text-center font-mono text-[10px] uppercase tracking-[0.32em] text-muted-foreground/55">
+                Misha Lubich · AI Engineer
+              </p>
             </div>
           </div>
         </div>

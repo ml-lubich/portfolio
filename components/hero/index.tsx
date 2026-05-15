@@ -11,10 +11,26 @@ import { heroOverlay } from "@/lib/theme"
 import { navigateTo } from "@/components/nav/woosh-scroll"
 import { RotatingStats } from "./rotating-stats"
 
+const MOBILE_PERFORMANCE_QUERY = "(max-width: 767px), (pointer: coarse), (hover: none)"
+
 const Brain3D = dynamic(
   () => import("../brain").then((mod) => mod.Brain3D),
   { ssr: false }
 )
+
+function useMobilePerformanceMode() {
+  const [mobilePerformanceMode, setMobilePerformanceMode] = useState(true)
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia(MOBILE_PERFORMANCE_QUERY)
+    const syncMode = () => setMobilePerformanceMode(mediaQuery.matches)
+    syncMode()
+    mediaQuery.addEventListener("change", syncMode)
+    return () => mediaQuery.removeEventListener("change", syncMode)
+  }, [])
+
+  return mobilePerformanceMode
+}
 
 /** Defer 3D brain (and Three.js) until well after LCP to reduce TBT and main-thread work. */
 function useDeferBrain() {
@@ -37,9 +53,10 @@ function useDeferBrain() {
 const BRAIN_FADE_MS = Math.round(HERO_NAME_REVEAL.durationMs * 1.12) + 80
 
 export function Hero() {
+  const mobilePerformanceMode = useMobilePerformanceMode()
   const idleBrain = useDeferBrain()
   const [nameRevealStarted, setNameRevealStarted] = useState(false)
-  const showBrain = idleBrain || nameRevealStarted
+  const showBrain = !mobilePerformanceMode && (idleBrain || nameRevealStarted)
   /** Prefer syncing with the name; fall back to idle so the brain never stays stuck if IO never fires. */
   const brainRevealGate = nameRevealStarted || idleBrain
 
@@ -50,7 +67,7 @@ export function Hero() {
     >
       {/* Spectrum lives only in this section (not fixed to viewport) — avoids mobile scroll seam / mask repaint */}
       <BackgroundOrbs />
-      <ParticleCanvas className="z-[1]" />
+      {!mobilePerformanceMode && <ParticleCanvas className="z-[1]" />}
 
       {/* 3D Brain — deferred for LCP; fades in via CSS (opacity-only, compositor) for performance */}
       <div
