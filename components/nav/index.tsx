@@ -4,7 +4,7 @@ import { useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo } fr
 import { SiteLogoMark } from "@/components/site-logo-mark"
 import { Menu, X, ChevronUp, ArrowRight } from "lucide-react"
 import { navLinks } from "./nav-links"
-import { wooshScrollTo, navigateTo, isProgrammaticScroll } from "./woosh-scroll"
+import { wooshScrollTo, navigateTo } from "./woosh-scroll"
 import { useActiveSection } from "./use-nav-hooks"
 import { ExpandingText } from "./expanding-text"
 import { computeNavPastHero } from "@/lib/nav-hero-surface"
@@ -110,7 +110,6 @@ function BackToTopButton() {
 const NAV_FIXED_BASE =
   "fixed top-0 left-0 right-0 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
 const NAV_VISIBLE = "translate-y-0 opacity-100"
-const NAV_HIDDEN = "-translate-y-full opacity-0"
 /** Over hero: fully transparent — no blur (avoids cutting off the brain graphic). */
 const NAV_SURFACE_HERO =
   "border-b border-transparent bg-transparent py-4 shadow-none backdrop-blur-none backdrop-saturate-100"
@@ -120,20 +119,26 @@ const NAV_SURFACE_SCROLLED =
 
 const NAV_SSR_CLASS = [NAV_FIXED_BASE, "z-50", NAV_VISIBLE, NAV_SURFACE_HERO].join(" ")
 
-/** Frosted bar only after `#hero` has fully left the viewport (bottom edge at or above viewport top). */
-function isPastHero(): boolean {
+/**
+ * Frosted bar only after `#hero` has fully left the viewport.
+ * `previous` enables hysteresis around the boundary so iOS Safari URL-bar
+ * resize / scroll jitter does not flip the surface every frame.
+ */
+function isPastHero(previous: boolean): boolean {
   if (typeof document === "undefined") return false
   const hero = document.getElementById("hero")
-  return computeNavPastHero(hero, window.scrollY)
+  return computeNavPastHero(hero, window.scrollY, previous)
 }
 
 export function Navigation() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const mobileOpenRef = useRef(false)
-  const lastScrollY = useRef(0)
   const navRef = useRef<HTMLElement>(null)
   const linkRefs = useRef<Map<string, HTMLAnchorElement>>(new Map())
-  const navSurfaceRef = useRef({ scrolled: false, hideNav: false })
+  // hideNav removed: auto-hide on scroll-down caused visible flicker on mobile
+  // (iOS URL-bar resize jitters scrollY) and was the user-reported flicker on
+  // mishalubich.com. Nav now stays visible always.
+  const navSurfaceRef = useRef({ scrolled: false })
 
   const sectionIds = useMemo(
     () => navLinks.filter((l) => !l.href.startsWith("/")).map((l) => l.href.replace("#", "")),
@@ -149,12 +154,12 @@ export function Navigation() {
   const applyNavSurface = useCallback(() => {
     const nav = navRef.current
     if (!nav) return
-    const { scrolled, hideNav } = navSurfaceRef.current
+    const { scrolled } = navSurfaceRef.current
     const z = mobileOpenRef.current ? "z-[200]" : "z-50"
     nav.className = [
       NAV_FIXED_BASE,
       z,
-      hideNav ? NAV_HIDDEN : NAV_VISIBLE,
+      NAV_VISIBLE,
       scrolled ? NAV_SURFACE_SCROLLED : NAV_SURFACE_HERO,
     ].join(" ")
   }, [])
@@ -165,45 +170,26 @@ export function Navigation() {
     applyNavSurface()
   }, [applyNavSurface, mobileOpen, activeSection])
 
-  /* Once: align scrolled flag + lastScrollY with restored scroll without clobbering direction tracking on later renders. */
+  /* Once: align scrolled flag with restored scroll. */
   useLayoutEffect(() => {
-    const y = window.scrollY
-    const nextScrolled = isPastHero()
+    const nextScrolled = isPastHero(scrolledPastHeroRef.current)
     scrolledPastHeroRef.current = nextScrolled
     navSurfaceRef.current.scrolled = nextScrolled
-    lastScrollY.current = y
     applyNavSurface()
   }, [applyNavSurface])
 
-  /* Hide navbar on scroll-down, reveal on scroll-up */
+  /* Update only the hero/scrolled surface on scroll. Auto-hide removed. */
   useEffect(() => {
     let rafId: number
     function handleScroll() {
       cancelAnimationFrame(rafId)
       rafId = requestAnimationFrame(() => {
-        const y = window.scrollY
-        const nextScrolled = isPastHero()
+        const nextScrolled = isPastHero(scrolledPastHeroRef.current)
         if (nextScrolled !== scrolledPastHeroRef.current) {
           scrolledPastHeroRef.current = nextScrolled
           navSurfaceRef.current.scrolled = nextScrolled
           applyNavSurface()
         }
-        // Skip hide/show logic during programmatic (navbar-initiated) scrolls
-        // to prevent the nav from flickering away mid-animation
-        if (!isProgrammaticScroll && !mobileOpenRef.current) {
-          if (y > 300 && y > lastScrollY.current + 8) {
-            if (!navSurfaceRef.current.hideNav) {
-              navSurfaceRef.current.hideNav = true
-              applyNavSurface()
-            }
-          } else if (y < lastScrollY.current - 4) {
-            if (navSurfaceRef.current.hideNav) {
-              navSurfaceRef.current.hideNav = false
-              applyNavSurface()
-            }
-          }
-        }
-        lastScrollY.current = y
       })
     }
     window.addEventListener("scroll", handleScroll, { passive: true })
@@ -216,7 +202,7 @@ export function Navigation() {
 
   useEffect(() => {
     function onResize() {
-      const next = isPastHero()
+      const next = isPastHero(scrolledPastHeroRef.current)
       scrolledPastHeroRef.current = next
       navSurfaceRef.current.scrolled = next
       applyNavSurface()
@@ -228,9 +214,6 @@ export function Navigation() {
 
   useEffect(() => {
     mobileOpenRef.current = mobileOpen
-    if (mobileOpen) {
-      navSurfaceRef.current.hideNav = false
-    }
     applyNavSurface()
   }, [mobileOpen, applyNavSurface])
 
@@ -268,16 +251,13 @@ export function Navigation() {
   )
 
   const handleLinkClick = useCallback(
-    (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-      e.preventDefault()
-      // Ensure navbar stays visible during the scroll animation
-      navSurfaceRef.current.hideNav = false
-      applyNavSurface()
+    (_e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+      _e.preventDefault()
       // Close overlay immediately: navigateTo may defer work (lazy sections) or skip callback (/blog).
       setMobileOpen(false)
       navigateTo(href)
     },
-    [applyNavSurface],
+    [],
   )
 
   return (
@@ -302,8 +282,6 @@ export function Navigation() {
             onClick={(e) => {
               e.preventDefault()
               e.stopPropagation()
-              navSurfaceRef.current.hideNav = false
-              applyNavSurface()
               wooshScrollTo(0)
               history.replaceState(null, "", window.location.pathname)
               setMobileOpen(false)

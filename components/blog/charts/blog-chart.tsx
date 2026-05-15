@@ -1,13 +1,7 @@
 "use client"
 
 import React, { useEffect, useState } from "react"
-import {
-  PieChart as RechartsPie,
-  Pie,
-  Cell,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts"
+import dynamic from "next/dynamic"
 import type {
   BlogChart,
   ChartColor,
@@ -17,6 +11,17 @@ import type {
   TreeChart,
   TreeDecisionNode,
 } from "./types"
+
+/* Recharts (~200KB gz) ships only when a post actually contains a `pie` chart.
+   Tree / pipeline / comparison charts are pure JSX and stay in the main blog chunk. */
+const LazyPieChartBody = dynamic(() => import("./pie-chart-body").then((m) => m.PieChartBody), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-[260px] w-full items-center justify-center text-xs text-white/40">
+      Loading chart…
+    </div>
+  ),
+})
 
 /* ── Colour map ─────────────────────────────────────────────────── */
 
@@ -175,37 +180,7 @@ function PieRenderer({ chart }: { chart: PieChartDef }) {
 
   return (
     <div className="flex flex-col items-center gap-4">
-      <ResponsiveContainer width="100%" height={260}>
-        <RechartsPie>
-          <Pie
-            data={data}
-            dataKey="value"
-            nameKey="name"
-            cx="50%"
-            cy="50%"
-            outerRadius={100}
-            innerRadius={45}
-            strokeWidth={0}
-            label={({ name, percent }) =>
-              `${name} ${(percent * 100).toFixed(0)}%`
-            }
-            labelLine={false}
-          >
-            {data.map((entry, i) => (
-              <Cell key={i} fill={entry.fill} />
-            ))}
-          </Pie>
-          <Tooltip
-            contentStyle={{
-              background: "hsl(220 20% 8%)",
-              border: "1px solid hsl(220 15% 18%)",
-              borderRadius: "8px",
-              color: "#e2e8f0",
-              fontSize: "13px",
-            }}
-          />
-        </RechartsPie>
-      </ResponsiveContainer>
+      <LazyPieChartBody data={data} />
       {/* Legend */}
       <div className="flex flex-wrap justify-center gap-x-5 gap-y-1.5">
         {data.map((d, i) => (

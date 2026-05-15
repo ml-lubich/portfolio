@@ -117,6 +117,14 @@ function BlogPageInner({
         if (pauseFeaturedCarousel || featuredCarouselPosts.length < 2) {
             return
         }
+        // Don't waste mobile/reduced-motion CPU rotating the featured hero every 8s.
+        // Honor coarse-pointer + prefers-reduced-motion users — they get a static
+        // featured slot and can still navigate via the dot indicators.
+        if (typeof window !== "undefined") {
+            const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+            const coarsePointer = window.matchMedia("(pointer: coarse)").matches
+            if (reducedMotion || coarsePointer) return
+        }
         const id = window.setInterval(() => {
             setCarouselIndex((i) => (i + 1) % featuredCarouselPosts.length)
         }, FEATURED_CAROUSEL_MS)

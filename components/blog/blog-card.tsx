@@ -24,6 +24,12 @@ function useBlogCardTiltGlare(
   const lastTouchAtRef = useRef(0)
   const rafRef = useRef<number | null>(null)
   const pendingRef = useRef<{ cx: number; cy: number } | null>(null)
+  /** Coarse pointer (touch / pen) skips tilt + glare entirely — no rAF, no transform writes. */
+  const isCoarse = useRef<boolean>(false)
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    isCoarse.current = window.matchMedia("(pointer: coarse)").matches
+  }, [])
 
   useEffect(() => {
     return () => {
@@ -40,6 +46,7 @@ function useBlogCardTiltGlare(
 
   const handleMouseMove = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
+      if (isCoarse.current) return
       if (Date.now() - lastTouchAtRef.current < 500) return
       const el = cardRef.current
       if (!el) return

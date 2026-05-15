@@ -32,15 +32,18 @@ function useMobilePerformanceMode() {
   return mobilePerformanceMode
 }
 
-/** Defer 3D brain (and Three.js) until well after LCP to reduce TBT and main-thread work. */
+/** Defer 3D brain (and Three.js) until well after LCP on every viewport.
+ *  The brain is essential to the experience but should never compete with first paint —
+ *  the page renders fully, then the brain chunk loads on its own and fades in.
+ *  Same long timeout on desktop and mobile so behavior is consistent. */
 function useDeferBrain() {
   const [show, setShow] = useState(false)
   useEffect(() => {
     const cb = () => setShow(true)
     const id =
       typeof requestIdleCallback !== "undefined"
-        ? requestIdleCallback(cb, { timeout: 2500 })
-        : window.setTimeout(cb, 2000)
+        ? requestIdleCallback(cb, { timeout: 5000 })
+        : window.setTimeout(cb, 4500)
     return () => {
       if (typeof cancelIdleCallback !== "undefined") cancelIdleCallback(id as number)
       else clearTimeout(id)
@@ -55,10 +58,10 @@ const BRAIN_FADE_MS = Math.round(HERO_NAME_REVEAL.durationMs * 1.12) + 80
 export function Hero() {
   const mobilePerformanceMode = useMobilePerformanceMode()
   const idleBrain = useDeferBrain()
-  const [nameRevealStarted, setNameRevealStarted] = useState(false)
-  const showBrain = !mobilePerformanceMode && (idleBrain || nameRevealStarted)
-  /** Prefer syncing with the name; fall back to idle so the brain never stays stuck if IO never fires. */
-  const brainRevealGate = nameRevealStarted || idleBrain
+  /** Brain mounts only after the idle/timeout signal — never tied to name reveal —
+   *  so the rest of the hero is fully painted and interactive before Three.js loads. */
+  const showBrain = idleBrain
+  const brainRevealGate = idleBrain
 
   return (
     <section
@@ -99,7 +102,7 @@ export function Hero() {
 
       {/* Content */}
       <div className="relative z-10 mx-auto w-full max-w-6xl px-3 text-center pointer-events-none md:px-6">
-        <RoleRotator onNameRevealStart={() => setNameRevealStarted(true)} />
+        <RoleRotator />
         <HeroSubtitle />
         <HeroCTAs />
         <SocialLinks />

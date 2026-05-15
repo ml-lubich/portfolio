@@ -23,7 +23,11 @@ describe("mobile performance guardrails", () => {
   it("keeps decorative homepage work deferred on mobile", () => {
     const heroSource = source("components/hero/index.tsx")
     expect(heroSource).toContain("MOBILE_PERFORMANCE_QUERY")
-    expect(heroSource).toContain("!mobilePerformanceMode && (idleBrain || nameRevealStarted)")
+    // Brain defers on every viewport (desktop matches mobile) — never tied to name reveal,
+    // so the page paints first and Three.js loads on its own afterwards.
+    expect(heroSource).toContain("const showBrain = idleBrain")
+    expect(heroSource).toContain("const brainRevealGate = idleBrain")
+    expect(heroSource).not.toContain("nameRevealStarted")
     expect(heroSource).toContain("!mobilePerformanceMode && <ParticleCanvas")
     expect(source("components/hero/role-rotator.tsx")).toContain("hero-subtitle")
     expect(source("app/globals.css")).toContain(".hero-subtitle .animated-text-word")
