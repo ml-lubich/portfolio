@@ -895,8 +895,8 @@ function ScrollStackCardsDesktop({
       ro?.disconnect()
       window.removeEventListener("scroll", onScroll)
       window.removeEventListener("resize", onResize)
-      containerRef.current?.removeAttribute("data-stack-scrolling")
-      containerRef.current?.removeAttribute("data-stack-reduced")
+      container?.removeAttribute("data-stack-scrolling")
+      container?.removeAttribute("data-stack-reduced")
     }
   }, [updateCards])
 

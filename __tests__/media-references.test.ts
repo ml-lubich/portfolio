@@ -24,6 +24,8 @@ const LOCAL_MEDIA_PREFIXES = ["/favicon/", "/images/", "/media/"] as const
 const REMOTE_MEDIA_HOST_HINTS = ["images.", "img.", "media.", "cdn.", "static."] as const
 const USER_AGENT =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+const REQUEST_TIMEOUT_MS = 8_000
+const REMOTE_MEDIA_TEST_TIMEOUT_MS = 60_000
 
 interface MediaReference {
   url: string
@@ -252,7 +254,7 @@ function checkRemoteUrl(targetUrl: string): Promise<HttpResult> {
       const client = currentUrl.startsWith("https://") ? https : http
       const request = client.request(
         currentUrl,
-        { method, timeout: 15_000, headers: { "User-Agent": USER_AGENT } },
+        { method, timeout: REQUEST_TIMEOUT_MS, headers: { "User-Agent": USER_AGENT } },
         (response) => {
           const statusCode = response.statusCode ?? 0
           if ([301, 302, 307, 308].includes(statusCode) && response.headers.location) {
@@ -372,5 +374,5 @@ describe("media references", () => {
       })
 
     expect(failures, failures.join("\n")).toEqual([])
-  })
+  }, REMOTE_MEDIA_TEST_TIMEOUT_MS)
 })

@@ -81,6 +81,22 @@ describe("Navigation wiring (regression)", () => {
     expect(navSrc).toMatch(/backdrop-blur-2xl/)
   })
 
+  it("desktop nav uses the modern floating glass shell", () => {
+    const navSrc = fs.readFileSync(
+      path.join(ROOT, "components/nav/index.tsx"),
+      "utf8",
+    )
+    expect(navSrc).toContain("nav-shell")
+  })
+
+  it("capsule frost is gated to scrolled state (no per-frame hero blur)", () => {
+    const navSrc = fs.readFileSync(
+      path.join(ROOT, "components/nav/index.tsx"),
+      "utf8",
+    )
+    expect(navSrc).toContain("nav.dataset.navScrolled")
+  })
+
   it("mobile menu keeps Contact as the CTA instead of duplicating it in the link list", () => {
     const navSrc = fs.readFileSync(
       path.join(ROOT, "components/nav/index.tsx"),

@@ -113,9 +113,9 @@ export function Brain3D({
       >
         <Canvas
           camera={{ position: [0, 0, initCam.z], fov: initCam.fov }}
-          dpr={[1, 1.5]}
+          dpr={[1, 2]}
           gl={{
-            antialias: false,
+            antialias: true,
             alpha: true,
             powerPreference: "high-performance",
           }}

@@ -12,6 +12,7 @@ import {
 import { createPullUniforms, injectPull, makeOrbMaterial } from "./materials"
 import { NeuralOrbs } from "./neural-orbs"
 import { hexNum } from "@/lib/theme"
+import { subscribeWidthResize } from "@/lib/viewport-resize"
 
 /* ── Rotating wireframe brain with neural orb effects ──────────────── */
 
@@ -75,8 +76,7 @@ export function BrainWireframe() {
       orbMaterial.uniforms.uPointGlowMul.value = tier.pointGlowMul
     }
     apply()
-    window.addEventListener("resize", apply, { passive: true })
-    return () => window.removeEventListener("resize", apply)
+    return subscribeWidthResize(apply)
   }, [orbMaterial])
 
   const signalGeo = useMemo(() => {

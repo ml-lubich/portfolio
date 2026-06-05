@@ -90,7 +90,7 @@ export function ConsultingClients() {
             "relative z-[1] h-[220px] w-full shrink-0 overflow-hidden border-b border-white/[0.08] sm:h-[260px]"
 
           const baseCard =
-            "glass-stack-card group relative flex h-full min-h-0 w-full flex-col overflow-hidden rounded-2xl border border-white/[0.08] text-left transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:border-primary/30"
+            "glass-stack-card group relative flex h-full min-h-0 w-full flex-col overflow-hidden rounded-2xl border border-white/[0.08] text-left transition-all duration-500 ease-fluid hover:border-primary/30"
 
           const inner = (
             <>

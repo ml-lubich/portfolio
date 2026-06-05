@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState, useCallback } from "react"
+import { subscribeWidthResize } from "@/lib/viewport-resize"
 
 /**
  * Returns a smooth 0→1 progress value based on how far an element has
@@ -60,12 +61,12 @@ export function useScrollProgress(offset = 0.35) {
     update()
 
     window.addEventListener("scroll", onScroll, { passive: true })
-    window.addEventListener("resize", onScroll, { passive: true })
+    const unsubscribeWidthResize = subscribeWidthResize(onScroll)
 
     return () => {
       cancelAnimationFrame(rafRef.current)
       window.removeEventListener("scroll", onScroll)
-      window.removeEventListener("resize", onScroll)
+      unsubscribeWidthResize()
     }
   }, [update])
 

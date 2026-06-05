@@ -28,6 +28,12 @@ describe("Hero SSR consistency", () => {
     expect(a).toBe(b)
   })
 
+  it("renders the full ambient orb tree during SSR", async () => {
+    const { Hero } = await import("@/components/hero")
+    const html = renderToString(createElement(Hero))
+    expect(html.match(/data-ambient-orb="true"/g)?.length).toBe(7)
+  })
+
   it("hero shell does not use viewport hooks for className (hydration-safe layout)", () => {
     const src = fs.readFileSync(path.join(ROOT, "components/hero/index.tsx"), "utf8")
     expect(src).not.toMatch(/useIsMobile\s*\(/)

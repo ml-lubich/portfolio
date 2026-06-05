@@ -177,65 +177,55 @@
   }
 }
 
-/* Spectrum orbs: gentle drift + slow hue shift (variant A) */
+/* Spectrum orbs: gentle transform-only drift (variant A) */
 @keyframes spectrum-drift-a {
   0% {
     transform: translate(-50%, -50%) translate(0, 0);
-    filter: blur(10vmax) hue-rotate(0deg);
   }
 
   25% {
     transform: translate(-50%, -50%) translate(1vmax, -0.7vmax);
-    filter: blur(10vmax) hue-rotate(12deg);
   }
 
   50% {
     transform: translate(-50%, -50%) translate(-0.6vmax, 0.8vmax);
-    filter: blur(10vmax) hue-rotate(25deg);
   }
 
   75% {
     transform: translate(-50%, -50%) translate(0.7vmax, 0.4vmax);
-    filter: blur(10vmax) hue-rotate(15deg);
   }
 
   100% {
     transform: translate(-50%, -50%) translate(0, 0);
-    filter: blur(10vmax) hue-rotate(0deg);
   }
 }
 
-/* Spectrum orbs: gentle drift + slow hue shift (variant B — reverse) */
+/* Spectrum orbs: gentle transform-only drift (variant B — reverse) */
 @keyframes spectrum-drift-b {
   0% {
     transform: translate(-50%, -50%) translate(0, 0);
-    filter: blur(10vmax) hue-rotate(0deg);
   }
 
   25% {
     transform: translate(-50%, -50%) translate(-0.8vmax, 0.6vmax);
-    filter: blur(10vmax) hue-rotate(-15deg);
   }
 
   50% {
     transform: translate(-50%, -50%) translate(0.7vmax, -1vmax);
-    filter: blur(10vmax) hue-rotate(-25deg);
   }
 
   75% {
     transform: translate(-50%, -50%) translate(-0.4vmax, -0.3vmax);
-    filter: blur(10vmax) hue-rotate(-10deg);
   }
 
   100% {
     transform: translate(-50%, -50%) translate(0, 0);
-    filter: blur(10vmax) hue-rotate(0deg);
   }
 }
 
 /* ── Mobile-friendly spectrum orbs ──────────────────────────────────
  *  Fixed-px blur (40px) instead of vmax — much cheaper on mobile GPUs.
- *  No hue-rotate to avoid per-frame filter recalc.
+ *  No animated color filter to avoid per-frame filter recalc.
  * ─────────────────────────────────────────────────────────────────── */
 @keyframes spectrum-drift-mobile-a {
   0% {
@@ -278,6 +268,17 @@
 
   100% {
     transform: translate(-50%, -50%) translate(0, 0);
+  }
+}
+
+@media (max-width: 767px),
+(pointer: coarse),
+(hover: none) {
+  [data-ambient-orb="true"] {
+    animation-duration: var(--orb-mobile-duration) !important;
+    animation-name: var(--orb-mobile-animation) !important;
+    filter: blur(36px) !important;
+    will-change: transform !important;
   }
 }
 
@@ -444,13 +445,83 @@ body {
   box-shadow: 0 0 20px hsl(var(--accent) / 0.15), 0 0 60px hsl(var(--accent) / 0.05);
 }
 
-/* ── Navigation glass (menus / FAB) — matches main nav: frost, not opaque black ─ */
+/* ── Navigation glass (menus / FAB / blog header) — frost over static content ─ */
 .nav-glass {
   background: hsl(0 0% 100% / 0.07);
-  backdrop-filter: blur(24px) saturate(1.6);
-  -webkit-backdrop-filter: blur(24px) saturate(1.6);
-  border-bottom: 1px solid hsl(0 0% 100% / 0.1);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12), 0 10px 28px rgba(0, 0, 0, 0.14);
+  -webkit-backdrop-filter: blur(20px) saturate(1.6);
+  backdrop-filter: blur(20px) saturate(1.6);
+  border: 1px solid hsl(0 0% 100% / 0.1);
+  box-shadow: 0 1px 2px hsl(0 0% 0% / 0.12), 0 10px 28px hsl(0 0% 0% / 0.14);
+}
+
+/* ── Floating nav capsule — liquid glass ───────────────────────────
+   No hard border (uses a soft layered glass rim instead). The backdrop
+   blur is ALWAYS ON so its compositing layer is never created/destroyed
+   at the hero boundary — that on/off toggle was the scroll-paint flicker.
+   Over the live WebGL hero the blur stays light + cheap; once the page is
+   static we only deepen the radius, which animates smoothly (no flash). */
+.nav-shell {
+  position: relative;
+  isolation: isolate;
+  border-radius: 1.75rem;
+  border: 1px solid transparent;
+  background:
+    linear-gradient(135deg, hsl(220 22% 10% / 0.32), hsl(220 22% 7% / 0.22)),
+    radial-gradient(circle at 18% 0%, hsl(var(--rainbow-6) / 0.1), transparent 44%),
+    radial-gradient(circle at 82% 0%, hsl(var(--rainbow-5) / 0.09), transparent 42%);
+  -webkit-backdrop-filter: blur(12px) saturate(1.5);
+  backdrop-filter: blur(12px) saturate(1.5);
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / 0.14),
+    inset 0 0 0 1px hsl(0 0% 100% / 0.05),
+    inset 0 -1px 0 hsl(0 0% 0% / 0.22),
+    0 12px 36px hsl(0 0% 0% / 0.24);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  will-change: backdrop-filter, background;
+  transition:
+    background 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    -webkit-backdrop-filter 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    backdrop-filter 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Specular sheen — a static "wet glass" highlight. Pure paint, no per-frame
+   work, so it adds the liquid look without reintroducing flicker. */
+.nav-shell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background:
+    linear-gradient(180deg, hsl(0 0% 100% / 0.1) 0%, transparent 38%),
+    radial-gradient(120% 80% at 50% -20%, hsl(0 0% 100% / 0.08), transparent 60%);
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+/* Past the hero the content behind is static, so we deepen the frost for the
+   premium liquid-glass read. Only the blur radius / tint changes — the layer
+   already exists, so the transition is smooth with no repaint flash. */
+nav[data-nav-scrolled="true"] .nav-shell {
+  background:
+    linear-gradient(135deg, hsl(0 0% 100% / 0.13), hsl(0 0% 100% / 0.05)),
+    radial-gradient(circle at 18% 0%, hsl(var(--rainbow-6) / 0.14), transparent 36%),
+    radial-gradient(circle at 82% 0%, hsl(var(--rainbow-5) / 0.12), transparent 34%);
+  -webkit-backdrop-filter: blur(22px) saturate(1.7);
+  backdrop-filter: blur(22px) saturate(1.7);
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / 0.18),
+    inset 0 0 0 1px hsl(0 0% 100% / 0.06),
+    inset 0 -1px 0 hsl(0 0% 0% / 0.24),
+    0 18px 60px hsl(0 0% 0% / 0.28);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-shell {
+    transition: none;
+  }
 }
 
 @keyframes nav-pill-in {
@@ -477,6 +548,7 @@ body {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -494,6 +566,7 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .mobile-nav-item,
   .mobile-nav-cta {
     animation: none;
@@ -535,6 +608,10 @@ body {
 
 .animate-gradient-shift {
   animation: gradient-shift 6s ease infinite;
+}
+
+.ease-fluid {
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .gradient-border {
@@ -1030,7 +1107,9 @@ strong:not(.no-metallic) {
   transform: translateY(0) scale(1);
 }
 
-@media (max-width: 767px), (pointer: coarse), (hover: none) {
+@media (max-width: 767px),
+(pointer: coarse),
+(hover: none) {
   .hero-subtitle {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   }
@@ -1714,8 +1793,28 @@ article .blog-prose b a[href],
   *,
   *::before,
   *::after {
+    animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
+  }
+
+  [data-ambient-orb="true"],
+  .rainbow-text,
+  .rainbow-border::before,
+  .gradient-border::before,
+  .translucent-glow,
+  .skill-tag-shine,
+  .shimmer,
+  .pulse-ring,
+  .scan-sweep::after,
+  .holo-shimmer {
+    animation: none !important;
+  }
+
+  [data-ambient-orb="true"] {
+    transform: translate(-50%, -50%) !important;
+    will-change: auto !important;
   }
 }
 

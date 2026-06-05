@@ -3,6 +3,13 @@
 import { useEffect } from "react"
 
 const MOBILE_MAX = 768
+const SCROLL_STEP_PX = 32
+
+function shouldBindScrollShimmer(): boolean {
+  if (window.matchMedia(`(max-width: ${MOBILE_MAX - 1}px)`).matches) return false
+  if (window.matchMedia("(pointer: coarse)").matches) return false
+  return !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+}
 
 /**
  * ScrollShimmer — sets a CSS custom property `--scroll-y` on <html>
@@ -15,17 +22,21 @@ const MOBILE_MAX = 768
  */
 export function ScrollShimmer() {
   useEffect(() => {
+    let lastBucket = -1
+
     function update() {
+      const bucket = Math.round(window.scrollY / SCROLL_STEP_PX)
+      if (bucket === lastBucket) return
+      lastBucket = bucket
       document.documentElement.style.setProperty(
         "--scroll-y",
-        String(window.scrollY),
+        String(bucket * SCROLL_STEP_PX),
       )
     }
 
     update()
 
-    const mobileMql = window.matchMedia(`(max-width: ${MOBILE_MAX - 1}px)`)
-    if (mobileMql.matches) {
+    if (!shouldBindScrollShimmer()) {
       return
     }
 

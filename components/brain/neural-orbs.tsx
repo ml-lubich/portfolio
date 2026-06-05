@@ -15,6 +15,7 @@ import {
   type BrainOrbViewportTier,
 } from "./constants"
 import { buildAdjacency, buildInitialChain, extendChain } from "./graph-utils"
+import { subscribeWidthResize } from "@/lib/viewport-resize"
 
 function hueToRgb(h: number): [number, number, number] {
   h = ((h % 1) + 1) % 1
@@ -118,8 +119,7 @@ export function NeuralOrbs({
       tierRef.current = t
       orbGeometry.setDrawRange(0, t.activeOrbCount)
     }
-    window.addEventListener("resize", onResize, { passive: true })
-    return () => window.removeEventListener("resize", onResize)
+    return subscribeWidthResize(onResize)
   }, [orbGeometry])
 
   useFrame((_state, delta) => {
@@ -208,7 +208,7 @@ export function NeuralOrbs({
       orbColors[i * 3 + 1] = base * 0.75
       orbColors[i * 3 + 2] = base + 0.25
 
-      const flicker = 0.96 + 0.04 * Math.sin(t * 3.5 + flickerSeeds.current[i])
+      const flicker = 0.98 + 0.02 * Math.sin(t * 1.8 + flickerSeeds.current[i])
 
       for (let e = 0; e < orb.chain.length; e++) {
         const chainEdge = orb.chain[e]

@@ -40,9 +40,8 @@ const edgeStart = src.indexOf("COMPLETE_BRAIN_EDGES");
 const edgeBracket = src.indexOf("[", edgeStart);
 // Read edge data in chunks to handle the massive array
 const edgeLines = [];
-let pos = edgeBracket + 1;
 const edgeEndSearch = src.indexOf("];\n", edgeBracket);
-const edgeBlock = src.slice(pos, edgeEndSearch);
+const edgeBlock = src.slice(edgeBracket + 1, edgeEndSearch);
 const allEdges = [];
 const edgeRe = /\[\s*(\d+)\s*,\s*(\d+)\s*\]/g;
 let em;

@@ -85,10 +85,10 @@ export function buildInitialChain(
   const goForward = Math.random() > 0.5
   chainDirs.push(goForward)
 
-  let tipVertex = goForward
+  const tipVertex = goForward
     ? edgePairs[startEdge * 2 + 1]
     : edgePairs[startEdge * 2]
-  let lastEdge = startEdge
+  const lastEdge = startEdge
 
   const ext = extendChain(chain, chainDirs, tipVertex, lastEdge, CHAIN_BUFFER, adjacency, edgePairs)
 

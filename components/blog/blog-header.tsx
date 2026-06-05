@@ -53,7 +53,7 @@ export function BlogHeader() {
     <header
       className={[
         "fixed top-0 left-0 right-0 z-50",
-        "transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
+        "transition-all duration-500 ease-fluid",
         hideNav ? "-translate-y-full opacity-0" : "translate-y-0 opacity-100",
         scrolled ? "bg-transparent py-2.5" : "bg-transparent py-5",
       ].join(" ")}
@@ -131,7 +131,7 @@ export function BlogHeader() {
       {/* Mobile menu */}
       <div
         className={[
-          "md:hidden overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
+          "md:hidden overflow-hidden transition-all duration-500 ease-fluid",
           mobileOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0",
         ].join(" ")}
       >

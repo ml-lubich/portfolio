@@ -28,6 +28,8 @@ const APP_DIR = path.join(ROOT, "app")
 
 const UA =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+const REQUEST_TIMEOUT_MS = 8_000
+const EXTERNAL_TEST_TIMEOUT_MS = 20_000
 
 /** Patterns we intentionally skip (dynamic, non-HTTP, placeholder). */
 const SKIP_PATTERNS = [
@@ -48,6 +50,7 @@ const EXTERNAL_ALLOWLIST = new Set([
 
 /** Domains that aggressively block cloud-IP / bot traffic (valid links, but 403 in CI). */
 const BOT_BLOCKED_DOMAINS = [
+  "calendar.app.google",
   "scholar.google.com",
   "linkedin.com",
 ]
@@ -139,7 +142,7 @@ function checkUrl(targetUrl: string): Promise<{ ok: boolean; status: number | st
       if (redirects > 5) return resolve({ ok: false, status: "too many redirects", error: null })
 
       const lib = currentUrl.startsWith("https") ? https : http
-      const req = lib.request(currentUrl, { method, timeout: 15_000, headers: { "User-Agent": UA } }, (res) => {
+      const req = lib.request(currentUrl, { method, timeout: REQUEST_TIMEOUT_MS, headers: { "User-Agent": UA } }, (res) => {
         if ([301, 302, 307, 308].includes(res.statusCode!) && res.headers.location) {
           currentUrl = new URL(res.headers.location, currentUrl).href
           return doRequest("HEAD", redirects + 1)
@@ -253,7 +256,7 @@ describe("Link smoke tests", () => {
           result.ok,
           `${url} → ${result.error ?? `HTTP ${result.status}`}. Referenced in: ${where}`
         ).toBe(true)
-      })
+      }, EXTERNAL_TEST_TIMEOUT_MS)
     }
   })
 })

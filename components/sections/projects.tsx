@@ -50,7 +50,7 @@ export function Projects() {
         children: (
           <button
             onClick={() => handleSelect(project.id)}
-            className={`glass-stack-card group relative w-full overflow-hidden rounded-2xl border text-left transition-all duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] md:duration-500 ${selectedId === project.id
+            className={`glass-stack-card group relative w-full overflow-hidden rounded-2xl border text-left transition-all duration-200 ease-fluid md:duration-500 ${selectedId === project.id
               ? "border-primary/40 shadow-[0_0_40px_-8px] shadow-primary/20"
               : "border-white/[0.08] hover:border-primary/30"
               }`}

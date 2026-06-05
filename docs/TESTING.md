@@ -3,6 +3,7 @@
 ## Commands
 
 - `bun run test` — Vitest suite (required before release per `package.json` `prebuild`).
+- `bun run build` — production Next build using `bunx next build --webpack`; Turbopack currently fails on `pages-manifest.json` generation in this app-only project.
 - `bun run lint` — ESLint.
 
 ## Automated: blog listing metadata
@@ -12,6 +13,7 @@
 ## Automated: media references
 
 - `__tests__/media-references.test.ts` — walks `app/`, `components/`, `content/`, `data/`, `lib/`, `styles/`, and text manifests under `public/` for image/media/static resource references. Local URLs must resolve to existing files under `public/` or a valid relative file, remote media URLs must return HTTP 2xx/3xx, and remote blog cover hosts must be present in `next.config.mjs` image remote patterns.
+- External URL probes use bounded request timeouts. Known bot-blocked or automation-hostile domains such as Google Scholar, LinkedIn, and Google Calendar are explicitly skipped in link smoke tests while still remaining visible in source and data tests.
 
 ## Automated: blog hydration dates
 
@@ -32,6 +34,7 @@
 ## Automated: navbar surface over hero
 
 - `__tests__/nav-hero-surface.test.ts` — `computeNavPastHero` in `lib/nav-hero-surface.ts`: frosted mode only when `#hero`’s `getBoundingClientRect().bottom <= 0`; transparent while any part of the hero remains below the viewport top. Includes a shallow guard that `components/nav/index.tsx` still calls `computeNavPastHero` and retains blur-off vs blur-on class tokens.
+- The same suite guards that the desktop navbar keeps the floating `.nav-glass.nav-shell` shell so future edits do not regress to a flat full-width bar.
 
 ## Automated: terminal snake game
 
@@ -51,7 +54,7 @@ No automated visual regression for WebGL is required unless a dedicated snapshot
 
 ## Automated: mobile performance guardrails
 
-- `__tests__/mobile-performance-regression.test.ts` — guards that blog listing/article client code does not import Framer Motion, blog card touch taps do not trigger route prefetch, and the homepage keeps mobile performance mode for delayed WebGL, skipped particle canvas, and tighter lazy-section preload margins.
+- `__tests__/mobile-performance-regression.test.ts` — guards that blog listing/article client code does not import Framer Motion, blog card touch taps do not trigger route prefetch, and the homepage keeps mobile performance mode for delayed WebGL, skipped particle canvas, tighter lazy-section preload margins, stable `svh` hero sizing, hydration-stable transform-only ambient orbs, throttled scroll shimmer, and width-only brain resize listeners. `__tests__/hero-ssr-consistency.test.ts` also asserts the full seven-orb SSR tree so breakpoint detection cannot change the first client render.
 
 ## Manual: blog card → article (performance)
 

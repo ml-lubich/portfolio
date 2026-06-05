@@ -6,6 +6,9 @@ All notable changes to this project are documented here.
 
 ### Fixed
 
+- Hardened external link/media smoke tests with bounded request timeouts and an explicit skip for Google Calendar bot-blocking so CI does not hang on valid third-party links.
+- Removed broad visual jitter from the homepage: ambient hero orbs now use static blur with transform-only drift instead of per-frame hue/filter animation, scroll-linked metallic shimmer updates are quantized and disabled on coarse/reduced-motion devices, and element scroll-progress bars ignore mobile browser chrome height-only resize events.
+- Fixed the homepage hero hydration mismatch by making the ambient-orb DOM deterministic across SSR and first client render. Mobile now hides extra decorative orbs with stable CSS classes instead of slicing the rendered tree during breakpoint detection, and the hero shell uses stable `svh` sizing rather than dynamic viewport height.
 - Reduced hero 3D brain flicker on desktop: the rotating wireframe lines now render with MSAA antialiasing and a 2x DPR cap (was `antialias: false` / DPR 1.5), so thin lines no longer crawl/shimmer as the brain auto-rotates. Also softened two synchronized per-frame strobe terms — the orb glow breathe (`0.88 + 0.12*sin(t*5)` -> `0.95 + 0.05*sin(t*2)`) and the neural-trail flicker (`0.96 + 0.04*sin(t*3.5)` -> `0.98 + 0.02*sin(t*1.8)`) — which read as flicker on the otherwise static hero.
 
 ### Changed

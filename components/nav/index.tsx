@@ -91,7 +91,7 @@ function BackToTopButton() {
       className={[
         "fixed bottom-6 right-6 z-50 flex h-12 w-12 min-h-[48px] min-w-[48px] items-center justify-center rounded-full",
         "nav-glass border border-white/[0.04] text-muted-foreground hover:text-foreground",
-        "transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]",
+        "transition-all duration-300 ease-fluid",
         visible
           ? "translate-y-0 opacity-100 scale-100"
           : "translate-y-4 opacity-0 scale-90 pointer-events-none",
@@ -108,14 +108,16 @@ function BackToTopButton() {
 
 /** Stable SSR/first-paint class string; scroll/hide state is applied via ref + layout effect / scroll handler so React never patches a divergent className. */
 const NAV_FIXED_BASE =
-  "fixed top-0 left-0 right-0 transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
+  "fixed left-0 right-0 top-3 pointer-events-none transition-all duration-300 ease-fluid md:top-4"
 const NAV_VISIBLE = "translate-y-0 opacity-100"
 /** Over hero: fully transparent — no blur (avoids cutting off the brain graphic). */
 const NAV_SURFACE_HERO =
-  "border-b border-transparent bg-transparent py-4 shadow-none backdrop-blur-none backdrop-saturate-100"
-/** Scrolled: frosted bar for readability over page content. */
+  "border-b border-transparent bg-transparent py-0 shadow-none backdrop-blur-none backdrop-saturate-100"
+/** Scrolled: outer bar stays transparent + unblurred; the floating `.nav-shell`
+ * capsule carries the frosted look (via `data-nav-scrolled`), so there is no
+ * full-width blur band and no double backdrop-filter stacking. */
 const NAV_SURFACE_SCROLLED =
-  "border-b border-white/[0.10] bg-white/[0.08] py-2.5 shadow-[0_12px_40px_-20px_rgba(0,0,0,0.22)] backdrop-blur-2xl backdrop-saturate-150"
+  "border-b border-transparent bg-transparent py-0 shadow-none backdrop-blur-none backdrop-saturate-100"
 
 const NAV_SSR_CLASS = [NAV_FIXED_BASE, "z-50", NAV_VISIBLE, NAV_SURFACE_HERO].join(" ")
 
@@ -162,6 +164,9 @@ export function Navigation() {
       NAV_VISIBLE,
       scrolled ? NAV_SURFACE_SCROLLED : NAV_SURFACE_HERO,
     ].join(" ")
+    // Capsule frost (heavy blur) is gated to scrolled state so it never
+    // re-blurs the animated hero every frame. Ref-driven: no React re-render.
+    nav.dataset.navScrolled = scrolled ? "true" : "false"
   }, [])
 
   /* After paint: align with restored scroll + re-apply when React resets className on re-render. */
@@ -272,7 +277,7 @@ export function Navigation() {
       >
         <div
           className={[
-            "mx-auto flex max-w-6xl items-center justify-between px-6",
+            "nav-shell pointer-events-auto mx-auto flex w-[calc(100%_-_1rem)] max-w-6xl items-center justify-between px-3 py-2 sm:w-[calc(100%_-_2rem)] sm:px-4",
             mobileOpen ? "relative z-[110]" : "",
           ].join(" ")}
         >
@@ -291,7 +296,7 @@ export function Navigation() {
             title="Back to top"
           >
             <div
-              className="logo-flip-hover relative flex h-12 w-12 sm:h-16 sm:w-16 items-center justify-center rounded-[9px] overflow-hidden"
+              className="logo-flip-hover relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.04] shadow-[inset_0_1px_0_rgba(255,255,255,0.16)] transition-all duration-300 group-hover:scale-[1.03] group-hover:bg-white/[0.08] sm:h-11 sm:w-11"
               onMouseEnter={(e) => {
                 const el = e.currentTarget
                 if (!el.classList.contains('is-flipping')) {
@@ -303,9 +308,9 @@ export function Navigation() {
               }}
             >
               <SiteLogoMark
-                width={64}
-                height={64}
-                sizes="(max-width: 639px) 48px, 64px"
+                width={48}
+                height={48}
+                sizes="44px"
                 alt="Misha Lubich logo"
                 suppressHydrationWarning
               />
@@ -313,7 +318,7 @@ export function Navigation() {
           </a>
 
           {/* Desktop links */}
-          <div className="hidden items-center gap-0.5 lg:flex relative">
+          <div className="relative hidden items-center gap-1 rounded-full border border-white/[0.06] bg-black/[0.12] p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] lg:flex">
             {navLinks.filter((l) => l.href !== "#contact").map((link) => {
               const isExternal = link.href.startsWith("/")
               const isActive = !isExternal && activeSection === link.href.replace("#", "")
@@ -328,10 +333,10 @@ export function Navigation() {
                   onClick={(e) => handleLinkClick(e, link.href)}
                   title={link.label}
                   className={[
-                    "group/link relative whitespace-nowrap rounded-full px-2.5 py-1.5 text-[13px] xl:px-3.5 xl:text-[14px] tracking-wide transition-all duration-300",
+                    "group/link relative isolate overflow-hidden whitespace-nowrap rounded-full border px-3 py-2 text-[13px] tracking-[0.01em] transition-all duration-300 xl:px-3.5 xl:text-[14px]",
                     isActive
-                      ? "text-foreground font-medium"
-                      : "text-muted-foreground hover:text-foreground",
+                      ? "border-white/[0.12] bg-white/[0.10] font-medium text-foreground shadow-[0_10px_30px_-18px_rgba(255,255,255,0.8)]"
+                      : "border-transparent text-muted-foreground hover:border-white/[0.08] hover:bg-white/[0.06] hover:text-foreground",
                   ].join(" ")}
                 >
                   <ExpandingText text={link.label} />
@@ -343,7 +348,7 @@ export function Navigation() {
               onClick={(e) => handleLinkClick(e, "#contact")}
               aria-label="Get In Touch"
               title="Get In Touch"
-              className="group/link ml-2 xl:ml-3 whitespace-nowrap rounded-full bg-primary px-3 py-1.5 text-[13px] xl:px-4 xl:text-[14px] font-medium text-primary-foreground transition-all duration-300 hover:shadow-lg hover:shadow-primary/25 hover:scale-[1.03] active:scale-[0.97]"
+              className="group/link relative isolate ml-2 overflow-hidden whitespace-nowrap rounded-full border border-white/[0.16] bg-foreground px-4 py-2 text-[13px] font-semibold text-background shadow-[0_14px_34px_-18px_rgba(255,255,255,0.8)] transition-all duration-300 before:absolute before:inset-0 before:-z-10 before:bg-[linear-gradient(120deg,rgba(255,255,255,0.95),rgba(255,255,255,0.72))] hover:scale-[1.03] hover:shadow-[0_18px_46px_-18px_rgba(255,255,255,0.9)] active:scale-[0.98] xl:ml-3 xl:px-4 xl:text-[14px]"
             >
               <ExpandingText text="Get In Touch" />
             </a>
@@ -353,7 +358,7 @@ export function Navigation() {
           <button
             type="button"
             onClick={() => setMobileOpen((o) => !o)}
-            className="rounded-lg p-3 min-h-[48px] min-w-[48px] flex items-center justify-center text-muted-foreground transition-colors hover:text-foreground lg:hidden"
+            className="flex min-h-[48px] min-w-[48px] items-center justify-center rounded-2xl border border-white/[0.08] bg-white/[0.05] p-3 text-muted-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] transition-all duration-300 hover:border-white/[0.14] hover:bg-white/[0.09] hover:text-foreground lg:hidden"
             aria-expanded={mobileOpen ? "true" : "false"}
             aria-controls="mobile-nav-overlay"
             aria-label="Toggle menu"

@@ -1,6 +1,6 @@
 # Portfolio Site
 
-> Personal portfolio + blog built with **Next.js 15**, **TypeScript**, **Tailwind**,
+> Personal portfolio + blog built with **Next.js 16**, **TypeScript**, **Tailwind**,
 > and **Bun**. A living, evolving space for my work, writing, and side projects —
 > with a 3D brain hero, terminal-style nav, and a custom MDX blog pipeline.
 
@@ -151,6 +151,7 @@ Do not use npm or yarn.
 ```bash
 bun install              # install dependencies
 bun run dev              # start dev server (Next.js)
+bun run ship:dev         # full local pre-ship check
 bun run build            # run tests then build for production
 bun run start            # start production server
 bun run test             # run tests (Vitest)
@@ -174,6 +175,14 @@ styles/             # Tailwind + global CSS
 __tests__/          # Vitest suites
 docs/               # Project docs
 ```
+
+Canonical maintainer docs:
+
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
+- [`docs/API.md`](docs/API.md)
+- [`docs/TESTING.md`](docs/TESTING.md)
+- [`docs/RUNBOOK.md`](docs/RUNBOOK.md)
+- [`docs/CHANGELOG.md`](docs/CHANGELOG.md)
 
 ## Performance
 
@@ -232,9 +241,12 @@ mindmap
       projects.ts
     docs/
       ARCHITECTURE.md
+      API.md
+      CHANGELOG.md
       DESIGN.md
       OVERVIEW.md
       REQUIREMENTS.md
+      RUNBOOK.md
       TESTING.md
     hooks/
       use-mobile.tsx
