@@ -30,6 +30,16 @@ bun run ship:dev
 `bun run build` runs Vitest first through the `prebuild` script, then produces the Next.js production build.
 `bun run ship:dev` is the Bun-standard local pre-ship alias for the full CI check.
 
+## Deployment flow
+
+All changes ship to the `dev` branch first. Do not push directly to production or update the production branch until Misha explicitly approves the dev deployment.
+
+1. Finish the local change and run `bun run ship:dev` from the repository root.
+2. Commit the verified change with a conventional commit message.
+3. Push the verified commit to `origin/dev` for review or preview deployment.
+4. Wait for Misha's approval before promoting the same commit to production.
+5. After approval, fast-forward or merge the approved `dev` commit into the production branch.
+
 ## Common failures
 
 | Symptom | Likely cause | Recovery |

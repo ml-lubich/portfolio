@@ -14,6 +14,7 @@ All notable changes to this project are documented here.
 
 ### Changed
 
+- Documented the approval-gated release flow: verified changes push to `origin/dev` first, then promote to production only after Misha approves the dev deployment.
 - Reworked the navbar capsule into a stable liquid-glass surface: removed the hard border (soft layered glass rim instead) and added a static specular sheen for the wet-glass look.
 
 ### Fixed
