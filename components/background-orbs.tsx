@@ -1,6 +1,5 @@
 "use client"
 
-import type { CSSProperties } from "react"
 import { useEffect, useRef, useState } from "react"
 
 /* ── Cursor.com-style light spectrum ─────────────────────────────────
@@ -28,57 +27,10 @@ const ORBS = [
 
 /** Fewer orbs on small screens to reduce composite layers and GPU cost */
 const MOBILE_ORB_COUNT = 4
-type Orb = (typeof ORBS)[number]
-type OrbStyle = CSSProperties & {
-  "--orb-mobile-animation": string
-  "--orb-mobile-duration": string
-}
-
-function _get_playState(inView: boolean): "running" | "paused" {
-  return inView ? "running" : "paused"
-}
-
-function _get_orbAnimationName(orb: Orb, prefix = "spectrum-drift") {
-  return `${prefix}-${orb.dir > 0 ? "a" : "b"}`
-}
 
 function _fmt_orbClass(index: number) {
-  return index >= MOBILE_ORB_COUNT ? "hidden md:block" : ""
-}
-
-function _fmt_orbBackground(orb: Orb) {
-  const h2 = (orb.hue + 35) % 360
-  return [
-    `radial-gradient(circle,`,
-    `hsl(${orb.hue} 100% 62% / 0.55) 0%,`,
-    `hsl(${orb.hue} 100% 60% / 0.45) 15%,`,
-    `hsl(${h2} 95% 57% / 0.32) 30%,`,
-    `hsl(${h2} 90% 55% / 0.18) 45%,`,
-    `hsl(${h2} 85% 55% / 0.08) 60%,`,
-    `hsl(${h2} 80% 55% / 0) 75%)`,
-  ].join(" ")
-}
-
-function _fmt_orbStyle(orb: Orb, playState: "running" | "paused"): OrbStyle {
-  return {
-    "--orb-mobile-animation": _get_orbAnimationName(orb, "spectrum-drift-mobile"),
-    "--orb-mobile-duration": `${orb.dur * 0.55}s`,
-    position: "absolute",
-    left: `${orb.x}%`,
-    top: `${orb.y}%`,
-    width: `${orb.size}vmax`,
-    height: `${orb.size}vmax`,
-    borderRadius: "50%",
-    background: _fmt_orbBackground(orb),
-    filter: "blur(10vmax)",
-    willChange: "transform",
-    transform: "translate(-50%, -50%)",
-    animationName: _get_orbAnimationName(orb),
-    animationDuration: `${orb.dur}s`,
-    animationTimingFunction: "ease-in-out",
-    animationIterationCount: "infinite",
-    animationPlayState: playState,
-  }
+  const visibility = index >= MOBILE_ORB_COUNT ? " hidden md:block" : ""
+  return `ambient-orb ambient-orb--${index}${visibility}`
 }
 
 export function BackgroundOrbs() {
@@ -96,21 +48,18 @@ export function BackgroundOrbs() {
     return () => io.disconnect()
   }, [])
 
-  const playState = _get_playState(inView)
-
   return (
     <div
       ref={rootRef}
-      className="absolute inset-0 z-0 min-h-full pointer-events-none overflow-hidden isolate"
-      style={{ transform: "translateZ(0)" }}
+      className="ambient-orbs-root absolute inset-0 z-0 min-h-full pointer-events-none overflow-hidden isolate"
+      data-orbs-in-view={inView ? "true" : "false"}
       aria-hidden="true"
     >
-      {ORBS.map((orb, i) => (
+      {ORBS.map((_, i) => (
         <div
           key={i}
           className={_fmt_orbClass(i)}
           data-ambient-orb="true"
-          style={_fmt_orbStyle(orb, playState)}
         />
       ))}
     </div>

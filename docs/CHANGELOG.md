@@ -6,6 +6,7 @@ All notable changes to this project are documented here.
 
 ### Fixed
 
+- Fixed the homepage React hydration warning caused by mobile-only ambient-orb style overrides and viewport-derived animated-section entrance styles. Ambient orb geometry/animation is now CSS/data-attribute driven instead of inline style driven, and animated sections no longer read viewport breakpoints for their first render.
 - Hardened external link/media smoke tests with bounded request timeouts and an explicit skip for Google Calendar bot-blocking so CI does not hang on valid third-party links.
 - Removed broad visual jitter from the homepage: ambient hero orbs now use static blur with transform-only drift instead of per-frame hue/filter animation, scroll-linked metallic shimmer updates are quantized and disabled on coarse/reduced-motion devices, and element scroll-progress bars ignore mobile browser chrome height-only resize events.
 - Fixed the homepage hero hydration mismatch by making the ambient-orb DOM deterministic across SSR and first client render. Mobile now hides extra decorative orbs with stable CSS classes instead of slicing the rendered tree during breakpoint detection, and the hero shell uses stable `svh` sizing rather than dynamic viewport height.

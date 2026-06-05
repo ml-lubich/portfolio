@@ -17,6 +17,10 @@ Do **not** confuse `useInitialScale()` with `uSizeMul` / `uPointGlowMul`. Loweri
 
 Rainbow wash orbs are **not** part of the WebGL brain. They live in `components/background-orbs.tsx` and section-level ambient divs; changes there do not affect the brain mesh.
 
+`components/background-orbs.tsx` renders the same seven decorative orb nodes during SSR and the first client render. Orb position, color, blur, animation, mobile overrides, and paused/running state are owned by `app/globals.css` through stable classes and `data-orbs-in-view`; do not reintroduce inline visual styles or viewport-based render branches for those properties.
+
+`components/animations/animated-section.tsx` also keeps first-render reveal styling independent of viewport hooks. Entrance visibility and settling are expressed through `data-reveal-*` attributes plus CSS classes so React hydrates stable attributes before IntersectionObserver updates run.
+
 ## Blog listing performance & URLs
 
 | Concern | Decision |

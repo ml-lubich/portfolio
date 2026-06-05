@@ -67,7 +67,7 @@ describe("mobile performance guardrails", () => {
   })
 
   it("keeps ambient orbs transform-only", () => {
-    expect(source("components/background-orbs.tsx")).toContain('willChange: "transform"')
+    expect(source("app/globals.css")).toContain("will-change: transform;")
   })
 
   it("keeps mobile ambient blur lightweight", () => {
@@ -88,6 +88,14 @@ describe("mobile performance guardrails", () => {
 
   it("keeps ambient hero orbs hydration-stable", () => {
     expect(source("components/background-orbs.tsx")).toContain('data-ambient-orb="true"')
+  })
+
+  it("keeps ambient hero orb visuals out of inline hydration styles", () => {
+    expect(source("components/background-orbs.tsx")).not.toMatch(/\b(background|filter|animationName|animationDuration|willChange):/)
+  })
+
+  it("keeps animated sections independent of viewport hooks during first render", () => {
+    expect(source("components/animations/animated-section.tsx")).not.toContain("useIsMobile")
   })
 
   it("keeps brain resize listeners width-only", () => {
