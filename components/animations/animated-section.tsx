@@ -12,13 +12,19 @@ interface AnimatedSectionProps {
   enable3D?: boolean
 }
 
+/** True when the visitor asked the OS to minimize motion. */
+function _wantsReducedMotion(): boolean {
+  if (typeof window === "undefined") return false
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches
+}
+
 /**
- * Animated section with:
- * 1. One-shot IntersectionObserver reveal (smooth fade + slide + 3D tilt)
- * 2. Continuous scroll-driven subtle parallax after reveal
+ * One-shot scroll-into-view reveal (fade + slide + subtle 3D tilt).
  *
- * The initial reveal uses CSS transitions for buttery smoothness.
- * After reveal, a gentle translateY parallax keeps sections feeling alive.
+ * The reveal is a single GPU-composited CSS transition — there is **no**
+ * per-section scroll listener, so N sections no longer thrash layout on every
+ * scroll frame. `will-change` is dropped once the reveal settles to release the
+ * GPU layer, and motion is skipped entirely for reduced-motion users.
  */
 export function AnimatedSection({
   children,
@@ -30,76 +36,58 @@ export function AnimatedSection({
   const isMobile = useIsMobile()
   const ref = useRef<HTMLElement>(null)
   const [isVisible, setIsVisible] = useState(false)
-  const rafRef = useRef<number>(0)
-  const revealDone = useRef(false)
-  const revealTailMs = isMobile ? 480 : 1200
+  const [settled, setSettled] = useState(false)
 
-  // One-shot IntersectionObserver for the initial reveal
+  // One-shot IntersectionObserver for the initial reveal.
   useEffect(() => {
     const el = ref.current
     if (!el) return
+    if (_wantsReducedMotion()) {
+      setIsVisible(true)
+      setSettled(true)
+      return
+    }
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true)
-          observer.unobserve(entry.target)
-          // Allow the CSS reveal transition to finish, then switch to direct DOM parallax
-          setTimeout(() => { revealDone.current = true }, revealTailMs + delay)
-        }
+        if (!entry.isIntersecting) return
+        setIsVisible(true)
+        observer.unobserve(entry.target)
       },
-      { threshold: 0.08 }
+      { threshold: 0.08, rootMargin: "0px 0px -8% 0px" }
     )
     observer.observe(el)
     return () => observer.disconnect()
-  }, [delay, revealTailMs])
-
-  // Continuous scroll-driven parallax — skipped on small viewports (touch scroll cost).
-  useEffect(() => {
-    if (typeof window !== "undefined" && window.innerWidth < 768) return
-
-    function updateParallax() {
-      const el = ref.current
-      if (!el || !revealDone.current) return
-      const rect = el.getBoundingClientRect()
-      const windowH = window.innerHeight
-      const centerOffset = (rect.top + rect.height / 2 - windowH / 2) / windowH
-      const parallaxY = centerOffset * 16
-      el.style.transform = `perspective(1200px) translateY(${parallaxY}px) rotateX(0deg) scale(1)`
-      el.style.transitionProperty = "opacity"
-    }
-
-    function onScroll() {
-      cancelAnimationFrame(rafRef.current)
-      rafRef.current = requestAnimationFrame(updateParallax)
-    }
-    window.addEventListener("scroll", onScroll, { passive: true })
-    return () => {
-      cancelAnimationFrame(rafRef.current)
-      window.removeEventListener("scroll", onScroll)
-    }
   }, [])
 
-  // 3D perspective tilt amount (only during entrance, fades to 0)
-  const rotateX = enable3D && !isVisible ? (isMobile ? 2 : 5) : 0
-  const scaleVal = isVisible ? 1 : (isMobile ? 0.99 : 0.97)
-  const enterY = isMobile ? 16 : 32
-  const durOpacity = isMobile ? "0.4s" : "1s"
-  const durTransform = isMobile ? "0.52s" : "1.2s"
+  // Release the GPU layer after the reveal finishes (no permanent will-change).
+  useEffect(() => {
+    if (!isVisible || settled) return
+    const tail = (isMobile ? 420 : 620) + delay
+    const t = window.setTimeout(() => setSettled(true), tail)
+    return () => clearTimeout(t)
+  }, [isVisible, settled, isMobile, delay])
+
+  // 3D perspective tilt amount (only during entrance, fades to 0).
+  const rotateX = enable3D && !isVisible ? (isMobile ? 2 : 4) : 0
+  const scaleVal = isVisible ? 1 : (isMobile ? 0.99 : 0.985)
+  const enterY = isMobile ? 14 : 24
+  const dur = isMobile ? "0.42s" : "0.55s"
 
   return (
     <section
       ref={ref}
       id={id}
-      className={`will-change-transform ${className}`}
+      className={className}
       style={{
         opacity: isVisible ? 1 : 0,
         transform: `perspective(1200px) translateY(${isVisible ? 0 : enterY
           }px) rotateX(${rotateX}deg) scale(${scaleVal})`,
         transformOrigin: "center bottom",
         transitionProperty: isVisible ? "opacity, transform" : "none",
-        transitionDuration: isVisible ? `${durOpacity}, ${durTransform}` : "0s",
-        transitionTimingFunction: isVisible ? "cubic-bezier(0.16, 1, 0.3, 1)" : "ease",
+        transitionDuration: isVisible ? `${dur}, ${dur}` : "0s",
+        transitionTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
         transitionDelay: isVisible ? `${delay}ms` : "0ms",
+        willChange: settled ? "auto" : "opacity, transform",
       }}
     >
       {children}
