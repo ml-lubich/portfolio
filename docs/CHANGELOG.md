@@ -6,6 +6,14 @@ All notable changes to this project are documented here.
 
 ### Fixed
 
+- Fixed the "A Day in My Life" live terminal collapsing code indentation while typing: cmd/out/code lines now render with `whitespace-pre-wrap`, so leading tabs/spaces in Python snippets and multi-space column alignment in command output are preserved. Added `__tests__/terminal-indentation-regression.test.ts` guarding the fix.
+
+### Added
+
+- Added a proprietary all-rights-reserved `LICENSE` at the repo root: the portfolio source, design, and content may not be copied, reused, or repurposed without written permission.
+
+### Fixed
+
 - Fixed the homepage React hydration warning caused by mobile-only ambient-orb style overrides and viewport-derived animated-section entrance styles. Ambient orb geometry/animation is now CSS/data-attribute driven instead of inline style driven, and animated sections no longer read viewport breakpoints for their first render.
 - Hardened external link/media smoke tests with bounded request timeouts and an explicit skip for Google Calendar bot-blocking so CI does not hang on valid third-party links.
 - Removed broad visual jitter from the homepage: ambient hero orbs now use static blur with transform-only drift instead of per-frame hue/filter animation, scroll-linked metallic shimmer updates are quantized and disabled on coarse/reduced-motion devices, and element scroll-progress bars ignore mobile browser chrome height-only resize events.
