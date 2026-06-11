@@ -37,11 +37,14 @@ describe("terminal indentation regression guards", () => {
       /<span className="text-foreground\/80[^"]*">/,
     )?.[0]
     expect(codeSpan).toContain("whitespace-pre-wrap")
+    expect(codeSpan).toContain("[tab-size:4]")
+    expect(codeSpan).toContain("break-all")
   })
 
   it("output line renderer preserves whitespace", () => {
     const outDiv = terminalSource.match(/className=\{`pl-5[^`]*`\}/)?.[0]
     expect(outDiv).toContain("whitespace-pre-wrap")
+    expect(outDiv).toContain("[tab-size:4]")
   })
 
   it("command line renderer preserves whitespace", () => {
@@ -49,5 +52,6 @@ describe("terminal indentation regression guards", () => {
       /<span className="text-foreground\/90[^"]*">/,
     )?.[0]
     expect(cmdSpan).toContain("whitespace-pre-wrap")
+    expect(cmdSpan).toContain("[tab-size:4]")
   })
 })

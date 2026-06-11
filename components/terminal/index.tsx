@@ -167,19 +167,19 @@ export function LiveTerminal() {
         return (
           <div className="flex items-start gap-2 min-h-[1.35em]">
             <span className="text-emerald-400 shrink-0 select-none">❯</span>
-            <span className="text-foreground/90 whitespace-pre-wrap">
+            <span className="text-foreground/90 whitespace-pre-wrap break-words [tab-size:4]">
               {dl.text}
               {blink && <span className="animate-[terminal-blink_1s_step-end_infinite] text-emerald-400">▊</span>}
             </span>
           </div>
         )
       case "out":
-        return <div className={`pl-5 whitespace-pre-wrap ${ld.c ?? "text-muted-foreground"} min-h-[1.35em]`}>{dl.text}</div>
+        return <div className={`pl-5 whitespace-pre-wrap break-words [tab-size:4] ${ld.c ?? "text-muted-foreground"} min-h-[1.35em]`}>{dl.text}</div>
       case "code":
         return (
           <div className="flex items-start min-h-[1.35em]">
             <span className="text-muted-foreground/25 select-none w-5 text-right mr-2 text-[11px] leading-relaxed shrink-0">{dl.li}</span>
-            <span className="text-foreground/80 whitespace-pre-wrap">
+            <span className="text-foreground/80 whitespace-pre-wrap break-all [tab-size:4]">
               {dl.done ? highlight(dl.text) : <>{dl.text}{blink && <span className="animate-[terminal-blink_1s_step-end_infinite] text-emerald-400">▊</span>}</>}
             </span>
           </div>

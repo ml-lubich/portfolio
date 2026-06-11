@@ -4,6 +4,10 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+### Fixed
+
+- Live terminal cmd/out/code lines now render with `[tab-size:4]` and explicit word-breaking (`break-words` for cmd/out, `break-all` for code), so tab-indented snippets keep consistent 4-column indentation and long lines wrap instead of overflowing the terminal card. Regression guards extended in `__tests__/terminal-indentation-regression.test.ts`.
+
 ### Added
 
 - Test gate is now explicit in the `build` script (`vitest run && bunx next build --webpack`) instead of relying on the `prebuild` lifecycle hook, so Vercel deployments always run the full suite — including asset/media reference checks — before building.
