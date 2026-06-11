@@ -2,9 +2,16 @@
 
 ## Commands
 
-- `bun run test` — Vitest suite (required before release per `package.json` `prebuild`).
-- `bun run build` — production Next build using `bunx next build --webpack`; Turbopack currently fails on `pages-manifest.json` generation in this app-only project.
+- `bun run test` — Vitest suite (also enforced by the `pre-push` git hook).
+- `bun run build` — runs `vitest run` explicitly, then the production Next build using `bunx next build --webpack`; Turbopack currently fails on `pages-manifest.json` generation in this app-only project. Vercel executes this same script, so the test suite (including asset/media reference checks) gates every deployment.
 - `bun run lint` — ESLint.
+
+## Git hook enforcement
+
+`bun install` installs both hooks via `scripts/install-hooks.js`:
+
+- `pre-commit` → `bun run lint` + `bun run build` (tests + production build).
+- `pre-push` → `bun run test` (full suite, including media/resource reference checks). Do not bypass with `--no-verify`.
 
 ## Automated: blog listing metadata
 

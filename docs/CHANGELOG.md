@@ -4,6 +4,11 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+### Added
+
+- Test gate is now explicit in the `build` script (`vitest run && bunx next build --webpack`) instead of relying on the `prebuild` lifecycle hook, so Vercel deployments always run the full suite — including asset/media reference checks — before building.
+- Added a `pre-push` git hook (`scripts/pre-push.sh`, installed by `scripts/install-hooks.js`) that runs the full Vitest suite before any push.
+
 ### Fixed
 
 - Fixed the "A Day in My Life" live terminal collapsing code indentation while typing: cmd/out/code lines now render with `whitespace-pre-wrap`, so leading tabs/spaces in Python snippets and multi-space column alignment in command output are preserved. Added `__tests__/terminal-indentation-regression.test.ts` guarding the fix.

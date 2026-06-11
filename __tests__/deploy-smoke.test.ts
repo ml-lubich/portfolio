@@ -17,8 +17,12 @@ describe("deploy smoke — package scripts", () => {
     scripts: Record<string, string>
   }
 
-  it("prebuild runs vitest (blocks broken builds on Vercel)", () => {
-    expect(pkg.scripts.prebuild).toMatch(/vitest/)
+  it("build runs vitest before next build (blocks broken builds on Vercel)", () => {
+    expect(pkg.scripts.build).toMatch(/vitest run\s*&&.*next build/)
+  })
+
+  it("does not rely on the prebuild lifecycle hook (runner-dependent)", () => {
+    expect(pkg.scripts.prebuild).toBeUndefined()
   })
 
   it("deploy:check runs lint then test", () => {

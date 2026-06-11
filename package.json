@@ -1,6 +1,6 @@
 {
   "name": "portfolio",
-  "version": "0.2.9",
+  "version": "0.2.10",
   "private": true,
   "browserslist": [
     "chrome >= 111",
@@ -13,8 +13,7 @@
   "scripts": {
     "prepare": "node scripts/install-hooks.js",
     "dev": "next dev --webpack",
-    "prebuild": "vitest run",
-    "build": "bunx next build --webpack",
+    "build": "vitest run && bunx next build --webpack",
     "start": "next start",
     "lint": "eslint .",
     "test": "vitest run",
