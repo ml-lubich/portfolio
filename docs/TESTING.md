@@ -3,6 +3,7 @@
 ## Commands
 
 - `bun run test` — Vitest suite (also enforced by the `pre-push` git hook).
+- `bun run test:add <slug>` — scaffold a new test file in `__tests__/`. Generates a ready-to-run stub with correct imports, naming convention guidance, and fixture path instructions. Accepts `--describe "what you are guarding"`. Example: `bun run test:add nav-scroll --describe "navbar stays transparent over the hero"`.
 - `bun run build` — runs `vitest run` explicitly, then the production Next build using `bunx next build --webpack`; Turbopack currently fails on `pages-manifest.json` generation in this app-only project. Vercel executes this same script, so the test suite (including asset/media reference checks) gates every deployment.
 - `bun run lint` — ESLint.
 

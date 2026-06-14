@@ -1,8 +1,10 @@
 /**
- * Guardrails for the "A Day in My Life" live terminal: typed-out code must keep
- * its indentation. HTML collapses leading/repeated whitespace by default, so the
- * cmd/out/code renderers must opt into `whitespace-pre-wrap`. Session data is the
- * fixture proving indentation actually exists to preserve.
+ * Guardrails for the "A Day in My Life" live terminal.
+ *
+ * Root cause fixed: code lines use a `<code>` flex-item (not an inline `<span>`)
+ * so the browser never collapses leading spaces during the typing animation.
+ * `font-mono` ensures monospace space-width; `whitespace-pre-wrap` preserves
+ * the indentation at every character burst.
  */
 
 import { readFileSync } from "node:fs"
@@ -32,13 +34,14 @@ describe("terminal indentation regression guards", () => {
     expect(aligned.length).toBeGreaterThan(0)
   })
 
-  it("code line renderer preserves whitespace", () => {
-    const codeSpan = terminalSource.match(
-      /<span className="text-foreground\/80[^"]*">/,
-    )?.[0]
-    expect(codeSpan).toContain("whitespace-pre-wrap")
-    expect(codeSpan).toContain("[tab-size:4]")
-    expect(codeSpan).toContain("break-all")
+  it("code line renderer uses <code> flex-item so leading spaces are never collapsed", () => {
+    // <code> as a flex child becomes a block-level box; whitespace-pre-wrap then
+    // guarantees leading spaces in dl.text survive the typing animation.
+    const codeEl = terminalSource.match(/<code className="text-foreground\/80[^"]*">/)?.[0]
+    expect(codeEl).toContain("whitespace-pre-wrap")
+    expect(codeEl).toContain("font-mono")
+    expect(codeEl).toContain("flex-1")
+    expect(codeEl).toContain("[tab-size:4]")
   })
 
   it("output line renderer preserves whitespace", () => {

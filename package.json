@@ -1,6 +1,6 @@
 {
   "name": "portfolio",
-  "version": "0.2.10",
+  "version": "0.2.11",
   "private": true,
   "browserslist": [
     "chrome >= 111",
@@ -23,6 +23,7 @@
     "deploy:check": "bun run lint && bun run test",
     "test:links": "vitest run __tests__/links.test.ts",
     "test:watch": "vitest",
+    "test:add": "bun scripts/add-test.ts",
     "resize-logo": "bun scripts/resize-logo.js",
     "generate-favicons": "bun scripts/generate-favicons.js"
   },

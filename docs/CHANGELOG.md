@@ -6,7 +6,10 @@ All notable changes to this project are documented here.
 
 ### Fixed
 
-- Live terminal cmd/out/code lines now render with `[tab-size:4]` and explicit word-breaking (`break-words` for cmd/out, `break-all` for code), so tab-indented snippets keep consistent 4-column indentation and long lines wrap instead of overflowing the terminal card. Regression guards extended in `__tests__/terminal-indentation-regression.test.ts`.
+- Live terminal code lines changed from inline `<span>` to `<code>` flex-item (`flex-1 min-w-0 font-mono whitespace-pre-wrap`). Leading spaces in indented Python snippets no longer collapse during the typing animation — the browser was discarding leading-whitespace-only inline text nodes on each keystroke burst. Regression test updated to assert `<code>` element, `font-mono`, and `flex-1`.
+- Removed `break-all` from code line renderer (was incorrectly breaking in the middle of identifiers); `whitespace-pre-wrap` with a block-level flex item handles long-line wrapping correctly.
+
+- Live terminal cmd/out/code lines now render with `[tab-size:4]` and explicit word-breaking (`break-words` for cmd/out), so aligned columns in output lines and long command strings wrap instead of overflowing the terminal card.
 
 ### Added
 
