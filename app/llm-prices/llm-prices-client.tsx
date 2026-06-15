@@ -130,6 +130,17 @@ function calcCostFromState(entry: PriceEntry, calc: CalcState): number {
   return calcCost(entry, parseTokens(calc.input), parseTokens(calc.cached), parseTokens(calc.output))
 }
 
+export function matchesPriceSearch(entry: PriceEntry, query: string): boolean {
+  const q = query.trim().toLowerCase()
+  if (!q) return true
+  return entry.name.toLowerCase().includes(q) || entry.vendor.toLowerCase().includes(q)
+}
+
+export function priceEntryRowKey(entry: PriceEntry, index: number): string {
+  const cached = entry.input_cached === null ? "uncached" : entry.input_cached
+  return [index, entry.vendor, entry.id, entry.name, entry.input, entry.output, cached].join("|")
+}
+
 /* ── Sub-components ─────────────────────────────────────────────────── */
 
 function LiveBadge() {
@@ -549,8 +560,7 @@ export function LlmPricesClient({ data }: { data: PricesData | null }) {
     if (!data) return []
     const rows = data.prices.filter(p => {
       const matchVendor = vendor === "all" || p.vendor.toLowerCase() === vendor
-      const q = search.toLowerCase()
-      const matchSearch = !q || p.name.toLowerCase().includes(q) || p.vendor.toLowerCase().includes(q)
+      const matchSearch = matchesPriceSearch(p, search)
       return matchVendor && matchSearch
     })
     return [...rows].sort((a, b) => {
@@ -630,7 +640,7 @@ export function LlmPricesClient({ data }: { data: PricesData | null }) {
             </div>
           ) : (
             filtered.map((entry, i) => (
-              <ModelRow key={entry.id} entry={entry} calc={calc} showCalcCol={showCalcCol} index={i} />
+              <ModelRow key={priceEntryRowKey(entry, i)} entry={entry} calc={calc} showCalcCol={showCalcCol} index={i} />
             ))
           )}
           <div className="border-t border-white/[0.04] px-4 py-3 sm:px-6">

@@ -19,6 +19,8 @@ import {
   calcCost,
   vendorAccent,
   vendorLabel,
+  matchesPriceSearch,
+  priceEntryRowKey,
   VENDOR_ACCENTS,
   VENDOR_LABELS,
   type PriceEntry,
@@ -143,6 +145,44 @@ describe("calcCost", () => {
   })
   it("returns 0 for all-zero token counts", () => {
     expect(calcCost(MOCK_ENTRY, 0, 0, 0)).toBe(0)
+  })
+})
+
+// ── search matching ─────────────────────────────────────────────────────────
+
+const GROK_ENTRY: PriceEntry = {
+  id: "shared-id",
+  vendor: "xai",
+  name: "Grok 4 Fast",
+  input: 0.2,
+  output: 0.5,
+  input_cached: 0.05,
+}
+
+const OPUS_ENTRY: PriceEntry = {
+  id: "shared-id",
+  vendor: "anthropic",
+  name: "Claude Opus 4.8",
+  input: 5,
+  output: 25,
+  input_cached: null,
+}
+
+describe("matchesPriceSearch", () => {
+  it("does not match Grok rows for an Opus query", () => {
+    expect(matchesPriceSearch(GROK_ENTRY, "opus")).toBe(false)
+  })
+  it("matches Claude Opus rows for an Opus query", () => {
+    expect(matchesPriceSearch(OPUS_ENTRY, "opus")).toBe(true)
+  })
+  it("trims search input before matching", () => {
+    expect(matchesPriceSearch(OPUS_ENTRY, "  opus  ")).toBe(true)
+  })
+})
+
+describe("priceEntryRowKey", () => {
+  it("keeps duplicate upstream ids unique by rendered row", () => {
+    expect(new Set([priceEntryRowKey(GROK_ENTRY, 0), priceEntryRowKey(OPUS_ENTRY, 1)]).size).toBe(2)
   })
 })
 
