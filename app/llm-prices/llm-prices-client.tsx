@@ -219,12 +219,12 @@ function CalcPanel({ calc, onChange, onClear }: CalcPanelProps) {
 /* ── Table header ───────────────────────────────────────────────────── */
 
 /* Column widths — shared between header and row so they stay in sync. */
-const COL_RANK    = "hidden w-7 shrink-0 sm:block"
-const COL_VENDOR  = "hidden w-28 shrink-0 sm:block"
-const COL_INPUT   = "w-28 shrink-0 sm:w-36"
-const COL_OUTPUT  = "w-16 shrink-0 sm:w-20"
-const COL_CALC    = "w-20 shrink-0 sm:w-24"
-const ROW_GAP     = "gap-2 sm:gap-4"
+const COL_RANK    = "hidden w-5 shrink-0 sm:block"
+const COL_VENDOR  = "hidden w-24 shrink-0 sm:block"
+const COL_INPUT   = "w-20 shrink-0 sm:w-28"
+const COL_OUTPUT  = "w-14 shrink-0 sm:w-16"
+const COL_CALC    = "w-16 shrink-0 sm:w-20"
+const ROW_GAP     = "gap-2 sm:gap-3"
 
 function TableHeader({ showCalcCol }: { showCalcCol: boolean }) {
   return (
@@ -264,7 +264,7 @@ function ModelRow({ entry, calc, showCalcCol, index }: RowProps) {
   const cost = showCalcCol ? calcCostFromState(entry, calc) : null
 
   return (
-    <div className={`group relative flex items-center ${ROW_GAP} border-b border-white/[0.04] px-4 py-3 transition-colors hover:bg-white/[0.025] sm:px-6`}>
+    <div className={`group relative flex items-center ${ROW_GAP} border-b border-white/[0.04] px-4 py-2.5 transition-colors hover:bg-white/[0.025] sm:px-6`}>
       {/* Vendor accent strip on hover */}
       <div
         className="absolute left-0 top-0 h-full w-0.5 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
