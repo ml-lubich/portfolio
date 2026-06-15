@@ -1,0 +1,46 @@
+---
+title: "Production RAG Needs Latency Budgets, Not Hope"
+excerpt: "RAG quality collapses when retrieval, reranking, and generation each add 'just a little' latency. A hard latency budget forces better architecture decisions."
+date: "2026-05-15"
+category: "AI Products"
+tags: ["RAG", "Latency", "Performance", "Architecture", "Product"]
+---
+
+Many RAG outages are not correctness failures. They are patience failures.
+
+Each stage looks acceptable in isolation: retrieval adds 120ms, reranking adds 180ms, generation adds 900ms. Then network overhead and retries turn an "okay" path into a multi-second experience users abandon.
+
+## Budget the full path
+
+Start with user tolerance, not model preference. If your product interaction feels broken beyond 2.5 seconds, design backward from that limit and assign explicit stage budgets.
+
+```mermaid
+{
+  "type": "pipeline",
+  "title": "RAG Latency Budget Example (p95 target: 2500ms)",
+  "steps": [
+    { "label": "Request normalization", "annotation": "100ms", "color": "cyan" },
+    { "label": "Hybrid retrieval", "annotation": "350ms", "color": "blue" },
+    { "label": "Rerank + filter", "annotation": "300ms", "color": "purple" },
+    { "label": "Prompt assembly", "annotation": "150ms", "color": "amber" },
+    { "label": "Model generation", "annotation": "1300ms", "color": "green" },
+    { "label": "Post-processing", "annotation": "200ms", "color": "default" },
+    { "label": "Response delivery", "annotation": "100ms", "color": "default" }
+  ]
+}
+```
+
+## Design consequences
+
+Once you have hard budgets, architecture decisions become obvious:
+
+- shrink retrieval candidate set when reranking dominates
+- cache embeddings for repeated queries
+- reduce context payload for low-value sections
+- stream partial responses early for perceived performance
+
+Teams that skip budgets usually overfit for offline quality and lose users in real interaction loops.
+
+## Takeaway
+
+If latency is unbounded, quality work is invisible. Budget the path and enforce it in CI and runtime alerts.

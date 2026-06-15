@@ -4,6 +4,12 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+### Added
+
+- Expanded the blog timeline from `2026-04-06` through `2026-06-15` with eight new posts across AI architecture, MLOps, engineering culture, and product execution.
+- Added mixed-length editorial content (short tactical briefs + long-form deep dives) so reading depth now varies by topic instead of clustering around a single article length.
+- Added additional chart-backed visual narratives (pipeline, pie, comparison, and tree JSON fences) in new posts, aligned to the blog chart schema so MDX visualization rendering remains reliable.
+
 ### Fixed
 
 - Live terminal code lines now render through a `<pre><code>` pair and the regression suite locks the multiline `streamInference` snippet indentation, so generated code remains tabbed before and after syntax highlighting.

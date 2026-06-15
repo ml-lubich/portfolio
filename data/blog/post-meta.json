@@ -17,6 +17,10 @@
       "views": "1k",
       "coverImage": "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1200&h=630&fit=crop"
     },
+    "ai-agent-observability-runbook": {
+      "views": "1k",
+      "coverImage": "https://images.unsplash.com/photo-1518773553398-650c184e0bb3?w=1200&h=630&fit=crop"
+    },
     "ai-evaluation-hardest-unsolved-problem": {
       "views": "1k",
       "coverImage": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&h=630&fit=crop"
@@ -53,9 +57,17 @@
       "views": "2k",
       "coverImage": "https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=1200&h=630&fit=crop"
     },
+    "incident-reviews-that-actually-improve-agents": {
+      "views": "1k",
+      "coverImage": "https://images.unsplash.com/photo-1526378800651-c32d170fe6f8?w=1200&h=630&fit=crop"
+    },
     "langchain-considered-harmful": {
       "views": "3k",
       "coverImage": "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=1200&h=630&fit=crop"
+    },
+    "mcp-contract-tests-save-enterprise-rollouts": {
+      "views": "1k",
+      "coverImage": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=1200&h=630&fit=crop"
     },
     "mcp-production-engineering-2026": {
       "views": "1k",
@@ -85,6 +97,10 @@
       "views": "1k",
       "coverImage": "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=1200&h=630&fit=crop"
     },
+    "production-rag-latency-budgets": {
+      "views": "1k",
+      "coverImage": "https://images.unsplash.com/photo-1515876305430-f06edab8282a?w=1200&h=630&fit=crop"
+    },
     "prompt-engineering-is-not-engineering": {
       "views": "4k",
       "coverImage": "https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=1200&h=630&fit=crop"
@@ -97,6 +113,10 @@
       "views": "1k",
       "coverImage": "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=1200&h=630&fit=crop"
     },
+    "shipping-ai-features-with-design-systems": {
+      "views": "1k",
+      "coverImage": "https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?w=1200&h=630&fit=crop"
+    },
     "stop-building-ai-products-nobody-wants": {
       "views": "2k",
       "coverImage": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&h=630&fit=crop"
@@ -105,6 +125,14 @@
       "views": "1k",
       "coverImage": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=1200&h=630&fit=crop"
     },
+    "retrieval-freshness-beats-bigger-models": {
+      "views": "1k",
+      "coverImage": "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=1200&h=630&fit=crop"
+    },
+    "eval-budgeting-playbook-2026": {
+      "views": "1k",
+      "coverImage": "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=1200&h=630&fit=crop"
+    },
     "uncomfortable-truth-ai-safety": {
       "views": "2k",
       "coverImage": "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=1200&h=630&fit=crop"
@@ -112,6 +140,10 @@
     "vibe-coding-future-or-anti-pattern": {
       "views": "2k",
       "coverImage": "https://images.unsplash.com/photo-1550439062-609e1531270e?w=1200&h=630&fit=crop"
+    },
+    "what-broke-our-agent-stack-and-how-we-fixed-it": {
+      "views": "1k",
+      "coverImage": "https://images.unsplash.com/photo-1492724441997-5dc865305da7?w=1200&h=630&fit=crop"
     }
   }
 }

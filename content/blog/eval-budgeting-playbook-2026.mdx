@@ -1,0 +1,99 @@
+---
+title: "The Eval Budgeting Playbook for 2026"
+excerpt: "Most teams budget inference and forget evaluation. That leads to brittle launches, expensive regressions, and surprise staffing cost. Budget evals like production infrastructure."
+date: "2026-05-02"
+category: "MLOps"
+tags: ["Evals", "Budgeting", "Quality", "Governance", "LLMOps"]
+---
+
+Teams that say they "care about quality" but do not budget evaluation are gambling with delayed feedback. You can absolutely launch this way, but you pay later with support churn, trust loss, and emergency rewrites. In 2026, evaluation cost is not overhead. It is the price of operating a model-backed product responsibly.
+
+The mistake is structural: planning spreadsheets include model inference cost and token growth, but evaluation appears as an ad hoc line item under "research." That framing guarantees underinvestment, because research budgets are the first to get squeezed when roadmaps tighten.
+
+## Treat eval cost like reliability cost
+
+Think of eval budget the same way you think about SRE headcount and observability tooling. You cannot prove reliability by asserting it; you must continuously measure it under realistic traffic patterns.
+
+For AI systems, this means paying for:
+
+- curated test sets that evolve with product behavior
+- judge-model or hybrid scoring passes
+- human review loops for high-impact surfaces
+- CI and pre-release evaluation gates
+- drift monitors for real production outputs
+
+The short-term instinct is to minimize this spend. The long-term outcome is almost always higher total cost because defects reach users and become organizational incidents.
+
+```mermaid
+{
+  "type": "pie",
+  "title": "Suggested AI Quality Budget Allocation",
+  "data": [
+    { "label": "Automated unit/scenario evals", "value": 38, "color": "blue" },
+    { "label": "Human review and adjudication", "value": 22, "color": "amber" },
+    { "label": "Prod drift monitoring", "value": 18, "color": "green" },
+    { "label": "Dataset curation and labeling", "value": 14, "color": "purple" },
+    { "label": "Regression triage and tooling", "value": 8, "color": "cyan" }
+  ]
+}
+```
+
+## A budgeting model you can defend to finance
+
+Use three budget buckets:
+
+1. **Pre-merge quality**
+   - lightweight checks on every commit
+   - catches formatting, schema, safety, and structural defects
+
+2. **Pre-release quality**
+   - deeper scenario evals on release candidates
+   - includes long-context and multi-turn cases
+
+3. **Post-release quality**
+   - sampled real outputs scored daily/weekly
+   - tracks drift, not just static benchmark movement
+
+This structure lets finance reason about why each dollar exists and what risk it mitigates.
+
+## How to avoid "eval theater"
+
+It is easy to build a beautiful dashboard that measures the wrong thing. Avoid vanity metrics like a single aggregate score detached from user outcomes.
+
+Instead, maintain a metric map tied to product value:
+
+- deflection quality for support agents
+- resolution correctness for operations workflows
+- policy adherence for compliance-critical responses
+- latency-adjusted quality for interactive UX
+
+If your evals cannot explain why a product KPI moved, you are not evaluating the system that users experience.
+
+## Staffing reality
+
+Someone owns this. Usually, the ownership is diffuse and quality falls between teams.
+
+Healthy pattern:
+
+- product engineering owns pre-merge eval checks
+- AI platform owns shared judge infrastructure and pipelines
+- domain experts own high-risk rubric definitions
+- leadership funds this explicitly as a recurring operational function
+
+Unhealthy pattern:
+
+- one "AI person" manually checks random samples before launch
+- no rubrics, no baselines, no formal regression policy
+
+## A simple quarterly cadence
+
+- **Week 1**: refresh priority scenarios and retire stale ones
+- **Week 2**: recalibrate judge prompts and human-review thresholds
+- **Week 3**: simulate failure campaigns (tool outage, stale retrieval, malformed output)
+- **Week 4**: publish scorecards with pass/fail release criteria updates
+
+This cadence keeps evaluation from fossilizing while preserving comparability over time.
+
+## Takeaway
+
+Your eval budget is not insurance for a rare event. It is the control system that keeps your AI product inside acceptable behavior as traffic, data, and models change. Budget it with the same seriousness you budget infra, because users experience both as a single product.

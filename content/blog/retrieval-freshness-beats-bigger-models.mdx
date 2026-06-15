@@ -1,0 +1,25 @@
+---
+title: "Retrieval Freshness Beats Bigger Models"
+excerpt: "Teams over-invest in model upgrades while stale retrieval quietly destroys answer quality. Fresh evidence often beats a larger checkpoint."
+date: "2026-04-20"
+category: "AI Architecture"
+tags: ["RAG", "Retrieval", "LLM", "Data Freshness", "Search"]
+---
+
+When answers degrade in production, teams usually ask, "Should we switch models?" The better first question is, "How old is the evidence we are retrieving?"
+
+A bigger model can reason better over the context it receives, but it cannot reason over facts you never retrieved. If your index lags product updates by 24 hours, your model is confidently wrong in a way users notice immediately.
+
+## Practical rule
+
+Before paying for a bigger model tier, measure these three numbers:
+
+- median index delay from source-of-truth updates
+- retrieval hit-rate on recent documents
+- stale-evidence rate in user-facing answers
+
+If freshness is poor, spend that budget on ingestion reliability and incremental indexing first.
+
+## Takeaway
+
+Model quality matters. Retrieval freshness usually matters **first**.

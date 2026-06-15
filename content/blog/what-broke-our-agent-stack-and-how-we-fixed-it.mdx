@@ -1,0 +1,142 @@
+---
+title: "What Broke Our Agent Stack in Q2 (and How We Fixed It)"
+excerpt: "A detailed field report from a real quarter of failures: stale retrieval, schema drift, runaway retries, and expensive judge loops. Here is what changed and what we now enforce."
+date: "2026-06-15"
+category: "AI Architecture"
+tags: ["Agents", "Architecture", "Reliability", "Postmortem", "LLMOps"]
+---
+
+Q2 looked successful from the outside: deployment frequency up, feature velocity up, executive demos clean. Internally, we were carrying compounding reliability debt.
+
+We did not have one catastrophic outage. We had a stream of medium-severity failures that drained engineering time and eroded team trust: flaky tool outputs, silent retrieval staleness, and quality regressions hidden by average-based dashboards.
+
+This post is the condensed version of what broke and the concrete controls we now enforce.
+
+## Failure mode 1: stale retrieval made good prompts look bad
+
+Symptoms were subtle at first. Users reported that answers were "mostly right" but outdated on policy details released within the last week. Prompt changes did not fix it because the issue was upstream: ingestion lag and index refresh inconsistency.
+
+We discovered that different content pipelines had different freshness windows and no shared SLO. A support article updated in one source propagated in under an hour; another source took nearly a day.
+
+### Fixes
+
+- unified freshness SLO per source
+- ingestion lag monitor with alerting
+- retrieval tests seeded with "newly changed" documents
+
+After this, quality improved without touching the base model.
+
+## Failure mode 2: schema drift at tool boundaries
+
+A tool team made a legitimate change to response structure, but downstream agent logic assumed old field names and optionality. We had validation in some paths, not all. The result was intermittent failures and fallback loops that looked like model indecision.
+
+### Fixes
+
+- contract tests for every high-traffic tool
+- strict runtime validation + explicit typed errors
+- canary traffic on contract changes before full rollout
+
+This reduced integration incidents and cut rollback frequency.
+
+## Failure mode 3: retry loops inflated cost and latency
+
+Our retry policy was too permissive. In degraded conditions, agents repeated the same failing strategy with minor prompt variations. Success rate barely improved while latency and cost spiked.
+
+```mermaid
+{
+  "type": "tree",
+  "title": "Retry Control Logic After Q2 Incidents",
+  "color": "purple",
+  "steps": [
+    "Tool/action failure detected",
+    {
+      "label": "Failure type known and recoverable?",
+      "branches": [
+        {
+          "condition": "Yes",
+          "color": "green",
+          "steps": [
+            "Single bounded retry",
+            "Switch strategy class",
+            "Continue execution"
+          ]
+        },
+        {
+          "condition": "No",
+          "color": "red",
+          "steps": [
+            "Stop retry loop",
+            "Escalate to fallback path",
+            "Emit incident telemetry"
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+### Fixes
+
+- maximum retry budget per run
+- strategy-change requirement between retries
+- hard stop + deterministic fallback when budget exhausted
+
+The change improved p95 latency and cost efficiency immediately.
+
+## Failure mode 4: eval coverage lagged feature velocity
+
+Our team shipped quickly, but evaluation suite updates lagged behind feature changes. This created blind spots where "green" test runs did not reflect new user behavior.
+
+### Fixes
+
+- release checklist requires scenario updates for new behaviors
+- weekly drift review over real user traces
+- judge+human hybrid review for critical flows
+
+```mermaid
+{
+  "type": "pipeline",
+  "title": "New Release Quality Gate",
+  "steps": [
+    { "label": "Feature merge", "annotation": "PR approved", "color": "default" },
+    { "label": "Schema + contract tests", "annotation": "must pass", "color": "blue" },
+    { "label": "Scenario evals", "annotation": "updated for new behavior", "color": "cyan" },
+    { "label": "Canary rollout", "annotation": "limited traffic", "color": "amber" },
+    { "label": "Outcome verification", "annotation": "KPI + quality", "color": "green" },
+    { "label": "Full rollout", "annotation": "if stable", "color": "default" }
+  ]
+}
+```
+
+## What changed culturally
+
+The technical fixes only stuck after a process shift:
+
+- incidents now require preventive artifacts, not just documentation
+- quality ownership is shared between product and platform teams
+- rollback is treated as normal engineering control, not failure theater
+
+We also stopped celebrating raw velocity without reliability context. Shipping more code is not progress if user-visible quality moves backward.
+
+## Metrics after enforcement
+
+Within six weeks of these controls:
+
+- repeated incident patterns dropped significantly
+- median run cost decreased due to bounded retries
+- release confidence improved because dashboards reflected real failure signatures
+
+Numbers varied by workflow, but the directional improvement was consistent across all major agent surfaces.
+
+## What we still have not solved
+
+- fully automated scoring for nuanced domain-specific outputs
+- robust long-horizon memory consistency across multi-session tasks
+- perfect failure attribution when multiple tools degrade simultaneously
+
+These remain active workstreams and deserve explicit roadmap space.
+
+## Final takeaway
+
+Most agent-stack failures are not mysterious model failures. They are systems failures: stale data, loose contracts, weak controls, and missing feedback loops. Once you treat the stack as a reliability system—not a prompt playground—you can make quality improvements that compound.

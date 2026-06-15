@@ -1,0 +1,23 @@
+---
+title: "Incident Reviews That Actually Improve Agents"
+excerpt: "Most AI postmortems read like blame theater. A useful one produces guardrails, eval cases, and a measurable drop in repeat incidents."
+date: "2026-04-12"
+category: "Engineering Culture"
+tags: ["Postmortems", "Agents", "Reliability", "Process", "Leadership"]
+---
+
+Most teams still run incident reviews for AI systems the way they ran them for REST APIs in 2017. They collect logs, write a timeline, and stop at "human error" or "model hallucinated." That gives you closure, not improvement.
+
+A good review for agentic systems has one required output: **new constraints in code and tests**. If the incident happened because tool output was malformed, you should leave with a stricter schema validator. If the incident happened because an agent retried the same failing path six times, you should leave with a bounded retry policy and a circuit breaker.
+
+## The review format that works
+
+1. **User-visible failure first**: what exactly broke for the customer.
+2. **Control-plane failure second**: where routing, prompts, tools, or state management allowed it.
+3. **Preventive artifacts**: one new eval, one new runtime guard, one new dashboard alert.
+
+If a review ends without those three artifacts, it was a meeting, not an engineering mechanism.
+
+## Takeaway
+
+Incidents are expensive tuition. Pay once. Convert each one into a testable guardrail so your system gets harder to break every week, not just better narrated in Slack.

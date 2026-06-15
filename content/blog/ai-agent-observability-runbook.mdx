@@ -1,0 +1,113 @@
+---
+title: "AI Agent Observability Runbook: What to Measure Before It Burns"
+excerpt: "Agent failures rarely show up as HTTP 500s. They show up as loops, brittle tool calls, and quiet quality drift. This runbook captures the signals that matter."
+date: "2026-05-28"
+category: "MLOps"
+tags: ["Observability", "Agents", "Reliability", "Runbook", "Monitoring"]
+---
+
+Most observability stacks were designed for deterministic services: requests in, responses out, maybe a queue in the middle. Agent systems are not deterministic in that way. They branch, revise, call tools conditionally, and can appear "healthy" while delivering quietly degraded outcomes.
+
+If you instrument agents like CRUD APIs, you get false confidence. You need a runbook that observes behavior, not just uptime.
+
+## Layer 1: execution health
+
+At minimum, capture for every run:
+
+- total steps taken
+- tool call count by tool type
+- retries per step
+- terminal status (success, fail, timeout, canceled)
+- wall-clock duration and p95/p99
+
+This layer answers: "Is the engine running?"
+
+## Layer 2: decision quality
+
+Add behavior metrics:
+
+- hallucination proxy rate (unsupported assertions)
+- policy compliance score
+- action reversals (undo/retry loops)
+- judge score for task completion quality
+
+This layer answers: "Is the engine making good choices?"
+
+## Layer 3: business impact
+
+Connect to outcomes:
+
+- ticket resolution delta
+- handoff/escalation frequency
+- revenue or cost impact per workflow
+- customer satisfaction trend on agent-assisted sessions
+
+This layer answers: "Does this help the business?"
+
+```mermaid
+{
+  "type": "tree",
+  "title": "Agent Incident Triage Decision Tree",
+  "color": "blue",
+  "steps": [
+    "Alert triggered on agent quality regression",
+    {
+      "label": "Execution health degraded?",
+      "branches": [
+        {
+          "condition": "Yes",
+          "color": "red",
+          "steps": [
+            "Inspect step retries/timeouts",
+            "Check tool latency and error envelopes",
+            "Throttle or route to safe fallback"
+          ]
+        },
+        {
+          "condition": "No",
+          "color": "amber",
+          "steps": [
+            "Inspect decision-quality signals",
+            "Sample outputs for policy/factual drift",
+            "Update prompts/evals and re-score"
+          ],
+          "loop": "Alert triggered on agent quality regression"
+        }
+      ]
+    }
+  ]
+}
+```
+
+## The three dashboards to keep open
+
+1. **Runtime panel**: throughput, queue depth, timeout rates, tool error rates
+2. **Behavior panel**: judge scores, loop signatures, policy violations
+3. **Outcome panel**: product KPI impact by cohort and feature flag
+
+If these views are isolated across different teams, incident response becomes slow and political. Keep them mapped to the same run IDs.
+
+## Failure signatures worth alerting on
+
+- sudden rise in median step count (often hidden loops)
+- a single tool dominating call volume after a release
+- quality score drift without latency drift (prompt or retrieval issue)
+- latency drift without quality drift (infra or dependency issue)
+
+These patterns often appear hours before obvious customer complaints.
+
+## Runbook response levels
+
+- **SEV-3**: local quality drop in non-critical workflow; gate new rollout
+- **SEV-2**: sustained drift or frequent escalation in core workflow; partial rollback
+- **SEV-1**: policy/safety failures or major outcome regression; hard failover to deterministic path
+
+Document who can trigger each level and how rollback happens without waiting for a full deployment.
+
+## Keep instrumentation close to contracts
+
+For each tool boundary, enforce typed request/response contracts and log contract violations as first-class signals. A malformed tool output should not be a buried warning; it should be an observable, alertable event tied to run IDs.
+
+## Takeaway
+
+You cannot monitor agents with a single uptime chart. Instrument execution, decisions, and business outcomes together. That is how you catch failures while they are still cheap.
