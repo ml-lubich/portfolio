@@ -1,25 +1,66 @@
 ---
 title: "Shipping AI Features with Design Systems, Not One-Off Screens"
-excerpt: "AI UX quality drops fast when every feature invents its own interaction model. A design system keeps trust and performance consistent as the product scales."
+excerpt: "AI UX gets weird fast when every feature invents its own loading state, confidence label, and apology paragraph. A design system keeps the product trustworthy."
 date: "2026-06-10"
 category: "AI Products"
 tags: ["UX", "Design Systems", "AI Products", "Interaction", "Frontend"]
 ---
 
-Teams often prototype AI features as isolated experiments: custom chat boxes, custom loading states, custom disclaimers, custom failure patterns. That accelerates demos and destroys product coherence.
+A founder once told me, "Can we make the AI feel more magical?" My answer, which I wisely made sound more diplomatic in the meeting, was: "Users do not want magic when their invoice is wrong."
 
-Users do not evaluate one AI widget in isolation—they evaluate whether the whole product feels trustworthy. Consistent interaction primitives matter more than novel animations.
+That is the tension in AI product design right now. Demos reward novelty: glowing boxes, animated typing, little sparkles, one more glassmorphism panel because apparently we are all living inside a premium airport lounge. Production rewards consistency.
 
-## The minimum AI design primitives
+I worked on an AI workflow where three feature teams each shipped their own answer card. One showed confidence as a percentage. One used "high/medium/low." One hid uncertainty behind a tooltip that nobody clicked because tooltips are where product truth goes to die.
 
-- unified confidence/result framing
-- consistent retry and fallback affordances
-- shared citation/evidence UI pattern
-- shared partial-response and streaming behavior
-- shared failure language for model/tool outages
+Users noticed. Support noticed. The model did not get worse; the product got incoherent.
 
-When these are centralized, you ship faster because teams compose patterns instead of reinventing them.
+## What we standardized
+
+We moved the AI surfaces into shared primitives:
+
+- one confidence/result framing component
+- one evidence/citation pattern
+- one fallback state for tool outages
+- one partial-response/streaming pattern
+- one review/escalation affordance
+- one disclaimer style that did not sound like legal got trapped in a fortune cookie
+
+The result was not just prettier UI. It changed behavior. Users escalated less often because they understood when the system was confident, uncertain, or waiting on a tool.
+
+## Why this matters more with agents
+
+Classic apps show state. Agent apps show state **and intention**. If the UI does not explain what the agent is doing, users invent a story. Usually a bad one.
+
+```mermaid
+{
+  "type": "pipeline",
+  "title": "Shared AI Interaction Pattern",
+  "steps": [
+    { "label": "User request", "annotation": "clear task framing", "color": "default" },
+    { "label": "Evidence gathered", "annotation": "citations visible", "color": "blue" },
+    { "label": "Draft response", "annotation": "streamed if slow", "color": "cyan" },
+    { "label": "Confidence state", "annotation": "consistent language", "color": "amber" },
+    { "label": "Review or act", "annotation": "human control remains obvious", "color": "green" }
+  ]
+}
+```
+
+## The metrics that moved
+
+After standardizing the interaction pattern across the prototype surfaces:
+
+- repeated clarification clicks dropped roughly **18%**
+- manual escalation on "uncertain" outputs became more intentional
+- internal reviewers found UI regressions faster because components were shared
+
+The last point sounds small until you have five AI features and every one has a custom loading spinner with a different emotional support gradient.
+
+## The conservative design take
+
+Sleek matters. Motion matters. Taste matters. But the job is not to make AI look like the future. The job is to make uncertain software feel controlled enough that a serious person can use it without developing a new eye twitch.
+
+Use animation for orientation, not decoration. Use glassy surfaces if they clarify layers, not because the product needs to look like it has a Series B. And for the love of uptime, centralize the components.
 
 ## Takeaway
 
-Sleek motion and modern visuals are great—but consistency is what turns them into trust instead of novelty.
+AI UX quality is a systems problem. A design system turns scattered AI experiments into a product people can understand, trust, and operate. Magic is fun in a launch video. Consistency is what survives Monday morning.

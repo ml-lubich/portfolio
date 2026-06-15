@@ -1,0 +1,116 @@
+---
+title: "State of AI — June 2026: The Hangover After the Agent Hype Cycle"
+excerpt: "June's AI market feels less like a breakthrough month and more like the morning after a very expensive demo party. The winners are building boring control systems."
+date: "2026-06-01"
+category: "Hot Takes"
+tags: ["AI Industry", "Agents", "Strategy", "Startups", "LLMOps"]
+---
+
+A CEO told me this month, "We don't need more agents. We need the ones we already bought to stop freelancing."
+
+That basically summarizes June 2026.
+
+The industry is not anti-agent now. It is post-naive-agent. The vibe shifted from "look, it can use tools" to "why did it open five tabs, call Salesforce twice, and summarize the wrong account with startup-founder confidence?"
+
+This is a good shift. Hype is fun. Control is useful. The companies that win the next phase will not be the ones with the most cinematic demos. They will be the ones that can answer a boring question: **what happens when the agent is wrong?**
+
+## What changed this month
+
+Three things stood out in the projects and conversations I saw:
+
+1. **Buyers got more conservative**
+   - teams still want AI, but procurement is asking about audit logs, rollback, and data boundaries earlier
+   - "we use GPT-5" is not a procurement answer; it is a LinkedIn post with invoices
+
+2. **Agent builders started adding rails**
+   - bounded retries, tool contracts, eval gates, and feature flags are moving from "later" to "before pilot"
+   - this is healthy and overdue
+
+3. **UX became a trust problem**
+   - users do not want the assistant to be cute when the answer affects money, policy, or customer promises
+   - visible evidence and clear uncertainty beat one more sparkly typing animation
+
+```mermaid
+{
+  "type": "comparison",
+  "title": "AI Product Mood: January vs June 2026",
+  "left": {
+    "title": "January: demo energy",
+    "color": "amber",
+    "steps": [
+      "Autonomous everything",
+      "Ship the agent",
+      "Trust the model",
+      "Patch later"
+    ]
+  },
+  "right": {
+    "title": "June: operator energy",
+    "color": "green",
+    "steps": [
+      "Bound the workflow",
+      "Test the tools",
+      "Show the evidence",
+      "Rollback cleanly"
+    ]
+  }
+}
+```
+
+## The project pattern I keep seeing
+
+The teams getting real value are not replacing departments with swarms of agents. They are automating narrow, high-frequency workflows with explicit ownership.
+
+Good examples:
+
+- support triage where the agent drafts and a human approves
+- sales research where evidence is cited and stale sources are visible
+- internal ops workflows where tool actions are reversible
+- code review assistants that comment, not auto-merge like a caffeinated intern with admin rights
+
+Bad examples:
+
+- "general AI teammate" with no bounded task
+- agent orchestration with no run trace
+- RAG over stale docs plus a confident tone
+- eval dashboards that measure vibes per token
+
+## My June take
+
+The next moat is not model access. It is **operational discipline**.
+
+Everyone has access to strong models. Fewer teams have clean data pipelines, eval suites, tool contracts, UX patterns, and leaders willing to say "no, the demo is not the product." That last one is underrated. Saying no to a cool but unsafe workflow is spiritually unsexy and financially useful.
+
+## What I would build now
+
+If I were starting an AI product in June 2026, I would prioritize:
+
+- one narrow workflow with obvious ROI
+- human review on high-impact actions
+- full traceability from answer to evidence/tool calls
+- evals before launch, not after the first angry screenshot
+- a kill switch that product and engineering both understand
+
+```mermaid
+{
+  "type": "pipeline",
+  "title": "June 2026 AI Product Checklist",
+  "steps": [
+    { "label": "Pick narrow workflow", "annotation": "not a generic agent", "color": "blue" },
+    { "label": "Map failure cost", "annotation": "money, trust, ops", "color": "amber" },
+    { "label": "Add eval gate", "annotation": "blocks release", "color": "purple" },
+    { "label": "Expose evidence", "annotation": "users can inspect", "color": "cyan" },
+    { "label": "Ship with rollback", "annotation": "boring on purpose", "color": "green" }
+  ]
+}
+```
+
+## The conservative optimism
+
+I am still bullish. Very bullish. But I am bullish on AI systems that look less like magic and more like good infrastructure with a model in the loop.
+
+The party trick phase was useful. It expanded imagination. Now the serious work is making these systems reliable enough that normal operators can trust them on a random Tuesday.
+
+## Takeaway
+
+June 2026 is the month agent hype started growing up. The winners will keep the ambition and drop the cosplay autonomy. Build the rails, show the evidence, measure the outcomes, and let the demo bros argue about whose gradient is more inevitable.

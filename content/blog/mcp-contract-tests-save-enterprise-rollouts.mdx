@@ -1,20 +1,35 @@
 ---
 title: "MCP Contract Tests Save Enterprise Rollouts"
-excerpt: "Most MCP incidents are contract drift incidents: schema mismatches, stale assumptions, or missing capability negotiation. Contract tests catch these before customers do."
+excerpt: "A renamed field should not take down an enterprise agent rollout. MCP only scales if contracts are tested like APIs, not treated like vibes with JSON."
 date: "2026-06-05"
 category: "Open Source"
 tags: ["MCP", "Contracts", "Testing", "Enterprise", "Integration"]
 ---
 
-Enterprises adopting MCP usually fail in integration, not in model quality. The model may be fine. The tool contract is not.
+The most dangerous MCP bug I hit was not dramatic. No outage siren. No heroic war room. Just one renamed field and a workflow that started making slightly worse decisions with a straight face.
 
-A tiny schema drift—like a renamed field, missing enum value, or changed nullability—can silently degrade tool effectiveness across thousands of runs.
+That is why I am bullish on MCP as a protocol and deeply suspicious of MCP rollouts without contract tests. The protocol gives agents a cleaner way to use tools. It does not magically make your tool contracts stable. If anything, it makes contract drift easier to spread because now more agents can depend on the same broken assumption.
+
+## The failure
+
+A tool response changed from a flat owner field to a nested owner object. Reasonable backend cleanup. Unfortunately, one agent path still expected the old shape and silently fell back to free-text inference.
+
+That fallback worked in demos. It failed in the places that matter: ambiguous ownership, handoff workflows, and anything involving three teams plus a Slack thread that looked like a hostage note.
+
+The practical impact in our sample runs:
+
+- owner-routing accuracy dropped from **92%** to **76%**
+- manual review rose by roughly **14 points**
+- the average failure took longer to debug because every individual trace looked "plausible"
+
+Plausible is the worst kind of wrong. Obviously broken systems get fixed. Plausibly wrong systems become quarterly OKRs.
 
 ## What to enforce in CI
 
-- request/response schema validation for each tool action
+- request/response schema validation for every tool action
 - capability negotiation checks for optional features
 - backward-compatibility snapshots for high-use payloads
+- negative fixtures for missing fields, unknown enums, and null payloads
 
 ```mermaid
 {
@@ -26,6 +41,7 @@ A tiny schema drift—like a renamed field, missing enum value, or changed nulla
     "steps": [
       "Manual smoke test",
       "Schema drift found in production",
+      "Agent improvises around missing data",
       "Emergency patch"
     ]
   },
@@ -35,12 +51,19 @@ A tiny schema drift—like a renamed field, missing enum value, or changed nulla
     "steps": [
       "CI schema validation",
       "Capability mismatch caught pre-release",
+      "Typed error returned to agent",
       "Predictable rollout"
     ]
   }
 }
 ```
 
+## The conservative MCP take
+
+MCP is a great direction because it standardizes the boring boundary. But standard boundaries are not self-enforcing. You still need versioning, compatibility policy, and tests.
+
+My rule now: if a tool is important enough to expose through MCP, it is important enough to have contract tests before an agent touches it.
+
 ## Takeaway
 
-MCP is powerful, but only if you treat protocol compatibility as a deploy gate, not an afterthought.
+MCP will make agent tooling more portable. It will not save you from sloppy contracts. Treat MCP servers like production APIs, not like a clever plugin folder, and the rollout gets much less spicy.

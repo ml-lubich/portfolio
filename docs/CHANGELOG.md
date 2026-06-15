@@ -6,9 +6,14 @@ All notable changes to this project are documented here.
 
 ### Added
 
+- Added a recurring-style `State of AI — June 2026` post with a monthly industry pulse format, concrete market framing, and chart-backed strategy checklist.
 - Expanded the blog timeline from `2026-04-06` through `2026-06-15` with eight new posts across AI architecture, MLOps, engineering culture, and product execution.
 - Added mixed-length editorial content (short tactical briefs + long-form deep dives) so reading depth now varies by topic instead of clustering around a single article length.
 - Added additional chart-backed visual narratives (pipeline, pie, comparison, and tree JSON fences) in new posts, aligned to the blog chart schema so MDX visualization rendering remains reliable.
+
+### Changed
+
+- Reworked flagship June blog posts to use stronger hooks, more first-person project context, concrete impact metrics, failed-attempt lessons, and a more casual but conservative Silicon Valley operator voice.
 
 ### Fixed
 

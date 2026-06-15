@@ -1,18 +1,33 @@
 ---
 title: "Production RAG Needs Latency Budgets, Not Hope"
-excerpt: "RAG quality collapses when retrieval, reranking, and generation each add 'just a little' latency. A hard latency budget forces better architecture decisions."
+excerpt: "A RAG answer can be correct and still lose the user. I learned that the boring way: by watching a good retrieval pipeline feel slow enough to be broken."
 date: "2026-05-15"
 category: "AI Products"
 tags: ["RAG", "Latency", "Performance", "Architecture", "Product"]
 ---
 
-Many RAG outages are not correctness failures. They are patience failures.
+The answer was correct. The user still hated it.
 
-Each stage looks acceptable in isolation: retrieval adds 120ms, reranking adds 180ms, generation adds 900ms. Then network overhead and retries turn an "okay" path into a multi-second experience users abandon.
+That is the part RAG benchmark decks skip. Offline quality looked solid. Retrieval hit-rate was up. The response cited the right documents. But the interaction felt like waiting for an expensive intern to find Wi-Fi.
+
+The project was a support/research RAG workflow with hybrid retrieval, reranking, generated summaries, and citations. The first version optimized answer quality. The second version optimized the thing users actually experience: **time to useful confidence**.
+
+## The failure
+
+We had stages that each looked fine alone:
+
+- query normalization: about **90ms**
+- hybrid retrieval: **300-500ms**
+- reranking: **250-400ms**
+- prompt assembly: **120ms**
+- model generation: **1.4-2.8s**
+- citation formatting and post-processing: **200-350ms**
+
+Individually, not tragic. Together, p95 drifted past **4.6s** on messy queries. That is not "AI magic." That is a progress bar with a trust problem.
 
 ## Budget the full path
 
-Start with user tolerance, not model preference. If your product interaction feels broken beyond 2.5 seconds, design backward from that limit and assign explicit stage budgets.
+Start with user tolerance, not model preference. If the product feels broken beyond 2.5 seconds, assign a budget and make every stage fight for its milliseconds.
 
 ```mermaid
 {
@@ -30,17 +45,24 @@ Start with user tolerance, not model preference. If your product interaction fee
 }
 ```
 
-## Design consequences
+## What we tried that did not fix it
 
-Once you have hard budgets, architecture decisions become obvious:
+- bigger model: better prose, same sluggish feel
+- more retrieved chunks: slightly better recall, worse latency
+- heavier reranker: improved edge cases, punished normal queries
 
-- shrink retrieval candidate set when reranking dominates
-- cache embeddings for repeated queries
-- reduce context payload for low-value sections
-- stream partial responses early for perceived performance
+Very Silicon Valley arc: we bought more intelligence before admitting the pipeline needed a stopwatch.
 
-Teams that skip budgets usually overfit for offline quality and lose users in real interaction loops.
+## What did fix it
+
+- candidate set capped by query class
+- citation streaming after first useful answer span
+- cached embeddings for repeated/account-level queries
+- fallback to lightweight rerank for low-risk questions
+- alerting on p95 budget by stage, not just total latency
+
+After the changes, the same scenario suite moved from **4.6s p95** to roughly **2.7s p95**, with no meaningful drop in answer acceptance.
 
 ## Takeaway
 
-If latency is unbounded, quality work is invisible. Budget the path and enforce it in CI and runtime alerts.
+RAG quality is not just correctness. It is correctness delivered before the user emotionally exits the tab. Budget the path, enforce the budget, and make latency visible before it turns a good system into a slow one.

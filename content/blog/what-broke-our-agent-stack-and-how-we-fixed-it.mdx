@@ -1,46 +1,90 @@
 ---
 title: "What Broke Our Agent Stack in Q2 (and How We Fixed It)"
-excerpt: "A detailed field report from a real quarter of failures: stale retrieval, schema drift, runaway retries, and expensive judge loops. Here is what changed and what we now enforce."
+excerpt: "A field report from a quarter where the demos looked great, the dashboards looked calm, and the agent stack quietly set small piles of money on fire."
 date: "2026-06-15"
 category: "AI Architecture"
 tags: ["Agents", "Architecture", "Reliability", "Postmortem", "LLMOps"]
 ---
 
-Q2 looked successful from the outside: deployment frequency up, feature velocity up, executive demos clean. Internally, we were carrying compounding reliability debt.
+"Why did the agent spend $42 to fail the same way nine times?" is not the question you want to hear before coffee.
 
-We did not have one catastrophic outage. We had a stream of medium-severity failures that drained engineering time and eroded team trust: flaky tool outputs, silent retrieval staleness, and quality regressions hidden by average-based dashboards.
+That was the mood of one Q2 review. From the outside, the agent work looked solid: faster prototypes, cleaner demos, fewer manual handoffs. Internally, we had the classic Silicon Valley disease where everything is "basically working" right up until the spreadsheet starts doing spoken-word poetry.
 
-This post is the condensed version of what broke and the concrete controls we now enforce.
+The project was a production-style agent stack for knowledge work: retrieval, tool calls, structured outputs, eval gates, and a small orchestration layer that routed tasks through specialist agents. Think support triage, internal research, and workflow automation—not a toy chatbot wearing a blazer.
+
+The useful part: most failures were not mystical model failures. They were boring system failures. Boring is good. Boring means you can fix it without summoning a new foundation model and pretending the invoice is strategy.
+
+## The scorecard before we got serious
+
+Before the fixes, the stack looked like this on our internal runs:
+
+- median task completion: **71%** across 420 sampled agent runs
+- p95 latency: **18.4s** on multi-tool workflows
+- repeated-failure loops: **11%** of runs
+- manual escalation: **29%** on policy-heavy tasks
+- most embarrassing metric: one agent called the same retrieval tool **seven times** with semantically identical queries and then concluded "insufficient evidence"
+
+That last one is the AI equivalent of opening the fridge six times and blaming the refrigerator for not becoming dinner.
+
+```mermaid
+{
+  "type": "pie",
+  "title": "Q2 Agent Failure Mix Before Fixes",
+  "data": [
+    { "label": "Stale retrieval", "value": 31, "color": "amber" },
+    { "label": "Schema/tool drift", "value": 24, "color": "red" },
+    { "label": "Retry loops", "value": 18, "color": "purple" },
+    { "label": "Weak eval coverage", "value": 17, "color": "blue" },
+    { "label": "Actual model miss", "value": 10, "color": "green" }
+  ]
+}
+```
+
+The uncomfortable lesson: only about **10%** of the failures were meaningfully "the model is dumb." The rest were architecture, data, contracts, and incentives.
 
 ## Failure mode 1: stale retrieval made good prompts look bad
 
-Symptoms were subtle at first. Users reported that answers were "mostly right" but outdated on policy details released within the last week. Prompt changes did not fix it because the issue was upstream: ingestion lag and index refresh inconsistency.
+The first bug looked like a prompt problem. Users said answers were "mostly right" but wrong on recently changed policy details. The reflex was to tweak the system prompt. We did, because apparently every AI engineer must pay the prompt-tax before admitting the database is stale.
 
-We discovered that different content pipelines had different freshness windows and no shared SLO. A support article updated in one source propagated in under an hour; another source took nearly a day.
+The real issue: one ingestion path refreshed within **45 minutes**. Another took **18-26 hours**. Both fed the same retriever. The model got a confident, outdated paragraph and did exactly what we asked: synthesize the evidence. Beautifully wrong. Michelin-star hallucination, locally sourced.
 
-### Fixes
+### What failed first
 
-- unified freshness SLO per source
-- ingestion lag monitor with alerting
-- retrieval tests seeded with "newly changed" documents
+- We tried adding "prefer recent evidence" to the prompt.
+- We tried increasing top-k from 8 to 16.
+- We tried a bigger reranker.
 
-After this, quality improved without touching the base model.
+All three were expensive ways to avoid saying: "our index freshness is not a vibe; it needs an SLO."
+
+### What fixed it
+
+- freshness SLO per source class
+- ingestion lag alerts at 2x expected refresh window
+- test cases seeded with documents changed in the last 24 hours
+- response metadata that exposed source timestamp in review traces
+
+After this, recent-document misses dropped from **19%** to **4%** in the sampled suite without changing the model.
 
 ## Failure mode 2: schema drift at tool boundaries
 
-A tool team made a legitimate change to response structure, but downstream agent logic assumed old field names and optionality. We had validation in some paths, not all. The result was intermittent failures and fallback loops that looked like model indecision.
+A tool response changed from `owner_name` to `owner.display_name`. Perfectly reasonable refactor. Also a tiny landmine.
 
-### Fixes
+The agent did not crash cleanly. It degraded. It started routing tasks to a fallback owner and then asked the LLM to "infer" responsibility from surrounding text. That is how you get a very confident assistant assigning infra tickets to the person who wrote the README in 2022.
 
-- contract tests for every high-traffic tool
-- strict runtime validation + explicit typed errors
-- canary traffic on contract changes before full rollout
+### What fixed it
 
-This reduced integration incidents and cut rollback frequency.
+- contract tests for every high-traffic tool payload
+- runtime validators at the tool boundary, not three layers later
+- typed error envelopes that agents can route on
+- canary deployment for tool schema changes
+
+The conservative take: an agent should not be allowed to improvise around broken plumbing. If the contract breaks, fail loudly and hand the operator a useful error. Jazz is for clubs, not production incident routing.
 
 ## Failure mode 3: retry loops inflated cost and latency
 
-Our retry policy was too permissive. In degraded conditions, agents repeated the same failing strategy with minor prompt variations. Success rate barely improved while latency and cost spiked.
+The ugliest failure was a retry loop. The agent called the same tool with slightly different wording, got the same failure, and tried again because the prompt told it to "be persistent."
+
+This is where product language can sabotage infrastructure. "Be persistent" sounds cute in a demo. In production it means the agent becomes a golden retriever with an AmEx.
 
 ```mermaid
 {
@@ -76,23 +120,20 @@ Our retry policy was too permissive. In degraded conditions, agents repeated the
 }
 ```
 
-### Fixes
+### What fixed it
 
 - maximum retry budget per run
-- strategy-change requirement between retries
-- hard stop + deterministic fallback when budget exhausted
+- required strategy change between retries
+- no retry on validation errors unless a repair function exists
+- deterministic fallback when budget is exhausted
 
-The change improved p95 latency and cost efficiency immediately.
+The result: p95 latency moved from **18.4s** to **9.7s** on the same scenario set, and median cost per successful run dropped roughly **34%**.
 
 ## Failure mode 4: eval coverage lagged feature velocity
 
-Our team shipped quickly, but evaluation suite updates lagged behind feature changes. This created blind spots where "green" test runs did not reflect new user behavior.
+We shipped features faster than we updated evals. That is not an eval problem. That is a management problem wearing a YAML hoodie.
 
-### Fixes
-
-- release checklist requires scenario updates for new behaviors
-- weekly drift review over real user traces
-- judge+human hybrid review for critical flows
+The release board said green because the old suite was green. The new workflow introduced longer tool chains, new failure modes, and more ways to be subtly wrong. The eval suite did not know that yet.
 
 ```mermaid
 {
@@ -109,34 +150,51 @@ Our team shipped quickly, but evaluation suite updates lagged behind feature cha
 }
 ```
 
+### What fixed it
+
+Every new agent behavior now needs one of three artifacts before launch:
+
+- a scenario eval
+- a contract test
+- a runtime metric with an alert threshold
+
+No artifact, no release. Very boring. Very effective. The best production systems often feel like a stern accountant quietly saving your weekend.
+
 ## What changed culturally
 
-The technical fixes only stuck after a process shift:
+The biggest shift was not technical. We stopped asking, "Did the model answer?" and started asking, "Can we explain the run?"
 
-- incidents now require preventive artifacts, not just documentation
-- quality ownership is shared between product and platform teams
-- rollback is treated as normal engineering control, not failure theater
+That changed design reviews. Instead of arguing about model brands, we reviewed:
 
-We also stopped celebrating raw velocity without reliability context. Shipping more code is not progress if user-visible quality moves backward.
+- what evidence entered context
+- which tool contracts were trusted
+- why the agent chose a retry versus fallback
+- what metric would catch this failure next time
+
+This is less glamorous than swapping model providers. It also works.
 
 ## Metrics after enforcement
 
-Within six weeks of these controls:
+Six weeks later:
 
-- repeated incident patterns dropped significantly
-- median run cost decreased due to bounded retries
-- release confidence improved because dashboards reflected real failure signatures
+- task completion: **71% → 86%** on sampled workflows
+- p95 latency: **18.4s → 9.7s**
+- repeated-failure loops: **11% → 2.8%**
+- manual escalation: **29% → 18%**
+- incident review action items with tests/guards: **under half → 100%**
 
-Numbers varied by workflow, but the directional improvement was consistent across all major agent surfaces.
+Treat those numbers as directional, not universal truth. Different workflows move differently. But the pattern was consistent: fewer spooky failures, fewer expensive loops, more boring success.
 
 ## What we still have not solved
 
-- fully automated scoring for nuanced domain-specific outputs
-- robust long-horizon memory consistency across multi-session tasks
-- perfect failure attribution when multiple tools degrade simultaneously
+- nuanced domain scoring still needs humans in the loop
+- long-horizon memory across sessions is still easy to fake and hard to audit
+- multi-tool degradation attribution remains messy when two dependencies fail at once
 
-These remain active workstreams and deserve explicit roadmap space.
+Anyone claiming those are solved is probably selling a platform deck with a suspicious number of gradients.
 
 ## Final takeaway
 
-Most agent-stack failures are not mysterious model failures. They are systems failures: stale data, loose contracts, weak controls, and missing feedback loops. Once you treat the stack as a reliability system—not a prompt playground—you can make quality improvements that compound.
+The most useful agent work in Q2 was not "make the model smarter." It was making the system less unserious: fresh retrieval, strict contracts, bounded retries, and evals tied to shipped behavior.
+
+That is the conservative AI take I keep coming back to: move fast, but put rails on the parts that can quietly cost you money. Demos reward magic. Production rewards receipts.

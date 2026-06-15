@@ -1,48 +1,54 @@
 ---
 title: "AI Agent Observability Runbook: What to Measure Before It Burns"
-excerpt: "Agent failures rarely show up as HTTP 500s. They show up as loops, brittle tool calls, and quiet quality drift. This runbook captures the signals that matter."
+excerpt: "A practical runbook from debugging an agent stack where HTTP was green, dashboards were calm, and the agent was quietly doing interpretive dance with tool calls."
 date: "2026-05-28"
 category: "MLOps"
 tags: ["Observability", "Agents", "Reliability", "Runbook", "Monitoring"]
 ---
 
-Most observability stacks were designed for deterministic services: requests in, responses out, maybe a queue in the middle. Agent systems are not deterministic in that way. They branch, revise, call tools conditionally, and can appear "healthy" while delivering quietly degraded outcomes.
+The scariest agent incident I saw this quarter did not throw a 500. It returned `200 OK` and gave a polished, wrong answer with the confidence of a VC partner explaining databases.
 
-If you instrument agents like CRUD APIs, you get false confidence. You need a runbook that observes behavior, not just uptime.
+That is the problem with agent observability: uptime is not enough. The service can be alive while the reasoning path is on fire, the tool schema is drifting, and the fallback policy is quietly converting user trust into confetti.
+
+This runbook came from instrumenting an internal agent workflow that routed research and support-style tasks through retrieval, tool calls, and structured output. The first dashboards told us nothing useful. The second version started catching failures before users did.
+
+## The first dashboard was basically a nightlight
+
+We initially tracked:
+
+- request count
+- HTTP errors
+- latency
+- token cost
+
+Useful, but incomplete. It told us whether the API was breathing. It did not tell us whether the agent was thinking, looping, guessing, or laundering stale retrieval through a nice paragraph.
+
+The first red flag came from cost: one workflow had a **2.3x** cost spike with no traffic spike. That should be impossible unless the agent is doing extra work. Spoiler: it was doing extra work. It was retrying one failing retrieval path and then asking a judge model to bless the chaos.
 
 ## Layer 1: execution health
 
-At minimum, capture for every run:
+Capture for every run:
 
-- total steps taken
-- tool call count by tool type
+- total steps
+- tool calls by tool type
 - retries per step
-- terminal status (success, fail, timeout, canceled)
+- terminal status: success, fail, timeout, canceled
 - wall-clock duration and p95/p99
+- cost per completed workflow
 
-This layer answers: "Is the engine running?"
+This layer answers: "Is the engine running, and is it running like a normal engine instead of a Roomba trapped under a couch?"
 
 ## Layer 2: decision quality
 
-Add behavior metrics:
+Execution health will not catch confident nonsense. Add behavior signals:
 
-- hallucination proxy rate (unsupported assertions)
+- unsupported-claim rate from sampled outputs
 - policy compliance score
-- action reversals (undo/retry loops)
-- judge score for task completion quality
+- action reversals and retry loops
+- judge score for task completion
+- evidence freshness attached to final answer
 
 This layer answers: "Is the engine making good choices?"
-
-## Layer 3: business impact
-
-Connect to outcomes:
-
-- ticket resolution delta
-- handoff/escalation frequency
-- revenue or cost impact per workflow
-- customer satisfaction trend on agent-assisted sessions
-
-This layer answers: "Does this help the business?"
 
 ```mermaid
 {
@@ -79,35 +85,47 @@ This layer answers: "Does this help the business?"
 }
 ```
 
-## The three dashboards to keep open
+## Layer 3: business impact
 
-1. **Runtime panel**: throughput, queue depth, timeout rates, tool error rates
-2. **Behavior panel**: judge scores, loop signatures, policy violations
-3. **Outcome panel**: product KPI impact by cohort and feature flag
+This is where teams get shy because the numbers are political. Measure them anyway.
 
-If these views are isolated across different teams, incident response becomes slow and political. Keep them mapped to the same run IDs.
+For this stack, the useful metrics were:
 
-## Failure signatures worth alerting on
+- manual escalation rate
+- time-to-resolution on agent-assisted tasks
+- user correction rate
+- repeated question rate within 24 hours
+- cost per successful task, not cost per request
 
-- sudden rise in median step count (often hidden loops)
-- a single tool dominating call volume after a release
-- quality score drift without latency drift (prompt or retrieval issue)
-- latency drift without quality drift (infra or dependency issue)
+Cost per request is a vanity metric. Cost per successful task is the adult table.
 
-These patterns often appear hours before obvious customer complaints.
+## Failure signatures I now alert on
+
+- median step count jumps more than **30%** week-over-week
+- one tool suddenly dominates call volume
+- quality score falls while latency stays flat
+- latency rises while quality stays flat
+- evidence age exceeds the source freshness SLO
+- judge calls grow faster than primary model calls
+
+That last one is sneaky. If your judge usage grows faster than task volume, you might be using evals as a mop instead of fixing the leak.
+
+## The three dashboards I actually keep open
+
+1. **Runtime panel**: throughput, queue depth, timeout rates, tool errors
+2. **Behavior panel**: loops, judge scores, policy violations, source freshness
+3. **Outcome panel**: escalation, resolution time, correction rate, cost per success
+
+The important part is joining them by run ID. Without that, you get three dashboards and one meeting where everyone performs confidence.
 
 ## Runbook response levels
 
-- **SEV-3**: local quality drop in non-critical workflow; gate new rollout
+- **SEV-3**: local quality drop in non-critical workflow; gate rollout
 - **SEV-2**: sustained drift or frequent escalation in core workflow; partial rollback
-- **SEV-1**: policy/safety failures or major outcome regression; hard failover to deterministic path
+- **SEV-1**: safety/policy failures or major outcome regression; deterministic fallback
 
-Document who can trigger each level and how rollback happens without waiting for a full deployment.
-
-## Keep instrumentation close to contracts
-
-For each tool boundary, enforce typed request/response contracts and log contract violations as first-class signals. A malformed tool output should not be a buried warning; it should be an observable, alertable event tied to run IDs.
+The boring rule: rollback should not require a new deployment. If you need to ship code to stop the bleeding, your feature flag strategy is not a strategy. It is a wish with YAML.
 
 ## Takeaway
 
-You cannot monitor agents with a single uptime chart. Instrument execution, decisions, and business outcomes together. That is how you catch failures while they are still cheap.
+Monitor agent systems like products, not like endpoints. Uptime tells you the server is alive. Observability tells you whether the agent is doing the job without quietly converting GPU budget into performance art.

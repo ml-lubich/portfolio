@@ -1,28 +1,42 @@
 ---
 title: "The Eval Budgeting Playbook for 2026"
-excerpt: "Most teams budget inference and forget evaluation. That leads to brittle launches, expensive regressions, and surprise staffing cost. Budget evals like production infrastructure."
+excerpt: "If your AI budget has tokens but no eval line item, you did not make a budget. You made a very confident wish with a model invoice attached."
 date: "2026-05-02"
 category: "MLOps"
 tags: ["Evals", "Budgeting", "Quality", "Governance", "LLMOps"]
 ---
 
-Teams that say they "care about quality" but do not budget evaluation are gambling with delayed feedback. You can absolutely launch this way, but you pay later with support churn, trust loss, and emergency rewrites. In 2026, evaluation cost is not overhead. It is the price of operating a model-backed product responsibly.
+A finance lead once asked the best AI question in the room: "Why does quality cost extra?"
 
-The mistake is structural: planning spreadsheets include model inference cost and token growth, but evaluation appears as an ad hoc line item under "research." That framing guarantees underinvestment, because research budgets are the first to get squeezed when roadmaps tighten.
+Fair question. The uncomfortable answer is: quality always cost extra. We just used to hide the bill inside engineers manually checking outputs, support teams cleaning up messes, and one exhausted domain expert becoming the human eval pipeline by accident.
+
+On one internal workflow, inference cost looked manageable: roughly **$0.09-$0.14** per successful task on normal traffic. Then we added judge passes, human review for edge cases, and scenario testing. The real quality-controlled cost was closer to **$0.22-$0.31** per successful task.
+
+That is not bad. It is just real. Pretending the cheaper number is the product cost is how teams end up "surprised" by production.
+
+## The budgeting mistake
+
+Most AI budgets include:
+
+- model inference
+- vector database / storage
+- application hosting
+- maybe observability if someone recently got burned
+
+Then evals appear as a vague "we'll test it" note. That note is where product quality goes to become folklore.
 
 ## Treat eval cost like reliability cost
 
-Think of eval budget the same way you think about SRE headcount and observability tooling. You cannot prove reliability by asserting it; you must continuously measure it under realistic traffic patterns.
+For AI systems, evaluation is reliability infrastructure. You pay for it because the alternative is finding out from users, which is the most expensive monitoring system ever invented.
 
-For AI systems, this means paying for:
+A useful budget includes:
 
-- curated test sets that evolve with product behavior
-- judge-model or hybrid scoring passes
-- human review loops for high-impact surfaces
-- CI and pre-release evaluation gates
-- drift monitors for real production outputs
-
-The short-term instinct is to minimize this spend. The long-term outcome is almost always higher total cost because defects reach users and become organizational incidents.
+- curated scenario sets that evolve with product behavior
+- judge-model passes for fast feedback
+- human review for high-impact surfaces
+- CI gates before release
+- production drift sampling
+- regression triage time after failures
 
 ```mermaid
 {
@@ -38,62 +52,70 @@ The short-term instinct is to minimize this spend. The long-term outcome is almo
 }
 ```
 
-## A budgeting model you can defend to finance
+## What failed before the budget got honest
 
-Use three budget buckets:
+We had a classic eval-theater dashboard: green aggregate score, nice chart, zero ability to explain a real user complaint.
+
+The problem was not that the dashboard was fake. It measured something. It just measured the average of scenarios that no longer matched the product. Very common. Very LinkedIn-ready. Not useful.
+
+The fix was not adding more charts. It was tying eval spend to release risk:
 
 1. **Pre-merge quality**
-   - lightweight checks on every commit
-   - catches formatting, schema, safety, and structural defects
+   - schema checks
+   - formatting and safety checks
+   - low-cost unit evals
 
 2. **Pre-release quality**
-   - deeper scenario evals on release candidates
-   - includes long-context and multi-turn cases
+   - scenario evals for changed workflows
+   - stale retrieval and tool failure cases
+   - judge + human review for risky categories
 
 3. **Post-release quality**
-   - sampled real outputs scored daily/weekly
-   - tracks drift, not just static benchmark movement
+   - sampled production outputs
+   - drift monitoring by workflow
+   - correction/escalation tracking
 
-This structure lets finance reason about why each dollar exists and what risk it mitigates.
+## A metric finance understands
 
-## How to avoid "eval theater"
+Stop reporting "tokens per request" as if it answers the business question. Report **cost per successful outcome**.
 
-It is easy to build a beautiful dashboard that measures the wrong thing. Avoid vanity metrics like a single aggregate score detached from user outcomes.
+For example:
 
-Instead, maintain a metric map tied to product value:
+- cost per resolved support case
+- cost per accepted research summary
+- cost per correctly routed ticket
+- cost per avoided human escalation
 
-- deflection quality for support agents
-- resolution correctness for operations workflows
-- policy adherence for compliance-critical responses
-- latency-adjusted quality for interactive UX
-
-If your evals cannot explain why a product KPI moved, you are not evaluating the system that users experience.
+This changes the conversation. Suddenly evals are not extra cost. They are part of the denominator that makes outcomes trustworthy.
 
 ## Staffing reality
 
-Someone owns this. Usually, the ownership is diffuse and quality falls between teams.
+Someone owns this, or nobody owns it.
 
-Healthy pattern:
+The pattern that worked best:
 
-- product engineering owns pre-merge eval checks
-- AI platform owns shared judge infrastructure and pipelines
-- domain experts own high-risk rubric definitions
-- leadership funds this explicitly as a recurring operational function
+- product engineering owns pre-merge checks
+- platform owns judge infrastructure and shared pipelines
+- domain experts own rubrics for high-impact cases
+- leadership funds eval maintenance as a recurring product function
 
-Unhealthy pattern:
+The pattern that failed:
 
-- one "AI person" manually checks random samples before launch
-- no rubrics, no baselines, no formal regression policy
+- one engineer manually spot-checks 25 outputs before launch
+- everyone calls it "human evaluation"
+- the spreadsheet receives a ceremonial green cell
+
+That is not quality. That is a campfire ritual with CSV export.
 
 ## A simple quarterly cadence
 
-- **Week 1**: refresh priority scenarios and retire stale ones
-- **Week 2**: recalibrate judge prompts and human-review thresholds
-- **Week 3**: simulate failure campaigns (tool outage, stale retrieval, malformed output)
-- **Week 4**: publish scorecards with pass/fail release criteria updates
-
-This cadence keeps evaluation from fossilizing while preserving comparability over time.
+- **Week 1**: refresh scenarios and retire stale cases
+- **Week 2**: recalibrate judges against human review
+- **Week 3**: run failure campaigns: stale docs, tool outage, malformed payloads
+- **Week 4**: publish pass/fail criteria for the next release window
 
 ## Takeaway
 
-Your eval budget is not insurance for a rare event. It is the control system that keeps your AI product inside acceptable behavior as traffic, data, and models change. Budget it with the same seriousness you budget infra, because users experience both as a single product.
+If your AI budget has no eval budget, you have not budgeted the product. You have budgeted the demo.
+
+The conservative move is to fund quality like infrastructure: predictable, recurring, and tied to business outcomes. It is less glamorous than a model migration. It also prevents the model migration from becoming a very expensive distraction.
