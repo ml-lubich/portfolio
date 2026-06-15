@@ -45,3 +45,12 @@ Rainbow wash orbs are **not** part of the WebGL brain. They live in `components/
 |--------|-----------|--------|
 | **Post body** (MDX) | `content/blog/<slug>.mdx` | Frontmatter: title, excerpt, date, category, tags. |
 | **Listing metadata** | `data/blog/post-meta.json` | Per-slug `coverImage` and `views` (display strings). Loaded in `lib/mdx.ts` and merged when posts are read. |
+
+## AI tools
+
+| Layer | Location | Notes |
+|--------|-----------|--------|
+| **Tools route** | `app/tools/page.tsx` + `app/tools/tools-client.tsx` | Client-side estimator and prompt linter UI; no paid AI call is required for core behavior. |
+| **Estimator logic** | `lib/ai-tools/estimator.ts` + `lib/ai-tools/config.ts` | Deterministic ranges for LLM cost, infrastructure, build weeks, complexity, stack, and assumptions. |
+| **Prompt linter** | `lib/ai-tools/prompt-linter.ts` | Local deterministic prompt contract audit used by the page and API fallback. |
+| **Optional AI critique** | `app/api/prompt-lint/route.ts` | Server-only Hugging Face token use with per-IP in-memory rate limiting; failures fall back to local analysis. |

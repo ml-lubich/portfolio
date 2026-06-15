@@ -26,6 +26,12 @@ export const navLinks: NavLink[] = [
 
 export const liveTools: LiveTool[] = [
   {
+    href: "/tools",
+    label: "AI Tools",
+    description: "Estimate AI project cost and lint system prompts",
+    badge: "New",
+  },
+  {
     href: "/llm-prices",
     label: "LLM Pricing",
     description: "Real-time token pricing across all major AI providers",

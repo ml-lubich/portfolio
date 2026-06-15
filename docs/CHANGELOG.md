@@ -6,6 +6,7 @@ All notable changes to this project are documented here.
 
 ### Added
 
+- Added `/tools` with a polished AI project cost estimator, deterministic system prompt linter, optional rate-limited Hugging Face critique endpoint, sitemap exposure, and nav dropdown entry.
 - Added a recurring-style `State of AI — June 2026` post with a monthly industry pulse format, concrete market framing, and chart-backed strategy checklist.
 - Expanded the blog timeline from `2026-04-06` through `2026-06-15` with eight new posts across AI architecture, MLOps, engineering culture, and product execution.
 - Added mixed-length editorial content (short tactical briefs + long-form deep dives) so reading depth now varies by topic instead of clustering around a single article length.
