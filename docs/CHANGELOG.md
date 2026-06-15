@@ -6,6 +6,7 @@ All notable changes to this project are documented here.
 
 ### Fixed
 
+- Live terminal code lines now render through a `<pre><code>` pair and the regression suite locks the multiline `streamInference` snippet indentation, so generated code remains tabbed before and after syntax highlighting.
 - Live terminal code lines changed from inline `<span>` to `<code>` flex-item (`flex-1 min-w-0 font-mono whitespace-pre-wrap`). Leading spaces in indented Python snippets no longer collapse during the typing animation — the browser was discarding leading-whitespace-only inline text nodes on each keystroke burst. Regression test updated to assert `<code>` element, `font-mono`, and `flex-1`.
 - Removed `break-all` from code line renderer (was incorrectly breaking in the middle of identifiers); `whitespace-pre-wrap` with a block-level flex item handles long-line wrapping correctly.
 

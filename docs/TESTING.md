@@ -47,6 +47,7 @@
 ## Automated: terminal snake game
 
 - `__tests__/snake-game.test.ts` — `lib/snake-game.ts`: verifies initial board placement, laptop keyboard direction mapping, reversal prevention, food growth/scoring, and wall collision loss state.
+- `__tests__/terminal-indentation-regression.test.ts` — guards the live terminal renderer against code indentation regressions, including the multiline TypeScript `streamInference` fixture and `<pre><code>` rendering path.
 
 ## Manual: hero brain
 

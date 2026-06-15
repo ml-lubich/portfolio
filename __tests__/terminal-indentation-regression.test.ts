@@ -1,10 +1,8 @@
 /**
  * Guardrails for the "A Day in My Life" live terminal.
  *
- * Root cause fixed: code lines use a `<code>` flex-item (not an inline `<span>`)
- * so the browser never collapses leading spaces during the typing animation.
- * `font-mono` ensures monospace space-width; `whitespace-pre-wrap` preserves
- * the indentation at every character burst.
+ * Root cause fixed: code lines use a `<pre><code>` pair instead of an inline
+ * text container, so leading spaces survive typed and highlighted states.
  */
 
 import { readFileSync } from "node:fs"
@@ -18,6 +16,11 @@ const terminalSource = readFileSync(
   join(__dirname, "..", "components", "terminal", "index.tsx"),
   "utf8",
 )
+
+const getSourceMatch = (pattern: RegExp): string => {
+  const match = terminalSource.match(pattern)
+  return match?.[0] ?? ""
+}
 
 describe("terminal indentation regression guards", () => {
   it("session data contains indented code lines worth preserving", () => {
@@ -34,27 +37,41 @@ describe("terminal indentation regression guards", () => {
     expect(aligned.length).toBeGreaterThan(0)
   })
 
-  it("code line renderer uses <code> flex-item so leading spaces are never collapsed", () => {
-    // <code> as a flex child becomes a block-level box; whitespace-pre-wrap then
-    // guarantees leading spaces in dl.text survive the typing animation.
-    const codeEl = terminalSource.match(/<code className="text-foreground\/80[^"]*">/)?.[0]
-    expect(codeEl).toContain("whitespace-pre-wrap")
-    expect(codeEl).toContain("font-mono")
-    expect(codeEl).toContain("flex-1")
-    expect(codeEl).toContain("[tab-size:4]")
+  it("streaming inference fixture preserves multiline TypeScript indentation", () => {
+    const streamingLines = sessions
+      .find((s) => s.label === "Streaming Inference API")
+      ?.lines.filter((l) => l.t === "code")
+      .map((l) => l.s) ?? []
+    expect(streamingLines.slice(0, 9)).toEqual([
+      "export async function* streamInference(",
+      "  prompt: string, model: ModelConfig",
+      "): AsyncGenerator<Token> {",
+      "  const sess = await gpu.allocate(model.vram);",
+      "  for await (const tok of model.generate(prompt)) {",
+      "    metrics.track('tps', sess.tokensPerSecond);",
+      "    yield { text: tok.decode(), latency: tok.ms };",
+      "  }",
+      "  gpu.release(sess);",
+    ])
+  })
+
+  it("code line renderer uses preformatted code so leading spaces are never collapsed", () => {
+    const preEl = getSourceMatch(/<pre className="m-0[^"]*">/)
+    expect(preEl).toMatch(/flex-1.*whitespace-pre-wrap.*font-mono/)
+  })
+
+  it("code line renderer keeps a semantic code child", () => {
+    const codeEl = getSourceMatch(/<code className="font-mono">/)
+    expect(codeEl).toBe('<code className="font-mono">')
   })
 
   it("output line renderer preserves whitespace", () => {
-    const outDiv = terminalSource.match(/className=\{`pl-5[^`]*`\}/)?.[0]
-    expect(outDiv).toContain("whitespace-pre-wrap")
-    expect(outDiv).toContain("[tab-size:4]")
+    const outDiv = getSourceMatch(/className=\{`pl-5[^`]*`\}/)
+    expect(outDiv).toMatch(/whitespace-pre-wrap.*\[tab-size:4\]/)
   })
 
   it("command line renderer preserves whitespace", () => {
-    const cmdSpan = terminalSource.match(
-      /<span className="text-foreground\/90[^"]*">/,
-    )?.[0]
-    expect(cmdSpan).toContain("whitespace-pre-wrap")
-    expect(cmdSpan).toContain("[tab-size:4]")
+    const cmdSpan = getSourceMatch(/<span className="text-foreground\/90[^"]*">/)
+    expect(cmdSpan).toMatch(/whitespace-pre-wrap.*\[tab-size:4\]/)
   })
 })

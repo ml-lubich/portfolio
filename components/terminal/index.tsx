@@ -179,9 +179,11 @@ export function LiveTerminal() {
         return (
           <div className="flex items-start min-h-[1.35em]">
             <span className="text-muted-foreground/25 select-none w-5 text-right mr-2 text-[11px] leading-relaxed shrink-0">{dl.li}</span>
-            <code className="text-foreground/80 whitespace-pre-wrap font-mono flex-1 min-w-0 [tab-size:4]">
-              {dl.done ? highlight(dl.text) : <>{dl.text}{blink && <span className="animate-[terminal-blink_1s_step-end_infinite] text-emerald-400">▊</span>}</>}
-            </code>
+            <pre className="m-0 flex-1 min-w-0 overflow-visible whitespace-pre-wrap break-words [tab-size:4] font-mono leading-relaxed text-foreground/80">
+              <code className="font-mono">
+                {dl.done ? highlight(dl.text) : <>{dl.text}{blink && <span className="animate-[terminal-blink_1s_step-end_infinite] text-emerald-400">▊</span>}</>}
+              </code>
+            </pre>
           </div>
         )
       case "hdr":
