@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo } from "react"
 import { SiteLogoMark } from "@/components/site-logo-mark"
-import { Menu, X, ChevronUp, ArrowRight } from "lucide-react"
-import { navLinks } from "./nav-links"
+import { Menu, X, ChevronUp, ArrowRight, Zap, ChevronDown, ExternalLink } from "lucide-react"
+import { navLinks, liveTools } from "./nav-links"
 import { wooshScrollTo, navigateTo } from "./woosh-scroll"
 import { useActiveSection } from "./use-nav-hooks"
 import { ExpandingText } from "./expanding-text"
@@ -99,6 +99,95 @@ function BackToTopButton() {
     >
       <ChevronUp className="h-4 w-4" />
     </button>
+  )
+}
+
+/* ── Tools dropdown (desktop) ────────────────────────────────────── */
+
+function ToolsDropdown() {
+  const [open, setOpen] = useState(false)
+  const wrapRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    function onOutside(e: MouseEvent) {
+      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) {
+        setOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", onOutside)
+    return () => document.removeEventListener("mousedown", onOutside)
+  }, [])
+
+  return (
+    <div
+      ref={wrapRef}
+      className="relative"
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+    >
+      <button
+        type="button"
+        onClick={() => setOpen(o => !o)}
+        className={[
+          "group/link relative isolate flex items-center gap-1 overflow-hidden whitespace-nowrap rounded-full border px-3 py-2 text-[13px] tracking-[0.01em] transition-all duration-300 xl:px-3.5 xl:text-[14px]",
+          open
+            ? "border-white/[0.12] bg-white/[0.10] font-medium text-foreground shadow-[0_10px_30px_-18px_rgba(255,255,255,0.8)]"
+            : "border-transparent text-muted-foreground hover:border-white/[0.08] hover:bg-white/[0.06] hover:text-foreground",
+        ].join(" ")}
+      >
+        Tools
+        <ChevronDown
+          className={[
+            "h-3 w-3 transition-transform duration-200",
+            open ? "rotate-180" : "rotate-0",
+          ].join(" ")}
+        />
+      </button>
+
+      {/* Dropdown panel */}
+      <div
+        className={[
+          "absolute left-1/2 top-full z-[300] min-w-[220px] pt-2 -translate-x-1/2 transition-all duration-200 ease-fluid",
+          open ? "pointer-events-auto translate-y-0 opacity-100" : "pointer-events-none -translate-y-1 opacity-0",
+        ].join(" ")}
+      >
+        <div className="overflow-hidden rounded-2xl border border-white/[0.10] bg-[hsl(220_20%_5%/0.96)] shadow-[0_20px_60px_-10px_rgba(0,0,0,0.7)] backdrop-blur-2xl">
+          {/* Header */}
+          <div className="border-b border-white/[0.06] px-3.5 py-2">
+            <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground/50">
+              Live on this site
+            </p>
+          </div>
+          {/* Tool entries */}
+          {liveTools.map(tool => (
+            <a
+              key={tool.href}
+              href={tool.href}
+              className="group/tool flex items-start gap-3 px-3.5 py-3 transition-colors hover:bg-white/[0.04]"
+            >
+              <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-emerald-500/30 bg-emerald-500/10">
+                <Zap className="h-3.5 w-3.5 text-emerald-400" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium text-foreground/90 group-hover/tool:text-foreground transition-colors">
+                    {tool.label}
+                  </span>
+                  <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-1.5 py-0.5 text-[9px] font-medium text-emerald-400">
+                    <span className="h-1 w-1 rounded-full bg-emerald-400" />
+                    {tool.badge}
+                  </span>
+                </div>
+                <p className="mt-0.5 text-[11px] leading-relaxed text-muted-foreground/60">
+                  {tool.description}
+                </p>
+              </div>
+              <ExternalLink className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground/30 transition-colors group-hover/tool:text-muted-foreground/70" />
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
   )
 }
 
@@ -343,6 +432,7 @@ export function Navigation() {
                 </a>
               )
             })}
+            <ToolsDropdown />
             <a
               href="#contact"
               onClick={(e) => handleLinkClick(e, "#contact")}
@@ -450,7 +540,37 @@ export function Navigation() {
               })}
             </nav>
 
-            <div className="mobile-nav-cta mt-8 flex flex-col gap-3">
+            {/* Live tools section */}
+            <div className="mt-6 rounded-2xl border border-white/[0.07] bg-white/[0.02] p-4">
+              <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground/50">
+                Live on this site
+              </p>
+              {liveTools.map(tool => (
+                <a
+                  key={tool.href}
+                  href={tool.href}
+                  onClick={() => setMobileOpen(false)}
+                  className="group/tool flex items-center gap-3 rounded-xl p-2 transition-colors hover:bg-white/[0.04]"
+                >
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-emerald-500/30 bg-emerald-500/10">
+                    <Zap className="h-3.5 w-3.5 text-emerald-400" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-foreground/85">{tool.label}</span>
+                      <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-1.5 py-0.5 text-[9px] font-medium text-emerald-400">
+                        <span className="h-1 w-1 rounded-full bg-emerald-400" />
+                        {tool.badge}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-muted-foreground/50">{tool.description}</p>
+                  </div>
+                  <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground/30 transition-all duration-300 group-hover/tool:translate-x-0.5 group-hover/tool:text-muted-foreground/70" />
+                </a>
+              ))}
+            </div>
+
+            <div className="mobile-nav-cta mt-6 flex flex-col gap-3">
               <a
                 href="#contact"
                 onClick={(e) => handleLinkClick(e, "#contact")}

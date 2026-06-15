@@ -5,6 +5,13 @@ export interface NavLink {
   href: string
 }
 
+export interface LiveTool {
+  href: string
+  label: string
+  description: string
+  badge: string
+}
+
 export const navLinks: NavLink[] = [
   { label: "About", href: "#about" },
   { label: "Journey", href: "#journey" },
@@ -15,4 +22,13 @@ export const navLinks: NavLink[] = [
   { label: "Research", href: "#research" },
   { label: "Blog", href: "/blog" },
   { label: "Contact", href: "#contact" },
+]
+
+export const liveTools: LiveTool[] = [
+  {
+    href: "/llm-prices",
+    label: "LLM Pricing",
+    description: "Real-time token pricing across all major AI providers",
+    badge: "Live",
+  },
 ]
