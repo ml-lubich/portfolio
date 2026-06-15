@@ -14,6 +14,7 @@ All notable changes to this project are documented here.
 
 ### Changed
 
+- Upgraded `/tools` prompt linter with a denser animated audit report, richer deterministic lint dimensions, quick wins, recommendations, and a clearer rewrite brief.
 - Reworked flagship June blog posts to use stronger hooks, more first-person project context, concrete impact metrics, failed-attempt lessons, and a more casual but conservative Silicon Valley operator voice.
 
 ### Fixed

@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState } from "react"
 import Link from "next/link"
-import { ArrowRight, Bot, BrainCircuit, Calculator, CheckCircle2, Loader2, ShieldCheck, Sparkles, Wand2, type LucideIcon } from "lucide-react"
+import { ArrowRight, Bot, BrainCircuit, Calculator, CheckCircle2, Gauge, Loader2, ShieldCheck, Sparkles, Wand2, type LucideIcon } from "lucide-react"
 import { SiteLogoMark } from "@/components/site-logo-mark"
 import { ESTIMATOR_CONFIG, MODEL_TIERS, PROJECT_OPTIONS, type LaunchSpeed, type ModelTier, type ProjectType } from "@/lib/ai-tools/config"
 import { defaultProjectInput, estimateProjectCost, type ProjectCostEstimate, type ProjectCostInput } from "@/lib/ai-tools/estimator"
@@ -30,7 +30,7 @@ export function ToolsClient() {
   return (
     <>
       <ToolsNav />
-      <section className="relative overflow-hidden px-4 pb-16 pt-24 sm:px-6 sm:pt-28">
+      <section className="relative overflow-hidden px-4 pb-10 pt-20 sm:px-6 sm:pt-24">
         <GlowField />
         <div className="relative mx-auto max-w-6xl">
           <ToolsHero />
@@ -70,14 +70,14 @@ function GlowField() {
 
 function ToolsHero() {
   return (
-    <div className="max-w-3xl">
+    <div className="max-w-4xl">
       <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-300">
         <Sparkles className="h-3.5 w-3.5" /> Free-first AI planning tools
       </span>
-      <h1 className="gradient-text mt-5 text-4xl font-bold tracking-tight sm:text-6xl">
+      <h1 className="gradient-text mt-4 text-4xl font-bold tracking-tight sm:text-6xl">
         Plan the AI build before the invoice surprises you.
       </h1>
-      <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">
+      <p className="mt-3 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">
         Estimate AI product cost, scope the build, and lint prompts with local deterministic logic. Optional Hugging Face critique stays server-side and rate-limited.
       </p>
     </div>
@@ -86,7 +86,7 @@ function ToolsHero() {
 
 function ToolTabs({ active, onChange }: { active: ToolTab; onChange: (tab: ToolTab) => void }) {
   return (
-    <div className="mt-8 inline-flex rounded-2xl border border-white/[0.08] bg-white/[0.03] p-1">
+    <div className="mt-6 inline-flex rounded-2xl border border-white/[0.08] bg-white/[0.03] p-1 shadow-[0_20px_80px_-50px_rgba(255,255,255,0.5)]">
       <TabButton label="Cost estimator" Icon={Calculator} active={active === "estimator"} onClick={() => onChange("estimator")} />
       <TabButton label="Prompt linter" Icon={Wand2} active={active === "linter"} onClick={() => onChange("linter")} />
     </div>
@@ -175,7 +175,7 @@ function PromptLinterPanel() {
     setLoading(false)
   }
   return (
-    <div className="mt-6 grid gap-5 lg:grid-cols-[1fr_1fr]">
+    <div className="mt-5 grid gap-4 lg:grid-cols-[0.92fr_1.08fr]">
       <PromptEditor prompt={prompt} setPrompt={setPrompt} loading={loading} runCritique={runCritique} />
       <PromptReport local={local} remote={remote} />
     </div>
@@ -188,14 +188,16 @@ function PromptEditor({ prompt, setPrompt, loading, runCritique }: { prompt: str
       <textarea
         value={prompt}
         onChange={e => setPrompt(e.target.value)}
-        className="min-h-[320px] w-full resize-y rounded-2xl border border-white/[0.08] bg-black/30 p-4 font-mono text-sm leading-6 text-foreground outline-none transition-colors placeholder:text-muted-foreground/40 focus:border-primary/40"
+        className="min-h-[240px] w-full resize-y rounded-2xl border border-white/[0.10] bg-black/40 p-4 font-mono text-sm leading-6 text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] outline-none transition-all duration-300 placeholder:text-muted-foreground/35 focus:border-primary/50 focus:shadow-[0_0_0_3px_rgba(255,255,255,0.04),inset_0_1px_0_rgba(255,255,255,0.08)]"
         placeholder="Paste a system prompt or instruction block..."
       />
-      <button type="button" onClick={runCritique} disabled={loading} className="mt-4 inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-black transition hover:bg-white/90 disabled:opacity-60">
+      <div className="mt-3 grid gap-3 sm:grid-cols-[auto_1fr] sm:items-center">
+      <button type="button" onClick={runCritique} disabled={loading} className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-black transition duration-300 hover:-translate-y-0.5 hover:bg-white/90 disabled:opacity-60">
         {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Bot className="h-4 w-4" />}
         Run optional AI critique
       </button>
-      <p className="mt-3 text-xs text-muted-foreground/60">Works locally by default. If HUGGINGFACE_API_TOKEN is set, the server adds a rate-limited free-tier critique.</p>
+      <p className="text-xs leading-5 text-muted-foreground/60">Local audit is instant. Hugging Face adds a server-side, rate-limited critique only when configured.</p>
+      </div>
     </GlassCard>
   )
 }
@@ -203,24 +205,35 @@ function PromptEditor({ prompt, setPrompt, loading, runCritique }: { prompt: str
 function PromptReport({ local, remote }: { local: PromptLintResult; remote: PromptApiResponse | null }) {
   return (
     <GlassCard title="Audit report" icon={<ShieldCheck className="h-5 w-5" />} accent>
-      <div className="flex items-end justify-between gap-4">
-        <Metric label="Prompt score" value={`${local.score}/100`} />
-        <span className="rounded-full border border-white/[0.08] bg-white/[0.04] px-3 py-1 text-xs text-muted-foreground">{local.verdict}</span>
-      </div>
+      <PromptScore result={local} />
       <IssueList result={local} />
       <RemoteSummary remote={remote} />
     </GlassCard>
   )
 }
 
+function PromptScore({ result }: { result: PromptLintResult }) {
+  return (
+    <div className="grid gap-3 sm:grid-cols-[150px_1fr]">
+      <div className="relative flex aspect-square items-center justify-center overflow-hidden rounded-[1.75rem] border border-primary/25 bg-black/25 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+        <div className="absolute inset-3 rounded-full border border-primary/30 bg-primary/10 motion-safe:animate-[pulse_4s_ease-in-out_infinite]" />
+        <div className="absolute inset-7 rounded-full bg-background shadow-[0_0_40px_rgba(255,255,255,0.06)]" />
+        <div className="relative text-center"><p className="text-3xl font-semibold text-foreground">{result.score}</p><p className="text-xs text-muted-foreground">/100</p></div>
+      </div>
+      <div className="grid gap-2 sm:grid-cols-2">
+        <MiniStat label="Verdict" value={result.verdict} />
+        <MiniStat label="Issues" value={`${result.issues.length} found`} />
+        <QuickWinList items={result.quickWins} />
+      </div>
+    </div>
+  )
+}
+
 function IssueList({ result }: { result: PromptLintResult }) {
   return (
-    <div className="mt-5 space-y-3">
+    <div className="mt-4 grid gap-3 xl:grid-cols-2">
       {result.issues.length === 0 ? <PassRow /> : result.issues.map(issue => <IssueRow key={issue.id} issue={issue} />)}
-      <div className="rounded-2xl border border-white/[0.08] bg-black/20 p-4">
-        <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground/50">Rewrite brief</p>
-        <p className="mt-2 text-sm leading-6 text-foreground/80">{result.rewrittenBrief}</p>
-      </div>
+      <RecommendationPanel result={result} />
     </div>
   )
 }
@@ -234,8 +247,38 @@ function PassRow() {
 }
 
 function IssueRow({ issue }: { issue: PromptLintResult["issues"][number] }) {
-  const color = issue.severity === "critical" ? "text-rose-200 border-rose-500/20 bg-rose-500/10" : "text-amber-100 border-amber-500/20 bg-amber-500/10"
-  return <div className={`rounded-2xl border p-4 text-sm ${color}`}><strong>{issue.label}:</strong> {issue.message}</div>
+  const color = issue.severity === "critical" ? "text-rose-100 border-rose-500/20 bg-rose-500/10" : "text-amber-100 border-amber-500/20 bg-amber-500/10"
+  return <div className={`group rounded-2xl border p-3 text-sm transition duration-300 hover:-translate-y-0.5 hover:bg-white/[0.04] ${color}`}><strong>{issue.label}:</strong> {issue.message}<p className="mt-2 text-xs leading-5 opacity-75">{issue.recommendation}</p></div>
+}
+
+function RecommendationPanel({ result }: { result: PromptLintResult }) {
+  return (
+    <div className="rounded-2xl border border-white/[0.08] bg-black/25 p-4 xl:col-span-2">
+      <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground/50">Recommendations</p>
+      <div className="mt-3 grid gap-2 sm:grid-cols-2">
+        {result.recommendations.map(item => <p key={item} className="rounded-xl bg-white/[0.035] px-3 py-2 text-xs leading-5 text-foreground/75">{item}</p>)}
+      </div>
+      <p className="mt-3 rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-2 text-xs leading-5 text-muted-foreground">{result.rewrittenBrief}</p>
+    </div>
+  )
+}
+
+function QuickWinList({ items }: { items: string[] }) {
+  return (
+    <div className="rounded-2xl border border-white/[0.08] bg-black/20 p-3 sm:col-span-2">
+      <p className="mb-2 flex items-center gap-2 text-xs uppercase tracking-[0.16em] text-muted-foreground/50"><Gauge className="h-3.5 w-3.5" /> Quick wins</p>
+      <div className="flex flex-wrap gap-2">{items.map(item => <Pill key={item}>{item}</Pill>)}</div>
+    </div>
+  )
+}
+
+function MiniStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-2xl border border-white/[0.08] bg-black/20 p-3">
+      <p className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground/50">{label}</p>
+      <p className="mt-1 text-sm font-semibold text-foreground">{value}</p>
+    </div>
+  )
 }
 
 function RemoteSummary({ remote }: { remote: PromptApiResponse | null }) {

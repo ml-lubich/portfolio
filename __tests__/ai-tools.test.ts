@@ -34,6 +34,14 @@ describe("system prompt linter", () => {
   it("returns rewrite guidance for missing prompt pieces", () => {
     expect(lintPrompt("Summarize this").rewrittenBrief).toContain("output")
   })
+
+  it("returns actionable recommendations", () => {
+    expect(lintPrompt("Summarize this").recommendations[0]).toContain("persona")
+  })
+
+  it("returns quick wins for the UI", () => {
+    expect(lintPrompt("Summarize this").quickWins).toContain("Add role")
+  })
 })
 
 describe("AI tools route wiring", () => {
@@ -70,6 +78,9 @@ function strongPrompt(): string {
     "Given workflow context and input examples, decide whether automation is safe.",
     "Return JSON output with verdict, risks, data_needed, and next_steps.",
     "You must not recommend automation without human review for high-risk cases.",
+    "If context is missing, ask one clarifying question before continuing.",
+    "Tone should be concise, direct, and professional for an executive reviewer.",
     "Success criteria: answer is specific, auditable, and includes one example.",
+    "Example input: workflow notes. Example output: JSON verdict with risks.",
   ].join(" ")
 }

@@ -15,7 +15,7 @@
 
 ## AI tools
 
-The `/tools` page ships two free-first tools: an AI project cost estimator and a system prompt linter. The estimator is deterministic and client-side. The prompt linter always runs deterministic local checks, and `POST /api/prompt-lint` may add a Hugging Face critique when `HUGGINGFACE_API_TOKEN` is configured on the server. The API is in-memory rate limited to eight requests per minute per forwarded client IP.
+The `/tools` page ships two free-first tools: an AI project cost estimator and a system prompt linter. The estimator is deterministic and client-side. The prompt linter always runs deterministic local checks for role, inputs, output format, constraints, success criteria, examples, failure behavior, and tone, then returns a score, recommendations, quick wins, and a rewrite brief. `POST /api/prompt-lint` may add a Hugging Face critique when `HUGGINGFACE_API_TOKEN` is configured on the server. The API is in-memory rate limited to eight requests per minute per forwarded client IP.
 
 ## LLM pricing search
 
