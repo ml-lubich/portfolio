@@ -93,4 +93,80 @@ describe("shell-interpreter", () => {
     const { lines } = runCommand(after, "cat test.txt")
     expect(lines.some((l) => l.text === "hello")).toBe(true)
   })
+
+  it("cp copies a file", () => {
+    const state = createShellState()
+    const { state: next } = runCommand(state, "cp .bashrc .bashrc.bak")
+    const node = getNode(next.vfs, ["home", "misha", ".bashrc.bak"])
+    expect(node?.kind).toBe("file")
+  })
+
+  it("mv moves a file", () => {
+    const state = createShellState()
+    const { state: next } = runCommand(state, "mv .bashrc .bashrc.moved")
+    const orig = getNode(next.vfs, ["home", "misha", ".bashrc"])
+    expect(orig).toBeNull()
+  })
+
+  it("head returns first N lines", () => {
+    const state = createShellState()
+    const { lines } = runCommand(state, "head -n 2 logs/training.log")
+    const output = lines.filter(l => l.kind === "output")
+    expect(output.length).toBe(2)
+  })
+
+  it("tail returns last N lines", () => {
+    const state = createShellState()
+    const { lines } = runCommand(state, "tail -n 2 logs/training.log")
+    const output = lines.filter(l => l.kind === "output")
+    expect(output.length).toBe(2)
+  })
+
+  it("wc returns line count", () => {
+    const state = createShellState()
+    const { lines } = runCommand(state, "wc -l logs/training.log")
+    expect(lines.some(l => l.kind === "output")).toBe(true)
+  })
+
+  it("grep finds matching lines", () => {
+    const state = createShellState()
+    const { lines } = runCommand(state, "grep INFO logs/api.log")
+    expect(lines.some(l => l.kind === "output" && l.text.includes("INFO"))).toBe(true)
+  })
+
+  it("tree output includes directory names", () => {
+    const state = createShellState()
+    const { lines } = runCommand(state, "tree projects")
+    expect(lines.some(l => l.text.includes("ml-pipeline"))).toBe(true)
+  })
+
+  it("uname returns expected string", () => {
+    const state = createShellState()
+    const { lines } = runCommand(state, "uname")
+    expect(lines.some(l => l.text === "Linux")).toBe(true)
+  })
+
+  it("git status returns on branch main", () => {
+    const state = createShellState()
+    const { lines } = runCommand(state, "git status")
+    expect(lines.some(l => l.text.includes("On branch main"))).toBe(true)
+  })
+
+  it("sudo returns permission denied", () => {
+    const state = createShellState()
+    const { lines } = runCommand(state, "sudo rm -rf /")
+    expect(lines.some(l => l.text.includes("permission denied"))).toBe(true)
+  })
+
+  it("python returns Python version line", () => {
+    const state = createShellState()
+    const { lines } = runCommand(state, "python3")
+    expect(lines.some(l => l.text.includes("Python 3.12.4"))).toBe(true)
+  })
+
+  it("env output includes HOME", () => {
+    const state = createShellState()
+    const { lines } = runCommand(state, "env")
+    expect(lines.some(l => l.text.includes("HOME="))).toBe(true)
+  })
 })
