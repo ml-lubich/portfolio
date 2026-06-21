@@ -6,6 +6,15 @@ All notable changes to this project are documented here.
 
 ### Added
 
+- **Token Invaders** (`/games/token-invaders`) — LLM-themed Space Invaders game. Player is an inference engine defending against AI failure modes (null errors, hallucinations, prompt injections, context overflows, jailbreaks). Five enemy types, 5 waves, UFO bonus, degradable shields, mobile on-screen controls.
+- **Games hub page** (`/games`) — landing page listing all portfolio games including a Snake easter egg card.
+- **Games nav dropdown** — "Games" button in the desktop nav (and mobile overlay section) with violet accent, mirroring the Tools dropdown style.
+- `lib/token-invaders.ts` — pure TypeScript Space Invaders game logic; immutable state, 10-step tick pipeline, pure functions only.
+- `components/games/token-invaders-game.tsx` — canvas-based React client component with responsive scaling, RAF game loop, keyboard + mobile pointer input.
+- `__tests__/token-invaders.test.ts` — 54 unit tests covering all public game logic functions (1 assert each).
+
+### Added (continued)
+
 - Interactive shell terminal mode (`"shell"`) in the terminal section. Visitors can type real commands (`ls`, `cd`, `mkdir`, `touch`, `cat`, `echo`, `rm`, `pwd`, `clear`, `whoami`, `date`, `neofetch`, `history`) against an in-browser virtual filesystem.
 - `lib/virtual-fs.ts` — immutable in-memory VFS with initial tree under `/home/misha/projects` (agents, rag-system). Pure functions, no null returns.
 - `lib/shell-interpreter.ts` — pure command dispatcher with history tracking. `runCommand` returns `{ state, lines, action? }`. `snake` action hands off to snake mode; `clear` resets output.

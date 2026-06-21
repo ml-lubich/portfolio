@@ -38,3 +38,12 @@ export const liveTools: LiveTool[] = [
     badge: "Live",
   },
 ]
+
+export const liveGames: LiveTool[] = [
+  {
+    href: "/games/token-invaders",
+    label: "Token Invaders",
+    description: "Defend your context window against LLM failures",
+    badge: "Play",
+  },
+]

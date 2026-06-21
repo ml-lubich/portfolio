@@ -21,6 +21,17 @@ Rainbow wash orbs are **not** part of the WebGL brain. They live in `components/
 
 `components/animations/animated-section.tsx` also keeps first-render reveal styling independent of viewport hooks. Entrance visibility and settling are expressed through `data-reveal-*` attributes plus CSS classes so React hydrates stable attributes before IntersectionObserver updates run.
 
+## Games
+
+| Concern | Where it lives |
+|--------|----------------|
+| **Game logic** | `lib/token-invaders.ts` — pure TS, no DOM; immutable state updates; 10-step `tickGame` pipeline |
+| **Canvas renderer** | `components/games/token-invaders-game.tsx` — `"use client"`, RAF loop, ResizeObserver for responsive scaling, keyboard + mobile pointer input |
+| **Routes** | `app/games/page.tsx` (hub), `app/games/token-invaders/page.tsx` (server wrapper) |
+| **Nav entry** | `components/nav/nav-links.ts` `liveGames` array → `GamesDropdown` in `components/nav/index.tsx` |
+
+Logical coordinate space: 1000×700px. Canvas applies `ctx.scale(clientW/1000, clientH/700)` per frame so all game logic stays in logical coordinates regardless of display size.
+
 ## Blog listing performance & URLs
 
 | Concern | Decision |
