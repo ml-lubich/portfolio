@@ -117,6 +117,28 @@ export function SnakeTerminal() {
     }
   }, [resetGame, toggleRunState])
 
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null)
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    const t = e.touches[0]
+    if (t) touchStartRef.current = { x: t.clientX, y: t.clientY }
+  }, [])
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    const start = touchStartRef.current
+    if (!start) return
+    const t = e.changedTouches[0]
+    if (!t) return
+    const dx = t.clientX - start.x
+    const dy = t.clientY - start.y
+    if (Math.max(Math.abs(dx), Math.abs(dy)) < 20) return
+    const dir: SnakeDirection = Math.abs(dx) > Math.abs(dy)
+      ? (dx > 0 ? "right" : "left")
+      : (dy > 0 ? "down" : "up")
+    steer(dir)
+    touchStartRef.current = null
+  }, [steer])
+
   const cells = useMemo(() => getSnakeCells(game), [game])
   const isRunning = game.status === "running"
 
@@ -129,6 +151,8 @@ export function SnakeTerminal() {
           tabIndex={0}
           aria-label="Playable terminal snake game. Use arrow keys or W A S D to steer, space to pause or resume, and R to restart."
           onKeyDown={handleKeyDown}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
           className="grid aspect-square w-full max-w-[252px] grid-cols-[repeat(16,minmax(0,1fr))] rounded-lg border border-white/[0.08] bg-[#080d10] p-1 shadow-inner shadow-black/60 outline-none ring-0 transition focus-visible:ring-2 focus-visible:ring-emerald-400/50 sm:max-w-[292px] md:max-w-[316px]"
         >
           {cells.map((cell) => (

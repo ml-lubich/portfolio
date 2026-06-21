@@ -124,26 +124,28 @@ export default function InteractiveTerminal({ onSnakeMode }: InteractiveTerminal
         {outputLines.map((line, i) => renderLine(line, i))}
       </div>
       <div className="flex items-center gap-1 mt-1 shrink-0">
-        <span className="text-emerald-400 select-none shrink-0">❯</span>
-        <span className="text-muted-foreground/60 text-xs shrink-0">
+        <span className="text-emerald-400 select-none shrink-0 pointer-events-none">❯</span>
+        <span className="text-muted-foreground/60 text-xs shrink-0 pointer-events-none">
           misha@dev {cwdString(shellState.vfs)} $
         </span>
-        <div className="relative flex-1 min-w-0">
-          <span className="text-foreground/90">{input}</span>
-          <span className="animate-[terminal-blink_1s_step-end_infinite] text-emerald-400">▊</span>
+        {/* Cursor display + input overlay — input sits on top so iOS tap registers directly */}
+        <div className="relative flex-1 min-w-0 h-5">
+          <span className="pointer-events-none text-foreground/90">{input}</span>
+          <span className="pointer-events-none animate-[terminal-blink_1s_step-end_infinite] text-emerald-400">▊</span>
+          <input
+            ref={inputRef}
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            className="absolute inset-0 w-full h-full opacity-0 cursor-text"
+            style={{ fontSize: 16 }}
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="off"
+            spellCheck={false}
+          />
         </div>
       </div>
-      <input
-        ref={inputRef}
-        value={input}
-        onChange={e => setInput(e.target.value)}
-        onKeyDown={handleKeyDown}
-        style={{ position: "absolute", opacity: 0, pointerEvents: "none", width: 1, height: 1 }}
-        autoComplete="off"
-        autoCorrect="off"
-        spellCheck={false}
-        aria-hidden="true"
-      />
     </div>
   )
 }
