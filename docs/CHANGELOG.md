@@ -6,6 +6,14 @@ All notable changes to this project are documented here.
 
 ### Added
 
+- Interactive shell terminal mode (`"shell"`) in the terminal section. Visitors can type real commands (`ls`, `cd`, `mkdir`, `touch`, `cat`, `echo`, `rm`, `pwd`, `clear`, `whoami`, `date`, `neofetch`, `history`) against an in-browser virtual filesystem.
+- `lib/virtual-fs.ts` — immutable in-memory VFS with initial tree under `/home/misha/projects` (agents, rag-system). Pure functions, no null returns.
+- `lib/shell-interpreter.ts` — pure command dispatcher with history tracking. `runCommand` returns `{ state, lines, action? }`. `snake` action hands off to snake mode; `clear` resets output.
+- `components/terminal/interactive-terminal.tsx` — REPL React component with hidden input capture, click-to-focus, tab completion (commands + filenames), Up/Down history navigation, and blinking cursor.
+- `__tests__/interactive-terminal.test.ts` — 13 unit tests covering VFS ops and shell commands (1 assert each).
+
+
+
 - Added `/tools` with a polished AI project cost estimator, deterministic system prompt linter, optional rate-limited Hugging Face critique endpoint, sitemap exposure, and nav dropdown entry.
 - Added a recurring-style `State of AI — June 2026` post with a monthly industry pulse format, concrete market framing, and chart-backed strategy checklist.
 - Expanded the blog timeline from `2026-04-06` through `2026-06-15` with eight new posts across AI architecture, MLOps, engineering culture, and product execution.
@@ -19,6 +27,7 @@ All notable changes to this project are documented here.
 
 ### Fixed
 
+- Removed remaining scroll-driven flicker on the homepage by unmounting the root `ScrollShimmer`, removing the top navbar progress strip, making metallic gradients static, and replacing `.nav-shell` backdrop blur with static gradient/shadow paint.
 - Fixed `/llm-prices` search rendering so an `opus` query does not keep stale Grok rows visible when the upstream pricing feed reuses model identifiers.
 
 - Live terminal code lines now render through a `<pre><code>` pair and the regression suite locks the multiline `streamInference` snippet indentation, so generated code remains tabbed before and after syntax highlighting.

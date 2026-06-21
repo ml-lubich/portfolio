@@ -7,11 +7,12 @@ import { Terminal, Clock, Zap, Activity, Play, Gamepad2 } from "lucide-react"
 import { sessions } from "./session-data"
 import { highlight } from "./syntax-highlight"
 import { SnakeTerminal } from "./snake-terminal"
+import InteractiveTerminal from "./interactive-terminal"
 import type { DisplayLine } from "./types"
 import { terminalChrome } from "@/lib/theme"
 
 const S = sessions
-type TerminalMode = "live" | "snake"
+type TerminalMode = "live" | "snake" | "shell"
 
 export function LiveTerminal() {
   const [lines, setLines] = useState<DisplayLine[]>([])
@@ -26,6 +27,7 @@ export function LiveTerminal() {
   const wrapRef = useRef<HTMLDivElement>(null)
   const rafRef = useRef(0)
   const jumpRef = useRef<number | null>(null)
+  const prevLinesCountRef = useRef(0)
 
   // Shuffle
   const shuffle = useCallback(() => {
@@ -148,14 +150,20 @@ export function LiveTerminal() {
     return () => { cancelAnimationFrame(rafRef.current); clearInterval(iv) }
   }, [visible, terminalMode, shuffle])
 
-  // Auto-scroll
+  // Auto-scroll — only when a new line is added (not on every typed character)
+  // to prevent the terminal from appearing to "scroll up" on every keystroke.
   useEffect(() => {
     const el = scrollRef.current
-    if (el) el.scrollTop = el.scrollHeight
+    if (!el) return
+    if (lines.length !== prevLinesCountRef.current) {
+      prevLinesCountRef.current = lines.length
+      el.scrollTop = el.scrollHeight
+    }
   }, [lines])
 
   const cur = S[activeSession]
   const isSnakeMode = terminalMode === "snake"
+  const isShellMode = terminalMode === "shell"
 
   const renderLine = useCallback((dl: DisplayLine, idx: number, last: boolean) => {
     const ld = S[dl.si]?.lines[dl.li]
@@ -254,6 +262,22 @@ export function LiveTerminal() {
             <Gamepad2 className="h-3.5 w-3.5" />
             <span>Snake</span>
           </button>
+          <button
+            type="button"
+            onClick={() => setTerminalMode("shell")}
+            className={`
+              flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium
+              transition-all duration-150 whitespace-nowrap cursor-pointer
+              hover:bg-primary/10 hover:text-primary active:scale-95
+              ${isShellMode
+                ? "bg-primary/15 text-primary border border-primary/30 shadow-sm shadow-primary/10"
+                : "text-muted-foreground/50 border border-transparent hover:border-primary/20"
+              }
+            `}
+          >
+            <Terminal className="h-3.5 w-3.5" />
+            <span>Shell</span>
+          </button>
         </div>
 
         {/* Terminal window */}
@@ -271,7 +295,7 @@ export function LiveTerminal() {
                   <div className={`w-3 h-3 rounded-full bg-[${terminalChrome.dotExpand}]`} />
                 </div>
                 <span className="ml-3 text-xs text-muted-foreground/50 font-mono truncate min-w-0">
-                  misha@dev ~ {isSnakeMode ? "snake.play" : cur?.label}
+                  misha@dev ~ {isSnakeMode ? "snake.play" : isShellMode ? "interactive shell" : cur?.label}
                 </span>
               </div>
               <div className="flex items-center gap-3 text-[11px] shrink-0">
@@ -298,7 +322,7 @@ export function LiveTerminal() {
                   <div className={`w-2.5 h-2.5 rounded-full bg-[${terminalChrome.dotExpand}]`} />
                 </div>
                 <span className="ml-1 text-[10px] text-muted-foreground/50 font-mono min-w-0">
-                  misha@dev ~ {isSnakeMode ? "snake.play" : cur?.label}
+                  misha@dev ~ {isSnakeMode ? "snake.play" : isShellMode ? "interactive shell" : cur?.label}
                 </span>
               </div>
               <div className="flex items-center gap-3 mt-1.5 ml-[calc(3*0.625rem+0.375rem+0.5rem)] text-[10px]">
@@ -323,21 +347,23 @@ export function LiveTerminal() {
             <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-[11px] min-w-0">
               <Clock className="w-3 h-3 text-primary/30 shrink-0" />
               <span className="font-mono text-foreground/50 truncate min-w-0">
-                {isSnakeMode ? "snake --play" : `${cur?.icon} ${cur?.time} — ${cur?.label}`}
+                {isSnakeMode ? "snake --play" : isShellMode ? "interactive shell" : `${cur?.icon} ${cur?.time} — ${cur?.label}`}
               </span>
             </div>
             <span className="text-[10px] font-mono text-muted-foreground/25 shrink-0">
-              {isSnakeMode ? "keyboard ready" : `${linesCount} lines`}
+              {isSnakeMode ? "keyboard ready" : isShellMode ? "bash — 80×24" : `${linesCount} lines`}
             </span>
           </div>
 
           {/* Body */}
           <div
             ref={scrollRef}
-            className={`p-2.5 sm:p-4 font-mono text-[11px] sm:text-[13px] leading-relaxed ${isSnakeMode ? "h-[460px] sm:h-[420px]" : "h-[320px] sm:h-[380px]"} overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-border/40 scrollbar-track-transparent`}
+            className={`p-2.5 sm:p-4 font-mono text-[11px] sm:text-[13px] leading-relaxed ${(isSnakeMode || isShellMode) ? "h-[460px] sm:h-[420px]" : "h-[320px] sm:h-[380px]"} overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-border/40 scrollbar-track-transparent`}
           >
             {isSnakeMode ? (
               <SnakeTerminal />
+            ) : isShellMode ? (
+              <InteractiveTerminal onSnakeMode={() => setTerminalMode("snake")} />
             ) : (
               <>
                 {lines.length === 0 && visible && (
@@ -357,7 +383,7 @@ export function LiveTerminal() {
           {/* Footer */}
           <div className={`px-2.5 sm:px-4 py-1 bg-[${terminalChrome.footerBg}] border-t border-white/[0.04] flex items-center justify-between text-[10px] font-mono text-muted-foreground/25`}>
             <span>SESSION {activeSession + 1}/{S.length}</span>
-            <span>{isSnakeMode ? "snake — local" : "zsh — 80×24"}</span>
+            <span>{isSnakeMode ? "snake — local" : isShellMode ? "bash — 80×24" : "zsh — 80×24"}</span>
           </div>
         </div>
       </div>
