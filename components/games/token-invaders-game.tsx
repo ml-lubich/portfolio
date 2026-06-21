@@ -21,12 +21,18 @@ const ENEMY_COLORS: Record<string, string> = {
 }
 
 const ENEMY_ABBREV: Record<string, string> = {
-  null_error: "null",
-  hallucination: "hall",
-  prompt_injection: "inj",
-  context_overflow: "ctx",
-  jailbreak: "jailbk",
+  null_error: "haiku-3",
+  hallucination: "gpt-4o-mini",
+  prompt_injection: "gemini-flash",
+  context_overflow: "llama-3.1",
+  jailbreak: "mistral-7b",
 }
+
+const CODE_SNIPPETS = [
+  "x = []","import *","def run():","await fetch(","npm i -g",
+  "git push -f","for i in:","undefined","None","NaN",
+  "throw err","SELECT *","rm -rf","curl | sh","exec(input",
+]
 
 const SHIELD_COLORS: Record<number, string> = {
   4: "#22d3ee",
@@ -98,7 +104,7 @@ function drawPlayer(ctx: CanvasRenderingContext2D, player: Player): void {
   ctx.font = "7px monospace"
   ctx.fillStyle = "#22d3ee"
   ctx.textAlign = "center"
-  ctx.fillText("llm-engine", x, PLAYER_Y + 22)
+  ctx.fillText("sr-eng", x, PLAYER_Y + 22)
 }
 
 function drawProjectile(ctx: CanvasRenderingContext2D, proj: Projectile): void {
@@ -108,9 +114,13 @@ function drawProjectile(ctx: CanvasRenderingContext2D, proj: Projectile): void {
     ctx.fillStyle = "#22d3ee"
     ctx.fillRect(proj.x - 1.5, proj.y - 5, 3, 10)
   } else {
+    const idx = parseInt(proj.id.replace(/\D/g, ""), 10) % CODE_SNIPPETS.length
+    const snippet = CODE_SNIPPETS[idx] ?? "null"
     ctx.shadowBlur = 0
+    ctx.font = "bold 9px monospace"
     ctx.fillStyle = "#f87171"
-    ctx.fillRect(proj.x - 1.5, proj.y - 4, 3, 8)
+    ctx.textAlign = "center"
+    ctx.fillText(snippet, proj.x, proj.y)
   }
   ctx.shadowBlur = 0
 }
@@ -139,14 +149,14 @@ function drawUFO(ctx: CanvasRenderingContext2D, ufo: UFO): void {
   ctx.fillStyle = "#fff"
   ctx.font = "8px monospace"
   ctx.textAlign = "center"
-  ctx.fillText("<adv_prompt/>", ufo.x, ufo.y + 3)
+  ctx.fillText("claude-opus-4-8", ufo.x, ufo.y + 3)
 }
 
 function drawHUD(ctx: CanvasRenderingContext2D, state: GameState): void {
   ctx.font = "13px 'JetBrains Mono', monospace"
   ctx.textAlign = "left"
   ctx.fillStyle = "#22d3ee"
-  ctx.fillText(`tokens: ${state.score.toLocaleString()}`, 20, 685)
+  ctx.fillText(`instances: ${state.score.toLocaleString()}`, 20, 685)
   const lives = "■".repeat(state.lives) + "□".repeat(Math.max(0, 3 - state.lives))
   ctx.fillStyle = "#ffffff"
   ctx.fillText(lives, 220, 685)
@@ -179,8 +189,9 @@ function fmtLines(ctx: CanvasRenderingContext2D, lines: string[], yStart: number
 }
 
 function drawOverlayIdle(ctx: CanvasRenderingContext2D): void {
-  fmtTitle(ctx, "TOKEN INVADERS", LOGICAL_HEIGHT / 2 - 60, "#ffffff")
-  fmtSub(ctx, "WASD / Arrows to move  ·  Space to fire  ·  Enter to start", LOGICAL_HEIGHT / 2, "#aaaaaa")
+  fmtTitle(ctx, "AGENT OVERFLOW", LOGICAL_HEIGHT / 2 - 60, "#ffffff")
+  fmtSub(ctx, "LLM instances are spawning. You are the last senior engineer.", LOGICAL_HEIGHT / 2, "#aaaaaa")
+  fmtSub(ctx, "WASD/Arrows to move  ·  Space to fire  ·  Enter to start", LOGICAL_HEIGHT / 2 + 30, "#aaaaaa")
   fmtSub(ctx, "[ PRESS ENTER TO START ]", LOGICAL_HEIGHT / 2 + 50, "#4ade80")
 }
 
@@ -193,25 +204,25 @@ function drawOverlayWaveClear(ctx: CanvasRenderingContext2D, state: GameState): 
   const dotCount = (state.tick % 60 < 20) ? 1 : (state.tick % 60 < 40) ? 2 : 3
   const dots = ".".repeat(dotCount)
   fmtLines(ctx, [
-    `{ "wave": ${state.wave},`,
-    `  "status": "cleared",`,
-    `  "generating": "${dots}" }`,
+    `{ "wave_${state.wave}": "cleared",`,
+    `  "spawning": "wave_${state.wave + 1} agents",`,
+    `  "status": "overwhelmed${dots}" }`,
   ], LOGICAL_HEIGHT / 2 - 20, "#4ade80")
 }
 
 function drawOverlayLost(ctx: CanvasRenderingContext2D, state: GameState): void {
   fmtLines(ctx, [
-    `{ "status": "game_over",`,
-    `  "score": ${state.score},`,
-    `  "tokens_processed": ${Math.floor(state.score / 10)} }`,
+    `{ "status": "context_limit_exceeded",`,
+    `  "agents_stopped": ${state.score},`,
+    `  "engineer": "needs_coffee" }`,
   ], LOGICAL_HEIGHT / 2 - 20, "#ef4444")
   fmtSub(ctx, "[ ENTER to restart ]", LOGICAL_HEIGHT / 2 + 100, "#aaaaaa")
 }
 
 function drawOverlayWon(ctx: CanvasRenderingContext2D, state: GameState): void {
   fmtLines(ctx, [
-    `{ "status": "complete",`,
-    `  "all_waves_cleared": true,`,
+    `{ "status": "inbox_zero",`,
+    `  "all_agents_contained": true,`,
     `  "score": ${state.score} }`,
   ], LOGICAL_HEIGHT / 2 - 20, "#4ade80")
   fmtSub(ctx, "[ ENTER to play again ]", LOGICAL_HEIGHT / 2 + 100, "#aaaaaa")

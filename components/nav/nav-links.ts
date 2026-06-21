@@ -43,7 +43,13 @@ export const liveGames: LiveTool[] = [
   {
     href: "/games/token-invaders",
     label: "Token Invaders",
-    description: "Defend your context window against LLM failures",
+    description: "Defend your context window against LLM agent overflow",
+    badge: "Play",
+  },
+  {
+    href: "/games/snake",
+    label: "Snake",
+    description: "Classic Snake — terminal edition",
     badge: "Play",
   },
 ]
