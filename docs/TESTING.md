@@ -42,7 +42,7 @@
 ## Automated: navbar surface over hero
 
 - `__tests__/nav-hero-surface.test.ts` — `computeNavPastHero` in `lib/nav-hero-surface.ts`: frosted mode only when `#hero`’s `getBoundingClientRect().bottom <= 0`; transparent while any part of the hero remains below the viewport top. Includes a shallow guard that `components/nav/index.tsx` still calls `computeNavPastHero` and retains blur-off vs blur-on class tokens.
-- The same suite guards that the desktop navbar keeps the floating `.nav-glass.nav-shell` shell so future edits do not regress to a flat full-width bar.
+- The same suite guards that the desktop navbar keeps the floating `.nav-glass.nav-shell` shell, renders no top scroll-progress bar, and keeps `.nav-shell` free of `backdrop-filter` so future edits do not regress to scroll flicker or a flat full-width bar.
 
 ## Automated: terminal snake game
 
@@ -63,7 +63,7 @@ No automated visual regression for WebGL is required unless a dedicated snapshot
 
 ## Automated: mobile performance guardrails
 
-- `__tests__/mobile-performance-regression.test.ts` — guards that blog listing/article client code does not import Framer Motion, blog card touch taps do not trigger route prefetch, and the homepage keeps mobile performance mode for delayed WebGL, skipped particle canvas, tighter lazy-section preload margins, stable `svh` hero sizing, hydration-stable transform-only ambient orbs, CSS-owned ambient-orb visuals, viewport-independent animated-section first render, throttled scroll shimmer, and width-only brain resize listeners. `__tests__/hero-ssr-consistency.test.ts` also asserts the full seven-orb SSR tree so breakpoint detection cannot change the first client render.
+- `__tests__/mobile-performance-regression.test.ts` — guards that blog listing/article client code does not import Framer Motion, blog card touch taps do not trigger route prefetch, and the homepage keeps mobile performance mode for delayed WebGL, skipped particle canvas, tighter lazy-section preload margins, stable `svh` hero sizing, hydration-stable transform-only ambient orbs, CSS-owned ambient-orb visuals, viewport-independent animated-section first render, root `ScrollShimmer` remains unmounted, metallic text gradients stay static while scrolling, and width-only brain resize listeners. `__tests__/hero-ssr-consistency.test.ts` also asserts the full seven-orb SSR tree so breakpoint detection cannot change the first client render.
 
 ## Manual: blog card → article (performance)
 

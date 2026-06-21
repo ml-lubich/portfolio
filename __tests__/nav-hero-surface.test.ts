@@ -97,6 +97,26 @@ describe("Navigation wiring (regression)", () => {
     expect(navSrc).toContain("nav.dataset.navScrolled")
   })
 
+  it("nav shell avoids backdrop-filter over WebGL hero", () => {
+    const cssSrc = fs.readFileSync(path.join(ROOT, "app/globals.css"), "utf8")
+    const shellBlock = cssSrc.match(/\.nav-shell \{[\s\S]*?\n\}/)?.[0] ?? ""
+    expect(shellBlock).not.toContain("backdrop-filter")
+  })
+
+  it("scrolled nav shell avoids backdrop-filter churn", () => {
+    const cssSrc = fs.readFileSync(path.join(ROOT, "app/globals.css"), "utf8")
+    const scrolledBlock = cssSrc.match(/nav\[data-nav-scrolled="true"\] \.nav-shell \{[\s\S]*?\n\}/)?.[0] ?? ""
+    expect(scrolledBlock).not.toContain("backdrop-filter")
+  })
+
+  it("top scroll progress bar is not rendered", () => {
+    const navSrc = fs.readFileSync(
+      path.join(ROOT, "components/nav/index.tsx"),
+      "utf8",
+    )
+    expect(navSrc).not.toContain("ScrollProgressBar")
+  })
+
   it("mobile menu keeps Contact as the CTA instead of duplicating it in the link list", () => {
     const navSrc = fs.readFileSync(
       path.join(ROOT, "components/nav/index.tsx"),

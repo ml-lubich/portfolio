@@ -5,7 +5,6 @@ import { GeistSans } from 'geist/font/sans'
 import { GeistMono } from 'geist/font/mono'
 
 import './globals.css'
-import { ScrollShimmer } from '@/components/scroll-shimmer'
 import { JsonLd } from '@/components/seo/json-ld'
 
 const jetbrains = JetBrains_Mono({
@@ -165,8 +164,6 @@ export default function RootLayout({
         <JsonLd />
       </head>
       <body className="font-sans antialiased font-light">
-        {/* Scroll-driven shine on gradient-text */}
-        <ScrollShimmer />
         {/* Skip to main content — accessibility */}
         <a
           href="#main-content"

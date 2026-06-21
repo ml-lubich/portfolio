@@ -98,6 +98,14 @@ describe("mobile performance guardrails", () => {
     expect(source("components/animations/animated-section.tsx")).not.toContain("useIsMobile")
   })
 
+  it("keeps root scroll shimmer unmounted", () => {
+    expect(source("app/layout.tsx")).not.toContain("ScrollShimmer")
+  })
+
+  it("keeps global metallic text static while scrolling", () => {
+    expect(source("app/globals.css")).not.toContain("var(--scroll-y")
+  })
+
   it("keeps brain resize listeners width-only", () => {
     expect(_src_brainFiles().every((src) => src.includes("subscribeWidthResize"))).toBe(true)
   })
