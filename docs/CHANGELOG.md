@@ -4,6 +4,10 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+### Fixed
+
+- Token Invaders enemies now render the Claude Code icon sprite (`/claude-code-icon.png`) with a colored glow halo; model name label rendered below the icon in the enemy color. Falls back to a colored rect if the image hasn't loaded yet.
+
 ### Added
 
 - **Token Invaders** (`/games/token-invaders`) — LLM-themed Space Invaders game. Player is an inference engine defending against AI failure modes (null errors, hallucinations, prompt injections, context overflows, jailbreaks). Five enemy types, 5 waves, UFO bonus, degradable shields, mobile on-screen controls.

@@ -56,7 +56,23 @@ function drawBg(ctx: CanvasRenderingContext2D): void {
   }
 }
 
-function drawEnemy(ctx: CanvasRenderingContext2D, enemy: Enemy): void {
+function drawEnemyIcon(ctx: CanvasRenderingContext2D, ex: number, ey: number, color: string, sprite: HTMLImageElement): void {
+  ctx.shadowColor = color
+  ctx.shadowBlur = 8
+  ctx.drawImage(sprite, ex - 11, ey - 11, 22, 22)
+  ctx.shadowBlur = 0
+}
+
+function drawEnemyFallback(ctx: CanvasRenderingContext2D, ex: number, ey: number, color: string, type: string): void {
+  ctx.fillStyle = color
+  ctx.fillRect(ex - 10, ey - 8, 20, 16)
+  ctx.fillStyle = "#000"
+  ctx.font = "7px monospace"
+  ctx.textAlign = "center"
+  ctx.fillText(ENEMY_ABBREV[type] ?? type, ex, ey + 5)
+}
+
+function drawEnemy(ctx: CanvasRenderingContext2D, enemy: Enemy, sprite: HTMLImageElement | null): void {
   const ex = ENEMY_GRID_X0 + enemy.col * ENEMY_CELL_W
   const ey = ENEMY_GRID_Y0 + enemy.row * ENEMY_CELL_H
   const color = ENEMY_COLORS[enemy.type] ?? "#ffffff"
@@ -69,23 +85,26 @@ function drawEnemy(ctx: CanvasRenderingContext2D, enemy: Enemy): void {
     ctx.stroke()
   }
 
-  ctx.fillStyle = color
-  ctx.fillRect(ex - 10, ey - 8, 20, 16)
+  if (sprite) {
+    drawEnemyIcon(ctx, ex, ey, color, sprite)
+  } else {
+    drawEnemyFallback(ctx, ex, ey, color, enemy.type)
+  }
 
   if (enemy.hp === 2) {
     ctx.fillStyle = color
     ctx.beginPath()
-    ctx.arc(ex - 4, ey + 11, 2, 0, Math.PI * 2)
+    ctx.arc(ex - 4, ey + 13, 2, 0, Math.PI * 2)
     ctx.fill()
     ctx.beginPath()
-    ctx.arc(ex + 4, ey + 11, 2, 0, Math.PI * 2)
+    ctx.arc(ex + 4, ey + 13, 2, 0, Math.PI * 2)
     ctx.fill()
   }
 
-  ctx.fillStyle = "#000"
+  ctx.fillStyle = ENEMY_COLORS[enemy.type] ?? "#aaa"
   ctx.font = "7px monospace"
   ctx.textAlign = "center"
-  ctx.fillText(ENEMY_ABBREV[enemy.type] ?? enemy.type, ex, ey + 5)
+  ctx.fillText(ENEMY_ABBREV[enemy.type] ?? enemy.type, ex, ey + 24)
 }
 
 function drawPlayer(ctx: CanvasRenderingContext2D, player: Player): void {
@@ -242,12 +261,12 @@ function drawOverlay(ctx: CanvasRenderingContext2D, state: GameState): void {
   handlers[state.status]?.()
 }
 
-function drawFrame(ctx: CanvasRenderingContext2D, state: GameState): void {
+function drawFrame(ctx: CanvasRenderingContext2D, state: GameState, sprite: HTMLImageElement | null): void {
   ctx.save()
   const canvas = ctx.canvas
   ctx.scale(canvas.width / LOGICAL_WIDTH, canvas.height / LOGICAL_HEIGHT)
   drawBg(ctx)
-  state.enemies.forEach((e) => drawEnemy(ctx, e))
+  state.enemies.forEach((e) => drawEnemy(ctx, e, sprite))
   state.shields.forEach((s) => drawShield(ctx, s))
   state.projectiles.forEach((p) => drawProjectile(ctx, p))
   drawUFO(ctx, state.ufo)
@@ -265,6 +284,7 @@ export function TokenInvadersGame() {
   const rafRef = useRef<number>(0)
   const keysHeld = useRef<Set<string>>(new Set())
   const mobileHeld = useRef<"left" | "right" | null>(null)
+  const spriteRef = useRef<HTMLImageElement | null>(null)
 
   const applyHeldKeys = useCallback(() => {
     if (keysHeld.current.has("arrowleft") || keysHeld.current.has("a")) {
@@ -275,6 +295,12 @@ export function TokenInvadersGame() {
     }
     if (mobileHeld.current === "left") stateRef.current = movePlayerLeft(stateRef.current)
     if (mobileHeld.current === "right") stateRef.current = movePlayerRight(stateRef.current)
+  }, [])
+
+  useEffect(() => {
+    const img = new Image()
+    img.onload = () => { spriteRef.current = img }
+    img.src = "/claude-code-icon.png"
   }, [])
 
   useEffect(() => {
@@ -293,7 +319,7 @@ export function TokenInvadersGame() {
     function loop() {
       applyHeldKeys()
       stateRef.current = tickGame(stateRef.current, Math.random)
-      drawFrame(ctx!, stateRef.current)
+      drawFrame(ctx!, stateRef.current, spriteRef.current)
       rafRef.current = requestAnimationFrame(loop)
     }
     rafRef.current = requestAnimationFrame(loop)
