@@ -311,7 +311,7 @@ export function Navigation() {
   /* Re-apply surface after React commits (resets className to NAV_SSR_CLASS); do not touch lastScrollY here. */
   useLayoutEffect(() => {
     applyNavSurface()
-  }, [applyNavSurface, mobileOpen, activeSection])
+  }, [applyNavSurface, mobileOpen])
 
   /* Once: align scrolled flag with restored scroll. */
   useLayoutEffect(() => {

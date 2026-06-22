@@ -671,7 +671,9 @@ body {
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   will-change: auto;
-  transition: none;
+  transition:
+    background 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.45s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Specular sheen — a static "wet glass" highlight. Pure paint, no per-frame

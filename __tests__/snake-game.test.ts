@@ -3,6 +3,7 @@ import {
   advanceSnakeGame,
   changeSnakeDirection,
   createSnakeGameState,
+  getSnakeCells,
   getSnakeDirectionFromKey,
   type SnakeGameState,
 } from "@/lib/snake-game"
@@ -46,6 +47,56 @@ describe("terminal snake game", () => {
     expect(advanced.snake).toHaveLength(game.snake.length + 1)
     expect(advanced.snake[0]).toEqual({ row: 4, col: 5 })
     expect(advanced.food).not.toEqual({ row: 4, col: 5 })
+  })
+
+  it("renders food cell at the correct grid position", () => {
+    const game = createSnakeGameState({ boardSize: 6, food: { row: 0, col: 0 } })
+    const cells = getSnakeCells(game)
+
+    const foodCell = cells.find((c) => c.kind === "food")
+    expect(foodCell).toBeDefined()
+    expect(foodCell?.key).toBe("0:0")
+  })
+
+  it("renders exactly one food cell per game state", () => {
+    const game = createSnakeGameState({ boardSize: 6, food: { row: 2, col: 4 } })
+    const cells = getSnakeCells(game)
+
+    expect(cells.filter((c) => c.kind === "food")).toHaveLength(1)
+  })
+
+  it("renders food at bottom-right corner", () => {
+    const game = createSnakeGameState({ boardSize: 6, food: { row: 5, col: 5 } })
+    const cells = getSnakeCells(game)
+
+    const foodCell = cells.find((c) => c.kind === "food")
+    expect(foodCell?.key).toBe("5:5")
+  })
+
+  it("renders food at new position after eating", () => {
+    const game = createSnakeGameState({ boardSize: 8, food: { row: 4, col: 5 } })
+    const running = changeSnakeDirection(game, "right")
+    const advanced = advanceSnakeGame(running, () => 0)
+
+    const cells = getSnakeCells(advanced)
+    const foodCells = cells.filter((c) => c.kind === "food")
+    expect(foodCells).toHaveLength(1)
+    expect(foodCells[0]?.key).not.toBe("4:5")
+  })
+
+  it("produces exactly boardSize*boardSize cells", () => {
+    const game = createSnakeGameState({ boardSize: 8, food: { row: 1, col: 1 } })
+    const cells = getSnakeCells(game)
+
+    expect(cells).toHaveLength(64)
+  })
+
+  it("cell keys are unique across the grid", () => {
+    const game = createSnakeGameState({ boardSize: 6, food: { row: 0, col: 5 } })
+    const cells = getSnakeCells(game)
+    const keys = cells.map((c) => c.key)
+
+    expect(new Set(keys).size).toBe(keys.length)
   })
 
   it("loses on wall collision", () => {

@@ -14,21 +14,14 @@ import {
   advanceSnakeGame,
   changeSnakeDirection,
   createSnakeGameState,
+  getSnakeCells,
   getSnakeDirectionFromKey,
   setSnakeGameStatus,
-  toSnakePointKey,
   type SnakeDirection,
   type SnakeGameState,
   type SnakeGameStatus,
 } from "@/lib/snake-game"
 import { cn } from "@/lib/utils"
-
-type SnakeCellKind = "empty" | "head" | "body" | "food"
-
-interface SnakeCell {
-  key: string
-  kind: SnakeCellKind
-}
 
 const SNAKE_STATUS_LABEL: Record<SnakeGameStatus, string> = {
   idle: "READY",
@@ -255,21 +248,3 @@ function DirectionButton({ label, direction, onSelect, children }: DirectionButt
   )
 }
 
-function getSnakeCells(game: SnakeGameState): SnakeCell[] {
-  const snakeCells = new Map<string, SnakeCellKind>()
-  game.snake.forEach((point, index) => {
-    snakeCells.set(toSnakePointKey(point), index === 0 ? "head" : "body")
-  })
-
-  const cells: SnakeCell[] = []
-  for (let row = 0; row < game.boardSize; row += 1) {
-    for (let col = 0; col < game.boardSize; col += 1) {
-      const key = `${row}:${col}`
-      const snakeKind = snakeCells.get(key)
-      const isFood = game.food !== null && game.food.row === row && game.food.col === col
-      cells.push({ key, kind: snakeKind ?? (isFood ? "food" : "empty") })
-    }
-  }
-
-  return cells
-}

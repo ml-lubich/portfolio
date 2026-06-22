@@ -167,6 +167,32 @@ export function pointsEqual(left: SnakePoint, right: SnakePoint): boolean {
   return left.row === right.row && left.col === right.col
 }
 
+export type SnakeCellKind = "empty" | "head" | "body" | "food"
+
+export interface SnakeCell {
+  key: string
+  kind: SnakeCellKind
+}
+
+export function getSnakeCells(game: SnakeGameState): SnakeCell[] {
+  const snakeCells = new Map<string, SnakeCellKind>()
+  game.snake.forEach((point, index) => {
+    snakeCells.set(toSnakePointKey(point), index === 0 ? "head" : "body")
+  })
+
+  const cells: SnakeCell[] = []
+  for (let row = 0; row < game.boardSize; row += 1) {
+    for (let col = 0; col < game.boardSize; col += 1) {
+      const key = toSnakePointKey({ row, col })
+      const snakeKind = snakeCells.get(key)
+      const isFood = game.food !== null && game.food.row === row && game.food.col === col
+      cells.push({ key, kind: snakeKind ?? (isFood ? "food" : "empty") })
+    }
+  }
+
+  return cells
+}
+
 function createInitialSnake(boardSize: number): SnakePoint[] {
   const row = Math.floor(boardSize / 2)
   const headCol = Math.floor(boardSize / 2)
