@@ -294,46 +294,30 @@ export function Navigation() {
   const applyNavSurface = useCallback(() => {
     const nav = navRef.current
     if (!nav) return
-    const { scrolled } = navSurfaceRef.current
+    // Always re-derive from the live DOM so IntersectionObserver re-renders
+    // (which trigger this via useLayoutEffect) never race with the RAF-deferred
+    // scroll handler and briefly write a stale data-nav-scrolled value.
+    const scrolled = isPastHero(scrolledPastHeroRef.current)
+    scrolledPastHeroRef.current = scrolled
+    navSurfaceRef.current.scrolled = scrolled
     const z = mobileOpenRef.current ? "z-[200]" : "z-50"
-    nav.className = [
-      NAV_FIXED_BASE,
-      z,
-      NAV_VISIBLE,
-      scrolled ? NAV_SURFACE_SCROLLED : NAV_SURFACE_HERO,
-    ].join(" ")
-    // Capsule frost (heavy blur) is gated to scrolled state so it never
-    // re-blurs the animated hero every frame. Ref-driven: no React re-render.
-    nav.dataset.navScrolled = scrolled ? "true" : "false"
+    const cls = [NAV_FIXED_BASE, z, NAV_VISIBLE, scrolled ? NAV_SURFACE_SCROLLED : NAV_SURFACE_HERO].join(" ")
+    if (nav.className !== cls) nav.className = cls
+    const attr = scrolled ? "true" : "false"
+    if (nav.dataset.navScrolled !== attr) nav.dataset.navScrolled = attr
   }, [])
 
-  /* After paint: align with restored scroll + re-apply when React resets className on re-render. */
-  /* Re-apply surface after React commits (resets className to NAV_SSR_CLASS); do not touch lastScrollY here. */
+  /* Re-apply after every React commit (resets className to NAV_SSR_CLASS) and on mobileOpen toggle. */
   useLayoutEffect(() => {
     applyNavSurface()
   }, [applyNavSurface, mobileOpen])
 
-  /* Once: align scrolled flag with restored scroll. */
-  useLayoutEffect(() => {
-    const nextScrolled = isPastHero(scrolledPastHeroRef.current)
-    scrolledPastHeroRef.current = nextScrolled
-    navSurfaceRef.current.scrolled = nextScrolled
-    applyNavSurface()
-  }, [applyNavSurface])
-
-  /* Update only the hero/scrolled surface on scroll. Auto-hide removed. */
+  /* Scroll: RAF-throttled. applyNavSurface re-derives state from DOM, so no stale-ref risk. */
   useEffect(() => {
     let rafId: number
     function handleScroll() {
       cancelAnimationFrame(rafId)
-      rafId = requestAnimationFrame(() => {
-        const nextScrolled = isPastHero(scrolledPastHeroRef.current)
-        if (nextScrolled !== scrolledPastHeroRef.current) {
-          scrolledPastHeroRef.current = nextScrolled
-          navSurfaceRef.current.scrolled = nextScrolled
-          applyNavSurface()
-        }
-      })
+      rafId = requestAnimationFrame(applyNavSurface)
     }
     window.addEventListener("scroll", handleScroll, { passive: true })
     handleScroll()
@@ -344,15 +328,9 @@ export function Navigation() {
   }, [applyNavSurface])
 
   useEffect(() => {
-    function onResize() {
-      const next = isPastHero(scrolledPastHeroRef.current)
-      scrolledPastHeroRef.current = next
-      navSurfaceRef.current.scrolled = next
-      applyNavSurface()
-    }
-    window.addEventListener("resize", onResize, { passive: true })
-    onResize()
-    return () => window.removeEventListener("resize", onResize)
+    window.addEventListener("resize", applyNavSurface, { passive: true })
+    applyNavSurface()
+    return () => window.removeEventListener("resize", applyNavSurface)
   }, [applyNavSurface])
 
   useEffect(() => {
