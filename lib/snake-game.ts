@@ -100,9 +100,9 @@ export function advanceSnakeGame(
   const direction = state.nextDirection
   const nextHead = moveSnakeHead(head, direction)
   const willEat = state.food !== null && pointsEqual(nextHead, state.food)
-  const collisionBody = willEat ? state.snake : state.snake.slice(0, -1)
+  const collisionKeys = toCollisionKeys(state.snake, willEat)
 
-  if (!isPointInsideBoard(nextHead, state.boardSize) || containsSnakePoint(collisionBody, nextHead)) {
+  if (!isPointInsideBoard(nextHead, state.boardSize) || collisionKeys.has(toSnakePointKey(nextHead))) {
     return {
       ...state,
       direction,
@@ -222,32 +222,33 @@ function placeSnakeFood(
   snake: readonly SnakePoint[],
   random: () => number,
 ): SnakePoint {
+  const snakeKeys = toSnakeKeySet(snake)
   const emptyCells: SnakePoint[] = []
-
   for (let row = 0; row < boardSize; row += 1) {
     for (let col = 0; col < boardSize; col += 1) {
-      const point = { row, col }
-      if (!containsSnakePoint(snake, point)) {
-        emptyCells.push(point)
-      }
+      if (!snakeKeys.has(toSnakePointKey({ row, col }))) emptyCells.push({ row, col })
     }
   }
-
-  if (emptyCells.length === 0) {
-    throw new Error("Cannot place snake food on a full board.")
-  }
-
-  const randomIndex = Math.min(
-    emptyCells.length - 1,
-    Math.max(0, Math.floor(random() * emptyCells.length)),
-  )
-  const food = emptyCells[randomIndex]
-
-  if (!food) {
-    throw new Error("Failed to choose a snake food cell.")
-  }
-
+  if (emptyCells.length === 0) throw new Error("Cannot place snake food on a full board.")
+  const idx = Math.min(emptyCells.length - 1, Math.max(0, Math.floor(random() * emptyCells.length)))
+  const food = emptyCells[idx]
+  if (!food) throw new Error("Failed to choose a snake food cell.")
   return food
+}
+
+function toSnakeKeySet(snake: readonly SnakePoint[]): Set<string> {
+  const set = new Set<string>()
+  for (const p of snake) set.add(toSnakePointKey(p))
+  return set
+}
+
+function toCollisionKeys(snake: readonly SnakePoint[], willEat: boolean): Set<string> {
+  const set = toSnakeKeySet(snake)
+  if (!willEat) {
+    const tail = snake[snake.length - 1]
+    if (tail) set.delete(toSnakePointKey(tail))
+  }
+  return set
 }
 
 function isPointInsideBoard(point: SnakePoint, boardSize: number): boolean {

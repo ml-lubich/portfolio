@@ -17,11 +17,21 @@ import {
   getSnakeCells,
   getSnakeDirectionFromKey,
   setSnakeGameStatus,
+  type SnakeCellKind,
   type SnakeDirection,
   type SnakeGameState,
   type SnakeGameStatus,
 } from "@/lib/snake-game"
 import { cn } from "@/lib/utils"
+
+// Static lookup — avoids cn() call per cell per render and removes
+// transition-colors (256 CSS transitions per 130ms tick is pure waste)
+const CELL_CLASS: Record<SnakeCellKind, string> = {
+  empty: "aspect-square rounded-[2px] border border-black/20 bg-white/[0.025]",
+  body:  "aspect-square rounded-[2px] border border-black/20 bg-emerald-500/70 shadow-[0_0_8px_rgba(16,185,129,0.18)]",
+  head:  "aspect-square rounded-[2px] border border-black/20 bg-cyan-300 shadow-[0_0_14px_rgba(103,232,249,0.45)]",
+  food:  "aspect-square rounded-[2px] border border-black/20 bg-rose-400 shadow-[0_0_14px_rgba(251,113,133,0.45)]",
+}
 
 const SNAKE_STATUS_LABEL: Record<SnakeGameStatus, string> = {
   idle: "READY",
@@ -149,17 +159,7 @@ export function SnakeTerminal() {
           className="grid aspect-square w-full max-w-[252px] grid-cols-[repeat(16,minmax(0,1fr))] rounded-lg border border-white/[0.08] bg-[#080d10] p-1 shadow-inner shadow-black/60 outline-none ring-0 transition focus-visible:ring-2 focus-visible:ring-emerald-400/50 sm:max-w-[292px] md:max-w-[316px]"
         >
           {cells.map((cell) => (
-            <span
-              key={cell.key}
-              aria-hidden="true"
-              className={cn(
-                "aspect-square rounded-[2px] border border-black/20 transition-colors",
-                cell.kind === "empty" && "bg-white/[0.025]",
-                cell.kind === "body" && "bg-emerald-500/70 shadow-[0_0_8px_rgba(16,185,129,0.18)]",
-                cell.kind === "head" && "bg-cyan-300 shadow-[0_0_14px_rgba(103,232,249,0.45)]",
-                cell.kind === "food" && "bg-rose-400 shadow-[0_0_14px_rgba(251,113,133,0.45)]",
-              )}
-            />
+            <span key={cell.key} aria-hidden="true" className={CELL_CLASS[cell.kind]} />
           ))}
         </div>
       </div>
