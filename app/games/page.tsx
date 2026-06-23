@@ -100,53 +100,101 @@ export default function GamesPage() {
             </div>
           </Link>
 
-          {/* Context Tetris — coming soon */}
-          <div className="flex flex-col overflow-hidden rounded-2xl border border-white/[0.05] bg-white/[0.02] p-6 opacity-50">
+          {/* Context Tetris */}
+          <Link
+            href="/games/context-tetris"
+            className="group relative flex flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 transition-all duration-300 hover:border-cyan-500/30 hover:bg-cyan-500/[0.04]"
+          >
+            <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 rounded-2xl"
+              style={{ background: "radial-gradient(60% 50% at 50% 0%, hsl(185 65% 55% / 0.08), transparent)" }} />
+
             <div className="mb-4 flex items-center justify-between">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-cyan-500/20 bg-cyan-500/[0.06]">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-cyan-500/30 bg-cyan-500/10">
                 <span className="text-xl">🧱</span>
               </div>
-              <span className="inline-flex items-center gap-1 rounded-full border border-white/[0.08] px-2.5 py-1 text-[10px] font-medium text-muted-foreground/50">
-                Soon
+              <span className="inline-flex items-center gap-1 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-2.5 py-1 text-[10px] font-medium text-cyan-400">
+                <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-pulse" />
+                Play
               </span>
             </div>
-            <h2 className="text-lg font-medium text-foreground/60 mb-1.5">Context Tetris</h2>
-            <p className="text-sm text-muted-foreground/50">
+
+            <h2 className="text-lg font-medium text-foreground mb-1.5 group-hover:text-white transition-colors">
+              Context Tetris
+            </h2>
+            <p className="text-sm text-muted-foreground flex-1 mb-4">
               Tokens fall from above. Arrange them before you hit the context limit. Clear lines to free up context window.
             </p>
-          </div>
 
-          {/* Hallucination Whack-a-Mole — coming soon */}
-          <div className="flex flex-col overflow-hidden rounded-2xl border border-white/[0.05] bg-white/[0.02] p-6 opacity-50">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground/60">
+              <span className="rounded-full border border-white/[0.08] px-2 py-0.5">Tetris</span>
+              <span className="rounded-full border border-white/[0.08] px-2 py-0.5">LLM Theme</span>
+              <ArrowRight className="ml-auto h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 text-muted-foreground/40 group-hover:text-cyan-400" />
+            </div>
+          </Link>
+
+          {/* Hallucination Detector */}
+          <Link
+            href="/games/hallucination-detector"
+            className="group relative flex flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 transition-all duration-300 hover:border-yellow-500/30 hover:bg-yellow-500/[0.04]"
+          >
+            <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 rounded-2xl"
+              style={{ background: "radial-gradient(60% 50% at 50% 0%, hsl(48 65% 55% / 0.08), transparent)" }} />
+
             <div className="mb-4 flex items-center justify-between">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-yellow-500/20 bg-yellow-500/[0.06]">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-yellow-500/30 bg-yellow-500/10">
                 <span className="text-xl">🔍</span>
               </div>
-              <span className="inline-flex items-center gap-1 rounded-full border border-white/[0.08] px-2.5 py-1 text-[10px] font-medium text-muted-foreground/50">
-                Soon
+              <span className="inline-flex items-center gap-1 rounded-full border border-yellow-500/30 bg-yellow-500/10 px-2.5 py-1 text-[10px] font-medium text-yellow-400">
+                <span className="h-1.5 w-1.5 rounded-full bg-yellow-400 animate-pulse" />
+                Play
               </span>
             </div>
-            <h2 className="text-lg font-medium text-foreground/60 mb-1.5">Hallucination Detector</h2>
-            <p className="text-sm text-muted-foreground/50">
+
+            <h2 className="text-lg font-medium text-foreground mb-1.5 group-hover:text-white transition-colors">
+              Hallucination Detector
+            </h2>
+            <p className="text-sm text-muted-foreground flex-1 mb-4">
               Facts flash on screen. Tap the hallucinated ones before they corrupt your context. Speed increases with each wave.
             </p>
-          </div>
 
-          {/* Prompt Runner — coming soon */}
-          <div className="flex flex-col overflow-hidden rounded-2xl border border-white/[0.05] bg-white/[0.02] p-6 opacity-50">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground/60">
+              <span className="rounded-full border border-white/[0.08] px-2 py-0.5">Click game</span>
+              <span className="rounded-full border border-white/[0.08] px-2 py-0.5">Wave-based</span>
+              <ArrowRight className="ml-auto h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 text-muted-foreground/40 group-hover:text-yellow-400" />
+            </div>
+          </Link>
+
+          {/* Prompt Runner */}
+          <Link
+            href="/games/prompt-runner"
+            className="group relative flex flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 transition-all duration-300 hover:border-orange-500/30 hover:bg-orange-500/[0.04]"
+          >
+            <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 rounded-2xl"
+              style={{ background: "radial-gradient(60% 50% at 50% 0%, hsl(25 65% 55% / 0.08), transparent)" }} />
+
             <div className="mb-4 flex items-center justify-between">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-orange-500/20 bg-orange-500/[0.06]">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-orange-500/30 bg-orange-500/10">
                 <span className="text-xl">🏃</span>
               </div>
-              <span className="inline-flex items-center gap-1 rounded-full border border-white/[0.08] px-2.5 py-1 text-[10px] font-medium text-muted-foreground/50">
-                Soon
+              <span className="inline-flex items-center gap-1 rounded-full border border-orange-500/30 bg-orange-500/10 px-2.5 py-1 text-[10px] font-medium text-orange-400">
+                <span className="h-1.5 w-1.5 rounded-full bg-orange-400 animate-pulse" />
+                Play
               </span>
             </div>
-            <h2 className="text-lg font-medium text-foreground/60 mb-1.5">Prompt Runner</h2>
-            <p className="text-sm text-muted-foreground/50">
+
+            <h2 className="text-lg font-medium text-foreground mb-1.5 group-hover:text-white transition-colors">
+              Prompt Runner
+            </h2>
+            <p className="text-sm text-muted-foreground flex-1 mb-4">
               Endless runner through a stream of prompts. Dodge injections, collect grounding data, survive as long as you can.
             </p>
-          </div>
+
+            <div className="flex items-center gap-2 text-xs text-muted-foreground/60">
+              <span className="rounded-full border border-white/[0.08] px-2 py-0.5">Runner</span>
+              <span className="rounded-full border border-white/[0.08] px-2 py-0.5">Endless</span>
+              <ArrowRight className="ml-auto h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 text-muted-foreground/40 group-hover:text-orange-400" />
+            </div>
+          </Link>
         </div>
       </div>
     </main>
