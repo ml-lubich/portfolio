@@ -39,6 +39,10 @@
 
 - `__tests__/brain-orb-regression.test.ts` — `makeOrbMaterial()` uniform declarations match shader usage and exposes the viewport-tuned `uPointGlowMul` shader uniform; `neural-orbs.tsx` uses `getBrainOrbViewportTier` + `setDrawRange` with shared `orbGeometry` buffers (no R3F `bufferGeometry ref` race); `brain-wireframe.tsx` builds `orbBundle`, mounts `<points geometry={…}>`, and applies tier uniforms on resize; `ORB_COUNT_CAP` stays bounded (8–64).
 
+## Automated: nav scroll-target reachability
+
+- `__tests__/nav-scroll-targets.test.ts` — every in-page anchor used anywhere in `app/`/`components/` (nav links, `navigateTo()` calls, `href="#…"`) must be reachable **before** lazy sections mount: either a `sectionId="…"` on its `LazySection` in `app/page.tsx` (renders an always-present `[data-section]` wrapper) or an always-mounted whitelist id (`hero`, `main-content`). Guards the "nav link looks dead" regression where a target section had no pre-mount placeholder.
+
 ## Automated: navbar surface over hero
 
 - `__tests__/nav-hero-surface.test.ts` — `computeNavPastHero` in `lib/nav-hero-surface.ts`: frosted mode only when `#hero`’s `getBoundingClientRect().bottom <= 0`; transparent while any part of the hero remains below the viewport top. Includes a shallow guard that `components/nav/index.tsx` still calls `computeNavPastHero` and retains blur-off vs blur-on class tokens.

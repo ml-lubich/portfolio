@@ -78,7 +78,7 @@ export default function Home() {
           <LiveTerminal />
         </LazySection>
         <ProfileIntro />
-        <LazySection className={LAZY_SECTION_TOP}>
+        <LazySection sectionId="ai-expertise" className={LAZY_SECTION_TOP}>
           <AIExpertise />
         </LazySection>
         <LazySection sectionId="about" className={LAZY_SECTION_TOP}>
@@ -106,7 +106,7 @@ export default function Home() {
         <LazySection sectionId="skills" className={LAZY_SECTION_TOP}>
           <Skills />
         </LazySection>
-        <LazySection className={LAZY_SECTION_TOP}>
+        <LazySection sectionId="github" className={LAZY_SECTION_TOP}>
           <GitHubStats />
         </LazySection>
         <LazySection sectionId="research" className={LAZY_SECTION_TOP}>

@@ -6,6 +6,8 @@ All notable changes to this project are documented here.
 
 ### Fixed
 
+- Nav "Stats" link (and the hero "Explore" arrow) actually scroll now: `GitHubStats` and `AIExpertise` LazySections were missing `sectionId`, so their anchors had no pre-mount placeholder and `navigateTo()` silently no-opped. New `__tests__/nav-scroll-targets.test.ts` gates every in-page anchor against this regression class (part of `vitest run`, which Vercel executes before every deployment).
+- Language Distribution card no longer shows a block of dead space: the legend is now full-width rows with per-language progress bars that fill the card, and the "Building on GitHub" footer pins to the bottom.
 - GitHub stats no longer 403 for visitors on shared IPs. The client fired 5 unauthenticated `api.github.com` fetches per visitor (60 req/hr/IP limit); all upstream calls now go through one server-side `/api/github` route cached for 1h (`revalidate` + `s-maxage`/`stale-while-revalidate`), with optional `GITHUB_TOKEN` support (see `.env.example`). Payloads are trimmed server-side; a flaky events page or contributions-API outage degrades gracefully instead of failing the route.
 - Skills grid: the orphan card in the last row now centers itself (flex-wrap + explicit per-card widths replacing CSS grid) instead of sitting left-aligned against dead space.
 - Anchor scroll is now ONE continuous motion. The previous fix converged on the target with repeated re-scrolls ("chase"), which read as stop-and-go at each lazy section. `navigateTo` now dispatches `portfolio:mount-all` so every LazySection mounts up front, waits for `scrollHeight` to hold still (1.5s stable, 5s cap — the GitHub-stats skeleton swaps to much taller content after its API fetch), then fires a single woosh. New e2e test traces `scrollY` and fails on any stop-and-go stall.
@@ -13,6 +15,8 @@ All notable changes to this project are documented here.
 
 ### Changed
 
+- Hero: live tokscale token-usage panel docked on the right on xl+ viewports (`TokscaleHeroPanel` — live embed + profile link); the centered pill badge now shows only below xl so there is one tokscale presence per viewport.
+- Contribution Activity card: six prominent stat tiles (year total, all-time, current streak, best streak, active days, avg per active day) with animated count-up.
 - Navbar: new "Stats" link scrolling to the GitHub stats section (`#github`), placed between Skills and Research to match page order.
 - Footer social links upgraded from plain text to the hero's glass icon buttons via a shared `components/social-icons.tsx` (GitHub, LinkedIn, Google Scholar — single source of truth used by hero and footer).
 - Glass cards gained a once-per-hover molten sheen sweep; nav glass carries a static diagonal specular highlight with a hover drift.

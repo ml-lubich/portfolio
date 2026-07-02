@@ -382,7 +382,7 @@ export function GitHubStats() {
         const { best, streak } = calcStreaks(allDays)
         const activeDays = yearDays.filter((d) => d.count > 0).length
         const avg = activeDays > 0 ? (total / activeDays).toFixed(1) : "0"
-        return { total, allTime, streak, best, avg }
+        return { total, allTime, streak, best, avg, activeDays }
     }, [yearDays, allDays, yearTotals, hasFullHistory])
 
     const monthPositions = useMemo(() => {
@@ -427,6 +427,14 @@ export function GitHubStats() {
 
     const topRepos = repos.slice(0, 4)
     const accountAge = user ? new Date().getFullYear() - new Date(user.created_at).getFullYear() : 0
+    const statTiles: { label: string; value: string; plain?: boolean }[] = [
+        { label: hasFullHistory ? "In " + selectedYear : "Contributions", value: String(contribStats.total) },
+        { label: "All-time", value: contribStats.allTime.toLocaleString(), plain: true },
+        { label: "Current streak", value: contribStats.streak + "d" },
+        { label: "Best streak", value: contribStats.best + "d" },
+        { label: "Active days", value: String(contribStats.activeDays) },
+        { label: "Avg / active day", value: contribStats.avg, plain: true },
+    ]
 
     return (
         <AnimatedSection id="github" className="relative py-10 sm:py-14 overflow-hidden">
@@ -524,6 +532,18 @@ export function GitHubStats() {
                             </div>
                         )}
 
+                        {/* Contribution count stat tiles */}
+                        <div className="mb-4 grid grid-cols-3 gap-2 sm:grid-cols-6">
+                            {statTiles.map((tile) => (
+                                <div key={tile.label} className="rounded-xl border border-white/[0.04] bg-white/[0.02] px-2 py-2.5 text-center">
+                                    <div className="text-base sm:text-lg font-bold text-foreground">
+                                        {tile.plain ? tile.value : <AnimatedCounter value={tile.value} duration={1200} />}
+                                    </div>
+                                    <div className="mt-0.5 text-[9px] sm:text-[10px] uppercase tracking-wider text-muted-foreground">{tile.label}</div>
+                                </div>
+                            ))}
+                        </div>
+
                         <div className="overflow-x-auto pb-2">
                             <div className="mx-auto flex w-max gap-0">
                                 {/* Day labels */}
@@ -620,7 +640,7 @@ export function GitHubStats() {
                 <div className="grid min-w-0 gap-4 lg:grid-cols-2">
                     {/* Language breakdown */}
                     <AnimatedSection delay={240} className="min-w-0">
-                        <div className="relative h-full min-w-0 max-w-full overflow-hidden rounded-2xl border border-white/[0.03] bg-white/[0.01] backdrop-blur-2xl p-5 sm:p-6 transition-all duration-500 hover:border-primary/20 hover:bg-white/[0.02] glass-card-3d">
+                        <div className="relative flex h-full min-w-0 max-w-full flex-col overflow-hidden rounded-2xl border border-white/[0.03] bg-white/[0.01] backdrop-blur-2xl p-5 sm:p-6 transition-all duration-500 hover:border-primary/20 hover:bg-white/[0.02] glass-card-3d">
                             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/6 to-transparent" />
                             <h3 className="mb-5 flex items-center gap-2 text-lg font-bold text-foreground">
                                 <GitCommit className="h-4 w-4 text-primary" />
@@ -643,18 +663,19 @@ export function GitHubStats() {
                                     />
                                 ))}
                             </div>
-                            <div className="grid min-w-0 grid-cols-1 gap-x-3 gap-y-2 sm:grid-cols-2 sm:gap-x-6 sm:gap-y-3">
+                            <div className="flex flex-1 flex-col justify-center gap-2.5">
                                 {languages.map((lang, idx) => (
-                                    <div key={lang.name} className="flex items-center justify-between gap-2 animate-slide-up" style={{ animationDelay: idx * 60 + "ms", opacity: 0 }}>
-                                        <div className="flex items-center gap-2 min-w-0">
-                                            <span className="inline-block h-2.5 w-2.5 flex-shrink-0 rounded-full" style={{ backgroundColor: lang.color }} />
-                                            <span className="truncate text-sm text-muted-foreground">{lang.name}</span>
+                                    <div key={lang.name} className="flex items-center gap-3 animate-slide-up" style={{ animationDelay: idx * 60 + "ms", opacity: 0 }}>
+                                        <span className="inline-block h-2.5 w-2.5 flex-shrink-0 rounded-full" style={{ backgroundColor: lang.color }} />
+                                        <span className="w-28 flex-shrink-0 truncate text-sm text-muted-foreground sm:w-32">{lang.name}</span>
+                                        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/[0.03]">
+                                            <div className="h-full rounded-full transition-[width] duration-1000 ease-out" style={{ width: lang.percentage + "%", backgroundColor: lang.color }} />
                                         </div>
-                                        <span className="flex-shrink-0 font-mono text-xs text-foreground/70">{lang.percentage.toFixed(1)}%</span>
+                                        <span className="w-14 flex-shrink-0 text-right font-mono text-xs text-foreground/70">{lang.percentage.toFixed(1)}%</span>
                                     </div>
                                 ))}
                             </div>
-                            <div className="mt-6 flex items-center gap-3 border-t border-white/[0.02] pt-4">
+                            <div className="mt-auto flex items-center gap-3 border-t border-white/[0.02] pt-4">
                                 <Clock className="h-3.5 w-3.5 text-muted-foreground" />
                                 <span className="text-xs text-muted-foreground">Building on GitHub for {accountAge}+ years</span>
                             </div>
