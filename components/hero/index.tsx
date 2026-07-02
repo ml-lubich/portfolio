@@ -10,6 +10,7 @@ import { HeroCTAs, SocialLinks } from "./hero-actions"
 import { heroOverlay } from "@/lib/theme"
 import { navigateTo } from "@/components/nav/woosh-scroll"
 import { RotatingStats } from "./rotating-stats"
+import { TokscaleHeroBadge } from "@/components/sections/tokscale-stats"
 
 const MOBILE_PERFORMANCE_QUERY = "(max-width: 767px), (pointer: coarse), (hover: none)"
 
@@ -106,6 +107,7 @@ export function Hero() {
         <HeroSubtitle />
         <HeroCTAs />
         <SocialLinks />
+        <TokscaleHeroBadge />
         <RotatingStats />
       </div>
 

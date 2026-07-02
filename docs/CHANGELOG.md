@@ -6,6 +6,16 @@ All notable changes to this project are documented here.
 
 ### Fixed
 
+- Anchor scroll is now ONE continuous motion. The previous fix converged on the target with repeated re-scrolls ("chase"), which read as stop-and-go at each lazy section. `navigateTo` now dispatches `portfolio:mount-all` so every LazySection mounts up front, waits for `scrollHeight` to hold still (1.5s stable, 5s cap — the GitHub-stats skeleton swaps to much taller content after its API fetch), then fires a single woosh. New e2e test traces `scrollY` and fails on any stop-and-go stall.
+- Molten glass surfaces stay paint-cheap: the nav-glass specular drift is hover-triggered (never an infinite animation on a backdrop-filter element), and the glass-card border-radius morph was dropped because it clobbered per-element radii.
+
+### Changed
+
+- Footer social links upgraded from plain text to the hero's glass icon buttons via a shared `components/social-icons.tsx` (GitHub, LinkedIn, Google Scholar — single source of truth used by hero and footer).
+- Glass cards gained a once-per-hover molten sheen sweep; nav glass carries a static diagonal specular highlight with a hover drift.
+- Live tokscale AI-token-usage stats: glass badge in the hero (`TokscaleHeroBadge`) and a full stats card in the GitHub-stats section (`TokscaleCard`), linking to the tokscale leaderboard and profile.
+- GitHub stats section: full contribution history via the jogruber contributions API with per-year selection; `/events` scan kept as fallback only.
+
 - Anchor navigation ("Get In Touch", nav section links) no longer lands far above the target section. `navigateTo` scrolled once toward a Y computed while intermediate LazySections were still collapsed placeholders; as they mounted mid-scroll the layout expanded by thousands of px and the viewport ended up well above `#contact` (perceived as "scrolls me back up"). It now converges: after each woosh settles it re-measures the target and re-scrolls until the element is stable under the nav offset (`components/nav/woosh-scroll.ts`). A generation counter aborts superseded chase loops when a new navigation starts.
 - Token Invaders enemies now render the Claude Code icon sprite (`/claude-code-icon.png`) with a colored glow halo; model name label rendered below the icon in the enemy color. Falls back to a colored rect if the image hasn't loaded yet.
 

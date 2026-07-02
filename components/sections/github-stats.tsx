@@ -27,6 +27,7 @@ import {
     Circle,
 } from "lucide-react"
 import { SiGithub } from "react-icons/si"
+import { TokscaleCard } from "./tokscale-stats"
 
 /* ── Types ───────────────────────────────────────────────────── */
 interface GitHubUser {
@@ -116,8 +117,9 @@ const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Se
 const DAY_LABELS = ["", "Mon", "", "Wed", "", "Fri", ""]
 
 const GITHUB_USERNAME = "ml-lubich"
-const WEEKS_TO_SHOW = 26
-const WEEKS_TO_SHOW_MOBILE = 18
+// Full contribution history, no auth token — GitHub's own /events API only covers ~90 days.
+const CONTRIB_API = "https://github-contributions-api.jogruber.de/v4/" + GITHUB_USERNAME + "?y=all"
+const FALLBACK_WEEKS = 26
 const CELL = 15
 const CELL_MOBILE = 10
 const GAP = 3
@@ -144,7 +146,8 @@ function toKey(d: Date) {
     return d.toISOString().split("T")[0]
 }
 
-function buildContributionData(events: GitHubEvent[]) {
+// Fallback only: approximate recent contributions from /events when the history API is down.
+function eventsToFlat(events: GitHubEvent[]): ContributionDay[] {
     const countMap: Record<string, number> = {}
     for (const ev of events) {
         const key = toKey(new Date(ev.created_at))
@@ -160,7 +163,7 @@ function buildContributionData(events: GitHubEvent[]) {
     const startOfThisWeek = new Date(today)
     startOfThisWeek.setDate(today.getDate() - today.getDay())
     const startDate = new Date(startOfThisWeek)
-    startDate.setDate(startDate.getDate() - (WEEKS_TO_SHOW - 1) * 7)
+    startDate.setDate(startDate.getDate() - (FALLBACK_WEEKS - 1) * 7)
 
     const flat: ContributionDay[] = []
     const cursor = new Date(startDate)
@@ -175,27 +178,33 @@ function buildContributionData(events: GitHubEvent[]) {
         flat.push({ date: key, count, level })
         cursor.setDate(cursor.getDate() + 1)
     }
+    return flat
+}
 
-    const grid: ContributionDay[][] = []
-    for (let i = 0; i < flat.length; i += 7) {
-        grid.push(flat.slice(i, Math.min(i + 7, flat.length)))
-    }
-
-    let total = 0, best = 0, cur = 0
+function calcStreaks(flat: ContributionDay[]) {
+    let best = 0, cur = 0
     for (const day of flat) {
-        total += day.count
         if (day.count > 0) { cur++; best = Math.max(best, cur) } else cur = 0
     }
-    best = Math.max(best, cur)
-
     let streak = 0
     for (let i = flat.length - 1; i >= 0; i--) {
-        if (flat[i].count > 0) streak++; else break
+        if (flat[i].count > 0) streak++
+        else if (i === flat.length - 1) continue // today isn't over yet — a zero today doesn't kill the streak
+        else break
     }
+    return { best, streak }
+}
 
-    const activeDays = flat.filter((d) => d.count > 0).length
-    const avg = activeDays > 0 ? (total / activeDays).toFixed(1) : "0"
-    return { grid, stats: { total, streak, best, avg } }
+// Weeks of 7, padded with nulls before the year's first day so columns align to Sunday.
+function buildYearGrid(days: ContributionDay[]): (ContributionDay | null)[][] {
+    if (days.length === 0) return []
+    const firstDow = new Date(days[0].date + "T12:00:00").getDay()
+    const cells: (ContributionDay | null)[] = [...Array(firstDow).fill(null), ...days]
+    const grid: (ContributionDay | null)[][] = []
+    for (let i = 0; i < cells.length; i += 7) {
+        grid.push(cells.slice(i, Math.min(i + 7, cells.length)))
+    }
+    return grid
 }
 
 /* ── Extended analytics helpers ──────────────────────────────── */
@@ -287,14 +296,14 @@ export function GitHubStats() {
     const isMobile = useIsMobile()
     const cellSize = isMobile ? CELL_MOBILE : CELL
     const gapSize = isMobile ? GAP_MOBILE : GAP
-    const weeksToShow = isMobile ? WEEKS_TO_SHOW_MOBILE : WEEKS_TO_SHOW
     const [user, setUser] = useState<GitHubUser | null>(null)
     const [repos, setRepos] = useState<GitHubRepo[]>([])
     const [languages, setLanguages] = useState<LanguageStat[]>([])
     const [totalStars, setTotalStars] = useState(0)
     const [totalForks, setTotalForks] = useState(0)
-    const [contributionGrid, setContributionGrid] = useState<ContributionDay[][]>([])
-    const [contribStats, setContribStats] = useState({ total: 0, streak: 0, best: 0, avg: "0" })
+    const [allDays, setAllDays] = useState<ContributionDay[]>([])
+    const [yearTotals, setYearTotals] = useState<Record<string, number>>({})
+    const [selectedYear, setSelectedYear] = useState(String(new Date().getFullYear()))
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
     const [hoveredCell, setHoveredCell] = useState<{ date: string; count: number; x: number; y: number } | null>(null)
@@ -310,9 +319,10 @@ export function GitHubStats() {
         fetchedRef.current = true
         try {
             const base = "https://api.github.com/users/" + GITHUB_USERNAME
-            const [userRes, reposRes, ev1, ev2, ev3] = await Promise.all([
+            const [userRes, reposRes, contribRes, ev1, ev2, ev3] = await Promise.all([
                 fetch(base),
                 fetch(base + "/repos?per_page=100&sort=updated"),
+                fetch(CONTRIB_API),
                 fetch(base + "/events?per_page=100&page=1"),
                 fetch(base + "/events?per_page=100&page=2"),
                 fetch(base + "/events?per_page=100&page=3"),
@@ -324,9 +334,21 @@ export function GitHubStats() {
             for (const res of [ev1, ev2, ev3]) {
                 if (res.ok) { const data = await res.json(); if (Array.isArray(data)) allEvents.push(...data) }
             }
-            const { grid, stats } = buildContributionData(allEvents)
-            setContributionGrid(grid)
-            setContribStats(stats)
+            let gotHistory = false
+            if (contribRes.ok) {
+                const history: { total: Record<string, number>; contributions: { date: string; count: number; level: number }[] } = await contribRes.json()
+                if (Array.isArray(history.contributions) && history.contributions.length > 0) {
+                    const todayKey = toKey(new Date())
+                    const days: ContributionDay[] = history.contributions
+                        .filter((d) => d.date <= todayKey)
+                        .sort((a, b) => a.date.localeCompare(b.date))
+                        .map((d) => ({ date: d.date, count: d.count, level: Math.max(0, Math.min(4, d.level)) as 0 | 1 | 2 | 3 | 4 }))
+                    setAllDays(days)
+                    setYearTotals(history.total || {})
+                    gotHistory = true
+                }
+            }
+            if (!gotHistory) setAllDays(eventsToFlat(allEvents))
             const ownRepos = reposData.filter((r) => !r.fork)
             const stars = ownRepos.reduce((sum, r) => sum + r.stargazers_count, 0)
             const forks = ownRepos.reduce((sum, r) => sum + r.forks_count, 0)
@@ -352,16 +374,35 @@ export function GitHubStats() {
 
     useEffect(() => { fetchGitHubData() }, [fetchGitHubData])
 
-    const visibleGrid = useMemo(() => {
-        if (contributionGrid.length <= weeksToShow) return contributionGrid
-        return contributionGrid.slice(contributionGrid.length - weeksToShow)
-    }, [contributionGrid, weeksToShow])
+    const hasFullHistory = Object.keys(yearTotals).length > 0
+    const years = useMemo(
+        () => Object.keys(yearTotals).sort((a, b) => b.localeCompare(a)),
+        [yearTotals]
+    )
+
+    const yearDays = useMemo(() => {
+        if (!hasFullHistory) return allDays
+        return allDays.filter((d) => d.date.startsWith(selectedYear))
+    }, [allDays, selectedYear, hasFullHistory])
+
+    const visibleGrid = useMemo(() => buildYearGrid(yearDays), [yearDays])
+
+    const contribStats = useMemo(() => {
+        const total = yearDays.reduce((s, d) => s + d.count, 0)
+        const allTime = hasFullHistory
+            ? Object.values(yearTotals).reduce((s, n) => s + n, 0)
+            : total
+        const { best, streak } = calcStreaks(allDays)
+        const activeDays = yearDays.filter((d) => d.count > 0).length
+        const avg = activeDays > 0 ? (total / activeDays).toFixed(1) : "0"
+        return { total, allTime, streak, best, avg }
+    }, [yearDays, allDays, yearTotals, hasFullHistory])
 
     const monthPositions = useMemo(() => {
         const positions: { label: string; col: number }[] = []
         let lastMonth = -1
         for (let w = 0; w < visibleGrid.length; w++) {
-            const day = visibleGrid[w]?.[0]
+            const day = visibleGrid[w]?.find((d) => d !== null)
             if (day) {
                 const month = new Date(day.date + "T12:00:00").getMonth()
                 if (month !== lastMonth) { positions.push({ label: MONTH_NAMES[month], col: w }); lastMonth = month }
@@ -444,6 +485,13 @@ export function GitHubStats() {
                     ))}
                 </div>
 
+                {/* Live AI token usage (tokscale) */}
+                <AnimatedSection delay={120}>
+                    <div className="mb-5">
+                        <TokscaleCard />
+                    </div>
+                </AnimatedSection>
+
                 {/* Contribution heatmap */}
                 <AnimatedSection delay={160}>
                     <div className="relative mb-5 overflow-hidden rounded-2xl border border-white/[0.03] bg-white/[0.01] backdrop-blur-2xl px-4 py-4 sm:px-5 sm:py-5 transition-all duration-500 hover:border-primary/20 hover:bg-white/[0.02] glass-card-3d">
@@ -467,8 +515,30 @@ export function GitHubStats() {
                             </div>
                         </div>
 
-                        <div className="pb-2 flex justify-center">
-                            <div className="inline-flex gap-0">
+                        {/* Year selector — all-time history */}
+                        {hasFullHistory && (
+                            <div className="mb-4 flex flex-wrap items-center gap-1.5">
+                                {years.map((y) => (
+                                    <button
+                                        key={y}
+                                        type="button"
+                                        onClick={() => setSelectedYear(y)}
+                                        className={
+                                            "rounded-full border px-3 py-1 text-[11px] font-medium transition-all duration-300 " +
+                                            (y === selectedYear
+                                                ? "border-primary/40 bg-primary/10 text-foreground"
+                                                : "border-white/[0.04] bg-white/[0.02] text-muted-foreground hover:border-primary/25 hover:text-foreground")
+                                        }
+                                    >
+                                        {y}
+                                        <span className="ml-1.5 font-mono text-[9px] text-muted-foreground/60">{yearTotals[y]}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+
+                        <div className="overflow-x-auto pb-2">
+                            <div className="mx-auto flex w-max gap-0">
                                 {/* Day labels */}
                                 <div className="flex flex-col mr-2" style={{ gap: gapSize }}>
                                     <div style={{ height: isMobile ? 12 : 16 }} />
@@ -493,7 +563,9 @@ export function GitHubStats() {
                                     <div className="flex" style={{ gap: gapSize }}>
                                         {visibleGrid.map((week, wIdx) => (
                                             <div key={wIdx} className="flex flex-col" style={{ gap: gapSize }}>
-                                                {week.map((day) => (
+                                                {week.map((day, dIdx) => day === null ? (
+                                                    <div key={"lead-" + dIdx} style={{ width: cellSize, height: cellSize }} />
+                                                ) : (
                                                     <div
                                                         key={day.date}
                                                         className="rounded-[3px] transition-all duration-200 hover:scale-[1.7] hover:z-10 cursor-crosshair"
@@ -514,7 +586,8 @@ export function GitHubStats() {
                                                             setTimeout(() => setHoveredCell(null), 1200)
                                                         }}
                                                     />
-                                                ))}
+                                                )
+                                                )}
                                                 {week.length < 7 && [...Array(7 - week.length)].map((_, i) => (
                                                     <div key={"pad-" + i} style={{ width: cellSize, height: cellSize }} />
                                                 ))}
@@ -535,7 +608,13 @@ export function GitHubStats() {
                                 <span>More</span>
                             </div>
                             <div className="flex items-center gap-5 text-xs text-muted-foreground">
-                                <span><span className="font-semibold text-foreground">{contribStats.total}</span> contributions</span>
+                                <span>
+                                    <span className="font-semibold text-foreground">{contribStats.total}</span>
+                                    {hasFullHistory ? " in " + selectedYear : " contributions"}
+                                </span>
+                                {hasFullHistory && (
+                                    <span><span className="font-semibold text-foreground">{contribStats.allTime.toLocaleString()}</span> all-time</span>
+                                )}
                                 <span className="hidden sm:block">Best streak: <span className="font-semibold text-foreground">{contribStats.best}</span> days</span>
                             </div>
                         </div>
