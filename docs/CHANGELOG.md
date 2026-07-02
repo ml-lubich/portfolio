@@ -24,6 +24,7 @@ All notable changes to this project are documented here.
 
 ### Added
 
+- Three new blog posts: "AI Agents in Your Business — My Workflow", "Shipping CRM Enrichment Solo", and "Weekend Knowledge Graph: Factory Floor".
 - Headless Playwright e2e regression suite for scroll navigation (`e2e/scroll-navigation.spec.ts`, `playwright.config.ts`, `bun run test:e2e`) — boots `next dev` on port 3811, verifies hero CTA / nav pill / section links land on their targets and stay there.
 - **Token Invaders** (`/games/token-invaders`) — LLM-themed Space Invaders game. Player is an inference engine defending against AI failure modes (null errors, hallucinations, prompt injections, context overflows, jailbreaks). Five enemy types, 5 waves, UFO bonus, degradable shields, mobile on-screen controls.
 - **Games hub page** (`/games`) — landing page listing all portfolio games including a Snake easter egg card.

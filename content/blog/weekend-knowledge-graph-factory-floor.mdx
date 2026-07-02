@@ -1,0 +1,130 @@
+---
+title: "The Saturday I Decided a Factory Needed a Knowledge Graph"
+excerpt: "One weekend, a wild idea, and an air-gapped knowledge graph for an industrial manufacturer that didn't trust the cloud — a field story about building self-improving agents where no data is allowed to leave the building."
+date: "2026-06-22"
+category: "AI Architecture"
+tags: ["Knowledge Graphs", "On-Prem", "Agents", "RAG", "Case Study"]
+---
+
+It started the way most of my better ideas do: with a Saturday afternoon, a second cup of coffee, and the distinct feeling that I was about to make someone's Monday harder.
+
+The thought that wouldn't leave me alone: a mid-sized industrial manufacturer I'd been talking to had *decades* of institutional knowledge scattered across a filing cabinet, a server room, and the brain of one veteran technician named something like "Gerald" — the kind of guy who has been there 22 years and is the only person who knows why Line 3 jams every time the humidity goes above 60%. Gerald is irreplaceable. Gerald is also not getting any younger. And Gerald's knowledge is currently backed up on exactly zero systems.
+
+So I spent a Saturday drafting an architecture. By Sunday evening I had a working prototype. By the following Friday I was doing a live demo to a room of people who had never willingly thought about graph databases before. This is that story.
+
+<Figure src="https://images.unsplash.com/photo-1492724441997-5dc865305da7?w=1200&h=630&fit=crop" alt="Factory floor at dusk" caption="Decades of know-how, most of it living in one veteran's head." />
+
+## The constraint that made everything interesting
+
+Here is the thing about industrial manufacturers: some of them have had one very bad experience with a cloud vendor's outage during a production run, and they have decided on their behalf that the internet is a polite suggestion, not a requirement for running a factory.
+
+The client was firm. Air-gapped. Nothing leaves the network. Full stop. Not "we'd prefer on-prem." Not "let's discuss a data processing agreement." The CISO's exact words, paraphrased: "If our maintenance logs touch AWS, someone here loses a job and it might be you."
+
+Friendly! Motivating.
+
+This ruled out approximately 90% of the fashionable answers to this problem. No OpenAI. No Anthropic APIs. No vector database SaaS. No hosted embeddings. Every tool that makes the AI developer's life comfortable was suddenly off the table, and I was left with a blank whiteboard, a Beelink mini PC in a rack, and the quiet satisfaction of a constraint that forces you to actually think.
+
+## Why a knowledge graph and not just "dump it in a vector store"
+
+The naive answer to "we have a bunch of documents and we want to query them" is: chunk the text, embed it, throw it in a vector store, and call it RAG. This works fine for homogeneous document sets. It falls apart when your documents have structure, and your queries care about that structure.
+
+A maintenance log is not just text. It's **a record about a specific machine, describing a specific fault, repaired by a specific procedure, using specific replacement parts, written by a specific technician, on a specific date**. Those relationships matter. When a floor supervisor asks "has Machine 14 had this kind of fault before, and if so what fixed it fastest," they don't want the top-5 most semantically similar paragraphs. They want a traversal.
+
+That's why I reached for `Neo4j`. The core entity graph looks roughly like:
+
+- `Machine` → `hasFault` → `FaultType`
+- `FaultType` → `resolvedBy` → `Procedure`
+- `Procedure` → `requires` → `Part`
+- `MaintenanceTicket` → `describes` → `FaultType`
+- `MaintenanceTicket` → `closedBy` → `Technician`
+
+When you model it this way, a query like "what parts should we pre-stage if Machine 14 starts throwing error code E-117 in summer" becomes a two-hop graph traversal plus a seasonal filter, not a prayer to the embedding gods that the relevant sentences happen to cluster together in vector space.
+
+```mermaid
+{
+  "type": "pie",
+  "title": "Where the Knowledge Actually Lived Before This Project",
+  "data": [
+    { "label": "Tribal knowledge (Gerald et al.)", "value": 41, "color": "amber" },
+    { "label": "Scanned PDFs, unindexed", "value": 27, "color": "red" },
+    { "label": "Maintenance tickets (partially structured)", "value": 19, "color": "blue" },
+    { "label": "Spreadsheets", "value": 9, "color": "purple" },
+    { "label": "Actual searchable documentation", "value": 4, "color": "green" }
+  ]
+}
+```
+
+Forty-one percent tribal knowledge. That number still haunts me.
+
+## Ingestion: the part nobody glamorizes
+
+The demo shows a clean graph. The ingestion pipeline is where you find out what PDFs have been doing for the last 20 years without supervision.
+
+The source material was: original equipment manufacturer manuals (some scanned, some not, one was apparently photographed sideways), internal procedure documents in Word format from three different decades with three different naming conventions, and 14,000 maintenance tickets from a homegrown ticketing system that used free-text fields for everything including the fault codes.
+
+Fun.
+
+I used a combination of `pdfplumber` and `pytesseract` for the scanned documents, then a quantized open-weights model running locally to do entity extraction — pulling out machine IDs, fault descriptions, part numbers, and procedure names from unstructured text. The outputs fed into a structured schema that I validated with Pydantic before anything touched Neo4j. Trust nothing that comes out of OCR without a typed guard.
+
+The rule I established early and enforced ruthlessly: **if the entity can't be linked to at least one other entity in the graph, it doesn't go in as a node.** Orphan nodes are worse than no nodes — they pollute search results and confuse the LLM downstream.
+
+## On-prem LLMs: the honest accounting
+
+Running a language model inside a factory's air-gapped network in 2026: totally workable, and you will not forget it.
+
+I ran everything through `Ollama` on a box with a decent consumer GPU. Quantized open-weights models — smaller variants of well-known open-source families. Not as capable as frontier API models, slower, but for question-answering with good retrieval context the gap is smaller than you'd expect. Local inference on a Q4 quantized 13B model runs 4-7 seconds per prompt vs. 1-2 seconds on a cloud API. Floor supervisors found this acceptable. They were not expecting Google Search; they were expecting something better than "ask Gerald."
+
+For hybrid retrieval, I ran `pgvector` alongside Neo4j. Semantic search found candidate nodes; graph traversal expanded context by following entity relationships. This hybrid approach outperformed pure vector RAG on the structured maintenance queries — roughly **31% improvement in answer precision** on the held-out eval set, directional given the sample size.
+
+<Figure src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=1200&h=630&fit=crop" alt="Knowledge graph nodes" caption="Machines, parts, faults, procedures — and the edges that actually matter." />
+
+## The self-improving loop (the part I'm actually proud of)
+
+The system started with an offline eval harness I built against a small labeled dataset — about 200 question/answer pairs I painstakingly assembled from documents and verified with the client's senior technicians. Precision and recall baselines, tracked on every retrieval config change.
+
+But the more interesting feedback loop came from the floor. I added a simple thumbs-up/thumbs-down UI to the query interface. Not a rating scale. Not a feedback essay. Just: was this helpful or not? Floor technicians have no patience for five-star rating systems when they're standing next to a machine that stopped working.
+
+Over the first six weeks of quiet deployment — before any formal rollout — that feedback data did two things:
+
+1. **Surfaced retrieval gaps.** Certain fault codes were underrepresented in the graph because the old tickets used informal names ("the clanging thing on press 7" is apparently a real fault class). Those gaps got patched.
+2. **Identified hallucination-prone query patterns.** When the model was asked about procedures that didn't exist in the graph, it sometimes improvised plausibly but wrongly. The feedback loop caught those. We added a "confidence: low — no procedure found in graph" response path for those cases.
+
+Before/after numbers on the tracked query set, directional and anonymized:
+
+- **Answer accuracy (verified against known correct answers):** 58% → 79% over 6 weeks
+- **"I don't know" responses when appropriate:** 12% → 34% (up is good — the model learned humility)
+- **Time to find a relevant procedure (self-reported by floor staff):** from "ask Gerald or give up" baseline to under 2 minutes for ~70% of queries
+
+## What broke (and was funny in retrospect)
+
+Two failures worth documenting.
+
+**Failure one:** The graph ingestion pipeline processed a batch of legacy documents and decided that "Line 3" and "Line Three" were two different machines. They are not. One machine, 847 maintenance tickets, split across two nodes with no edge between them. I discovered this when a query about "recurring faults on Line 3" returned dramatically incomplete results and I spent two hours convinced the LLM was broken before looking at the node count. The fix was a normalization pass I should have written week one.
+
+**Failure two:** I configured the Ollama server with a context window that was too short for the longer procedure documents. The model was silently truncating them mid-sentence. The output looked coherent — language models are very good at making truncated content sound complete. For two weeks I had great-looking responses that were missing the last third of every multi-step procedure. The technicians noticed before my eval harness did, which is a humbling data point about the limits of automated evaluation.
+
+<Callout type="warning">
+**Hybrid retrieval is not free.** Running `pgvector` semantic search to find candidates and then Neo4j traversal to expand context adds latency and complexity. Profile both paths before assuming the hybrid approach is always better — for simple factual lookups on well-structured data, the graph alone outperformed hybrid retrieval. Know when to skip the vector step.
+</Callout>
+
+## What's still unsolved
+
+A few honest loose ends.
+
+**Entity resolution at scale is hard.** The normalization problem I hit with "Line 3 / Line Three" is the mild version. The deeper version is: what happens when 22 years of technicians used slightly different names for the same part number? Fuzzy matching helps. It doesn't fully solve it. Eventually you need a human review pass for the long tail.
+
+**The model confidence problem doesn't go away.** A good retrieval system reduces hallucination but doesn't eliminate it. The model still occasionally presents a plausible-sounding answer with false confidence. The mitigations (low-confidence routing, graph-grounded citations, human escalation path) reduce the blast radius but don't close the gap to zero. This is the honest state of the technology.
+
+**Updating the graph from new tickets is still manual-ish.** The ingestion pipeline runs nightly on new ticket data, but validating novel entity types still requires human sign-off. That's probably the right call for an industrial setting where a wrong procedure recommendation has real consequences, but it means the graph lags live operations by a day.
+
+## The bigger point
+
+There's a class of company — and it's bigger than the AI industry acknowledges — that will never put sensitive operational data in the cloud. Not because they're technologically backward. Because their risk calculus is different, their liability exposure is different, and they had that one incident in 2019 that nobody talks about anymore but everyone remembers.
+
+For those companies, "just use the API" is not an answer. The answer is building systems that work entirely on-premise with open models, open databases, and retrieval architectures designed for the data they actually have — not the clean, well-labeled datasets that benchmarks are measured on.
+
+The knowledge graph approach worked here because the data had inherent structure worth preserving. The on-prem constraint worked because the tooling in 2026 is genuinely good enough. And the self-improving loop worked because floor staff will give you feedback when the interface doesn't get in the way.
+
+Gerald is still there. But now when someone asks why Line 3 jams when humidity spikes, there's a second source of truth. Gerald seemed mildly offended when I told him this. Then he asked the system a question it couldn't answer, looked satisfied, and walked back to the floor.
+
+Progress.

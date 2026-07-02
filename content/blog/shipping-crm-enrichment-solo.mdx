@@ -1,0 +1,101 @@
+---
+title: "How I Shipped a CRM Enrichment Product Solo (Between Two Other Jobs)"
+excerpt: "Sales teams pay enterprise SaaS prices for data that goes stale the moment a contact changes jobs. So one quarter I built the lean version myself — real-time-ish enrichment, job-change tracking, and quality maintenance — without the bloated vendor contract."
+date: "2026-06-20"
+category: "AI Products"
+tags: ["Consulting", "Data", "Next.js", "Product", "Case Study"]
+---
+
+Let me paint you a picture. A sales team has 40,000 contacts in their CRM. They're paying a major enrichment vendor somewhere between "uncomfortable" and "this better cure cancer" per month. And yet — when they actually try to reach someone — roughly a third of those records are wrong. The person left that company. The email bounces. The title is whatever it was when someone scraped LinkedIn in 2022.
+
+The vendor, when asked about this, produces a slide deck about "data freshness methodology" that amounts to: *we try our best.*
+
+Internally, we had the classic Silicon Valley disease where everything is "basically working" right up until the spreadsheet starts doing spoken-word poetry.
+
+<Figure src="https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=1200&h=630&fit=crop" alt="Stacks of records" caption="A CRM is just a very expensive list that's slowly becoming wrong." />
+
+## The Problem Nobody Wants to Admit
+
+CRM data decays fast. People change jobs every 18 months on average. That sounds like a fun statistics-class fact until you realize it means roughly 1 in 18 of your contacts becomes stale *every single month*. At 40,000 contacts, that's over 2,000 records quietly rotting per month. And that's just the job-change churn — it doesn't account for bad data that was entered wrong in the first place, duplicates from three different import sources, or the contacts who are technically still at the same company but have been promoted out of anyone's buying committee.
+
+The incumbent vendors charge enterprise prices for this. And they're not wrong to — enrichment at scale is genuinely hard. But "hard" and "requires a $200K annual contract to get mediocre results" are not the same thing. The market gap I kept seeing: smaller sales teams getting rinsed by vendor contracts sized for Fortune 500 needs, with none of the actual data quality guarantees.
+
+## The Wild Idea: What If One Person Who Cared Just Built It
+
+I had built data pipelines before. I knew what the enrichment APIs actually cost at volume — and it's not what vendors charge you. The delta between "raw API cost to enrich a record" and "what an enrichment platform invoices you" is... significant. That gap is mostly margin, some infrastructure, a lot of sales team salaries, and whatever the enterprise procurement process costs in human suffering.
+
+My hypothesis: a lean, well-engineered enrichment product — real-time-ish fills, job-change tracking, quality maintenance — could be built solo, priced sanely, and actually beat the big players on data quality because I'd care more about any individual client's results than a company with 10,000 customers can.
+
+So I built [EnrichData](https://www.enrichdata.net/).
+
+## What I Actually Built
+
+The core is a pipeline, not a database. That distinction matters.
+
+Most enrichment vendors are fundamentally giant databases of stale-ish contact data that they licensed, scraped, or bought somewhere. They stamp a freshness date on it and move on. My approach was different: treat enrichment as a continuous process rather than a point-in-time lookup.
+
+### The Enrichment Pipeline
+
+When a contact record comes in, the pipeline does a few things in sequence:
+
+1. **Normalize and deduplicate first.** Before you enrich anything, you need to know what you actually have. Duplicate contacts with slightly different email formats (`jon.smith@company.com` vs `jsmith@company.com`) will burn API credits and produce conflicting results. I built a dedup layer using a combination of exact-match keys and fuzzy matching on name + company.
+
+2. **Tiered freshness checks.** Not every contact needs to be re-enriched every day. I categorized records by age and activity signal: recently enriched contacts with no job-change signals get checked quarterly; older records or ones where `email_verified` had expired get prioritized. This cuts enrichment costs dramatically without sacrificing meaningful freshness.
+
+3. **Job-change detection as a first-class feature.** Most platforms treat this as a bonus. I treat it as the core product. If someone leaves their company, that record isn't "stale data" — it's an *opportunity signal*. The pipeline monitors employment signals and flags job changes with enough context to act on: what they left, where they went, how recently.
+
+4. **Quality maintenance loop.** Enrichment isn't a one-time event. The pipeline runs continuous quality checks: email verification, bounce rate monitoring, confidence scoring on title/seniority fields. Records that fall below a quality threshold get queued for re-enrichment or flagged for human review, depending on volume.
+
+The product surface — the thing clients actually interact with — is built in Next.js. Clean dashboard, export integrations, webhook support for pushing job-change alerts to whatever CRM they're running. Nothing fancy. The engineering effort is in the pipeline, not the UI.
+
+<Figure src="https://images.unsplash.com/photo-1509228468518-180dd4864904?w=1200&h=630&fit=crop" alt="Pipeline diagram on screen" caption="Freshness vs cost: the only two dials that actually matter in enrichment." />
+
+### The Real Engineering Trade-Off: Freshness vs. Cost
+
+Every decision in enrichment comes back to this tension. You can enrich every record every day and have perfect freshness — and also no profit margin and an API bill that makes you want to switch careers. Or you can enrich records once and ride the decay curve until clients start complaining about bounces.
+
+The right answer is neither extreme. My freshness model uses a few signals to prioritize re-enrichment budget:
+
+- **Engagement recency**: contacts that were emailed or called recently get higher re-enrichment priority
+- **Role volatility**: VP-level and above churn faster than individual contributors; weight accordingly
+- **Company signals**: if a company just announced layoffs or was acquired, all records from that company get bumped up the queue regardless of individual contact age
+
+This isn't magic — it's just thinking about enrichment like a product manager instead of a database administrator.
+
+```mermaid
+{"type":"pie","title":"Why CRM Records Go Stale","data":[{"label":"Job changes","value":44,"color":"amber"},{"label":"Bad or unverified email","value":28,"color":"red"},{"label":"Duplicates","value":18,"color":"purple"},{"label":"Never verified at entry","value":10,"color":"blue"}]}
+```
+
+## Data Quality Is a Discipline, Not a Feature
+
+This deserves its own section because it's where most enrichment products quietly fail. They'll tell you a record is "enriched" when what they mean is "we found *something* and put it in the field." Whether that something is accurate, current, or useful is left as an exercise for the reader.
+
+Tactics I actually use:
+
+- **Confidence scores on every field, not just the record.** A contact can have a high-confidence email and a low-confidence title. Treating it as one binary "enriched/not" hides that nuance and leads to bad decisions downstream.
+- **Email verification as a separate pass.** Syntax checking is not email verification. SMTP handshakes and deliverability signals are. I verify separately and store the result with a timestamp so clients know how fresh the verification is, not just whether it was done.
+- **Explicit "unknown" values over hallucinated ones.** If I don't have a reliable seniority signal, the field says `unknown`. It does not say "Mid-Level" because that's what the model thought seemed plausible. Garbage-in-garbage-out is a cliché because it's true, and I'd rather a client know they're missing data than believe they have good data when they don't.
+
+<Callout type="tip">
+The single best data quality investment you can make is capturing *when* each field was last verified, not just whether it was ever filled in. A phone number from 2021 and a phone number from last week look identical in most CRMs. They are not.
+</Callout>
+
+The illustrative numbers: clients who ran our quality maintenance loop saw bounce rates drop from somewhere in the 12–18% range to under 3% within two quarters. Job-change alerts surfaced enough re-engagement opportunities that one client credited the pipeline with recovering deals they'd written off. I'm calling these directional because every dataset is different, but the pattern held across the clients I worked with.
+
+## What Broke (The Part I'm Required to Include)
+
+I made a confident architectural decision early on: I would batch enrichment jobs during off-peak hours to save on API costs and avoid rate limits. Smart, right? Very economical. Very clever.
+
+What I did not adequately account for: clients who import a new list at 4pm on a Tuesday and then want to start a campaign at 9am Wednesday. The pipeline was happily queuing everything for the 2am batch window. The client was looking at a dashboard full of un-enriched records the next morning, drafting a Slack message to me that began with "so I wanted to ask about..."
+
+I rebuilt the priority queue to support `immediate` mode for freshly imported records and kept the batch window for routine re-enrichment. It was a week of work I hadn't planned for. The lesson, which I already knew intellectually but had to learn again in practice: user expectations about latency are formed by whatever they used before, and "your enrichment vendor had a 24-hour delay too" is cold comfort when someone has a campaign to run.
+
+## The Takeaway
+
+Bloated vendor contracts exist because procurement is hard, switching costs are real, and most companies would rather pay too much for something "enterprise" than take a risk on something lean. I get it. But for sales teams that are actually thoughtful about their data — that care about quality over checkbox compliance — there's a better option.
+
+EnrichData is what I'd want as a buyer: real-time-ish enrichment, job-change tracking that's actually actionable, quality maintenance that doesn't let records quietly rot, and pricing that doesn't require a six-figure approval chain.
+
+One person, one quarter, shipping something real. That's the move.
+
+If you're dealing with a CRM that's become more graveyard than database, [EnrichData](https://www.enrichdata.net/) might be worth a look.

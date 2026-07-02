@@ -1,0 +1,93 @@
+---
+title: "Do You Actually Struggle to Put AI Agents in Your Business? Here's My Workflow"
+excerpt: "Everyone wants AI agents in their company; almost nobody wants to talk about the boring plumbing that makes them work. Here's the exact workflow I use to take a business from 'wouldn't it be cool if' to something that runs every day."
+date: "2026-06-21"
+category: "AI Products"
+tags: ["Agents", "Workflow", "Consulting", "RAG", "Case Study"]
+---
+
+You've watched the demos. You've got a Notion page full of AI ideas with titles like "AI-powered onboarding" and "intelligent invoice processing" that have been sitting there since Q3 of last year. You sat through a vendor pitch where the guy spent 20 minutes showing you a ChatGPT wrapper with your logo on it and called it a "solution." Every time you try to actually ship one of these things, it dies quietly in a swamp of integrations, hallucinations, and a Slack thread that goes quiet after the fourth "we should sync on this."
+
+I've seen this pattern enough times that I could write a screenplay about it. Act one: excitement. Act two: a demo that works on clean data. Act three: a production environment that looks nothing like the demo. Act four: someone moves the Notion page to the archive folder.
+
+Here's the thing nobody in the AI sales ecosystem wants to tell you: **the model is almost never the problem.** The model is fine. GPT-4o is fine. Claude is fine. Gemini is fine. They are, by any measure, better than the human who used to do whatever task you're trying to automate. The problem is that nobody scoped a real workflow before they started building.
+
+<Figure src="https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=1200&h=630&fit=crop" alt="Workflow on a whiteboard" caption="The whole game: pick ONE workflow that actually bleeds time." />
+
+## Why Agent Projects Die in Businesses
+
+The failure mode I keep seeing is scoping an agent like a product vision instead of like an engineering task. "An AI that helps our sales team" is not a workflow. "An agent that reads inbound lead emails, looks up the company in our CRM, drafts a qualification summary, and drops it in Slack" — that's a workflow. One has a clear input, clear output, and a loop you can actually test. The other is a hope attached to a budget.
+
+The second failure mode is trying to automate everything at once. I once got a brief that basically said: "We want the AI to handle all of our internal operations." All of them. Great. That is twelve to fifteen distinct workflows, three different data sources, two legacy systems that haven't been touched since 2019, and a PDF export from QuickBooks that is technically a scan of a fax. Where exactly do you want to start?
+
+**Pick one workflow. The most painful one. The one that someone is visibly unhappy about every week.** That's where you start. Not the flashy one. The bleeding one.
+
+## My Actual Workflow for Deploying Agents
+
+This is the six-step process I use every time. Not theoretical — I've run this loop on real deployments. Some of them boring, some of them genuinely weird, all of them working.
+
+<Steps>
+<Step number="1" title="Find the one workflow that actually bleeds time">
+Don't ask people what they wish AI could do. Ask them what they do every day that they hate. The answer is almost always something repetitive and data-heavy: triaging support tickets, extracting fields from documents, generating the same report with slightly different numbers, routing requests between departments. The more specific and tedious the task sounds, the better it is for an agent. The person who has been copy-pasting data between two systems for three years is your best friend here. Interview them for 30 minutes. That conversation is worth more than any product roadmap.
+</Step>
+
+<Step number="2" title="Map the data and tools it touches">
+Before writing a single line of code, draw out what the workflow actually touches. What's the input? An email? A form submission? A file drop? What data sources does a human check while doing this task? A CRM, a database, a shared drive, a spreadsheet? What's the output and where does it go? This is also where you find the skeletons. Every organization has at least one system that's "the source of truth" but is actually a Google Sheet that one person updates manually on Thursdays. You need to know about that Google Sheet before the agent does.
+</Step>
+
+<Step number="3" title="Build the smallest agent that completes ONE loop end to end">
+Resist the urge to build the complete system first. Build the narrowest version that gets from input to output for a single, real example. No error handling. No edge cases. No scale. Just: does this thing work on one real piece of data? If you're building a document extraction agent, run it on five real documents from your production environment — not the nice clean PDFs from the demo. Real production data is always weirder than you expect. One client's "structured invoices" turned out to include three different formats, two scanned on a 2012 copier, and one that was a photo taken with someone's phone at a slight angle. Your first loop needs to surface this stuff early when it's cheap to fix.
+</Step>
+
+<Step number="4" title="Wrap it in evals and guardrails before anyone trusts it">
+This is the step most teams skip and then regret loudly. An agent with no evals is not an agent — it's a black box you're hoping works. You need a test set of real examples with expected outputs. You need a `confidence_threshold` before the agent takes action autonomously versus handing off to a human. You need logging so you can actually audit what the agent did when something goes wrong. The guardrails are not optional polish. They are what turns a demo into a system that a business can actually rely on. A `max_retries` limit is not a performance optimization; it's how you prevent a broken agent from spending $300 of API budget retrying a dead endpoint at 3am.
+</Step>
+
+<Step number="5" title="Deploy where the data lives — often that means on-prem">
+This is the plumbing nobody wants to talk about. Most businesses don't have all their data in the cloud in a nice API-accessible format. It's in an on-premise server, a legacy database, a network share, or a system that was last updated when BlackBerry was still relevant. Your agent needs to be deployed somewhere that can actually reach that data, not somewhere that requires it to hop through three VPNs and a prayer. For regulated industries — healthcare, finance, legal — this also means the data can't leave the building. Period. That shapes your entire deployment architecture. Confirm data residency requirements before you pick a stack, not after you've built something on a managed cloud service.
+</Step>
+
+<Step number="6" title="Close the feedback loop so it actually gets better">
+An agent you deploy and forget is a system that slowly degrades. Models update, data schemas drift, edge cases accumulate. The most important thing you can build after the initial deployment is a way for the humans who work with the agent to flag bad outputs. Even a simple thumbs up / thumbs down with a notes field gives you a feedback corpus. Every month, look at the failures. Update your evals. Retune the prompts. Add a new guardrail for the edge case you didn't anticipate. The agents that compound in value are the ones with a feedback loop. The ones that don't have that loop eventually become the Slack thread that goes quiet.
+</Step>
+</Steps>
+
+```mermaid
+{"type":"pipeline","title":"Agent Rollout Pipeline","steps":[{"label":"Scope","annotation":"One workflow, one input, one output","color":"blue"},{"label":"Build Smallest Loop","annotation":"Real data, no edge cases yet","color":"cyan"},{"label":"Evals + Guardrails","annotation":"Test set, confidence thresholds, logging","color":"amber"},{"label":"Deploy Where Data Lives","annotation":"On-prem or cloud depending on residency","color":"default"},{"label":"Feedback Loop","annotation":"Human flags, monthly review, retune","color":"green"},{"label":"Expand","annotation":"Add the next workflow only after this one is stable","color":"green"}]}
+```
+
+## A Real Example (Anonymized)
+
+I worked with a mid-sized professional services firm that was drowning in a specific problem: every new client engagement started with a knowledge retrieval process where a team member would manually search through internal documents — past reports, project notes, industry research — to brief the engagement team. This took two to four hours per engagement. They had dozens of engagements starting every month. The math was ugly.
+
+We mapped the workflow: inputs were the new client profile and industry, data sources were an internal document store (on-prem, for confidentiality reasons), output was a structured briefing document. We built a RAG pipeline with a retrieval step, a synthesis step, and a human-review gate before the document was sent to the team. The agent ran on their internal infrastructure.
+
+After the guardrails were in place and we'd run it through three weeks of real engagements side-by-side with the manual process, the team was spending about 20 minutes reviewing and editing agent output instead of two to four hours generating it from scratch. The quality, after the tuning cycle, was better than the manual version in two areas: consistency and coverage. Humans are good at synthesis but they miss things. The agent doesn't miss things once you've pointed it at the right data.
+
+That's not magic. That's a well-scoped RAG pipeline, a well-defined output schema, and a feedback loop that ran for three weeks before anyone called it done.
+
+<Figure src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&h=630&fit=crop" alt="Dashboard with metrics" caption="If you can't measure the agent, you don't have an agent — you have a vibe." />
+
+## The Honest Part: What You Should Not Automate Yet
+
+Some workflows look like great agent candidates until you look closely.
+
+**Do not automate workflows where the cost of a wrong output is high and hard to detect.** Drafting a summary that a human reviews is fine. Automatically sending that summary to an external client without review is not fine, not yet. The place where agents earn trust is in the review queue, not in the send button.
+
+**Do not automate workflows where the definition of "correct" changes week to week.** If your process relies on tribal knowledge that isn't written down anywhere, the agent will encode the first person's mental model and break when a new person with different mental models joins. Fix the process before you automate the process.
+
+**Do not skip the human-in-the-loop step because it feels like you're not really using AI then.** The humans in the loop are not a sign that the agent failed. They are the quality gate that makes the agent's output trustworthy enough to act on. A 20-minute review of high-quality agent output is better than a 4-hour manual process. That is still a win.
+
+<Callout type="warning">
+**The cost trap is real and it will surprise you.** An agent that retries on failure without a hard limit will run up your API bill in ways that don't show up until you get the monthly invoice. Set `max_retries`, set timeouts, and log every retry so you can audit why the agent was spinning. I've seen agents generate 40x normal cost for a single bad input because nobody put a ceiling on the retry loop. That's not an eval problem. That's a guardrail you forgot to write.
+</Callout>
+
+## If You're Still at "Wouldn't It Be Cool If"
+
+That's a completely normal place to be. It means you've done the hard work of imagining the possible. The gap between that Notion page and a working deployment is not a technical gap — it's a scoping gap. It's the difference between "AI-powered operations" and "an agent that reads the intake form, looks up the relevant policy document, and drafts a response for the rep to review."
+
+The boring, specific version ships. The exciting, general version accumulates in Notion.
+
+If your company has one workflow that bleeds time, that creates a real specific input, and where you'd be visibly better off with a faster, more consistent output — that's the place to start. Not everything at once. Not the transformation roadmap. One workflow, the minimum viable agent, the eval suite, the feedback loop.
+
+That's the whole playbook. It's not glamorous, but it runs in production.
