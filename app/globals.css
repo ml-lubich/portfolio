@@ -641,13 +641,45 @@ body {
   box-shadow: 0 0 20px hsl(var(--accent) / 0.15), 0 0 60px hsl(var(--accent) / 0.05);
 }
 
-/* ── Navigation glass (menus / FAB / blog header) — frost over static content ─ */
+/* ── Navigation glass (menus / FAB / blog header) — frost over static content ─
+   Do not add/animate backdrop-filter here — scroll-flicker regressions were
+   caused by an animated blur layer repainting every frame (see .nav-shell
+   below, commits c2afc91 / 7287ce4). The molten highlight is a second
+   background-image layer animated only via background-position, so it never
+   touches filter/layout and costs nothing extra on scroll. */
 .nav-glass {
-  background: hsl(0 0% 100% / 0.07);
+  background:
+    linear-gradient(115deg, transparent 38%, hsl(0 0% 100% / 0.07) 50%, transparent 62%),
+    hsl(0 0% 100% / 0.07);
+  background-size: 260% 260%;
+  background-position: 0% 0%;
   -webkit-backdrop-filter: blur(20px) saturate(1.6);
   backdrop-filter: blur(20px) saturate(1.6);
   border: 1px solid hsl(0 0% 100% / 0.1);
   box-shadow: 0 1px 2px hsl(0 0% 0% / 0.12), 0 10px 28px hsl(0 0% 0% / 0.14);
+}
+
+/* Specular drift — light creeping through hot glass. Background-position
+   only (no filter/box-shadow loop), peak white alpha stays <= 0.08.
+   Hover-triggered, NOT infinite: .nav-glass carries backdrop-filter, and a
+   perpetual background-position animation would invalidate its paint every
+   frame forever — the same cost class behind commits c2afc91 / 7287ce4. */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes nav-glass-specular-drift {
+
+    0%,
+    100% {
+      background-position: 0% 0%;
+    }
+
+    50% {
+      background-position: 100% 100%;
+    }
+  }
+
+  .nav-glass:hover {
+    animation: nav-glass-specular-drift 2.8s ease-in-out;
+  }
 }
 
 /* ── Floating nav capsule — stable glass paint ──────────────────────
@@ -929,6 +961,27 @@ nav[data-nav-scrolled="true"] .nav-shell {
   transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s ease, border-color 0.4s ease;
 }
 
+/* Molten sheen band — transform-driven, layered under the existing
+   background-position sweep below for a heavier "hot glass" pass on hover. */
+.glass-card-3d::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(115deg,
+      transparent 40%,
+      hsla(0, 0%, 100%, 0.04) 47%,
+      hsla(0, 0%, 100%, 0.1) 50%,
+      hsla(0, 0%, 100%, 0.04) 53%,
+      transparent 60%);
+  opacity: 0;
+  transform: translateX(-60%);
+  /* Smooth exit if hover ends mid-sweep (animation cancel snaps to base). */
+  transition: opacity 0.4s ease;
+}
+
 /* Shining glass sweep overlay */
 .glass-card-3d::after {
   content: "";
@@ -953,6 +1006,29 @@ nav[data-nav-scrolled="true"] .nav-shell {
 .glass-card-3d:hover::after {
   opacity: 1;
   background-position: -50% center;
+}
+
+/* Molten sheen sweep — plays once per hover-in (no infinite loop). */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes glass-card-molten-sheen {
+    0% {
+      opacity: 0;
+      transform: translateX(-60%);
+    }
+
+    18% {
+      opacity: 1;
+    }
+
+    100% {
+      opacity: 0;
+      transform: translateX(60%);
+    }
+  }
+
+  .glass-card-3d:hover::before {
+    animation: glass-card-molten-sheen 1.2s ease-out;
+  }
 }
 
 .glass-card-3d:hover {
