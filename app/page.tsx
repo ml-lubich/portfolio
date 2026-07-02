@@ -131,7 +131,7 @@ export default function Home() {
         <h2>Misha Lubich — Senior AI Engineer & Technical Leader</h2>
         <p>
           Misha Lubich is a Senior AI Engineer and Technical Leader with production
-          experience at Apple, GitHub, Braintrust Data, Walmart, and Lawrence Berkeley
+          experience at Apple, GitHub, Walmart, and Lawrence Berkeley
           National Lab. Specializing in machine learning, MLOps, large language models (LLMs),
           deep learning, natural language processing, computer vision, and full-stack
           software development.
@@ -142,7 +142,7 @@ export default function Home() {
             <li><a href="#about">About Misha Lubich</a></li>
             <li><a href="#projects">AI & ML Projects</a></li>
             <li><a href="#skills">Technical Skills — Python, TypeScript, React, PyTorch, TensorFlow</a></li>
-            <li><a href="#journey">Professional Experience — Apple, GitHub, Braintrust Data</a></li>
+            <li><a href="#journey">Professional Experience — Apple, GitHub, Walmart</a></li>
             <li><a href="#consulting">Consulting — client sites and engagements</a></li>
             <li><a href="#testimonials">Client feedback — past consulting engagements</a></li>
             <li><a href="#research">Research Publications</a></li>

@@ -10,7 +10,7 @@ export const sessions: Session[] = [
     time: "06:00 AM", label: "whoami", icon: "👤",
     lines: [
       { t: "cmd", s: "cat ~/.bio" },
-      { t: "out", s: "Experience at Braintrust Data, Apple, Walmart, LBNL, and Honda Innovations.", d: 60 },
+      { t: "out", s: "Experience at Apple, Walmart, LBNL, and Honda Innovations.", d: 60 },
       { t: "out", s: "Built production AI platform with multi-agent orchestration serving millions.", d: 40 },
       { t: "out", s: "Deploying real-time ML inference and RAG pipelines at scale.", d: 40 },
       { t: "out", s: "Published 6 peer-reviewed papers in ML for hydrology & environmental science.", d: 40 },

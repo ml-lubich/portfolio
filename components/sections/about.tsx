@@ -89,10 +89,10 @@ const highlights = [
     icon: Briefcase,
     title: "Experience",
     subtitleNum: "",
-    subtitleText: "Braintrust, Apple, Walmart",
-    detail: "Fortune 500 + AI Startups",
+    subtitleText: "Apple, Walmart, LBNL",
+    detail: "Fortune 500 + National Labs",
     gradient: lg.accentToCyan,
-    backDescription: "Built production AI platforms at Braintrust, led ML inference pipelines at Apple serving 100M+ users, and architected cloud-native microservices at Walmart at enterprise scale.",
+    backDescription: "Led ML inference pipelines at Apple serving 100M+ users, architected cloud-native microservices at Walmart, and built ML pipelines at Lawrence Berkeley National Lab.",
   },
   {
     icon: BookOpen,
@@ -163,7 +163,7 @@ export function About() {
             linePause={350}
             startDelay={400}
             lines={[
-              "Experience at Braintrust Data, Apple, Walmart, LBNL, and Honda Innovations.",
+              "Experience at Apple, Walmart, LBNL, and Honda Innovations.",
               "Built production AI platform with multi-agent orchestration serving millions.",
               "Deploying real-time ML inference and RAG pipelines at scale.",
               "Published 6 peer-reviewed papers in ML for hydrology & environmental science.",

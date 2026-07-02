@@ -22,7 +22,7 @@ export function Journey() {
     <ScrollStackSection
       id="journey"
       label="Experience"
-      title={<>From Braintrust to Apple, delivering{" "}<span className="gradient-text">impactful solutions</span></>}
+      title={<>From Berkeley Lab to Apple, delivering{" "}<span className="gradient-text">impactful solutions</span></>}
       subtitle="Click any role to explore architecture details, tech stack, and system diagrams."
       className="scroll-mt-24 pb-4 md:pb-10 lg:pb-14"
       bgEffects={

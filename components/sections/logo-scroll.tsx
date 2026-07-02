@@ -5,7 +5,7 @@ import {
     SiApple,
     SiHonda,
 } from "react-icons/si"
-import { GraduationCap, FlaskConical, Brain } from "lucide-react"
+import { GraduationCap, FlaskConical } from "lucide-react"
 import { AnimatedText } from "../animations/animated-text"
 
 /* ──────────────────────────────────────────────────────────────────────
@@ -38,7 +38,6 @@ interface Logo {
 }
 
 const LOGOS: Logo[] = [
-    { name: "Braintrust Data", icon: <Brain className="h-7 w-7 sm:h-8 sm:w-8" /> },
     { name: "Apple", icon: <SiApple className="h-7 w-7 sm:h-8 sm:w-8" /> },
     { name: "Walmart", icon: <WalmartSpark className="h-7 w-7 sm:h-8 sm:w-8" /> },
     { name: "Lawrence Berkeley Lab", icon: <FlaskConical className="h-7 w-7 sm:h-8 sm:w-8" /> },

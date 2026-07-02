@@ -39,51 +39,6 @@ const experiences: {
   detail: DetailPanelData
 }[] = [
   {
-    id: "braintrust",
-    title: "Senior Software Engineer",
-    company: "Braintrust Data",
-    period: "Aug 2024 \\u2013 Dec 2025",
-    location: "San Francisco, CA",
-    summary:
-      "Architected production AI platform with multi-agent orchestration, RAG pipelines, and real-time streaming \\u2014 sub-second P95 latency.",
-    tags: ["CrewAI", "LangGraph", "Next.js", "FastAPI", "AWS"],
-    gradient: "from-primary to-accent",
-    accent: "hsl(217 91% 60%)",
-    number: "01",
-    detail: {
-      title: "Senior Software Engineer",
-      subtitle: "Braintrust Data",
-      period: "August 2024 \\u2013 December 2025",
-      location: "San Francisco, CA",
-      description:
-        "Led the architecture and deployment of a production AI platform powering multi-agent orchestration, real-time RAG pipelines, and full-stack AI experiences \\u2014 all maintained at sub-second P95 latency serving enterprise customers.",
-      highlights: [
-        "Architected multi-agent orchestration with CrewAI + LangGraph, RAG pipeline (pgvector, FAISS), real-time streaming \\u2014 sub-second P95 latency",
-        "Built full-stack AI apps using React/Next.js, TypeScript, FastAPI, Tailwind CSS with MCP tool server integration and WebSocket streaming",
-        "Designed self-improving agentic systems with feedback loops, adaptive chunking, multi-model routing (GPT-4, Claude 3.5, Gemini)",
-        "Implemented LLM observability stack with LangSmith, Prometheus, Grafana and custom guardrails for prompt injection / bias detection",
-        "Led migration from monolith to event-driven microservices on AWS (ECS, Lambda, RDS, S3, Bedrock) using Terraform IaC",
-        "Mentored 5 engineers on AI engineering patterns \\u2014 code quality scores improved from 6.2 \\u2192 8.9/10",
-      ],
-      architecture: [
-        { label: "Agent Orchestrator", icon: "cpu", description: "CrewAI + LangGraph multi-agent routing with feedback loops" },
-        { label: "RAG Pipeline", icon: "database", description: "pgvector + FAISS vector search with adaptive chunking" },
-        { label: "API Gateway", icon: "server", description: "FastAPI with WebSocket streaming and MCP tool integration" },
-        { label: "Observability", icon: "shield", description: "LangSmith + Prometheus + Grafana with custom guardrails" },
-        { label: "Infrastructure", icon: "layers", description: "AWS ECS / Lambda / Bedrock \\u2014 Terraform IaC" },
-      ],
-      techStack: ["CrewAI", "LangGraph", "React", "Next.js", "TypeScript", "FastAPI", "pgvector", "FAISS", "AWS ECS", "Lambda", "Bedrock", "Terraform", "Prometheus", "Grafana"],
-      metrics: [
-        { label: "P95 Latency", value: "<1s" },
-        { label: "Code Quality", value: "6.2\\u21928.9" },
-        { label: "Engineers Mentored", value: "5" },
-      ],
-      diagramType: "agents",
-      gradient: "from-primary to-accent",
-      accent: "hsl(217 91% 60%)",
-    },
-  },
-  {
     id: "apple",
     title: "Software Development Engineer in Test",
     company: "Apple",
@@ -282,7 +237,7 @@ export function Journey() {
             Experience
           </span>
           <h2 className="mt-4 font-display text-3xl font-light text-foreground sm:text-4xl lg:text-5xl text-balance">
-            From Braintrust to Apple, delivering{" "}
+            From Berkeley Lab to Apple, delivering{" "}
             <span className="gradient-text">impactful solutions</span>
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground">

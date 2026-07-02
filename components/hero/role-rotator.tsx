@@ -103,11 +103,9 @@ export function HeroSubtitle() {
       <AnimatedText variant="blur-slide" delay={1200} stagger={30} duration={650}>
         {"Senior Software Engineer specializing in "}
         <span className="font-semibold text-foreground">AI-driven, cloud-native applications</span>
-        {". Led the design and deployment of a production AI platform with multi-agent orchestration at "}
-        <span className="font-semibold text-foreground">Braintrust Data</span>
-        {", "}
+        {". Shipped production AI and large-scale systems at "}
         <span className="font-semibold text-foreground">Apple</span>
-        {", and "}
+        {" and "}
         <span className="font-semibold text-foreground">Walmart</span>
         {"."}
       </AnimatedText>

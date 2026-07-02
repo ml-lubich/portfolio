@@ -19,7 +19,7 @@ import { SectionHeader } from "./section-header"
  *    <ScrollStackSection
  *      id="journey"
  *      label="Experience"
- *      title={<>From Braintrust to Apple, delivering{" "}
+ *      title={<>From Berkeley Lab to Apple, delivering{" "}
  *        <span className="gradient-text">impactful solutions</span></>}
  *      subtitle="Click any role to explore architecture details…"
  *      cards={cards}

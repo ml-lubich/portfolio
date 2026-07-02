@@ -27,7 +27,7 @@ const personSchema = {
   },
   jobTitle: "Senior AI Engineer & Technical Leader",
   description:
-    "Senior AI Engineer and Technical Leader with experience at Apple, GitHub, Braintrust Data, Walmart, and Lawrence Berkeley National Lab. Specialising in machine learning, MLOps, LLMs, and full-stack development.",
+    "Senior AI Engineer and Technical Leader with experience at Apple, GitHub, Walmart, and Lawrence Berkeley National Lab. Specialising in machine learning, MLOps, LLMs, and full-stack development.",
   sameAs: [
     "https://github.com/ml-lubich",
     "https://linkedin.com/in/mishalubich",
@@ -70,10 +70,6 @@ const personSchema = {
       url: "https://github.com",
     },
   ],
-  worksFor: {
-    "@type": "Organization",
-    name: "Braintrust Data",
-  },
   hasOccupation: {
     "@type": "Occupation",
     name: "AI Engineer",

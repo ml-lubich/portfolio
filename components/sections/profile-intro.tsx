@@ -121,8 +121,7 @@ export function ProfileIntro() {
                                     <AnimatedText variant="fade-up" delay={300} stagger={20} duration={600}>
                                         I architect AI-driven, cloud-native applications that scale to millions of users&mdash;from
                                         multi-agent orchestration and RAG pipelines to production systems shipping at{" "}
-                                        <span className="font-normal text-foreground/90">Braintrust Data</span>,{" "}
-                                        <span className="font-normal text-foreground/90">Apple</span>, and{" "}
+                                        <span className="font-normal text-foreground/90">Apple</span> and{" "}
                                         <span className="font-normal text-foreground/90">Walmart</span>.{" "}
                                         {"If you're exploring the frontier of intelligent software, I'd love to connect."}
                                     </AnimatedText>
