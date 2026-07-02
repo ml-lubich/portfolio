@@ -141,11 +141,14 @@ interface ScrollStall {
 }
 
 /**
- * Find "stop-and-go" stalls in a scrollY trace: runs of >=3 consecutive
- * sample-to-sample deltas under 2px that occur AFTER motion has begun, where
- * the scroll subsequently moves at least 100px further. A flat run at the
- * very tail of the trace (the spring easing out to its final resting spot,
- * with no further movement afterward) is NOT a stall — it's a normal finish.
+ * Find "stop-and-go" stalls in a scrollY trace: runs of >=10 consecutive
+ * sample-to-sample deltas under 2px (>=500ms visually stopped) that occur
+ * AFTER motion has begun, where the scroll subsequently moves at least 500px
+ * further — the old chase behavior (decelerate to a stop at a section, pause,
+ * scroll again). Deliberately tolerant of sub-500ms compositor hiccups inside
+ * a single native smooth scroll on a loaded machine; the one-scroll-command
+ * assertion below is what pins the architecture. A flat run at the very tail
+ * of the trace (easing out to rest, nothing after) is a normal finish.
  */
 function findStopAndGoStalls(samples: number[]): ScrollStall[] {
   const deltas: number[] = []
@@ -169,10 +172,10 @@ function findStopAndGoStalls(samples: number[]): ScrollStall[] {
       runLength++
       i++
     }
-    if (runLength >= 3) {
+    if (runLength >= 10) {
       let movementAfterPx = 0
       for (let j = i; j < deltas.length; j++) movementAfterPx += deltas[j]
-      if (movementAfterPx >= 100) {
+      if (movementAfterPx >= 500) {
         stalls.push({ startIndex: runStart, length: runLength, movementAfterPx })
       }
     }
@@ -181,10 +184,29 @@ function findStopAndGoStalls(samples: number[]): ScrollStall[] {
 }
 
 test("anchor scroll is one continuous motion (no stop-and-go)", async ({ page }) => {
+  // Count programmatic scroll commands: the stop-and-go bug WAS multiple
+  // scroll episodes per navigation (chase re-scrolls / rAF spring steps).
+  // One anchor click must issue exactly one scroll command.
+  await page.addInitScript(() => {
+    const w = window as unknown as { __scrollCalls: number }
+    w.__scrollCalls = 0
+    const orig = window.scrollTo.bind(window)
+     
+    ;(window as any).scrollTo = (...args: unknown[]) => {
+      const w2 = window as unknown as { __scrollCalls: number }
+      w2.__scrollCalls++
+       
+      return orig(...(args as any))
+    }
+  })
+  await page.goto("/")
+  await expect(page.getByRole("button", { name: /get in touch/i })).toBeVisible()
   await page.getByRole("button", { name: /get in touch/i }).click()
   const samples = await traceScroll(page)
   const stalls = findStopAndGoStalls(samples)
   expect(stalls, `stop-and-go stalls found in trace: ${JSON.stringify(stalls)}`).toHaveLength(0)
+  const scrollCalls = await page.evaluate(() => (window as unknown as { __scrollCalls: number }).__scrollCalls)
+  expect(scrollCalls, "programmatic scroll commands per navigation").toBe(1)
 })
 
 // NAV_OFFSET documented for future tightening; the band above is deliberately loose

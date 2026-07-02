@@ -86,6 +86,33 @@ export function wooshScrollTo(targetY: number, onSettle?: () => void) {
  *  the new navigation). */
 let navigationId = 0
 
+/**
+ * Native compositor-thread smooth scroll for anchor navigation.
+ * The rAF-driven woosh spring starves when the main thread is busy —
+ * "portfolio:mount-all" boots several WebGL canvases right before the
+ * scroll, and under that jank the spring's ticks coalesce into visible
+ * teleports. window.scrollTo({behavior: "smooth"}) animates on the
+ * compositor thread, so it stays one continuous motion regardless of
+ * main-thread load. Completion is detected via "scrollend" with a
+ * timeout fallback for browsers that lack the event.
+ */
+function smoothScrollTo(targetY: number, thisNavigation: number, onDone: () => void) {
+  cancelActiveWoosh()
+  isProgrammaticScroll = true
+  let finished = false
+  function finishOnce() {
+    if (finished) return
+    finished = true
+    window.removeEventListener("scrollend", finishOnce)
+    isProgrammaticScroll = false
+    if (thisNavigation !== navigationId) return // superseded mid-scroll
+    onDone()
+  }
+  window.addEventListener("scrollend", finishOnce)
+  window.scrollTo({ top: targetY, behavior: "smooth" })
+  setTimeout(finishOnce, 2000)
+}
+
 const LAYOUT_POLL_MS = 100
 /**
  * Consecutive unchanged polls required before layout counts as "stable".
@@ -171,14 +198,14 @@ export function navigateTo(href: string, callback?: () => void) {
   function scrollOnce() {
     const el = document.getElementById(id)
     if (el) {
-      wooshScrollTo(measureTargetY(el), finish)
+      smoothScrollTo(measureTargetY(el), thisNavigation, finish)
       return
     }
     // Id never appeared — fall back to its LazySection wrapper, which is
     // always in the DOM (data-section is set regardless of mount state).
     const wrapper = document.querySelector(`[data-section="${id}"]`)
     if (wrapper) {
-      wooshScrollTo(measureTargetY(wrapper), finish)
+      smoothScrollTo(measureTargetY(wrapper), thisNavigation, finish)
       return
     }
     // Neither exists — nothing to scroll to.
