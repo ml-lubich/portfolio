@@ -112,10 +112,16 @@ export function Skills() {
             </div>
           </AnimatedSection>
 
-          {/* Skills grid — pop-out tilt + liquid glass on hover */}
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {/* Skills grid — pop-out tilt + liquid glass on hover.
+             flex-wrap + explicit widths (not CSS grid) so an orphan card in
+             the final row centers itself instead of sitting left-aligned. */}
+          <div className="flex flex-wrap justify-center gap-5">
             {skillCategories.map((cat, i) => (
-              <AnimatedSection key={cat.category} delay={i * 80}>
+              <AnimatedSection
+                key={cat.category}
+                delay={i * 80}
+                className="w-full sm:w-[calc(50%-0.625rem)] lg:w-[calc(33.334%-0.834rem)]"
+              >
                 <TiltCard className="relative h-full">
                   <div className="group relative h-full overflow-hidden rounded-2xl border border-white/[0.06] bg-card/25 backdrop-blur-xl p-6 transition-all duration-300 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/15">
                     <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />

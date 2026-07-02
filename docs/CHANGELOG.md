@@ -6,11 +6,14 @@ All notable changes to this project are documented here.
 
 ### Fixed
 
+- GitHub stats no longer 403 for visitors on shared IPs. The client fired 5 unauthenticated `api.github.com` fetches per visitor (60 req/hr/IP limit); all upstream calls now go through one server-side `/api/github` route cached for 1h (`revalidate` + `s-maxage`/`stale-while-revalidate`), with optional `GITHUB_TOKEN` support (see `.env.example`). Payloads are trimmed server-side; a flaky events page or contributions-API outage degrades gracefully instead of failing the route.
+- Skills grid: the orphan card in the last row now centers itself (flex-wrap + explicit per-card widths replacing CSS grid) instead of sitting left-aligned against dead space.
 - Anchor scroll is now ONE continuous motion. The previous fix converged on the target with repeated re-scrolls ("chase"), which read as stop-and-go at each lazy section. `navigateTo` now dispatches `portfolio:mount-all` so every LazySection mounts up front, waits for `scrollHeight` to hold still (1.5s stable, 5s cap — the GitHub-stats skeleton swaps to much taller content after its API fetch), then fires a single woosh. New e2e test traces `scrollY` and fails on any stop-and-go stall.
 - Molten glass surfaces stay paint-cheap: the nav-glass specular drift is hover-triggered (never an infinite animation on a backdrop-filter element), and the glass-card border-radius morph was dropped because it clobbered per-element radii.
 
 ### Changed
 
+- Navbar: new "Stats" link scrolling to the GitHub stats section (`#github`), placed between Skills and Research to match page order.
 - Footer social links upgraded from plain text to the hero's glass icon buttons via a shared `components/social-icons.tsx` (GitHub, LinkedIn, Google Scholar — single source of truth used by hero and footer).
 - Glass cards gained a once-per-hover molten sheen sweep; nav glass carries a static diagonal specular highlight with a hover drift.
 - Live tokscale AI-token-usage stats: glass badge in the hero (`TokscaleHeroBadge`) and a full stats card in the GitHub-stats section (`TokscaleCard`), linking to the tokscale leaderboard and profile.

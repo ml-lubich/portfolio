@@ -71,10 +71,7 @@ interface ContributionDay {
 interface GitHubEvent {
     type: string
     created_at: string
-    payload?: {
-        commits?: unknown[]
-        size?: number
-    }
+    commitCount: number
 }
 
 /* ── Language colors (GitHub standard) ───────────────────────── */
@@ -117,8 +114,6 @@ const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Se
 const DAY_LABELS = ["", "Mon", "", "Wed", "", "Fri", ""]
 
 const GITHUB_USERNAME = "ml-lubich"
-// Full contribution history, no auth token — GitHub's own /events API only covers ~90 days.
-const CONTRIB_API = "https://github-contributions-api.jogruber.de/v4/" + GITHUB_USERNAME + "?y=all"
 const FALLBACK_WEEKS = 26
 const CELL = 15
 const CELL_MOBILE = 10
@@ -151,10 +146,7 @@ function eventsToFlat(events: GitHubEvent[]): ContributionDay[] {
     const countMap: Record<string, number> = {}
     for (const ev of events) {
         const key = toKey(new Date(ev.created_at))
-        const n =
-            ev.type === "PushEvent" && Array.isArray(ev.payload?.commits)
-                ? ev.payload!.commits!.length
-                : 1
+        const n = ev.type === "PushEvent" && ev.commitCount > 0 ? ev.commitCount : 1
         countMap[key] = (countMap[key] || 0) + n
     }
 
@@ -236,7 +228,7 @@ function buildDayOfWeekStats(events: GitHubEvent[]): DayOfWeekStat[] {
     const counts = [0, 0, 0, 0, 0, 0, 0]
     for (const ev of events) {
         const d = new Date(ev.created_at).getDay()
-        counts[d] += ev.type === "PushEvent" && Array.isArray(ev.payload?.commits) ? ev.payload!.commits!.length : 1
+        counts[d] += ev.type === "PushEvent" && ev.commitCount > 0 ? ev.commitCount : 1
     }
     const max = Math.max(...counts, 1)
     return counts.map((c, i) => ({ day: DAY_NAMES_FULL[i], short: DAY_NAMES_SHORT[i], count: c, pct: (c / max) * 100 }))
@@ -246,7 +238,7 @@ function buildHourStats(events: GitHubEvent[]): HourStat[] {
     const counts = new Array(24).fill(0)
     for (const ev of events) {
         const h = new Date(ev.created_at).getHours()
-        counts[h] += ev.type === "PushEvent" && Array.isArray(ev.payload?.commits) ? ev.payload!.commits!.length : 1
+        counts[h] += ev.type === "PushEvent" && ev.commitCount > 0 ? ev.commitCount : 1
     }
     const max = Math.max(...counts, 1)
     return counts.map((c, i) => ({
@@ -318,25 +310,20 @@ export function GitHubStats() {
         if (fetchedRef.current) return
         fetchedRef.current = true
         try {
-            const base = "https://api.github.com/users/" + GITHUB_USERNAME
-            const [userRes, reposRes, contribRes, ev1, ev2, ev3] = await Promise.all([
-                fetch(base),
-                fetch(base + "/repos?per_page=100&sort=updated"),
-                fetch(CONTRIB_API),
-                fetch(base + "/events?per_page=100&page=1"),
-                fetch(base + "/events?per_page=100&page=2"),
-                fetch(base + "/events?per_page=100&page=3"),
-            ])
-            if (!userRes.ok || !reposRes.ok) throw new Error("GitHub API rate limit reached. Stats will refresh shortly.")
-            const userData: GitHubUser = await userRes.json()
-            const reposData: GitHubRepo[] = await reposRes.json()
-            const allEvents: GitHubEvent[] = []
-            for (const res of [ev1, ev2, ev3]) {
-                if (res.ok) { const data = await res.json(); if (Array.isArray(data)) allEvents.push(...data) }
-            }
+            const res = await fetch("/api/github")
+            if (!res.ok) throw new Error("GitHub stats are temporarily unavailable — refresh in a bit.")
+            const payload: {
+                user: GitHubUser
+                repos: GitHubRepo[]
+                events: GitHubEvent[]
+                contributions: { total: Record<string, number>; contributions: { date: string; count: number; level: number }[] } | null
+            } = await res.json()
+            const userData = payload.user
+            const reposData = payload.repos
+            const allEvents = payload.events
             let gotHistory = false
-            if (contribRes.ok) {
-                const history: { total: Record<string, number>; contributions: { date: string; count: number; level: number }[] } = await contribRes.json()
+            const history = payload.contributions
+            if (history) {
                 if (Array.isArray(history.contributions) && history.contributions.length > 0) {
                     const todayKey = toKey(new Date())
                     const days: ContributionDay[] = history.contributions
