@@ -1,3 +1,6 @@
+"use client"
+
+import { useCallback, useRef } from "react"
 import { ExternalLink, Flame, Trophy } from "lucide-react"
 
 /* ── tokscale — live AI token usage (single source of truth) ──────── */
@@ -16,30 +19,68 @@ function LiveDot({ size = "h-2 w-2" }: { size?: string }) {
   )
 }
 
-/** Live tokscale embed, centered right under the hero brain — links to the tokscale profile. */
+/** Live tokscale embed, centered right under the hero brain — a floating 3D panel
+ *  with pointer-tracked tilt (desktop) and a pulsing emerald aura so it reads as
+ *  a hero centerpiece rather than a footnote. Links to the tokscale profile. */
 export function TokscaleHeroBadge() {
+  const cardRef = useRef<HTMLAnchorElement>(null)
+
+  const handlePointerMove = useCallback((e: React.PointerEvent<HTMLAnchorElement>) => {
+    const el = cardRef.current
+    if (!el || e.pointerType !== "mouse") return
+    const rect = el.getBoundingClientRect()
+    const px = (e.clientX - rect.left) / rect.width - 0.5
+    const py = (e.clientY - rect.top) / rect.height - 0.5
+    el.style.setProperty("--tilt-x", `${(-py * 12).toFixed(2)}deg`)
+    el.style.setProperty("--tilt-y", `${(px * 16).toFixed(2)}deg`)
+  }, [])
+
+  const resetTilt = useCallback(() => {
+    const el = cardRef.current
+    if (!el) return
+    el.style.setProperty("--tilt-x", "0deg")
+    el.style.setProperty("--tilt-y", "0deg")
+  }, [])
+
   return (
     <div
-      className="mt-5 flex animate-fade-in-up justify-center pointer-events-auto"
+      className="mt-6 flex animate-fade-in-up justify-center pointer-events-auto"
       style={{ animationDelay: "0.62s", opacity: 0 }}
     >
-      <a
-        href={TOKSCALE_PROFILE_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="Live AI token usage tracked by tokscale"
-        className="group inline-block overflow-hidden rounded-xl border border-white/[0.1] bg-white/[0.05] p-2 backdrop-blur-sm transition-all hover:border-emerald-400/40 hover:bg-white/[0.09]"
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={TOKSCALE_EMBED_URL}
-          alt="Misha Lubich — live AI token usage tracked by tokscale"
-          width={280}
-          height={99}
-          loading="lazy"
-          className="h-auto w-[240px] max-w-full rounded-lg transition-transform duration-500 group-hover:scale-[1.01] sm:w-[280px]"
-        />
-      </a>
+      <div className="tokscale-3d-scene relative">
+        <div className="tokscale-aura absolute -inset-5 rounded-[2rem]" aria-hidden="true" />
+        <div className="tokscale-float relative">
+          <a
+            ref={cardRef}
+            href={TOKSCALE_PROFILE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Live AI token usage tracked by tokscale"
+            onPointerMove={handlePointerMove}
+            onPointerLeave={resetTilt}
+            className="tokscale-tilt group relative block overflow-hidden rounded-2xl border border-emerald-400/25 bg-[hsla(222,20%,7%,0.72)] p-2.5 shadow-[0_18px_50px_-12px_rgba(16,185,129,0.3),0_8px_24px_-8px_rgba(0,0,0,0.5)] backdrop-blur-md transition-[border-color,box-shadow] duration-500 hover:border-emerald-300/50 hover:shadow-[0_24px_64px_-12px_rgba(16,185,129,0.45),0_8px_24px_-8px_rgba(0,0,0,0.5)]"
+          >
+            <div
+              className="absolute inset-x-4 top-0 h-[2px] bg-gradient-to-r from-transparent via-emerald-300/80 to-transparent"
+              aria-hidden="true"
+            />
+            <div className="tokscale-sheen absolute inset-0 overflow-hidden rounded-2xl" aria-hidden="true" />
+            <span className="absolute right-3 top-3 z-10 inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/15 px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.14em] text-emerald-300 backdrop-blur-sm">
+              <LiveDot size="h-1.5 w-1.5" />
+              Live
+            </span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={TOKSCALE_EMBED_URL}
+              alt="Misha Lubich — live AI token usage tracked by tokscale"
+              width={340}
+              height={120}
+              loading="lazy"
+              className="relative h-auto w-[290px] max-w-full rounded-xl sm:w-[340px]"
+            />
+          </a>
+        </div>
+      </div>
     </div>
   )
 }

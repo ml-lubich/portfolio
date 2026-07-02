@@ -1039,6 +1039,93 @@ nav[data-nav-scrolled="true"] .nav-shell {
     inset 0 1px 0 0 hsla(0, 0%, 100%, 0.05);
 }
 
+/* ── Tokscale hero 3D panel ── */
+.tokscale-3d-scene {
+  perspective: 900px;
+}
+
+.tokscale-float {
+  transform-style: preserve-3d;
+}
+
+/* Pointer-tracked tilt (vars set from JS; mouse only). Sits inside the idle
+   float so the two transforms compose instead of fighting. */
+.tokscale-tilt {
+  transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) translateZ(0);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+}
+
+.tokscale-aura {
+  pointer-events: none;
+  background:
+    radial-gradient(60% 70% at 30% 30%, hsl(160 84% 39% / 0.32), transparent 70%),
+    radial-gradient(55% 65% at 75% 70%, hsl(var(--primary) / 0.28), transparent 70%);
+  filter: blur(26px);
+  opacity: 0.55;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes tokscale-float-bob {
+
+    0%,
+    100% {
+      transform: translateY(0) rotateX(3deg) rotateY(-4deg);
+    }
+
+    50% {
+      transform: translateY(-8px) rotateX(-2.5deg) rotateY(4deg);
+    }
+  }
+
+  .tokscale-float {
+    animation: tokscale-float-bob 8s ease-in-out infinite;
+  }
+
+  @keyframes tokscale-aura-pulse {
+
+    0%,
+    100% {
+      opacity: 0.4;
+      transform: scale(0.97);
+    }
+
+    50% {
+      opacity: 0.85;
+      transform: scale(1.04);
+    }
+  }
+
+  .tokscale-aura {
+    animation: tokscale-aura-pulse 5s ease-in-out infinite;
+  }
+
+  @keyframes tokscale-sheen-sweep {
+    0% {
+      transform: translateX(-160%) skewX(-18deg);
+    }
+
+    55%,
+    100% {
+      transform: translateX(320%) skewX(-18deg);
+    }
+  }
+
+  .tokscale-sheen::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 45%;
+    background: linear-gradient(105deg,
+        transparent,
+        hsla(0, 0%, 100%, 0.09) 50%,
+        transparent);
+    animation: tokscale-sheen-sweep 5.5s ease-in-out infinite;
+  }
+}
+
 /* ── Translucent glow pulse ── */
 @keyframes translucent-pulse {
 
