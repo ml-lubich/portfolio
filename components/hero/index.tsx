@@ -10,7 +10,7 @@ import { HeroCTAs, SocialLinks } from "./hero-actions"
 import { heroOverlay } from "@/lib/theme"
 import { navigateTo } from "@/components/nav/woosh-scroll"
 import { RotatingStats } from "./rotating-stats"
-import { TokscaleHeroBadge, TokscaleHeroPanel } from "@/components/sections/tokscale-stats"
+import { TokscaleHeroBadge } from "@/components/sections/tokscale-stats"
 
 const MOBILE_PERFORMANCE_QUERY = "(max-width: 767px), (pointer: coarse), (hover: none)"
 
@@ -109,14 +109,6 @@ export function Hero() {
         <SocialLinks />
         <TokscaleHeroBadge />
         <RotatingStats />
-      </div>
-
-      {/* Tokscale panel — docked to the right on xl+; replaces the centered pill at that breakpoint */}
-      <div
-        className="pointer-events-auto absolute right-8 top-1/2 z-10 hidden max-w-[340px] -translate-y-1/2 animate-fade-in-up xl:block"
-        style={{ animationDelay: "0.8s", opacity: 0 }}
-      >
-        <TokscaleHeroPanel />
       </div>
 
       {/* Scroll indicator — flex centering avoids transform clash with animate-fade-in-up-subtle (which overwrites translate-x) */}

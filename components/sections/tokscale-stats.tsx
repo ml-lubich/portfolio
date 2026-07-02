@@ -1,4 +1,4 @@
-import { ArrowUpRight, ExternalLink, Flame, Trophy } from "lucide-react"
+import { ExternalLink, Flame, Trophy } from "lucide-react"
 
 /* ── tokscale — live AI token usage (single source of truth) ──────── */
 
@@ -16,12 +16,11 @@ function LiveDot({ size = "h-2 w-2" }: { size?: string }) {
   )
 }
 
-/** Compact hero pill — glass chip with a live pulse, links to the tokscale profile.
- *  Hidden at xl+ where {@link TokscaleHeroPanel} takes over as the docked hero ornament. */
+/** Live tokscale embed, centered right under the hero brain — links to the tokscale profile. */
 export function TokscaleHeroBadge() {
   return (
     <div
-      className="mt-5 flex animate-fade-in-up justify-center pointer-events-auto xl:hidden"
+      className="mt-5 flex animate-fade-in-up justify-center pointer-events-auto"
       style={{ animationDelay: "0.62s", opacity: 0 }}
     >
       <a
@@ -29,48 +28,19 @@ export function TokscaleHeroBadge() {
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Live AI token usage tracked by tokscale"
-        className="group inline-flex items-center gap-2.5 rounded-full border border-white/[0.1] bg-white/[0.05] px-4 py-2 text-xs text-white/80 backdrop-blur-sm transition-all hover:border-emerald-400/40 hover:bg-white/[0.09] hover:text-white"
+        className="group inline-block overflow-hidden rounded-xl border border-white/[0.1] bg-white/[0.05] p-2 backdrop-blur-sm transition-all hover:border-emerald-400/40 hover:bg-white/[0.09]"
       >
-        <LiveDot />
-        <span className="font-medium">Live AI token usage</span>
-        <span className="hidden font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-300/80 sm:inline">
-          tokscale
-        </span>
-        <ArrowUpRight className="h-3.5 w-3.5 text-white/50 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-emerald-300" />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={TOKSCALE_EMBED_URL}
+          alt="Misha Lubich — live AI token usage tracked by tokscale"
+          width={280}
+          height={99}
+          loading="lazy"
+          className="h-auto w-[240px] max-w-full rounded-lg transition-transform duration-500 group-hover:scale-[1.01] sm:w-[280px]"
+        />
       </a>
     </div>
-  )
-}
-
-/** Docked hero panel — compact glass card pinned to the hero's right edge on wide screens.
- *  Same live embed as {@link TokscaleCard}, scaled down as a floating ornament. */
-export function TokscaleHeroPanel() {
-  return (
-    <a
-      href={TOKSCALE_PROFILE_URL}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label="Live AI token usage tracked by tokscale"
-      className="group relative block overflow-hidden rounded-2xl border border-white/[0.06] bg-white/[0.03] p-3 backdrop-blur-xl transition-all duration-300 hover:scale-[1.02] hover:border-emerald-400/40"
-    >
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-      <div className="mb-2 flex items-center gap-2">
-        <LiveDot size="h-1.5 w-1.5" />
-        <span className="text-xs font-semibold text-white/90">AI Token Usage</span>
-        <span className="ml-auto font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-300/80">
-          tokscale
-        </span>
-      </div>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={TOKSCALE_EMBED_URL}
-        alt="Misha Lubich — AI token usage tracked by tokscale"
-        width={310}
-        height={109}
-        loading="lazy"
-        className="h-auto w-full max-w-[310px] rounded-lg border border-white/[0.06] transition-transform duration-500 group-hover:scale-[1.01]"
-      />
-    </a>
   )
 }
 
