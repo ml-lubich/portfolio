@@ -15,6 +15,8 @@ export default defineConfig({
     command: `bunx next dev --webpack -p ${PORT}`,
     url: `http://localhost:${PORT}`,
     reuseExistingServer: true,
-    timeout: 120_000,
+    // Generous: this box often runs heavy eval jobs (load >100) and a cold
+    // webpack dev boot can exceed two minutes under that contention.
+    timeout: 300_000,
   },
 })

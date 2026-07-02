@@ -58,6 +58,14 @@ export function LazySection({
     return () => observer.disconnect()
   }, [rootMargin])
 
+  useEffect(() => {
+    function onMountAll() {
+      setVisible(true)
+    }
+    window.addEventListener("portfolio:mount-all", onMountAll)
+    return () => window.removeEventListener("portfolio:mount-all", onMountAll)
+  }, [])
+
   return (
     <div
       ref={ref}

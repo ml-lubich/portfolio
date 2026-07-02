@@ -12,8 +12,20 @@ import { test, expect, type Page } from "@playwright/test"
 
 const NAV_OFFSET = 80
 
+/**
+ * Wait for the programmatic scroll to actually START (scrollY > 100).
+ * The current implementation waits for layout to stabilize BEFORE
+ * scrolling (see woosh-scroll.ts), so polling for "settled" immediately
+ * after a click can read a false-positive "settled at 0" before the
+ * woosh has even begun. Wait for real movement first.
+ */
+async function waitForScrollStart(page: Page): Promise<void> {
+  await page.waitForFunction(() => window.scrollY > 100, undefined, { timeout: 10_000 })
+}
+
 /** Resolve once window.scrollY has been stable for ~1s (woosh + lazy-mount churn done). */
 async function settledScrollY(page: Page): Promise<number> {
+  await waitForScrollStart(page)
   return page.evaluate(async () => {
     let last = window.scrollY
     let stableTicks = 0
@@ -77,6 +89,102 @@ test("nav section link ('Journey') lands on its section and stays", async ({ pag
   )
   expect(top, "#journey top after scroll settles").toBeGreaterThan(-300)
   expect(top, "#journey top after scroll settles").toBeLessThan(900 * 0.6)
+})
+
+/**
+ * Sample window.scrollY every 50ms (browser-side, via page.evaluate) for up
+ * to 20s, stopping early once scrollY has been stable for 1.5s AND total
+ * movement has exceeded 500px. Runs entirely in-page so sampling isn't
+ * skewed by IPC round-trip latency.
+ */
+async function traceScroll(page: Page): Promise<number[]> {
+  return page.evaluate(() => {
+    return new Promise<number[]>((resolve) => {
+      const samples: number[] = []
+      const sampleIntervalMs = 50
+      const maxDurationMs = 20_000
+      const stableForMs = 1_500
+      const minTotalMovementPx = 500
+      const startTime = performance.now()
+      let lastY = window.scrollY
+      let lastMoveTime = startTime
+      let totalMovement = 0
+
+      const timer = setInterval(() => {
+        const y = window.scrollY
+        samples.push(y)
+        const delta = Math.abs(y - lastY)
+        totalMovement += delta
+        if (delta >= 2) lastMoveTime = performance.now()
+        lastY = y
+
+        const now = performance.now()
+        const stableLongEnough = now - lastMoveTime >= stableForMs
+        const movedEnough = totalMovement >= minTotalMovementPx
+        const timedOut = now - startTime >= maxDurationMs
+        if ((stableLongEnough && movedEnough) || timedOut) {
+          clearInterval(timer)
+          resolve(samples)
+        }
+      }, sampleIntervalMs)
+    })
+  })
+}
+
+interface ScrollStall {
+  /** Index into the samples array where the flat run starts. */
+  startIndex: number
+  /** Number of consecutive small (<2px) sample-to-sample deltas in the run. */
+  length: number
+  /** Total |delta| movement observed after the run ends. */
+  movementAfterPx: number
+}
+
+/**
+ * Find "stop-and-go" stalls in a scrollY trace: runs of >=3 consecutive
+ * sample-to-sample deltas under 2px that occur AFTER motion has begun, where
+ * the scroll subsequently moves at least 100px further. A flat run at the
+ * very tail of the trace (the spring easing out to its final resting spot,
+ * with no further movement afterward) is NOT a stall — it's a normal finish.
+ */
+function findStopAndGoStalls(samples: number[]): ScrollStall[] {
+  const deltas: number[] = []
+  for (let i = 0; i < samples.length - 1; i++) {
+    deltas.push(Math.abs(samples[i + 1] - samples[i]))
+  }
+
+  const motionStart = deltas.findIndex((d) => d >= 2)
+  if (motionStart === -1) return []
+
+  const stalls: ScrollStall[] = []
+  let i = motionStart
+  while (i < deltas.length) {
+    if (deltas[i] >= 2) {
+      i++
+      continue
+    }
+    const runStart = i
+    let runLength = 0
+    while (i < deltas.length && deltas[i] < 2) {
+      runLength++
+      i++
+    }
+    if (runLength >= 3) {
+      let movementAfterPx = 0
+      for (let j = i; j < deltas.length; j++) movementAfterPx += deltas[j]
+      if (movementAfterPx >= 100) {
+        stalls.push({ startIndex: runStart, length: runLength, movementAfterPx })
+      }
+    }
+  }
+  return stalls
+}
+
+test("anchor scroll is one continuous motion (no stop-and-go)", async ({ page }) => {
+  await page.getByRole("button", { name: /get in touch/i }).click()
+  const samples = await traceScroll(page)
+  const stalls = findStopAndGoStalls(samples)
+  expect(stalls, `stop-and-go stalls found in trace: ${JSON.stringify(stalls)}`).toHaveLength(0)
 })
 
 // NAV_OFFSET documented for future tightening; the band above is deliberately loose

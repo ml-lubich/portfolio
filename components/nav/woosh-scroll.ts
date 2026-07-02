@@ -80,14 +80,63 @@ export function wooshScrollTo(targetY: number, onSettle?: () => void) {
   }, duration + 50)
 }
 
-/** Generation counter: a new navigateTo() call invalidates any chase loop
- *  still waiting in a setTimeout (its woosh is already cancelled, but the
- *  pending timer would otherwise revive it and fight the new navigation). */
+/** Generation counter: a new navigateTo() call invalidates any pending
+ *  layout-stability poll from a previous call (its woosh is already
+ *  cancelled, but the pending timer would otherwise revive it and fight
+ *  the new navigation). */
 let navigationId = 0
 
-/** Scroll to an anchor href with the woosh effect.
- *  If the target element isn't in the DOM yet (e.g. inside a LazySection),
- *  we progressively scroll down to trigger lazy-loading, then retry.
+const LAYOUT_POLL_MS = 100
+/**
+ * Consecutive unchanged polls required before layout counts as "stable".
+ * Deliberately more than a handful of polls: at least one section
+ * (GitHub stats) renders a short skeleton, kicks off an async data fetch,
+ * then swaps in much taller real content once it resolves — the skeleton
+ * itself holds still for a while, so a too-short stable window declares
+ * "stable" on the skeleton and lands short of any target below it.
+ */
+const LAYOUT_STABLE_POLLS = 15
+const LAYOUT_STABLE_CAP_MS = 5000
+
+/**
+ * Poll for the target id to exist AND document.documentElement.scrollHeight
+ * to stop changing for LAYOUT_STABLE_POLLS consecutive polls — i.e. every
+ * LazySection dispatched by "portfolio:mount-all" has finished mounting and
+ * expanding. Hard-capped at LAYOUT_STABLE_CAP_MS so a section that never
+ * appears can't stall navigation forever. Aborts silently (no onReady call)
+ * if a newer navigateTo() has superseded this one.
+ */
+function waitForStableLayout(id: string, thisNavigation: number, onReady: () => void) {
+  const start = performance.now()
+  let lastHeight = document.documentElement.scrollHeight
+  let stablePolls = 0
+
+  function poll() {
+    if (thisNavigation !== navigationId) return // superseded
+
+    const height = document.documentElement.scrollHeight
+    stablePolls = height === lastHeight ? stablePolls + 1 : 0
+    lastHeight = height
+
+    const ready = !!document.getElementById(id) && stablePolls >= LAYOUT_STABLE_POLLS
+    const timedOut = performance.now() - start >= LAYOUT_STABLE_CAP_MS
+    if (ready || timedOut) {
+      onReady()
+      return
+    }
+    setTimeout(poll, LAYOUT_POLL_MS)
+  }
+  poll()
+}
+
+/**
+ * Scroll to an anchor href with the woosh effect — ONE continuous motion,
+ * no stop-and-go. Before measuring anything, every LazySection is told to
+ * mount immediately ("portfolio:mount-all") and we wait for layout to
+ * settle, so the document has already reached its final height BEFORE the
+ * single scroll starts. (Previously the code chased a moving target with
+ * repeated re-scrolls as sections expanded mid-animation — visible as a
+ * stop-and-go "chase" on every click.)
  */
 export function navigateTo(href: string, callback?: () => void) {
   const thisNavigation = ++navigationId
@@ -118,68 +167,25 @@ export function navigateTo(href: string, callback?: () => void) {
     return Math.min(Math.max(rawY, 0), maxY)
   }
 
-  /**
-   * Converge on the target instead of scrolling once: LazySections mount and
-   * expand WHILE the animation passes them, shifting layout by thousands of
-   * px — a single pre-computed target lands far above the section (the
-   * "clicking Get In Touch scrolls me back up" bug). Re-measure after each
-   * woosh settles and re-scroll until the real element is stable under the
-   * nav offset (or attempts run out).
-   */
-  const maxChaseAttempts = 20
-  function chase(attempt: number) {
-    if (thisNavigation !== navigationId) return // superseded by a newer navigation
+  /** Fires once layout is stable (or the hard cap trips): the single scroll. */
+  function scrollOnce() {
     const el = document.getElementById(id)
-    const target = el ?? document.querySelector(`[data-section="${id}"]`)
-    if (!target) {
-      progressiveDiscovery()
+    if (el) {
+      wooshScrollTo(measureTargetY(el), finish)
       return
     }
-    const targetY = measureTargetY(target)
-    if (el && Math.abs(targetY - window.scrollY) <= 4) {
-      finish()
+    // Id never appeared — fall back to its LazySection wrapper, which is
+    // always in the DOM (data-section is set regardless of mount state).
+    const wrapper = document.querySelector(`[data-section="${id}"]`)
+    if (wrapper) {
+      wooshScrollTo(measureTargetY(wrapper), finish)
       return
     }
-    if (attempt >= maxChaseAttempts) {
-      finish()
-      return
-    }
-    // 120ms between attempts lets IntersectionObservers fire and lazy chunks mount
-    wooshScrollTo(targetY, () => setTimeout(() => chase(attempt + 1), 120))
+    // Neither exists — nothing to scroll to.
+    window.location.hash = id
+    callback?.()
   }
 
-  function progressiveDiscovery() {
-    // No element and no wrapper — fall back to progressive scroll discovery.
-    // (Should rarely happen now that LazySection carries data-section.)
-    cancelActiveWoosh()
-    isProgrammaticScroll = true
-    document.documentElement.style.scrollBehavior = "auto"
-
-    let attempts = 0
-    const maxAttempts = 20
-    const step = () => {
-      const found = document.getElementById(id)
-      if (found) {
-        isProgrammaticScroll = false
-        document.documentElement.style.scrollBehavior = ""
-        const targetY = found.getBoundingClientRect().top + window.scrollY - 80
-        wooshScrollTo(targetY)
-        if (id) history.pushState(null, "", `#${id}`)
-        callback?.()
-        return
-      }
-      attempts++
-      if (attempts >= maxAttempts) {
-        isProgrammaticScroll = false
-        document.documentElement.style.scrollBehavior = ""
-        callback?.()
-        return
-      }
-      window.scrollTo(0, window.scrollY + window.innerHeight * 0.6)
-      setTimeout(step, 100)
-    }
-    step()
-  }
-
-  chase(0)
+  window.dispatchEvent(new Event("portfolio:mount-all"))
+  waitForStableLayout(id, thisNavigation, scrollOnce)
 }
