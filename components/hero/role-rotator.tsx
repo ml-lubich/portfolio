@@ -1,14 +1,77 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useEffect } from "react"
+import { motion, AnimatePresence, useReducedMotion, type Variants } from "framer-motion"
 import { roles } from "./data"
 import { AnimatedName } from "../animations/animated-name"
 import { AnimatedText } from "../animations/animated-text"
 
-/* ── Role rotator with smooth slide transitions ───────────────────── */
+/* ── Role rotator — framer-motion per-character 3D reveal ─────────── */
 
 /** Hero H1 name timing — shared with brain fade-in in `hero/index.tsx`. */
 export const HERO_NAME_REVEAL = { delayMs: 400, durationMs: 700 } as const
+
+const ROLE_ROTATE_INTERVAL = 4500
+
+const containerVariants: Variants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.026, delayChildren: 0.05 } },
+  exit: { transition: { staggerChildren: 0.012 } },
+}
+
+const charVariants: Variants = {
+  hidden: { opacity: 0, y: "0.55em", rotateX: 60, filter: "blur(10px)" },
+  visible: {
+    opacity: 1,
+    y: "0em",
+    rotateX: 0,
+    filter: "blur(0px)",
+    transition: { type: "spring", damping: 22, stiffness: 280 },
+  },
+  exit: {
+    opacity: 0,
+    y: "-0.45em",
+    filter: "blur(8px)",
+    transition: { duration: 0.22, ease: "easeIn" },
+  },
+}
+
+/** Reduced motion: whole-line crossfade, no per-char stagger or blur. */
+const reducedCharVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { duration: 0.4 } },
+  exit: { opacity: 0, transition: { duration: 0.25 } },
+}
+
+const accentLineVariants: Variants = {
+  hidden: { scaleX: 0, opacity: 0 },
+  visible: {
+    scaleX: 1,
+    opacity: 1,
+    transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.15 },
+  },
+  exit: { scaleX: 0, opacity: 0, transition: { duration: 0.2, ease: "easeIn" } },
+}
+
+/** One role line split word→char so mid-word wraps never happen and every
+ *  character keeps a stable global stagger index across words. */
+function RoleChars({ role, reduce }: { role: string; reduce: boolean }) {
+  const variants = reduce ? reducedCharVariants : charVariants
+  let charIndex = 0
+  return (
+    <span className="inline-flex flex-wrap justify-center gap-x-[0.32em]">
+      {role.split(" ").map((word, wi) => (
+        <span key={`${word}-${wi}`} className="inline-flex whitespace-nowrap" style={{ transformStyle: "preserve-3d" }}>
+          {word.split("").map((char) => (
+            <motion.span key={charIndex++} variants={variants} className="inline-block will-change-transform">
+              {char}
+            </motion.span>
+          ))}
+        </span>
+      ))}
+    </span>
+  )
+}
 
 export function RoleRotator({
   onNameRevealStart,
@@ -16,25 +79,17 @@ export function RoleRotator({
   onNameRevealStart?: () => void
 } = {}) {
   const [roleIndex, setRoleIndex] = useState(0)
-  const [prevRoleIndex, setPrevRoleIndex] = useState(-1)
-  const [isTransitioning, setIsTransitioning] = useState(false)
-  const transitionTimeout = useRef<ReturnType<typeof setTimeout>>(undefined)
+  const reduce = useReducedMotion() ?? false
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setRoleIndex((prev) => {
-        setPrevRoleIndex(prev)
-        setIsTransitioning(true)
-        if (transitionTimeout.current) clearTimeout(transitionTimeout.current)
-        transitionTimeout.current = setTimeout(() => setIsTransitioning(false), 1000)
-        return (prev + 1) % roles.length
-      })
-    }, 4500)
-    return () => {
-      clearInterval(interval)
-      if (transitionTimeout.current) clearTimeout(transitionTimeout.current)
-    }
+    const interval = setInterval(
+      () => setRoleIndex((prev) => (prev + 1) % roles.length),
+      ROLE_ROTATE_INTERVAL
+    )
+    return () => clearInterval(interval)
   }, [])
+
+  const role = roles[roleIndex]
 
   return (
     <h1
@@ -51,45 +106,40 @@ export function RoleRotator({
           onReveal={onNameRevealStart}
         />
       </span>
-      <span className="relative mt-2 block min-h-[2rem] w-full overflow-hidden sm:min-h-[2.4rem] md:min-h-[3rem] lg:min-h-[3.6rem]">
-        {roles.map((role, i) => {
-          const isActive = i === roleIndex
-          const isLeaving = i === prevRoleIndex && isTransitioning
-
-          let translateY = "60px"
-          let opacity = 0
-          let scale = "scale(0.96)"
-
-          if (isActive) {
-            translateY = "0px"
-            opacity = 1
-            scale = "scale(1)"
-          } else if (isLeaving) {
-            translateY = "-50px"
-            opacity = 0
-            scale = "scale(0.97)"
-          }
-
-          return (
-            <span
-              key={role}
-              className="absolute inset-x-0 top-0 flex items-start justify-center"
-              style={{
-                opacity,
-                transform: `translateY(${translateY}) ${scale}`,
-                transition: isActive || isLeaving
-                  ? "opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)"
-                  : "none",
-              }}
-              aria-hidden={!isActive}
-            >
-              <span className="gradient-text mx-auto px-2 text-center text-pretty font-light whitespace-nowrap text-[clamp(0.95rem,4.2vw,1.5rem)] sm:text-3xl md:text-4xl lg:text-5xl">
-                {role}
-              </span>
+      <span
+        className="relative mt-3 flex min-h-[2rem] w-full items-start justify-center sm:min-h-[2.4rem] md:min-h-[3rem] lg:min-h-[3.6rem]"
+        style={{ perspective: "900px" }}
+      >
+        {/* Soft glow pooled behind the rotating role — breathes with each swap. */}
+        <span
+          className="pointer-events-none absolute left-1/2 top-1/2 h-[130%] w-[70%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/15 blur-3xl"
+          aria-hidden="true"
+        />
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.span
+            key={role}
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="relative flex items-center justify-center gap-3 sm:gap-4 md:gap-5"
+          >
+            <motion.span
+              variants={accentLineVariants}
+              className="hidden h-px w-8 origin-right bg-gradient-to-l from-primary/70 to-transparent sm:block md:w-12"
+              aria-hidden="true"
+            />
+            <span className="gradient-text px-1 text-center text-pretty font-light text-[clamp(0.95rem,4.2vw,1.5rem)] sm:text-3xl md:text-4xl lg:text-5xl">
+              <RoleChars role={role} reduce={reduce} />
             </span>
-          )
-        })}
-        <span className="sr-only">{roles[roleIndex]}</span>
+            <motion.span
+              variants={accentLineVariants}
+              className="hidden h-px w-8 origin-left bg-gradient-to-r from-primary/70 to-transparent sm:block md:w-12"
+              aria-hidden="true"
+            />
+          </motion.span>
+        </AnimatePresence>
+        <span className="sr-only">{role}</span>
       </span>
     </h1>
   )
