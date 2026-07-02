@@ -4,6 +4,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { AnimatedSection } from "../animations/animated-section"
 import { AnimatedText } from "../animations/animated-text"
+import { SocialIcons } from "../social-icons"
 
 const footerLinks = [
   { href: "/#about", label: "About" },
@@ -13,11 +14,6 @@ const footerLinks = [
   { href: "/#skills", label: "Skills" },
   { href: "/blog", label: "Blog" },
   { href: "/#contact", label: "Contact" },
-]
-
-const socialLinks = [
-  { href: "https://github.com/ml-lubich", label: "GitHub", rel: "noopener noreferrer me" },
-  { href: "https://www.linkedin.com/in/misha-lubich/", label: "LinkedIn", rel: "noopener noreferrer me" },
 ]
 
 export function Footer() {
@@ -56,15 +52,9 @@ export function Footer() {
 
             {/* Social */}
             <nav aria-label="Social links">
-              <ul className="flex gap-4">
-                {socialLinks.map(({ href, label, rel }) => (
-                  <li key={href}>
-                    <a href={href} target="_blank" rel={rel} className="text-xs text-muted-foreground transition-colors hover:text-white">
-                      {label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
+              <div className="flex gap-3">
+                <SocialIcons size="sm" />
+              </div>
             </nav>
           </div>
         </AnimatedSection>
