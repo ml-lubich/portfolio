@@ -167,7 +167,9 @@ function checkUrl(targetUrl: string): Promise<{ ok: boolean; status: number | st
 
 // ── Scan the codebase once, shared by all tests ────────────────────────────────
 
+// app/demo/ is a gitignored local-only playground — never deployed, so don't lint its links
 const files = SRC_DIRS.flatMap((d) => walk(path.join(ROOT, d)))
+  .filter((f) => !f.startsWith(path.join(APP_DIR, "demo") + path.sep))
 const allLinks = files.flatMap(extractHrefs)
 const sectionIds = collectSectionIds(files)
 
