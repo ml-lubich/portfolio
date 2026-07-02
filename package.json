@@ -17,6 +17,7 @@
     "start": "next start",
     "lint": "eslint .",
     "test": "vitest run",
+    "test:e2e": "playwright test",
     "test:coverage": "vitest run --coverage",
     "ci": "bun run lint && bun run build",
     "ship:dev": "bun run ci",
@@ -88,6 +89,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.5",
+    "@playwright/test": "^1.61.1",
     "@tailwindcss/postcss": "^4.1.13",
     "@types/node": "^22",
     "@types/react": "^19",

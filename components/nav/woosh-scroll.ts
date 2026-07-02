@@ -25,13 +25,17 @@ function cancelActiveWoosh() {
   document.documentElement.style.scrollBehavior = ""
 }
 
-export function wooshScrollTo(targetY: number) {
-  // Cancel any in-flight animation so two scrolls never fight
+export function wooshScrollTo(targetY: number, onSettle?: () => void) {
+  // Cancel any in-flight animation so two scrolls never fight.
+  // A superseded animation's onSettle is dropped with its timeout.
   cancelActiveWoosh()
 
   const startY = window.scrollY
   const distance = targetY - startY
-  if (Math.abs(distance) < 2) return
+  if (Math.abs(distance) < 2) {
+    onSettle?.()
+    return
+  }
 
   const duration = Math.min(900, Math.max(400, Math.abs(distance) * 0.35))
   let startTime: number | null = null
@@ -72,14 +76,21 @@ export function wooshScrollTo(targetY: number) {
     }
     activeTimeoutId = null
     isProgrammaticScroll = false
+    onSettle?.()
   }, duration + 50)
 }
+
+/** Generation counter: a new navigateTo() call invalidates any chase loop
+ *  still waiting in a setTimeout (its woosh is already cancelled, but the
+ *  pending timer would otherwise revive it and fight the new navigation). */
+let navigationId = 0
 
 /** Scroll to an anchor href with the woosh effect.
  *  If the target element isn't in the DOM yet (e.g. inside a LazySection),
  *  we progressively scroll down to trigger lazy-loading, then retry.
  */
 export function navigateTo(href: string, callback?: () => void) {
+  const thisNavigation = ++navigationId
   if (href.startsWith("/")) {
     callback?.()
     window.location.href = href
@@ -95,55 +106,50 @@ export function navigateTo(href: string, callback?: () => void) {
     return
   }
 
-  function scrollToElement() {
-    const el = id ? document.getElementById(id) : null
-    if (el) {
-      const targetY = el.getBoundingClientRect().top + window.scrollY - 80
-      wooshScrollTo(targetY)
-      if (id) history.pushState(null, "", `#${id}`)
-      callback?.()
+  const finish = () => {
+    history.pushState(null, "", `#${id}`)
+    callback?.()
+  }
+
+  /** Absolute Y for the target, clamped to the scrollable range. */
+  function measureTargetY(target: Element): number {
+    const rawY = target.getBoundingClientRect().top + window.scrollY - 80
+    const maxY = Math.max(0, document.documentElement.scrollHeight - window.innerHeight)
+    return Math.min(Math.max(rawY, 0), maxY)
+  }
+
+  /**
+   * Converge on the target instead of scrolling once: LazySections mount and
+   * expand WHILE the animation passes them, shifting layout by thousands of
+   * px — a single pre-computed target lands far above the section (the
+   * "clicking Get In Touch scrolls me back up" bug). Re-measure after each
+   * woosh settles and re-scroll until the real element is stable under the
+   * nav offset (or attempts run out).
+   */
+  const maxChaseAttempts = 20
+  function chase(attempt: number) {
+    if (thisNavigation !== navigationId) return // superseded by a newer navigation
+    const el = document.getElementById(id)
+    const target = el ?? document.querySelector(`[data-section="${id}"]`)
+    if (!target) {
+      progressiveDiscovery()
       return
     }
-
-    // Element not yet in DOM — look for a LazySection wrapper with
-    // a matching data-section attribute.  Scroll there first (which
-    // triggers the IntersectionObserver), then wait for the real
-    // element to mount and do one precise adjustment.
-    const wrapper = document.querySelector(`[data-section="${id}"]`)
-    if (wrapper) {
-      const wrapperY = wrapper.getBoundingClientRect().top + window.scrollY - 80
-      wooshScrollTo(wrapperY)
-
-      // Poll briefly for the real element to appear after lazy-load
-      let retries = 0
-      const maxRetries = 20
-      const poll = () => {
-        const found = document.getElementById(id)
-        if (found) {
-          // Element mounted — do a quick adjustment if needed
-          const finalY = found.getBoundingClientRect().top + window.scrollY - 80
-          if (Math.abs(finalY - window.scrollY) > 4) {
-            wooshScrollTo(finalY)
-          }
-          history.pushState(null, "", `#${id}`)
-          callback?.()
-          return
-        }
-        retries++
-        if (retries >= maxRetries) {
-          // Give up — wrapper scroll position is close enough
-          history.pushState(null, "", `#${id}`)
-          callback?.()
-          return
-        }
-        setTimeout(poll, 100)
-      }
-      // Start polling after a short delay to let IntersectionObserver fire
-      setTimeout(poll, 150)
+    const targetY = measureTargetY(target)
+    if (el && Math.abs(targetY - window.scrollY) <= 4) {
+      finish()
       return
     }
+    if (attempt >= maxChaseAttempts) {
+      finish()
+      return
+    }
+    // 120ms between attempts lets IntersectionObservers fire and lazy chunks mount
+    wooshScrollTo(targetY, () => setTimeout(() => chase(attempt + 1), 120))
+  }
 
-    // No wrapper either — fall back to progressive scroll discovery.
+  function progressiveDiscovery() {
+    // No element and no wrapper — fall back to progressive scroll discovery.
     // (Should rarely happen now that LazySection carries data-section.)
     cancelActiveWoosh()
     isProgrammaticScroll = true
@@ -175,5 +181,5 @@ export function navigateTo(href: string, callback?: () => void) {
     step()
   }
 
-  scrollToElement()
+  chase(0)
 }

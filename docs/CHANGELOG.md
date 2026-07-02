@@ -6,10 +6,12 @@ All notable changes to this project are documented here.
 
 ### Fixed
 
+- Anchor navigation ("Get In Touch", nav section links) no longer lands far above the target section. `navigateTo` scrolled once toward a Y computed while intermediate LazySections were still collapsed placeholders; as they mounted mid-scroll the layout expanded by thousands of px and the viewport ended up well above `#contact` (perceived as "scrolls me back up"). It now converges: after each woosh settles it re-measures the target and re-scrolls until the element is stable under the nav offset (`components/nav/woosh-scroll.ts`). A generation counter aborts superseded chase loops when a new navigation starts.
 - Token Invaders enemies now render the Claude Code icon sprite (`/claude-code-icon.png`) with a colored glow halo; model name label rendered below the icon in the enemy color. Falls back to a colored rect if the image hasn't loaded yet.
 
 ### Added
 
+- Headless Playwright e2e regression suite for scroll navigation (`e2e/scroll-navigation.spec.ts`, `playwright.config.ts`, `bun run test:e2e`) — boots `next dev` on port 3811, verifies hero CTA / nav pill / section links land on their targets and stay there.
 - **Token Invaders** (`/games/token-invaders`) — LLM-themed Space Invaders game. Player is an inference engine defending against AI failure modes (null errors, hallucinations, prompt injections, context overflows, jailbreaks). Five enemy types, 5 waves, UFO bonus, degradable shields, mobile on-screen controls.
 - **Games hub page** (`/games`) — landing page listing all portfolio games including a Snake easter egg card.
 - **Games nav dropdown** — "Games" button in the desktop nav (and mobile overlay section) with violet accent, mirroring the Tools dropdown style.
