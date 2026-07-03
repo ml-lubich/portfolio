@@ -17,11 +17,11 @@ const NAME = "Misha Lubich"
 /** Deterministic per-letter depth field (translateZ, px). Fixed values — never
  *  randomness — so SSR renders identically across passes. Alternating signs keep
  *  neighbouring letters on different planes for a real parallax spread. */
-const DEPTHS = [42, -28, 34, -40, 24, 8, -34, 46, -22, 38, -44, 26]
+const DEPTHS = [21, -14, 17, -20, 12, 4, -17, 23, -11, 19, -22, 13]
 
 /** How strongly cursor position displaces a letter, scaled by its depth. */
-const PARALLAX_X = 0.9
-const PARALLAX_Y = 0.6
+const PARALLAX_X = 1.8
+const PARALLAX_Y = 1.2
 
 /** Lazy spring so the letters drift after the cursor rather than track it. */
 const PARALLAX_SPRING = { stiffness: 55, damping: 18 }
@@ -120,7 +120,7 @@ export function HeroName3D({
 
   let charIndex = 0
   return (
-    <span className="relative inline-block max-w-full" style={{ perspective: "1000px" }}>
+    <span className="relative inline-block max-w-full" style={{ perspective: "1200px" }}>
       <span className="sr-only">{NAME}</span>
       <span
         aria-hidden="true"

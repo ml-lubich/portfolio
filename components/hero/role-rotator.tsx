@@ -63,7 +63,11 @@ function RoleChars({ role, reduce }: { role: string; reduce: boolean }) {
       {role.split(" ").map((word, wi) => (
         <span key={`${word}-${wi}`} className="inline-flex whitespace-nowrap" style={{ transformStyle: "preserve-3d" }}>
           {word.split("").map((char) => (
-            <motion.span key={charIndex++} variants={variants} className="inline-block will-change-transform">
+            <motion.span
+              key={charIndex++}
+              variants={variants}
+              className="role-char-3d inline-block will-change-transform"
+            >
               {char}
             </motion.span>
           ))}
@@ -122,7 +126,7 @@ export function RoleRotator({
               className="hidden h-px w-8 origin-right bg-gradient-to-l from-primary/70 to-transparent sm:block md:w-12"
               aria-hidden="true"
             />
-            <span className="gradient-text px-1 text-center text-pretty font-light text-[clamp(0.95rem,4.2vw,1.5rem)] sm:text-3xl md:text-4xl lg:text-5xl">
+            <span className="px-1 text-center text-pretty text-[clamp(0.95rem,4.2vw,1.5rem)] sm:text-3xl md:text-4xl lg:text-5xl">
               <RoleChars role={role} reduce={reduce} />
             </span>
             <motion.span

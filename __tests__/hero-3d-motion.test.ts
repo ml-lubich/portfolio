@@ -64,6 +64,16 @@ describe("Hero name — letters suspended in 3D space", () => {
     expect(src).toMatch(/useReducedMotion/)
   })
 
+  it("role line paints its gradient per character — parent-level background-clip:text with transformed char children renders invisible text", () => {
+    const src = fs.readFileSync(
+      path.join(ROOT, "components/hero/role-rotator.tsx"),
+      "utf8"
+    )
+    expect(src).not.toMatch(/gradient-text/)
+    expect(src).toMatch(/role-char-3d/)
+    expect(css).toMatch(/\.role-char-3d[\s\S]{0,600}background-clip:\s*text/)
+  })
+
   it("idle letter float runs as a compositor CSS animation gated behind reduced motion", () => {
     expect(css).toMatch(
       /@media \(prefers-reduced-motion: no-preference\)[\s\S]*?@keyframes hero-name-bob/
