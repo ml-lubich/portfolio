@@ -65,7 +65,7 @@ export function TokscaleHeroBadge() {
 
   return (
     <div
-      className="mt-8 flex animate-fade-in-up justify-center pointer-events-auto sm:mt-10"
+      className="mt-12 flex animate-fade-in-up justify-center pointer-events-auto sm:mt-20"
       style={{ animationDelay: "0.62s", opacity: 0 }}
     >
       <div ref={sceneRef} className="tokscale-3d-scene relative">
