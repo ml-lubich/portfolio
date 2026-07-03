@@ -75,11 +75,11 @@ export function TokscaleHeroBadge() {
 
   return (
     <div
-      className="mt-6 flex animate-fade-in-up justify-center pointer-events-auto"
+      className="mt-8 flex animate-fade-in-up justify-center pointer-events-auto sm:mt-10"
       style={{ animationDelay: "0.62s", opacity: 0 }}
     >
       <div ref={sceneRef} className="tokscale-3d-scene relative">
-        <div className="tokscale-aura absolute -inset-5 rounded-[2rem]" aria-hidden="true" />
+        <div className="tokscale-aura absolute -inset-3 rounded-[1.5rem]" aria-hidden="true" />
         <motion.div
           className="relative"
           style={{ transformStyle: "preserve-3d" }}
@@ -115,6 +115,20 @@ export function TokscaleHeroBadge() {
               loading="lazy"
               className="relative h-auto w-[290px] max-w-full rounded-xl sm:w-[340px]"
             />
+            {/* "In progress" strip — tokens are burning right now; the green bar
+                sweeps through the panel like an indeterminate progress indicator. */}
+            <span className="relative mt-2 flex items-center gap-2 px-1 pb-0.5">
+              <span className="whitespace-nowrap font-mono text-[9px] uppercase tracking-[0.18em] text-emerald-300/80">
+                tokens streaming
+              </span>
+              <span className="relative h-[3px] flex-1 overflow-hidden rounded-full bg-emerald-500/15">
+                <span
+                  data-tokscale-scan
+                  aria-hidden="true"
+                  className="tokscale-scan-bar absolute inset-y-0 left-0 w-1/3 rounded-full bg-gradient-to-r from-emerald-500/10 via-emerald-400 to-emerald-500/10"
+                />
+              </span>
+            </span>
           </motion.a>
         </motion.div>
       </div>

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence, useReducedMotion, type Variants } from "framer-motion"
 import { roles } from "./data"
-import { AnimatedName } from "../animations/animated-name"
+import { HeroName3D } from "./hero-name-3d"
 import { AnimatedText } from "../animations/animated-text"
 
 /* ── Role rotator — framer-motion per-character 3D reveal ─────────── */
@@ -97,14 +97,7 @@ export function RoleRotator({
       style={{ animationDelay: "0.1s", lineHeight: 1.15 }}
     >
       <span className="block text-pretty text-4xl font-semibold sm:text-5xl md:text-6xl lg:text-7xl">
-        <AnimatedName
-          name="Misha Lubich"
-          trigger="mount"
-          delay={HERO_NAME_REVEAL.delayMs}
-          duration={HERO_NAME_REVEAL.durationMs}
-          metallic
-          onReveal={onNameRevealStart}
-        />
+        <HeroName3D delay={HERO_NAME_REVEAL.delayMs} onReveal={onNameRevealStart} />
       </span>
       <span
         className="relative mt-3 flex min-h-[2rem] w-full items-start justify-center sm:min-h-[2.4rem] md:min-h-[3rem] lg:min-h-[3.6rem]"
