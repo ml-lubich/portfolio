@@ -64,6 +64,16 @@ describe("Hero name — letters suspended in 3D space", () => {
     expect(src).toMatch(/useReducedMotion/)
   })
 
+  it("cursor motion rotates the whole name as one rigid plane — never displaces letters individually", () => {
+    const src = fs.readFileSync(
+      path.join(ROOT, "components/hero/hero-name-3d.tsx"),
+      "utf8"
+    )
+    expect(src).not.toMatch(/depth\s*\*\s*PARALLAX/)
+    expect(src).toMatch(/rotateY/)
+    expect(src).toMatch(/rotateX/)
+  })
+
   it("role line paints its gradient per character — parent-level background-clip:text with transformed char children renders invisible text", () => {
     const src = fs.readFileSync(
       path.join(ROOT, "components/hero/role-rotator.tsx"),
