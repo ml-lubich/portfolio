@@ -8,7 +8,9 @@ import { ExternalLink, Flame, Trophy } from "lucide-react"
 
 export const TOKSCALE_PROFILE_URL = "https://tokscale.ai/u/ml-lubich"
 export const TOKSCALE_LEADERBOARD_URL = "https://tokscale.ai/leaderboard"
-const TOKSCALE_EMBED_URL = "https://tokscale.ai/api/embed/ml-lubich/svg?sort=cost&compact=1"
+/** Served by app/api/tokscale — the raw embed's opaque card background is
+ *  stripped server-side so the stats sit on the liquid-glass panel. */
+const TOKSCALE_EMBED_URL = "/api/tokscale"
 
 /** Idle float loop — gentle bob with a slow 3D sway. Runs only while not hovered. */
 const FLOAT_KEYFRAMES = {
@@ -85,7 +87,7 @@ export function TokscaleHeroBadge() {
             onPointerEnter={handlePointerEnter}
             onPointerLeave={handlePointerLeave}
             style={{ rotateX: tiltX, rotateY: tiltY, transformPerspective: 900 }}
-            className="group relative block overflow-hidden rounded-2xl border border-emerald-400/25 bg-[hsla(222,20%,7%,0.72)] p-2.5 shadow-[0_18px_50px_-12px_rgba(16,185,129,0.3),0_8px_24px_-8px_rgba(0,0,0,0.5)] backdrop-blur-md transition-[border-color,box-shadow] duration-500 hover:border-emerald-300/50 hover:shadow-[0_24px_64px_-12px_rgba(16,185,129,0.45),0_8px_24px_-8px_rgba(0,0,0,0.5)]"
+            className="group relative block overflow-hidden rounded-2xl border border-white/[0.14] bg-[hsla(222,25%,10%,0.34)] p-2.5 shadow-[0_18px_50px_-12px_rgba(16,185,129,0.22),0_8px_24px_-8px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-xl backdrop-saturate-150 transition-[border-color,box-shadow,background-color] duration-500 hover:border-emerald-300/40 hover:bg-[hsla(222,25%,10%,0.42)] hover:shadow-[0_24px_64px_-12px_rgba(16,185,129,0.35),0_8px_24px_-8px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.14)]"
           >
             <div
               className="absolute inset-x-4 top-0 h-[2px] bg-gradient-to-r from-transparent via-emerald-300/80 to-transparent"
