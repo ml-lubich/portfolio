@@ -1060,65 +1060,7 @@ nav[data-nav-scrolled="true"] .nav-shell {
   transform: translateX(30%);
 }
 
-/* ── Hero role line — per-character metallic gradient ──
-   The rotating role animates each character with transform/filter, which
-   creates stacking contexts; a parent-level background-clip:text can't paint
-   into those, so each char clips its own gradient instead. */
-.role-char-3d {
-  font-weight: 700;
-  background-image: linear-gradient(120deg,
-      hsl(0 0% 100%) 0%,
-      hsl(220 20% 82%) 16%,
-      hsl(0 0% 100%) 28%,
-      hsl(220 15% 75%) 40%,
-      hsl(0 0% 100%) 52%,
-      hsl(220 20% 82%) 66%,
-      hsl(0 0% 100%) 78%,
-      hsl(220 15% 75%) 90%,
-      hsl(0 0% 100%) 100%);
-  background-size: 250% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-position: 50% center;
-}
-
-/* ── Hero name — 3D suspended letters ──
-   Entrance + cursor parallax are framer-motion springs in hero-name-3d.tsx;
-   the infinite idle float below is CSS so it stays on the compositor. */
-.hero-name-3d-char {
-  background: linear-gradient(120deg,
-      hsl(var(--foreground)) 0%,
-      hsl(220 15% 75%) 20%,
-      hsl(0 0% 100%) 30%,
-      hsl(220 15% 75%) 40%,
-      hsl(var(--foreground)) 55%,
-      hsl(220 15% 75%) 70%,
-      hsl(0 0% 100%) 80%,
-      hsl(220 15% 75%) 90%,
-      hsl(var(--foreground)) 100%);
-  background-size: 250% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-position: 50% center;
-}
-
 @media (prefers-reduced-motion: no-preference) {
-  @keyframes hero-name-bob {
-    0% {
-      transform: translate3d(0, calc(var(--bob-amp, 3px) * -1), 0);
-    }
-
-    100% {
-      transform: translate3d(0, var(--bob-amp, 3px), 0);
-    }
-  }
-
-  .hero-name-3d-bob {
-    animation: hero-name-bob var(--bob-dur, 6s) ease-in-out var(--bob-delay, 0s) infinite alternate;
-    will-change: transform;
-  }
 
   /* Indeterminate "tokens streaming" bar — sweeps through the panel. */
   @keyframes tokscale-scan {

@@ -10,26 +10,16 @@ export const TOKSCALE_PROFILE_URL = "https://tokscale.ai/u/ml-lubich"
 export const TOKSCALE_LEADERBOARD_URL = "https://tokscale.ai/leaderboard"
 const TOKSCALE_EMBED_URL = "https://tokscale.ai/api/embed/ml-lubich/svg?sort=cost&compact=1"
 
-/** Pulsing "live" dot shared by the hero pill and the stats card chip. */
-function LiveDot({ size = "h-2 w-2" }: { size?: string }) {
-  return (
-    <span className={`relative flex ${size}`}>
-      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
-      <span className={`relative inline-flex ${size} rounded-full bg-emerald-400`} />
-    </span>
-  )
-}
-
 /** Idle float loop — gentle bob with a slow 3D sway. Runs only while not hovered. */
 const FLOAT_KEYFRAMES = {
-  y: [0, -8, 0],
+  y: [0, -12, 0],
   rotateX: [3, -2.5, 3],
   rotateY: [-4, 4, -4],
 }
-const FLOAT_TRANSITION = { duration: 8, repeat: Infinity, ease: "easeInOut" as const }
+const FLOAT_TRANSITION = { duration: 7, repeat: Infinity, ease: "easeInOut" as const }
 
-/** Hover pose — the float settles flat and lifts so only the spring tilt moves. */
-const HOVER_POSE = { y: -6, rotateX: 0, rotateY: 0 }
+/** Hover pose — the float settles flat, lifts and swells so only the spring tilt moves. */
+const HOVER_POSE = { y: -10, scale: 1.02, rotateX: 0, rotateY: 0 }
 const HOVER_TRANSITION = { type: "spring" as const, stiffness: 220, damping: 26 }
 
 const TILT_SPRING = { stiffness: 260, damping: 28 }
@@ -102,25 +92,18 @@ export function TokscaleHeroBadge() {
               aria-hidden="true"
             />
             <div className="tokscale-sheen absolute inset-0 overflow-hidden rounded-2xl" aria-hidden="true" />
-            <span className="absolute right-3 top-3 z-10 inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/15 px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.14em] text-emerald-300 backdrop-blur-sm">
-              <LiveDot size="h-1.5 w-1.5" />
-              Live
-            </span>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={TOKSCALE_EMBED_URL}
               alt="Misha Lubich — live AI token usage tracked by tokscale"
-              width={340}
-              height={120}
+              width={540}
+              height={190}
               loading="lazy"
-              className="relative h-auto w-[290px] max-w-full rounded-xl sm:w-[340px]"
+              className="relative h-auto w-[min(92vw,420px)] max-w-full rounded-xl sm:w-[460px] lg:w-[540px]"
             />
-            {/* "In progress" strip — tokens are burning right now; the green bar
+            {/* Wordless "in progress" strip — tokens are burning right now; the green bar
                 sweeps through the panel like an indeterminate progress indicator. */}
-            <span className="relative mt-2 flex items-center gap-2 px-1 pb-0.5">
-              <span className="whitespace-nowrap font-mono text-[9px] uppercase tracking-[0.18em] text-emerald-300/80">
-                tokens streaming
-              </span>
+            <span className="relative mt-2 flex items-center px-1 pb-0.5">
               <span className="relative h-[3px] flex-1 overflow-hidden rounded-full bg-emerald-500/15">
                 <span
                   data-tokscale-scan
@@ -149,10 +132,6 @@ export function TokscaleCard() {
           <div className="mb-2 flex flex-wrap items-center gap-2">
             <Flame className="h-4 w-4 text-emerald-400" />
             <h3 className="text-lg font-bold text-foreground">AI Token Usage</h3>
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.14em] text-emerald-400">
-              <LiveDot size="h-1.5 w-1.5" />
-              Live
-            </span>
           </div>
           <p className="mb-4 max-w-md text-sm leading-relaxed text-muted-foreground">
             Tokens burned shipping AI in production — auto-tracked across Claude Code, Codex,
