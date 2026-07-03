@@ -1039,21 +1039,11 @@ nav[data-nav-scrolled="true"] .nav-shell {
     inset 0 1px 0 0 hsla(0, 0%, 100%, 0.05);
 }
 
-/* ── Tokscale hero 3D panel ── */
+/* ── Tokscale hero 3D panel ──
+   Float + pointer tilt are framer-motion springs in tokscale-stats.tsx;
+   only the perspective scene, aura glow, and sheen sweep live here. */
 .tokscale-3d-scene {
   perspective: 900px;
-}
-
-.tokscale-float {
-  transform-style: preserve-3d;
-}
-
-/* Pointer-tracked tilt (vars set from JS; mouse only). Sits inside the idle
-   float so the two transforms compose instead of fighting. */
-.tokscale-tilt {
-  transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) translateZ(0);
-  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: transform;
 }
 
 .tokscale-aura {
@@ -1066,22 +1056,6 @@ nav[data-nav-scrolled="true"] .nav-shell {
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  @keyframes tokscale-float-bob {
-
-    0%,
-    100% {
-      transform: translateY(0) rotateX(3deg) rotateY(-4deg);
-    }
-
-    50% {
-      transform: translateY(-8px) rotateX(-2.5deg) rotateY(4deg);
-    }
-  }
-
-  .tokscale-float {
-    animation: tokscale-float-bob 8s ease-in-out infinite;
-  }
-
   @keyframes tokscale-aura-pulse {
 
     0%,

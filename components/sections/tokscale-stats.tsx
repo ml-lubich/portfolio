@@ -1,6 +1,7 @@
 "use client"
 
-import { useCallback, useRef } from "react"
+import { useCallback, useRef, useState } from "react"
+import { motion, useReducedMotion, useSpring } from "framer-motion"
 import { ExternalLink, Flame, Trophy } from "lucide-react"
 
 /* ── tokscale — live AI token usage (single source of truth) ──────── */
@@ -19,46 +20,82 @@ function LiveDot({ size = "h-2 w-2" }: { size?: string }) {
   )
 }
 
+/** Idle float loop — gentle bob with a slow 3D sway. Runs only while not hovered. */
+const FLOAT_KEYFRAMES = {
+  y: [0, -8, 0],
+  rotateX: [3, -2.5, 3],
+  rotateY: [-4, 4, -4],
+}
+const FLOAT_TRANSITION = { duration: 8, repeat: Infinity, ease: "easeInOut" as const }
+
+/** Hover pose — the float settles flat and lifts so only the spring tilt moves. */
+const HOVER_POSE = { y: -6, rotateX: 0, rotateY: 0 }
+const HOVER_TRANSITION = { type: "spring" as const, stiffness: 220, damping: 26 }
+
+const TILT_SPRING = { stiffness: 260, damping: 28 }
+
 /** Live tokscale embed, centered right under the hero brain — a floating 3D panel
- *  with pointer-tracked tilt (desktop) and a pulsing emerald aura so it reads as
- *  a hero centerpiece rather than a footnote. Links to the tokscale profile. */
+ *  with pointer-tracked spring tilt (desktop) and a pulsing emerald aura so it reads
+ *  as a hero centerpiece rather than a footnote. Links to the tokscale profile.
+ *  Pointer math reads the static scene wrapper (never the transforming card) and the
+ *  idle float pauses while hovered, so the tilt can't fight the bob and jitter. */
 export function TokscaleHeroBadge() {
-  const cardRef = useRef<HTMLAnchorElement>(null)
+  const sceneRef = useRef<HTMLDivElement>(null)
+  const [hovered, setHovered] = useState(false)
+  const reduce = useReducedMotion() ?? false
+  const tiltX = useSpring(0, TILT_SPRING)
+  const tiltY = useSpring(0, TILT_SPRING)
 
-  const handlePointerMove = useCallback((e: React.PointerEvent<HTMLAnchorElement>) => {
-    const el = cardRef.current
-    if (!el || e.pointerType !== "mouse") return
-    const rect = el.getBoundingClientRect()
-    const px = (e.clientX - rect.left) / rect.width - 0.5
-    const py = (e.clientY - rect.top) / rect.height - 0.5
-    el.style.setProperty("--tilt-x", `${(-py * 12).toFixed(2)}deg`)
-    el.style.setProperty("--tilt-y", `${(px * 16).toFixed(2)}deg`)
-  }, [])
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent<HTMLAnchorElement>) => {
+      if (reduce || e.pointerType !== "mouse") return
+      const rect = sceneRef.current?.getBoundingClientRect()
+      if (!rect) return
+      const px = (e.clientX - rect.left) / rect.width - 0.5
+      const py = (e.clientY - rect.top) / rect.height - 0.5
+      tiltX.set(-py * 10)
+      tiltY.set(px * 14)
+    },
+    [reduce, tiltX, tiltY]
+  )
 
-  const resetTilt = useCallback(() => {
-    const el = cardRef.current
-    if (!el) return
-    el.style.setProperty("--tilt-x", "0deg")
-    el.style.setProperty("--tilt-y", "0deg")
-  }, [])
+  const handlePointerEnter = useCallback(
+    (e: React.PointerEvent<HTMLAnchorElement>) => {
+      if (reduce || e.pointerType !== "mouse") return
+      setHovered(true)
+    },
+    [reduce]
+  )
+
+  const handlePointerLeave = useCallback(() => {
+    setHovered(false)
+    tiltX.set(0)
+    tiltY.set(0)
+  }, [tiltX, tiltY])
 
   return (
     <div
       className="mt-6 flex animate-fade-in-up justify-center pointer-events-auto"
       style={{ animationDelay: "0.62s", opacity: 0 }}
     >
-      <div className="tokscale-3d-scene relative">
+      <div ref={sceneRef} className="tokscale-3d-scene relative">
         <div className="tokscale-aura absolute -inset-5 rounded-[2rem]" aria-hidden="true" />
-        <div className="tokscale-float relative">
-          <a
-            ref={cardRef}
+        <motion.div
+          className="relative"
+          style={{ transformStyle: "preserve-3d" }}
+          animate={reduce ? { y: 0, rotateX: 0, rotateY: 0 } : hovered ? HOVER_POSE : FLOAT_KEYFRAMES}
+          transition={hovered || reduce ? HOVER_TRANSITION : FLOAT_TRANSITION}
+        >
+          <motion.a
             href={TOKSCALE_PROFILE_URL}
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Live AI token usage tracked by tokscale"
             onPointerMove={handlePointerMove}
-            onPointerLeave={resetTilt}
-            className="tokscale-tilt group relative block overflow-hidden rounded-2xl border border-emerald-400/25 bg-[hsla(222,20%,7%,0.72)] p-2.5 shadow-[0_18px_50px_-12px_rgba(16,185,129,0.3),0_8px_24px_-8px_rgba(0,0,0,0.5)] backdrop-blur-md transition-[border-color,box-shadow] duration-500 hover:border-emerald-300/50 hover:shadow-[0_24px_64px_-12px_rgba(16,185,129,0.45),0_8px_24px_-8px_rgba(0,0,0,0.5)]"
+            onPointerEnter={handlePointerEnter}
+            onPointerLeave={handlePointerLeave}
+            style={{ rotateX: tiltX, rotateY: tiltY, transformPerspective: 900 }}
+            className="group relative block overflow-hidden rounded-2xl border border-emerald-400/25 bg-[hsla(222,20%,7%,0.72)] p-2.5 shadow-[0_18px_50px_-12px_rgba(16,185,129,0.3),0_8px_24px_-8px_rgba(0,0,0,0.5)] backdrop-blur-md transition-[border-color,box-shadow] duration-500 hover:border-emerald-300/50 hover:shadow-[0_24px_64px_-12px_rgba(16,185,129,0.45),0_8px_24px_-8px_rgba(0,0,0,0.5)]"
           >
             <div
               className="absolute inset-x-4 top-0 h-[2px] bg-gradient-to-r from-transparent via-emerald-300/80 to-transparent"
@@ -78,8 +115,8 @@ export function TokscaleHeroBadge() {
               loading="lazy"
               className="relative h-auto w-[290px] max-w-full rounded-xl sm:w-[340px]"
             />
-          </a>
-        </div>
+          </motion.a>
+        </motion.div>
       </div>
     </div>
   )
