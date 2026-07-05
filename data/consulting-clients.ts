@@ -53,4 +53,15 @@ export const consultingClients: ConsultingClient[] = [
         gradient: g.primaryToCyan,
         accent: accentCycle[2],
     },
+    {
+        id: "eria",
+        name: "ERIA Events",
+        href: "https://www.eria.co/",
+        coverImage: "/images/projects/eria-hero.png",
+        summary:
+            "Web presence for the San Francisco Bay's most coveted venues and experiences—a luxury events brand featured in Forbes and trusted by Google, Anthropic, Samsung, and Hilton. Live at eria.co and eriaevents.co.",
+        tags: ["Web", "Events", "Luxury"],
+        gradient: g.primaryToRose,
+        accent: accentCycle[3],
+    },
 ]

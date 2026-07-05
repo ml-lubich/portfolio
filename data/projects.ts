@@ -363,4 +363,43 @@ export const projects: Project[] = [
             link: { label: "w3sourcing.com", url: "https://www.w3sourcing.com/" },
         },
     },
+    {
+        id: "eria",
+        name: "ERIA Events",
+        metric: "800+ events across 3 Bay Area venues",
+        coverImage: "/images/projects/eria-hero.png",
+        summary:
+            "Web presence for ERIA—the San Francisco Bay's most coveted venues and experiences. Luxury event brand featured in Forbes and trusted by Google, Anthropic, Samsung, and Hilton; live at eria.co and eriaevents.co.",
+        tags: ["Web", "Events", "Luxury", "Next.js"],
+        gradient: g.primaryToRose,
+        accent: accentCycle[3],
+        number: "10",
+        detail: {
+            title: "ERIA Events",
+            subtitle: "Luxury venues & experiences — eria.co · eriaevents.co",
+            description:
+                "Consulting on the public web experience for ERIA, founder Nikita Khandheria's “we never say no” luxury event company: three waterfront venues (ERIA Sausalito, ERIA Marina, ERIA Corte Madera), 800+ events, and destination planning from the Bay Area to India and Thailand—live at eria.co and eriaevents.co.",
+            highlights: [
+                "Cinematic full-bleed video hero and gold-on-black editorial language for the Bay Area's most coveted venues",
+                "Trusted-by storytelling for corporate clients including Google, Johnson & Johnson, Anthropic, Webflow, Samsung, and Hilton",
+                "Press credibility surfaced up front: as seen in Forbes, Sheen Magazine, San Francisco Chronicle, and Destination I Do",
+                "Portfolio, case studies (Samsung product launch, Anthropic offsite), journal, and booking funnels across both domains",
+            ],
+            architecture: [
+                { label: "Marketing site", icon: "layers", description: "Full-bleed video hero, portfolio galleries, and venue pages" },
+                { label: "Content", icon: "server", description: "Case studies, journal, press, and multi-venue location pages" },
+                { label: "Brand", icon: "zap", description: "Gold-accented luxury design system across eria.co and eriaevents.co" },
+                { label: "Conversion", icon: "git", description: "Booking, private-viewing, and mailing-list funnels" },
+            ],
+            techStack: ["TypeScript", "Next.js", "React", "Tailwind CSS"],
+            metrics: [
+                { label: "Events", value: "800+" },
+                { label: "Venues", value: "3 waterfront" },
+            ],
+            diagramType: "fullstack",
+            gradient: g.primaryToRose,
+            accent: accentCycle[3],
+            link: { label: "eria.co", url: "https://www.eria.co/" },
+        },
+    },
 ]
