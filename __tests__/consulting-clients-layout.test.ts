@@ -1,6 +1,7 @@
 /**
- * Regression: consulting client cards wrap with the leftover card(s) on the
- * last row centered — no lone left-aligned orphan under a 3-column grid.
+ * Regression: consulting clients render as a continuously scrolling marquee
+ * carousel with a play/pause toggle, keyboard-safe pausing, and a graceful
+ * cover-image fallback. Impact highlights surface as chips (ERIA press/logos).
  */
 
 import { describe, it, expect } from "vitest"
@@ -15,27 +16,41 @@ describe("ConsultingClients layout", () => {
     "utf8",
   )
 
-  it("card list is a wrapping flex row that centers the last row", () => {
-    const ulMatch = src.match(/<ul className="([^"]*)">/)
-    expect(ulMatch, "client <ul> must have a className").toBeTruthy()
-    const cls = ulMatch![1]
-    expect(cls).toContain("flex")
-    expect(cls).toContain("flex-wrap")
-    expect(cls).toContain("justify-center")
-    // The old strict grid left the 4th card orphaned at the left
-    expect(cls).not.toContain("grid-cols-3")
+  it("clients render inside a continuously scrolling carousel track", () => {
+    expect(src).toContain("client-carousel")
+    expect(src).toContain("client-carousel-track")
+    // Marquee needs the card set duplicated for a seamless loop; the copy is
+    // hidden from assistive tech and keyboard focus
+    expect(src).toMatch(/aria-hidden[\s\S]{0,40}inert/)
   })
 
-  it("cards keep responsive widths that account for the flex gaps", () => {
-    expect(src).toContain("sm:w-[calc(50%-0.5rem)]")
-    expect(src).toContain("md:w-[calc(50%-0.75rem)]")
-    expect(src).toContain("lg:w-[calc(33.333%-1rem)]")
+  it("cards are fixed-width and never shrink inside the track", () => {
+    expect(src).toMatch(/w-\[320px\][^"]*shrink-0/)
   })
 
-  it("cover images fall back to the styled placeholder on load error (no broken-image icon)", () => {
-    // A failed cover must flip hasCover so the "Preview unavailable" slot renders
+  it("carousel has a play/pause toggle", () => {
+    expect(src).toContain("carouselPaused")
+    expect(src).toMatch(/aria-pressed=\{carouselPaused\}/)
+    expect(src).toMatch(/data-paused=\{carouselPaused/)
+  })
+
+  it("marquee animation is infinite, pausable, and keyboard-safe (CSS)", () => {
+    const css = fs.readFileSync(path.join(ROOT, "app/globals.css"), "utf8")
+    expect(css).toContain("@keyframes client-carousel-scroll")
+    const track = css.match(/\.client-carousel-track \{[\s\S]*?\n\}/)?.[0] ?? ""
+    expect(track).toMatch(/animation:[^;]*linear infinite/)
+    // Pause when toggled off and while keyboard focus is inside the carousel
+    expect(css).toMatch(/\.client-carousel\[data-paused="true"\][\s\S]{0,120}animation-play-state:\s*paused/)
+    expect(css).toMatch(/\.client-carousel:focus-within[\s\S]{0,120}animation-play-state:\s*paused/)
+  })
+
+  it("cover images retry unoptimized then fall back to the styled placeholder", () => {
+    // A failed cover retries once unoptimized (raw file URL, dodges a poisoned
+    // optimizer cache entry), then flips hasCover so "Preview unavailable" renders
     expect(src).toMatch(/onError=\{/)
-    expect(src).toMatch(/failedCovers/)
+    expect(src).toMatch(/coverErrorCounts/)
+    expect(src).toMatch(/unoptimized=\{coverErrors > 0\}/)
+    expect(src).toMatch(/coverErrors < 2/)
     expect(src).toContain("Preview unavailable")
   })
 

@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Image from "next/image"
-import { ExternalLink, Handshake, Sparkles } from "lucide-react"
+import { ExternalLink, Handshake, Pause, Play, Sparkles } from "lucide-react"
 import { AnimatedLobsterClaw } from "../animations/animated-lobster-claw"
 import { AnimatedSection } from "../animations/animated-section"
 import { SectionHeader } from "../layout/section-header"
@@ -11,8 +11,159 @@ import { consultingClients } from "@/data/consulting-clients"
 import { navigateTo } from "@/components/nav/woosh-scroll"
 
 export function ConsultingClients() {
-  /** Covers that failed to load fall back to the styled "Preview unavailable" slot. */
-  const [failedCovers, setFailedCovers] = useState<Record<string, boolean>>({})
+  /**
+   * Per-client cover load failure count. The first failure retries unoptimized
+   * (the raw static file — a different URL, so a poisoned immutable cache entry
+   * for the optimizer route can't block it); only a second failure falls back
+   * to the styled "Preview unavailable" slot.
+   */
+  const [coverErrorCounts, setCoverErrorCounts] = useState<Record<string, number>>({})
+  const [carouselPaused, setCarouselPaused] = useState(false)
+
+  const clientCards = consultingClients.map((client) => {
+    const coverErrors = coverErrorCounts[client.id] ?? 0
+    const hasCover =
+      client.coverImage != null && client.coverImage !== "" && coverErrors < 2
+    /** Fixed slot so cards with / without hero share the same top band height */
+    const heroSlot =
+      "relative z-[1] h-[220px] w-full shrink-0 overflow-hidden border-b border-white/[0.08] sm:h-[260px]"
+
+    const baseCard =
+      "glass-stack-card group relative flex h-full min-h-0 w-full flex-col overflow-hidden rounded-2xl border border-white/[0.08] text-left transition-all duration-500 ease-fluid hover:border-primary/30"
+
+    const inner = (
+      <>
+        <div
+          className={`h-1 w-full shrink-0 bg-gradient-to-r ${client.gradient} opacity-70 transition-opacity duration-500 group-hover:opacity-100`}
+        />
+        {hasCover ? (
+          <div className={`${heroSlot} bg-black/20`}>
+            <Image
+              key={`${client.id}-cover-${coverErrors}`}
+              src={client.coverImage!}
+              unoptimized={coverErrors > 0}
+              alt={`${client.name} — site preview`}
+              width={1600}
+              height={900}
+              className="h-full w-full object-cover object-top"
+              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              loading="lazy"
+              onError={() =>
+                setCoverErrorCounts((prev) => ({
+                  ...prev,
+                  [client.id]: (prev[client.id] ?? 0) + 1,
+                }))
+              }
+            />
+          </div>
+        ) : (
+          <div
+            className={`${heroSlot} flex items-center justify-center bg-gradient-to-b from-white/[0.06] via-black/20 to-black/35`}
+            aria-hidden
+          >
+            <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground/45">
+              Preview unavailable
+            </span>
+          </div>
+        )}
+        <div
+          className="pointer-events-none absolute -right-20 -top-20 z-0 h-64 w-64 rounded-full opacity-[0.06] blur-3xl transition-opacity duration-700 group-hover:opacity-[0.14]"
+          style={{ background: client.accent }}
+        />
+        <ShimmerOverlay className="z-[3] rounded-2xl" />
+        <div
+          className="pointer-events-none absolute inset-0 z-0 opacity-[0.02] mix-blend-overlay"
+          style={{
+            backgroundImage:
+              "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
+          }}
+        />
+
+        <div className="relative z-[2] flex min-h-0 flex-1 flex-col space-y-4 p-6 sm:p-8">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h3 className="text-lg font-semibold text-foreground transition-colors group-hover:text-primary sm:text-xl">
+                {client.name}
+              </h3>
+              {client.href ? (
+                <p className="mt-1 font-mono text-xs text-muted-foreground/80">
+                  {client.href.replace(/^https?:\/\//, "")}
+                </p>
+              ) : (
+                <p className="mt-1 font-mono text-xs text-primary/90">
+                  {client.statusLabel ?? "In progress"}
+                </p>
+              )}
+            </div>
+            {client.href ? (
+              <span className="inline-flex shrink-0 items-center gap-1 rounded-lg border border-border/50 bg-secondary px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors group-hover:border-primary/30 group-hover:text-primary">
+                Visit
+                <ExternalLink className="h-3.5 w-3.5" aria-hidden />
+              </span>
+            ) : (
+              <span className="inline-flex shrink-0 rounded-lg border border-border/50 bg-secondary px-3 py-1.5 text-xs font-medium text-muted-foreground">
+                Contact
+              </span>
+            )}
+          </div>
+
+          <p className="text-sm leading-relaxed text-muted-foreground/85 sm:text-[15px]">
+            {client.summary}
+          </p>
+
+          {client.impact?.length ? (
+            <div className="flex flex-wrap gap-1.5">
+              {client.impact.map((item) => (
+                <span
+                  key={item}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-primary/25 bg-primary/[0.07] px-3 py-1 font-mono text-[10px] font-semibold uppercase tracking-wider text-primary"
+                >
+                  <Sparkles className="h-3 w-3 shrink-0" aria-hidden />
+                  {item}
+                </span>
+              ))}
+            </div>
+          ) : null}
+
+          <div className="mt-auto flex flex-wrap gap-1.5 pt-1">
+            {client.tags.map((tag) => (
+              <span
+                key={tag}
+                className="rounded-full border border-border/50 bg-secondary px-3 py-1 font-mono text-[10px] text-muted-foreground/65 transition-colors group-hover:border-primary/25 group-hover:text-muted-foreground/85"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+      </>
+    )
+
+    return (
+      <li key={client.id} className="flex min-h-0 w-[320px] shrink-0 sm:w-[380px] lg:w-[400px]">
+        {client.href ? (
+          <a
+            href={client.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`${baseCard} focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary`}
+            aria-label={`${client.name} (opens in a new tab)`}
+          >
+            {inner}
+          </a>
+        ) : (
+          <button
+            type="button"
+            className={`${baseCard} w-full cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary`}
+            onClick={() => navigateTo("#contact")}
+            aria-label={`Contact about ${client.name} consulting engagement`}
+          >
+            {inner}
+          </button>
+        )}
+      </li>
+    )
+  })
 
   return (
     <AnimatedSection
@@ -87,149 +238,50 @@ export function ConsultingClients() {
         </a>
       </div>
 
-      <ul className="flex flex-wrap justify-center gap-4 md:gap-6">
-        {consultingClients.map((client) => {
-          const hasCover =
-            client.coverImage != null && client.coverImage !== "" && !failedCovers[client.id]
-          /** Fixed slot so cards with / without hero share the same top band height */
-          const heroSlot =
-            "relative z-[1] h-[220px] w-full shrink-0 overflow-hidden border-b border-white/[0.08] sm:h-[260px]"
+      {/* Carousel controls */}
+      <div className="mb-4 flex items-center justify-end">
+        <button
+          type="button"
+          onClick={() => setCarouselPaused((p) => !p)}
+          aria-pressed={carouselPaused}
+          aria-label={carouselPaused ? "Resume client carousel" : "Pause client carousel"}
+          className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.04] px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-wider text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
+        >
+          {carouselPaused ? (
+            <Play className="h-3 w-3" aria-hidden />
+          ) : (
+            <Pause className="h-3 w-3" aria-hidden />
+          )}
+          {carouselPaused ? "Play" : "Pause"}
+        </button>
+      </div>
 
-          const baseCard =
-            "glass-stack-card group relative flex h-full min-h-0 w-full flex-col overflow-hidden rounded-2xl border border-white/[0.08] text-left transition-all duration-500 ease-fluid hover:border-primary/30"
-
-          const inner = (
-            <>
-              <div
-                className={`h-1 w-full shrink-0 bg-gradient-to-r ${client.gradient} opacity-70 transition-opacity duration-500 group-hover:opacity-100`}
-              />
-              {hasCover ? (
-                <div className={`${heroSlot} bg-black/20`}>
-                  <Image
-                    src={client.coverImage!}
-                    alt={`${client.name} — site preview`}
-                    width={1600}
-                    height={900}
-                    className="h-full w-full object-cover object-top"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    loading="lazy"
-                    onError={() =>
-                      setFailedCovers((prev) => ({ ...prev, [client.id]: true }))
-                    }
-                  />
-                </div>
-              ) : (
-                <div
-                  className={`${heroSlot} flex items-center justify-center bg-gradient-to-b from-white/[0.06] via-black/20 to-black/35`}
-                  aria-hidden
-                >
-                  <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground/45">
-                    Preview unavailable
-                  </span>
-                </div>
-              )}
-              <div
-                className="pointer-events-none absolute -right-20 -top-20 z-0 h-64 w-64 rounded-full opacity-[0.06] blur-3xl transition-opacity duration-700 group-hover:opacity-[0.14]"
-                style={{ background: client.accent }}
-              />
-              <ShimmerOverlay className="z-[3] rounded-2xl" />
-              <div
-                className="pointer-events-none absolute inset-0 z-0 opacity-[0.02] mix-blend-overlay"
-                style={{
-                  backgroundImage:
-                    "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
-                }}
-              />
-
-              <div className="relative z-[2] flex min-h-0 flex-1 flex-col space-y-4 p-6 sm:p-8">
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <h3 className="text-lg font-semibold text-foreground transition-colors group-hover:text-primary sm:text-xl">
-                      {client.name}
-                    </h3>
-                    {client.href ? (
-                      <p className="mt-1 font-mono text-xs text-muted-foreground/80">
-                        {client.href.replace(/^https?:\/\//, "")}
-                      </p>
-                    ) : (
-                      <p className="mt-1 font-mono text-xs text-primary/90">
-                        {client.statusLabel ?? "In progress"}
-                      </p>
-                    )}
-                  </div>
-                  {client.href ? (
-                    <span className="inline-flex shrink-0 items-center gap-1 rounded-lg border border-border/50 bg-secondary px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors group-hover:border-primary/30 group-hover:text-primary">
-                      Visit
-                      <ExternalLink className="h-3.5 w-3.5" aria-hidden />
-                    </span>
-                  ) : (
-                    <span className="inline-flex shrink-0 rounded-lg border border-border/50 bg-secondary px-3 py-1.5 text-xs font-medium text-muted-foreground">
-                      Contact
-                    </span>
-                  )}
-                </div>
-
-                <p className="text-sm leading-relaxed text-muted-foreground/85 sm:text-[15px]">
-                  {client.summary}
-                </p>
-
-                {client.impact?.length ? (
-                  <div className="flex flex-wrap gap-1.5">
-                    {client.impact.map((item) => (
-                      <span
-                        key={item}
-                        className="inline-flex items-center gap-1.5 rounded-full border border-primary/25 bg-primary/[0.07] px-3 py-1 font-mono text-[10px] font-semibold uppercase tracking-wider text-primary"
-                      >
-                        <Sparkles className="h-3 w-3 shrink-0" aria-hidden />
-                        {item}
-                      </span>
-                    ))}
-                  </div>
-                ) : null}
-
-                <div className="mt-auto flex flex-wrap gap-1.5 pt-1">
-                  {client.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="rounded-full border border-border/50 bg-secondary px-3 py-1 font-mono text-[10px] text-muted-foreground/65 transition-colors group-hover:border-primary/25 group-hover:text-muted-foreground/85"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </>
-          )
-
-          return (
-            <li
-              key={client.id}
-              className="flex min-h-0 w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)]"
-            >
-              {client.href ? (
-                <a
-                  href={client.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`${baseCard} focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary`}
-                  aria-label={`${client.name} (opens in a new tab)`}
-                >
-                  {inner}
-                </a>
-              ) : (
-                <button
-                  type="button"
-                  className={`${baseCard} w-full cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary`}
-                  onClick={() => navigateTo("#contact")}
-                  aria-label={`Contact about ${client.name} consulting engagement`}
-                >
-                  {inner}
-                </button>
-              )}
-            </li>
-          )
-        })}
-      </ul>
+      {/* Continuous marquee: two identical card sets, track slides one set width.
+          Pauses via the toggle (data-paused) or while keyboard focus is inside. */}
+      <div
+        className="client-carousel relative -mx-3 overflow-hidden md:-mx-6"
+        data-paused={carouselPaused ? "true" : "false"}
+        style={{ "--carousel-duration": `${consultingClients.length * 12}s` } as React.CSSProperties}
+      >
+        <div
+          className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-background to-transparent sm:w-16"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-background to-transparent sm:w-16"
+          aria-hidden
+        />
+        <div className="client-carousel-track flex w-max items-stretch">
+          <ul className="flex items-stretch gap-4 pl-4 md:gap-6 md:pl-6">{clientCards}</ul>
+          <ul
+            className="flex items-stretch gap-4 pl-4 md:gap-6 md:pl-6"
+            aria-hidden="true"
+            inert
+          >
+            {clientCards}
+          </ul>
+        </div>
+      </div>
     </AnimatedSection>
   )
 }

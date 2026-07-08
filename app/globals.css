@@ -910,6 +910,24 @@ nav[data-nav-scrolled="true"] .nav-shell {
   animation: shimmer 4.5s infinite;
 }
 
+/* ── Clients carousel — continuous marquee ── */
+@keyframes client-carousel-scroll {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.client-carousel-track {
+  animation: client-carousel-scroll var(--carousel-duration, 48s) linear infinite;
+  will-change: transform;
+}
+
+/* Pause via the toggle, or while keyboard focus is inside (no moving targets) */
+.client-carousel[data-paused="true"] .client-carousel-track,
+.client-carousel:focus-within .client-carousel-track {
+  animation-play-state: paused;
+}
+
 /* Hover lift effect */
 .hover-lift {
   transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
@@ -2147,6 +2165,7 @@ article .blog-prose b a[href],
   .shimmer,
   .pulse-ring,
   .scan-sweep::after,
+  .client-carousel-track,
   .holo-shimmer {
     animation: none !important;
   }
