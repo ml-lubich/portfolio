@@ -82,7 +82,7 @@ export function ConsultingClients() {
         </a>
       </div>
 
-      <ul className="grid auto-rows-fr gap-4 sm:grid-cols-2 lg:grid-cols-3 md:gap-6">
+      <ul className="flex flex-wrap justify-center gap-4 md:gap-6">
         {consultingClients.map((client) => {
           const hasCover = client.coverImage != null && client.coverImage !== ""
           /** Fixed slot so cards with / without hero share the same top band height */
@@ -178,7 +178,10 @@ export function ConsultingClients() {
           )
 
           return (
-            <li key={client.id} className="flex h-full min-h-0">
+            <li
+              key={client.id}
+              className="flex min-h-0 w-full sm:w-[calc(50%-0.5rem)] md:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)]"
+            >
               {client.href ? (
                 <a
                   href={client.href}
