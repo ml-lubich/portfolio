@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react"
 import Image from "next/image"
-import { Sparkles, ChevronRight, ArrowRight } from "lucide-react"
+import { Sparkles, ChevronRight, ArrowRight, FlaskConical } from "lucide-react"
 import { DetailPanel } from "../detail-panel"
 import { ScrollStackSection } from "../layout/scroll-stack-section"
 import { projects } from "@/data/projects"
@@ -97,9 +97,17 @@ export function Projects() {
                 </span>
 
                 <div className="min-w-0 flex-1">
-                  <h3 className="text-lg font-semibold text-foreground transition-colors group-hover:text-primary sm:text-xl">
-                    {project.name}
-                  </h3>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h3 className="text-lg font-semibold text-foreground transition-colors group-hover:text-primary sm:text-xl">
+                      {project.name}
+                    </h3>
+                    {project.prototype && (
+                      <span className="inline-flex items-center gap-1 rounded-full border border-amber-400/30 bg-amber-400/[0.08] px-2 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-wider text-amber-300/90">
+                        <FlaskConical className="h-2.5 w-2.5" aria-hidden />
+                        Prototype
+                      </span>
+                    )}
+                  </div>
                   <div className="mt-1.5 flex items-center gap-1.5">
                     <Sparkles className="h-3.5 w-3.5 text-primary" />
                     <span className="text-xs font-semibold text-primary">{project.metric}</span>
@@ -162,7 +170,16 @@ export function Projects() {
         ),
       }))}
     >
-      {/* Extra content after cards (if any) */}
+      {/* Prototype disclaimer — clarifies the live Vercel demos are proof-of-concept */}
+      <div className="mx-auto mt-8 flex max-w-2xl items-start gap-2.5 rounded-xl border border-amber-400/20 bg-amber-400/[0.04] px-4 py-3 text-left">
+        <FlaskConical className="mt-0.5 h-4 w-4 shrink-0 text-amber-300/80" aria-hidden />
+        <p className="text-xs leading-relaxed text-muted-foreground/80 sm:text-[13px]">
+          <span className="font-semibold text-amber-200/90">Prototype</span>{" "}
+          projects are live demo deployments on Vercel—working proof-of-concept
+          builds to show the idea and flow end to end, not full production
+          products. Client sites are live, in-production work.
+        </p>
+      </div>
     </ScrollStackSection>
   )
 }

@@ -19,6 +19,8 @@ export interface Project {
     detail: DetailPanelData
     /** Optional hero screenshot on the featured-project card (`public/` path) */
     coverImage?: string
+    /** True for live demo deployments that are proof-of-concept, not full products */
+    prototype?: boolean
 }
 
 export const projects: Project[] = [
@@ -400,6 +402,126 @@ export const projects: Project[] = [
             gradient: g.primaryToRose,
             accent: accentCycle[3],
             link: { label: "eria.co", url: "https://www.eria.co/" },
+        },
+    },
+    {
+        id: "reviewly",
+        name: "Reviewly",
+        metric: "AI Google Review automation",
+        coverImage: "/images/projects/reviewly-hero.png",
+        prototype: true,
+        summary:
+            "AI-powered Google Review management for local businesses—monitors new reviews, drafts on-brand replies with Claude, and never lets a review go unanswered. Live prototype deployment.",
+        tags: ["Claude API", "Next.js", "Supabase"],
+        gradient: g.primaryToAccent,
+        accent: accentCycle[0],
+        number: "11",
+        detail: {
+            title: "Reviewly",
+            subtitle: "AI Google Review management (live prototype)",
+            description:
+                "Proof-of-concept SaaS that watches a business's Google reviews and uses Claude to draft on-brand, context-aware replies so nothing slips through—positioned around the pain of missed reviews hurting local reputation.",
+            highlights: [
+                "Claude-drafted review responses tuned to business tone and rating context",
+                "Review monitoring and notification flow so no review goes unanswered",
+                "Next.js marketing + app surface with Supabase auth and data",
+                "Prototype deployment demonstrating the end-to-end product story",
+            ],
+            architecture: [
+                { label: "AI Replies", icon: "cpu", description: "Claude API drafts context-aware review responses" },
+                { label: "Monitoring", icon: "zap", description: "New-review detection and alerting" },
+                { label: "Data & Auth", icon: "database", description: "Supabase for accounts, businesses, and reviews" },
+                { label: "Web App", icon: "layers", description: "Next.js marketing site and dashboard" },
+            ],
+            techStack: ["Claude API", "Next.js", "React", "Supabase", "Tailwind CSS"],
+            metrics: [
+                { label: "Type", value: "Prototype" },
+                { label: "Status", value: "Live demo" },
+            ],
+            diagramType: "fullstack",
+            gradient: g.primaryToAccent,
+            accent: accentCycle[0],
+            link: { label: "reviewly-self.vercel.app", url: "https://reviewly-self.vercel.app/" },
+        },
+    },
+    {
+        id: "scrapechat",
+        name: "ScrapeChatAI",
+        metric: "Chat-driven web scraping",
+        coverImage: "/images/projects/scrapechat-hero.png",
+        prototype: true,
+        summary:
+            "Scrape any website in plain English—describe what you want, and AI writes the browser script, runs it, validates the data, and returns clean structured results. Live prototype deployment.",
+        tags: ["Claude", "Playwright", "FastAPI"],
+        gradient: g.accentToCyan,
+        accent: accentCycle[1],
+        number: "12",
+        detail: {
+            title: "ScrapeChatAI",
+            subtitle: "LLM-powered web scraper you chat with (live prototype)",
+            description:
+                "Proof-of-concept where users describe a scraping goal in natural language and the system generates, executes, and validates a Playwright browser script—no code required—returning clean structured data from a chat interface.",
+            highlights: [
+                "Natural-language prompt to AI-generated Playwright scraping scripts",
+                "Runs and validates scripts, self-correcting until data is clean",
+                "FastAPI backend orchestrating the LLM + headless browser loop",
+                "Prototype deployment showcasing the chat-to-data workflow",
+            ],
+            architecture: [
+                { label: "Script Gen", icon: "cpu", description: "LLM writes Playwright scripts from plain English" },
+                { label: "Browser Runtime", icon: "zap", description: "Headless Playwright execution and retries" },
+                { label: "Validation", icon: "shield", description: "Structured-output checks on scraped data" },
+                { label: "API", icon: "server", description: "FastAPI orchestration between chat, LLM, and browser" },
+            ],
+            techStack: ["Claude", "Playwright", "FastAPI", "Python", "Next.js"],
+            metrics: [
+                { label: "Type", value: "Prototype" },
+                { label: "Status", value: "Live demo" },
+            ],
+            diagramType: "pipeline",
+            gradient: g.accentToCyan,
+            accent: accentCycle[1],
+            link: { label: "scrapechat.vercel.app", url: "https://scrapechat.vercel.app/" },
+        },
+    },
+    {
+        id: "leadpipe",
+        name: "LeadPipe AI",
+        metric: "AI lead-gen for trades",
+        coverImage: "/images/projects/leadpipe-hero.png",
+        prototype: true,
+        summary:
+            "Finds local trade businesses with a weak digital presence, scores them, and drafts personalized consulting outreach—scrape, score, send, close. Live prototype deployment.",
+        tags: ["LLM", "Next.js", "Python"],
+        gradient: g.cyanToPrimary,
+        accent: accentCycle[2],
+        number: "13",
+        detail: {
+            title: "LeadPipe AI",
+            subtitle: "AI lead generation for local trades (live prototype)",
+            description:
+                "Proof-of-concept outreach CRM that scrapes local HVAC, plumbing, electrical, roofing, and landscaping businesses, scores their online presence, and generates personalized consulting outreach through a Kanban pipeline from New to Closed.",
+            highlights: [
+                "Auto-scrapes trade businesses by category and city with opportunity scoring",
+                "Kanban pipeline CRM: New → Researched → Contacted → Closed",
+                "LLM-generated outreach email templates with smart personalization variables",
+                "Prototype deployment demonstrating the scrape-score-send-close loop",
+            ],
+            architecture: [
+                { label: "Scraper", icon: "zap", description: "Collects local trade businesses by trade + city" },
+                { label: "Scoring", icon: "cpu", description: "Ranks digital-presence weakness as opportunity" },
+                { label: "Outreach", icon: "server", description: "LLM email templates with personalization variables" },
+                { label: "Pipeline CRM", icon: "layers", description: "Kanban board tracking leads to close" },
+            ],
+            techStack: ["Next.js", "Python", "React", "Tailwind CSS"],
+            metrics: [
+                { label: "Type", value: "Prototype" },
+                { label: "Status", value: "Live demo" },
+            ],
+            diagramType: "pipeline",
+            gradient: g.cyanToPrimary,
+            accent: accentCycle[2],
+            link: { label: "leadpipe-two.vercel.app", url: "https://leadpipe-two.vercel.app/" },
         },
     },
 ]
