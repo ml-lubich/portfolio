@@ -2,7 +2,6 @@
 
 import dynamic from "next/dynamic"
 import { AnimatedSection } from "../animations/animated-section"
-import { type BarItem } from "../animations/animated-bars"
 import { SectionHeader } from "../layout/section-header"
 import { ShimmerOverlay } from "../ui/shimmer-overlay"
 import { gradients as g } from "@/lib/theme"
@@ -10,7 +9,7 @@ const TerminalReveal = dynamic(
   () => import("../terminal/terminal-reveal").then((mod) => mod.TerminalReveal),
   { ssr: false }
 )
-import { NeuralConstellation } from "../three/neural-constellation"
+import { TechOrbit } from "../animations/tech-orbit"
 import { Brain, Sparkles, Target, TrendingUp } from "lucide-react"
 
 const aiDomains = [
@@ -60,76 +59,6 @@ const aiDomains = [
   },
 ]
 
-const metrics = [
-  { value: "300%", label: "Model Performance Gains" },
-  { value: "10M+", label: "Training Samples Processed" },
-  { value: "99.9%", label: "Model Uptime SLA" },
-  { value: "15+", label: "Production ML Systems" },
-]
-
-const techBars: BarItem[] = [
-  {
-    label: "PyTorch / TensorFlow / scikit-learn",
-    value: 95,
-    display: "Expert",
-    gradient: g.primaryToAccent,
-    details: [
-      "Built containerized ML pipelines with Docker, Airflow, MLflow & automated hyperparameter tuning",
-      "Neural networks, clustering, and tree-based models for environmental science & production systems",
-      "Deployed models and pipelines serving 100M+ users at Apple scale",
-      "Published 6 peer-reviewed papers applying ML to hydrology and environmental science",
-    ],
-  },
-  {
-    label: "LLMs & RAG Systems",
-    value: 94,
-    display: "Expert",
-    gradient: g.magentaToAccent,
-    details: [
-      "Fine-tuning & deploying GPT-4o, Claude Sonnet 4, Gemini 2.0, Llama 4, Mistral for production",
-      "RAG architectures with pgvector, FAISS, Pinecone, Weaviate — adaptive chunking & re-ranking",
-      "Prompt engineering, multi-model routing, and self-improving agentic retrieval systems",
-      "Comprehensive LLM observability with LangSmith, Prometheus, Grafana dashboards",
-    ],
-  },
-  {
-    label: "Multi-Agent Orchestration",
-    value: 92,
-    display: "Expert",
-    gradient: g.cyanToPrimary,
-    details: [
-      "Production multi-agent orchestration with CrewAI, LangGraph, and shared state graphs",
-      "MCP tool server integration for context-engineered autonomous agents",
-      "Designed feedback loops, self-correction, and circuit-breaker alerting for guardrail violations",
-      "Built self-improving review policies and adaptive agent routing",
-    ],
-  },
-  {
-    label: "MLOps & AWS Infrastructure",
-    value: 90,
-    display: "Expert",
-    gradient: g.primaryToMagenta,
-    details: [
-      "AWS ECS, Lambda, RDS, S3, Bedrock — Terraform IaC, CI/CD, model versioning with MLflow",
-      "Led migration from monolithic to event-driven microservices on AWS",
-      "A/B testing frameworks and automated LLM evaluation with RAGAS & DeepEval",
-      "99.9% uptime SLA across 15+ production ML systems with K8s & Docker",
-    ],
-  },
-  {
-    label: "Guardrails & Observability",
-    value: 88,
-    display: "Advanced",
-    gradient: g.primaryToCyan,
-    details: [
-      "Real-time monitoring dashboards with Prometheus, Grafana, and OpenTelemetry",
-      "Circuit-breaker alerting for guardrail violations and drift detection",
-      "Automated quality gates in CI/CD for model performance regression",
-      "End-to-end tracing across LLM chains, retrieval, and agent execution",
-    ],
-  },
-]
-
 export function AIExpertise() {
   return (
     <AnimatedSection id="ai-expertise" className="relative py-6 md:py-14 lg:py-20">
@@ -166,9 +95,9 @@ export function AIExpertise() {
           />
         </div>
 
-        {/* Neural constellation — telemetry readouts + interactive skill graph */}
+        {/* Orbiting tech stack — a storm of pills; tap one to reveal shipped proof */}
         <AnimatedSection delay={100} className="relative z-10 mb-10 md:mb-16">
-          <NeuralConstellation bars={techBars} metrics={metrics} />
+          <TechOrbit />
         </AnimatedSection>
 
         {/* AI Domains — Step-by-step cards */}
