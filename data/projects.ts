@@ -250,7 +250,7 @@ export const projects: Project[] = [
         id: "enrichdata",
         name: "EnrichData",
         metric: "320+ enrichment fields live",
-        coverImage: "/images/projects/enrichdata-hero.png",
+        coverImage: "/images/projects/enrichdata-hero.jpg",
         summary:
             "Live EnrichData marketing and product story—custom CRM enrichment that fills contact gaps, surfaces job changes, and keeps data fresh; built for teams and lean orgs who want serious data tooling without bloated vendor contracts.",
         tags: ["CRM", "Data Enrichment", "B2B", "Web"],

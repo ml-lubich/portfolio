@@ -12,10 +12,10 @@ import { navigateTo } from "@/components/nav/woosh-scroll"
 
 export function ConsultingClients() {
   /**
-   * Per-client cover load failure count. The first failure retries unoptimized
-   * (the raw static file — a different URL, so a poisoned immutable cache entry
-   * for the optimizer route can't block it); only a second failure falls back
-   * to the styled "Preview unavailable" slot.
+   * Per-client cover load failure count. The first failure remounts the image
+   * (via a changing key) so a transient load error refetches instead of
+   * sticking; only a second failure falls back to the styled "Preview
+   * unavailable" slot.
    */
   const [coverErrorCounts, setCoverErrorCounts] = useState<Record<string, number>>({})
   const [carouselPaused, setCarouselPaused] = useState(false)
@@ -41,7 +41,6 @@ export function ConsultingClients() {
             <Image
               key={`${client.id}-cover-${coverErrors}`}
               src={client.coverImage!}
-              unoptimized={coverErrors > 0}
               alt={`${client.name} — site preview`}
               width={1600}
               height={900}

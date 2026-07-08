@@ -10,6 +10,7 @@ import { ShimmerOverlay } from "../ui/shimmer-overlay"
 import { skillCategories, proficiencyBars } from "@/data/skills"
 import { hex } from "@/lib/theme"
 import { SkillDetailModal } from "./skill-detail-modal"
+import { SkillStorm } from "./skill-storm"
 
 const ParticleField = dynamic(
   () => import("../three/scene-backgrounds").then((mod) => mod.ParticleField),
@@ -113,10 +114,16 @@ export function Skills() {
             </div>
           </AnimatedSection>
 
-          {/* Skills grid — pop-out tilt + liquid glass on hover.
+          {/* Desktop (lg+): the skills churn as an orbital "Storm of Skills". */}
+          <div className="hidden lg:block">
+            <SkillStorm onSelect={handleSelectSkill} />
+          </div>
+
+          {/* Mobile / tablet: the classic category cards — tap-friendly, no motion cost.
+             Skills grid — pop-out tilt + liquid glass on hover.
              flex-wrap + explicit widths (not CSS grid) so an orphan card in
              the final row centers itself instead of sitting left-aligned. */}
-          <div className="flex flex-wrap justify-center gap-5">
+          <div className="flex flex-wrap justify-center gap-5 lg:hidden">
             {skillCategories.map((cat, i) => (
               <AnimatedSection
                 key={cat.category}

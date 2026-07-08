@@ -2,17 +2,16 @@
 
 import dynamic from "next/dynamic"
 import { AnimatedSection } from "../animations/animated-section"
-import { AnimatedCounter } from "../animations/animated-counter"
-import { AnimatedBars, type BarItem } from "../animations/animated-bars"
-import { ScrollMiniBar } from "../layout/scroll-mini-bar"
+import { type BarItem } from "../animations/animated-bars"
 import { SectionHeader } from "../layout/section-header"
 import { ShimmerOverlay } from "../ui/shimmer-overlay"
-import { gradients as g, textColors as tc } from "@/lib/theme"
+import { gradients as g } from "@/lib/theme"
 const TerminalReveal = dynamic(
   () => import("../terminal/terminal-reveal").then((mod) => mod.TerminalReveal),
   { ssr: false }
 )
-import { Brain, Code2, Database, Zap, Target, Sparkles, TrendingUp, Shield } from "lucide-react"
+import { NeuralConstellation } from "../three/neural-constellation"
+import { Brain, Sparkles, Target, TrendingUp } from "lucide-react"
 
 const aiDomains = [
   {
@@ -62,10 +61,10 @@ const aiDomains = [
 ]
 
 const metrics = [
-  { icon: Zap, value: "300%", label: "Model Performance Gains", color: tc.primary, bar: 95, gradient: g.primaryToAccent },
-  { icon: Database, value: "10M+", label: "Training Samples Processed", color: tc.accent, bar: 88, gradient: g.magentaToAccent },
-  { icon: Shield, value: "99.9%", label: "Model Uptime SLA", color: tc.cyan, bar: 99, gradient: g.cyanToPrimary },
-  { icon: Code2, value: "15+", label: "Production ML Systems", color: tc.magenta, bar: 78, gradient: g.primaryToMagenta },
+  { value: "300%", label: "Model Performance Gains" },
+  { value: "10M+", label: "Training Samples Processed" },
+  { value: "99.9%", label: "Model Uptime SLA" },
+  { value: "15+", label: "Production ML Systems" },
 ]
 
 const techBars: BarItem[] = [
@@ -167,35 +166,9 @@ export function AIExpertise() {
           />
         </div>
 
-        {/* Metrics grid — rolling numbers + mini bar */}
-        <div className="mb-6 grid gap-3 sm:grid-cols-2 sm:gap-4 md:mb-10 lg:grid-cols-4">
-          {metrics.map((metric, i) => (
-            <AnimatedSection key={metric.label} delay={i * 100}>
-                <div className="group relative overflow-hidden rounded-2xl border border-white/[0.04] bg-card/30 p-5 backdrop-blur-xl transition-all duration-500 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/15 glass-card-3d spotlight sm:p-6">
-                {/* Top edge light */}
-                <div className="absolute inset-x-0 top-0 h-px bg-white/[0.06]" />
-                <div className="absolute inset-0 rounded-2xl bg-primary/[0.03] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-                <ShimmerOverlay className="rounded-2xl" />
-                <metric.icon className={`relative mb-3 h-8 w-8 ${metric.color} transition-transform duration-500 group-hover:scale-110 group-hover:drop-shadow-[0_0_8px_currentColor]`} />
-                <AnimatedCounter
-                  value={metric.value}
-                  duration={2000}
-                  className="text-3xl font-display font-light text-foreground"
-                />
-                <div className="mt-1.5 text-sm text-muted-foreground">{metric.label}</div>
-                {/* Mini progress bar — scroll-driven */}
-                <ScrollMiniBar value={metric.bar} gradient={metric.gradient} />
-              </div>
-            </AnimatedSection>
-          ))}
-        </div>
-
-        {/* Proficiency bars */}
-        <AnimatedSection delay={200} className="relative z-10">
-          <div className="mb-10 rounded-2xl border border-white/[0.04] bg-card/25 p-5 backdrop-blur-xl frosted-panel md:mb-16 md:p-8">
-            <h3 className="mb-4 text-lg font-bold text-foreground md:mb-6">Core Proficiency</h3>
-            <AnimatedBars bars={techBars} duration={1600} stagger={150} />
-          </div>
+        {/* Neural constellation — telemetry readouts + interactive skill graph */}
+        <AnimatedSection delay={100} className="relative z-10 mb-10 md:mb-16">
+          <NeuralConstellation bars={techBars} metrics={metrics} />
         </AnimatedSection>
 
         {/* AI Domains — Step-by-step cards */}

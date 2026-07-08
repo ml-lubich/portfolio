@@ -26,7 +26,7 @@ export const consultingClients: ConsultingClient[] = [
         id: "enrichdata",
         name: "EnrichData",
         href: "https://www.enrichdata.net/",
-        coverImage: "/images/projects/enrichdata-hero.png",
+        coverImage: "/images/projects/enrichdata-hero.jpg",
         summary:
             "Public marketing and product story for a custom CRM enrichment offering—real-time-style data fills, job-change tracking, and quality maintenance for teams that want outcomes without bloated vendor contracts.",
         tags: ["Web", "CRM", "Next.js"],

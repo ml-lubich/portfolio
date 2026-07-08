@@ -1,7 +1,6 @@
 /**
- * Regression: consulting clients render as a continuously scrolling marquee
- * carousel with a play/pause toggle, keyboard-safe pausing, and a graceful
- * cover-image fallback. Impact highlights surface as chips (ERIA press/logos).
+ * Regression: consulting client cards wrap with the leftover card(s) on the
+ * last row centered — no lone left-aligned orphan under a 3-column grid.
  */
 
 import { describe, it, expect } from "vitest"
@@ -40,16 +39,17 @@ describe("ConsultingClients layout", () => {
     const track = css.match(/\.client-carousel-track \{[\s\S]*?\n\}/)?.[0] ?? ""
     expect(track).toMatch(/animation:[^;]*linear infinite/)
     // Pause when toggled off and while keyboard focus is inside the carousel
-    expect(css).toMatch(/\.client-carousel\[data-paused="true"\][\s\S]{0,120}animation-play-state:\s*paused/)
-    expect(css).toMatch(/\.client-carousel:focus-within[\s\S]{0,120}animation-play-state:\s*paused/)
+    // (the two selectors share one rule, so allow for the grouped-selector gap)
+    expect(css).toMatch(/\.client-carousel\[data-paused="true"\][\s\S]{0,160}animation-play-state:\s*paused/)
+    expect(css).toMatch(/\.client-carousel:focus-within[\s\S]{0,160}animation-play-state:\s*paused/)
   })
 
-  it("cover images retry unoptimized then fall back to the styled placeholder", () => {
-    // A failed cover retries once unoptimized (raw file URL, dodges a poisoned
-    // optimizer cache entry), then flips hasCover so "Preview unavailable" renders
+  it("cover images fall back to the styled placeholder on load error (no broken-image icon)", () => {
+    // A failed cover remounts once (changing key) to refetch a transient error,
+    // then flips hasCover so the "Preview unavailable" slot renders
     expect(src).toMatch(/onError=\{/)
     expect(src).toMatch(/coverErrorCounts/)
-    expect(src).toMatch(/unoptimized=\{coverErrors > 0\}/)
+    expect(src).toMatch(/key=\{`\$\{client\.id\}-cover-\$\{coverErrors\}`\}/)
     expect(src).toMatch(/coverErrors < 2/)
     expect(src).toContain("Preview unavailable")
   })

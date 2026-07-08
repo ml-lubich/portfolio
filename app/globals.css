@@ -2178,3 +2178,65 @@ article .blog-prose b a[href],
 
 /* Lazy sections: avoid content-visibility here — fixed intrinsic heights caused
    sections to visually crowd / “lose” vertical rhythm while scrolling on mobile. */
+
+/* ──────────────────────────────────────────────────────────── */
+/*  Skill Storm — orbital constellation of skill pills (lg+)     */
+/*  Pure-compositor transforms: each ring spins, each pill       */
+/*  counter-spins to stay upright. No JS per-frame work.         */
+/* ──────────────────────────────────────────────────────────── */
+@keyframes skill-orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.skill-storm {
+  /* Soft radial vignette so pills dissolve toward the edges instead
+     of hard-clipping — reads as a weather system, not a clipped box. */
+  -webkit-mask-image: radial-gradient(ellipse 78% 82% at 50% 50%, #000 55%, transparent 96%);
+  mask-image: radial-gradient(ellipse 78% 82% at 50% 50%, #000 55%, transparent 96%);
+}
+
+.skill-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  transform-origin: 0 0;
+  animation: skill-orbit linear infinite;
+  will-change: transform;
+}
+
+.skill-orbit-item {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.skill-pill-spin {
+  /* Cancels the parent ring's rotation so the label stays level.
+     No will-change here — 70 permanent layers would cost more than it saves;
+     the compositor promotes these on demand. */
+  animation: skill-orbit linear infinite;
+}
+
+.skill-pill {
+  transform: scale(1);
+}
+.skill-pill:hover {
+  transform: scale(1.1);
+}
+
+/* Lift + fully reveal the hovered pill above its neighbours. Wins over the
+   inline depth-opacity set per ring, which Tailwind hover utilities can't. */
+.skill-orbit-item:has(.skill-pill:hover) {
+  z-index: 40;
+  opacity: 1 !important;
+}
+
+/* Freeze the whole storm while the visitor is reading/aiming at a pill. */
+.skill-storm:has(.skill-pill:hover) .skill-ring,
+.skill-storm:has(.skill-pill:hover) .skill-pill-spin {
+  animation-play-state: paused;
+}
