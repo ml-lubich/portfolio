@@ -61,7 +61,7 @@ export function SectionHeader({
         <div className="mt-2 flex justify-center md:mt-2.5">{afterLabel}</div>
       )}
 
-      <h2 className="mt-2 font-display text-3xl font-light text-foreground sm:text-4xl lg:text-5xl text-balance md:mt-4">
+      <h2 className="section-title mt-2 font-display text-3xl font-light text-foreground sm:text-4xl lg:text-5xl text-balance md:mt-4">
         <AnimatedText variant="blur-slide" delay={150} stagger={55} duration={750}>
           {title}
         </AnimatedText>

@@ -957,6 +957,17 @@ nav[data-nav-scrolled="true"] .nav-shell {
 }
 
 /*
+ * Stack cards carry `transition-all` (for hover border/shadow), but that also
+ * animates backdrop-filter + background — so every scroll-state swap ramps the
+ * blur over 0.5s. On wheel scrolling the state toggles per notch, turning that
+ * ramp into a pulsing blur/brightness flicker. Snap those two properties (keep
+ * hover transitions) so the swap is instant and repaint-cheap.
+ */
+[data-stack-card] .glass-stack-card {
+  transition-property: color, border-color, box-shadow;
+}
+
+/*
  * ScrollStackCards: backdrop-filter + scroll-driven transforms forces full-card
  * recomposites every frame. Swap to opaque glass while the stack is scrolling.
  */
@@ -1288,27 +1299,18 @@ nav[data-nav-scrolled="true"] .nav-shell {
   opacity: 1;
 }
 
-/* ── Metallic shiny name effect (scroll-driven) ── */
+/* ── Hero name color — solid tech blue ──
+   The name letters render as a solid tech blue. A solid `color` needs no
+   `background-clip: text`, so it never triggers the compositor text-clip
+   glitch. The ghosting culprit was actually the *parent* `.font-semibold`
+   span picking up the global bold-metallic `background-clip: text` rule below;
+   that wrapper opts out via `no-metallic` (see role-rotator.tsx). */
 .animated-name-metallic .animated-name-char {
-  background: linear-gradient(120deg,
-      hsl(var(--foreground)) 0%,
-      hsl(220 15% 75%) 20%,
-      hsl(0 0% 100%) 30%,
-      hsl(220 15% 75%) 40%,
-      hsl(var(--foreground)) 55%,
-      hsl(220 15% 75%) 70%,
-      hsl(0 0% 100%) 80%,
-      hsl(220 15% 75%) 90%,
-      hsl(var(--foreground)) 100%);
-  background-size: 250% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-position: 50% center;
+  color: hsl(217 100% 68%);
+  -webkit-text-fill-color: hsl(217 100% 68%);
   transition:
     transform var(--name-duration, 900ms) cubic-bezier(0.16, 1, 0.3, 1) var(--stagger, 0ms),
-    opacity calc(var(--name-duration, 900ms) * 0.6) ease-out var(--stagger, 0ms),
-    background-position 0.1s linear;
+    opacity calc(var(--name-duration, 900ms) * 0.6) ease-out var(--stagger, 0ms);
 }
 
 @keyframes metallic-shimmer {
@@ -2181,62 +2183,140 @@ article .blog-prose b a[href],
 
 /* ──────────────────────────────────────────────────────────── */
 /*  Skill Storm — orbital constellation of skill pills (lg+)     */
-/*  Pure-compositor transforms: each ring spins, each pill       */
-/*  counter-spins to stay upright. No JS per-frame work.         */
+/*  One rotator spins the whole field via --storm-angle (set by  */
+/*  a single rAF loop); each pill counter-rotates by that same   */
+/*  angle so its label stays upright. Drag to spin either way.   */
 /* ──────────────────────────────────────────────────────────── */
-@keyframes skill-orbit {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
 .skill-storm {
   /* Soft radial vignette so pills dissolve toward the edges instead
      of hard-clipping — reads as a weather system, not a clipped box. */
-  -webkit-mask-image: radial-gradient(ellipse 78% 82% at 50% 50%, #000 55%, transparent 96%);
-  mask-image: radial-gradient(ellipse 78% 82% at 50% 50%, #000 55%, transparent 96%);
+  -webkit-mask-image: radial-gradient(ellipse 78% 82% at 50% 50%, #000 60%, transparent 97%);
+  mask-image: radial-gradient(ellipse 78% 82% at 50% 50%, #000 60%, transparent 97%);
+  /* Pointer drags rotate the field; never let them scroll the page. */
+  touch-action: none;
 }
 
-.skill-ring {
+/* The rotator fills the storm; rotating it about its centre orbits every
+   pill. JS writes --storm-angle each frame — transform-only, no layout. */
+.skill-storm-rotator {
   position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 0;
-  height: 0;
-  transform-origin: 0 0;
-  animation: skill-orbit linear infinite;
+  inset: 0;
+  transform: rotate(var(--storm-angle, 0deg));
+  transform-origin: 50% 50%;
   will-change: transform;
 }
 
 .skill-orbit-item {
   position: absolute;
-  left: 0;
-  top: 0;
+  left: 50%;
+  top: 50%;
 }
 
-.skill-pill-spin {
-  /* Cancels the parent ring's rotation so the label stays level.
-     No will-change here — 70 permanent layers would cost more than it saves;
-     the compositor promotes these on demand. */
-  animation: skill-orbit linear infinite;
+.skill-pill-counter {
+  /* Cancels the rotator so the label never tilts, whatever the spin angle. */
+  transform: rotate(calc(-1 * var(--storm-angle, 0deg)));
 }
 
+/* Opaque liquid-glass pill: a solid card-tinted base (so overlapping pills
+   occlude each other cleanly — no text bleed-through) with a blurred backdrop
+   and a faint top sheen for the glass read. */
 .skill-pill {
+  background:
+    linear-gradient(180deg, hsl(0 0% 100% / 0.06), hsl(0 0% 100% / 0) 60%),
+    hsl(var(--card));
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 1px 0 hsl(0 0% 100% / 0.05) inset, 0 8px 24px -12px hsl(0 0% 0% / 0.7);
   transform: scale(1);
 }
 .skill-pill:hover {
-  transform: scale(1.1);
+  background:
+    linear-gradient(180deg, hsl(0 0% 100% / 0.1), hsl(0 0% 100% / 0) 60%),
+    hsl(var(--card));
+  transform: scale(1.12);
 }
 
-/* Lift + fully reveal the hovered pill above its neighbours. Wins over the
-   inline depth-opacity set per ring, which Tailwind hover utilities can't. */
+/* The hovered pill lifts above its neighbours for a clean read. */
 .skill-orbit-item:has(.skill-pill:hover) {
-  z-index: 40;
-  opacity: 1 !important;
+  z-index: 60 !important;
 }
 
-/* Freeze the whole storm while the visitor is reading/aiming at a pill. */
-.skill-storm:has(.skill-pill:hover) .skill-ring,
-.skill-storm:has(.skill-pill:hover) .skill-pill-spin {
+/* ── Project marquee — 3 rows of auto-scrolling project cards ──────────
+   Each row's track holds the card set duplicated twice; translating the
+   track -50% loops seamlessly because the second half is identical to the
+   first. Cards carry a right margin (not flex `gap`) so exactly half the
+   track width == one full copy, which keeps the loop point jump-free.
+   Pure transform animation — compositor-friendly, no layout thrash.
+   Pauses on hover (CSS) or when a card is clicked (`.is-paused`, React). */
+.marquee-viewport {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 5%, #000 95%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 5%, #000 95%, transparent);
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+}
+
+.marquee-track--ltr {
+  animation: marquee-scroll-ltr var(--marquee-duration, 50s) linear infinite;
+}
+
+.marquee-track--rtl {
+  animation: marquee-scroll-rtl var(--marquee-duration, 50s) linear infinite;
+  transform: translateX(-50%);
+}
+
+/* Hover anywhere on the row, keyboard focus within it (WCAG 2.2.2 — a
+   mechanism to pause moving content), or a click-pinned row freezes the
+   scroll so the visitor can read or tab to a card without it sliding away. */
+.marquee-row:hover .marquee-track,
+.marquee-row:focus-within .marquee-track,
+.marquee-track.is-paused {
   animation-play-state: paused;
+}
+
+@keyframes marquee-scroll-ltr {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@keyframes marquee-scroll-rtl {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
+
+/* Reduced motion: no auto-scroll. The row becomes a normal horizontal
+   scroller so the projects stay fully browsable. */
+@media (prefers-reduced-motion: reduce) {
+  .marquee-viewport {
+    overflow-x: auto;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  .marquee-track--ltr,
+  .marquee-track--rtl {
+    animation: none;
+    transform: none;
+  }
+}
+
+/* ── Section header titles — solid tech blue ──
+   Matches the hero name (hsl(217 100% 68%)). Overrides the metallic
+   `background-clip: text` sheen that the global bold/gradient-text rules
+   applied to these <h2> titles, so section headers read as a clean,
+   on-brand blue instead of silver/white. Scoped to `.section-title` so
+   other `.gradient-text` highlights (hero roles, inline accents) keep
+   their metallic treatment. */
+.section-title,
+.section-title .animated-text-word,
+.section-title .gradient-text,
+.section-title .gradient-text .animated-text-word {
+  background-image: none !important;
+  -webkit-background-clip: border-box !important;
+  background-clip: border-box !important;
+  color: hsl(217 100% 68%) !important;
+  -webkit-text-fill-color: hsl(217 100% 68%) !important;
 }

@@ -18,7 +18,7 @@ const footerLinks = [
 
 export function Footer() {
   return (
-    <footer role="contentinfo" aria-label="Site footer" className="border-t border-border py-8 md:py-10">
+    <footer role="contentinfo" aria-label="Site footer" className="relative border-t border-white/[0.1] bg-[hsl(0_0%_100%/0.05)] py-8 shadow-[inset_0_1px_0_hsl(0_0%_100%/0.14)] backdrop-blur-[20px] backdrop-saturate-150 md:py-10">
       <div className="mx-auto max-w-6xl px-6">
         <AnimatedSection>
           <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">

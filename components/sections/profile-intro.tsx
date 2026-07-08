@@ -111,7 +111,7 @@ export function ProfileIntro() {
 
                             {/* Open letter intro */}
                             <div className="text-center sm:text-left">
-                                <h2 className="font-display text-2xl font-light tracking-tight text-foreground sm:text-3xl">
+                                <h2 className="section-title font-display text-2xl font-light tracking-tight text-foreground sm:text-3xl">
                                     <AnimatedText text="Hello, I'm Misha" variant="blur-slide" stagger={70} duration={800} />
                                 </h2>
 
