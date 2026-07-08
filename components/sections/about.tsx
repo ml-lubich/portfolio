@@ -6,6 +6,7 @@ import dynamic from "next/dynamic"
 import { AnimatedSection } from "../animations/animated-section"
 import { AnimatedCounter } from "../animations/animated-counter"
 import { SectionHeader } from "../layout/section-header"
+import { ShimmerOverlay } from "../ui/shimmer-overlay"
 import { lightGradients as lg, hex } from "@/lib/theme"
 
 const TerminalReveal = dynamic(
@@ -200,8 +201,8 @@ export function About() {
                     <p className="mt-1 text-xs text-muted-foreground">{item.detail}</p>
                   </div>
 
-                  {/* Shimmer effect */}
-                  <div className="absolute inset-0 shimmer opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                  {/* Shimmer effect — always sweeping, independent of hover */}
+                  <ShimmerOverlay />
                 </div>
               </TiltCard>
             </AnimatedSection>

@@ -6,6 +6,7 @@ import { ExternalLink, Handshake, Sparkles } from "lucide-react"
 import { AnimatedLobsterClaw } from "../animations/animated-lobster-claw"
 import { AnimatedSection } from "../animations/animated-section"
 import { SectionHeader } from "../layout/section-header"
+import { ShimmerOverlay } from "../ui/shimmer-overlay"
 import { consultingClients } from "@/data/consulting-clients"
 import { navigateTo } from "@/components/nav/woosh-scroll"
 
@@ -131,6 +132,7 @@ export function ConsultingClients() {
                 className="pointer-events-none absolute -right-20 -top-20 z-0 h-64 w-64 rounded-full opacity-[0.06] blur-3xl transition-opacity duration-700 group-hover:opacity-[0.14]"
                 style={{ background: client.accent }}
               />
+              <ShimmerOverlay className="z-[3] rounded-2xl" />
               <div
                 className="pointer-events-none absolute inset-0 z-0 opacity-[0.02] mix-blend-overlay"
                 style={{

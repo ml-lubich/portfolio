@@ -6,6 +6,7 @@ import { AnimatedCounter } from "../animations/animated-counter"
 import { AnimatedBars, type BarItem } from "../animations/animated-bars"
 import { ScrollMiniBar } from "../layout/scroll-mini-bar"
 import { SectionHeader } from "../layout/section-header"
+import { ShimmerOverlay } from "../ui/shimmer-overlay"
 import { gradients as g, textColors as tc } from "@/lib/theme"
 const TerminalReveal = dynamic(
   () => import("../terminal/terminal-reveal").then((mod) => mod.TerminalReveal),
@@ -174,6 +175,7 @@ export function AIExpertise() {
                 {/* Top edge light */}
                 <div className="absolute inset-x-0 top-0 h-px bg-white/[0.06]" />
                 <div className="absolute inset-0 rounded-2xl bg-primary/[0.03] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                <ShimmerOverlay className="rounded-2xl" />
                 <metric.icon className={`relative mb-3 h-8 w-8 ${metric.color} transition-transform duration-500 group-hover:scale-110 group-hover:drop-shadow-[0_0_8px_currentColor]`} />
                 <AnimatedCounter
                   value={metric.value}
@@ -209,6 +211,7 @@ export function AIExpertise() {
                   <div className="absolute inset-x-0 top-0 h-px bg-white/[0.06]" />
                   {/* Hover overlay */}
                   <div className="absolute inset-0 rounded-2xl bg-primary/[0.03] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                  <ShimmerOverlay className="rounded-2xl" />
 
                   {/* Top accent */}
                   <div className={`h-1 w-full bg-primary`} />

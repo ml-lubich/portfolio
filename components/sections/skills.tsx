@@ -6,6 +6,7 @@ import { AnimatedSection } from "../animations/animated-section"
 import { AnimatedBars } from "../animations/animated-bars"
 import { getSkillIcon } from "./skill-icons"
 import { SectionHeader } from "../layout/section-header"
+import { ShimmerOverlay } from "../ui/shimmer-overlay"
 import { skillCategories, proficiencyBars } from "@/data/skills"
 import { hex } from "@/lib/theme"
 import { SkillDetailModal } from "./skill-detail-modal"
@@ -151,7 +152,7 @@ export function Skills() {
                       </div>
                     </div>
 
-                    <div className="absolute inset-0 shimmer opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                    <ShimmerOverlay />
                   </div>
                 </TiltCard>
               </AnimatedSection>
