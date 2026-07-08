@@ -274,6 +274,7 @@ export function Navigation() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const mobileOpenRef = useRef(false)
   const navRef = useRef<HTMLElement>(null)
+  const scrimRef = useRef<HTMLDivElement>(null)
   const linkRefs = useRef<Map<string, HTMLAnchorElement>>(new Map())
   // hideNav removed: auto-hide on scroll-down caused visible flicker on mobile
   // (iOS URL-bar resize jitters scrollY) and was the user-reported flicker on
@@ -305,6 +306,12 @@ export function Navigation() {
     if (nav.className !== cls) nav.className = cls
     const attr = scrolled ? "true" : "false"
     if (nav.dataset.navScrolled !== attr) nav.dataset.navScrolled = attr
+    // Top scrim gradient fades in with the same past-hero state as the nav capsule.
+    const scrim = scrimRef.current
+    if (scrim) {
+      const opacity = scrolled ? "1" : "0"
+      if (scrim.style.opacity !== opacity) scrim.style.opacity = opacity
+    }
   }, [])
 
   /* Re-apply after every React commit (resets className to NAV_SSR_CLASS) and on mobileOpen toggle. */
@@ -383,6 +390,13 @@ export function Navigation() {
 
   return (
     <>
+      {/* Top scrim: dark gradient under the navbar, fades in once the hero is scrolled past.
+          Opacity is driven imperatively by applyNavSurface (same past-hero state as the nav). */}
+      <div
+        ref={scrimRef}
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-x-0 top-0 z-40 h-24 bg-gradient-to-b from-black/85 via-black/45 to-transparent opacity-0 transition-opacity duration-500 ease-fluid md:h-32"
+      />
       {/* Main nav bar */}
       <nav
         ref={navRef}

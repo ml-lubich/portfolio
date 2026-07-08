@@ -117,6 +117,39 @@ describe("Navigation wiring (regression)", () => {
     expect(navSrc).not.toContain("ScrollProgressBar")
   })
 
+  it("top scrim gradient exists: fixed, full-width, under the navbar, non-interactive", () => {
+    const navSrc = fs.readFileSync(
+      path.join(ROOT, "components/nav/index.tsx"),
+      "utf8",
+    )
+    const scrimMatch = navSrc.match(/ref=\{scrimRef\}[\s\S]*?className="([^"]*)"/)
+    expect(scrimMatch, "scrim div with ref={scrimRef} must be rendered").toBeTruthy()
+    const cls = scrimMatch![1]
+    // Pinned to the viewport top, full width
+    expect(cls).toContain("fixed")
+    expect(cls).toContain("inset-x-0")
+    expect(cls).toContain("top-0")
+    // Dark gradient fading downward to transparent
+    expect(cls).toMatch(/bg-gradient-to-b/)
+    expect(cls).toMatch(/from-black/)
+    expect(cls).toContain("to-transparent")
+    // Under the navbar (nav is z-50 / z-[200]) but above page content
+    expect(cls).toContain("z-40")
+    // Hidden until past hero; never blocks clicks
+    expect(cls).toContain("opacity-0")
+    expect(cls).toContain("pointer-events-none")
+    expect(cls).toContain("transition-opacity")
+  })
+
+  it("top scrim opacity is driven by the same past-hero state as the nav surface", () => {
+    const navSrc = fs.readFileSync(
+      path.join(ROOT, "components/nav/index.tsx"),
+      "utf8",
+    )
+    // applyNavSurface must toggle the scrim from the shared `scrolled` boolean
+    expect(navSrc).toMatch(/scrimRef\.current[\s\S]{0,200}scrolled \? "1" : "0"/)
+  })
+
   it("mobile menu keeps Contact as the CTA instead of duplicating it in the link list", () => {
     const navSrc = fs.readFileSync(
       path.join(ROOT, "components/nav/index.tsx"),
