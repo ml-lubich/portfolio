@@ -31,4 +31,30 @@ describe("ConsultingClients layout", () => {
     expect(src).toContain("md:w-[calc(50%-0.75rem)]")
     expect(src).toContain("lg:w-[calc(33.333%-1rem)]")
   })
+
+  it("cover images fall back to the styled placeholder on load error (no broken-image icon)", () => {
+    // A failed cover must flip hasCover so the "Preview unavailable" slot renders
+    expect(src).toMatch(/onError=\{/)
+    expect(src).toMatch(/failedCovers/)
+    expect(src).toContain("Preview unavailable")
+  })
+
+  it("impact highlights render as chips when a client has them", () => {
+    expect(src).toMatch(/client\.impact/)
+  })
+})
+
+describe("ConsultingClients impact data", () => {
+  it("ERIA lists offsites for Anthropic, Google & J&J and the Forbes feature", async () => {
+    const { consultingClients } = await import("@/data/consulting-clients")
+    const eria = consultingClients.find((c) => c.id === "eria")
+    expect(eria).toBeTruthy()
+    const impact = (eria!.impact ?? []).join(" ")
+    expect(impact).toContain("Anthropic")
+    expect(impact).toContain("Google")
+    expect(impact).toContain("J&J")
+    expect(impact).toContain("Forbes")
+    // The card itself links these highlights to the live eria.co site
+    expect(eria!.href).toContain("eria.co")
+  })
 })

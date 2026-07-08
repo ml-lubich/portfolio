@@ -1,7 +1,8 @@
 "use client"
 
+import { useState } from "react"
 import Image from "next/image"
-import { ExternalLink, Handshake } from "lucide-react"
+import { ExternalLink, Handshake, Sparkles } from "lucide-react"
 import { AnimatedLobsterClaw } from "../animations/animated-lobster-claw"
 import { AnimatedSection } from "../animations/animated-section"
 import { SectionHeader } from "../layout/section-header"
@@ -9,6 +10,9 @@ import { consultingClients } from "@/data/consulting-clients"
 import { navigateTo } from "@/components/nav/woosh-scroll"
 
 export function ConsultingClients() {
+  /** Covers that failed to load fall back to the styled "Preview unavailable" slot. */
+  const [failedCovers, setFailedCovers] = useState<Record<string, boolean>>({})
+
   return (
     <AnimatedSection
       id="consulting"
@@ -84,7 +88,8 @@ export function ConsultingClients() {
 
       <ul className="flex flex-wrap justify-center gap-4 md:gap-6">
         {consultingClients.map((client) => {
-          const hasCover = client.coverImage != null && client.coverImage !== ""
+          const hasCover =
+            client.coverImage != null && client.coverImage !== "" && !failedCovers[client.id]
           /** Fixed slot so cards with / without hero share the same top band height */
           const heroSlot =
             "relative z-[1] h-[220px] w-full shrink-0 overflow-hidden border-b border-white/[0.08] sm:h-[260px]"
@@ -107,6 +112,9 @@ export function ConsultingClients() {
                     className="h-full w-full object-cover object-top"
                     sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     loading="lazy"
+                    onError={() =>
+                      setFailedCovers((prev) => ({ ...prev, [client.id]: true }))
+                    }
                   />
                 </div>
               ) : (
@@ -162,6 +170,20 @@ export function ConsultingClients() {
                 <p className="text-sm leading-relaxed text-muted-foreground/85 sm:text-[15px]">
                   {client.summary}
                 </p>
+
+                {client.impact?.length ? (
+                  <div className="flex flex-wrap gap-1.5">
+                    {client.impact.map((item) => (
+                      <span
+                        key={item}
+                        className="inline-flex items-center gap-1.5 rounded-full border border-primary/25 bg-primary/[0.07] px-3 py-1 font-mono text-[10px] font-semibold uppercase tracking-wider text-primary"
+                      >
+                        <Sparkles className="h-3 w-3 shrink-0" aria-hidden />
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                ) : null}
 
                 <div className="mt-auto flex flex-wrap gap-1.5 pt-1">
                   {client.tags.map((tag) => (

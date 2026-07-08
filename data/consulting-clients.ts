@@ -17,6 +17,8 @@ export interface ConsultingClient {
     accent: string
     /** Optional card hero under `public/` (e.g. `/images/projects/lupfr-hero.png`) */
     coverImage?: string
+    /** Brand/press impact highlights shown as chips on the card (the card links to `href`) */
+    impact?: string[]
 }
 
 export const consultingClients: ConsultingClient[] = [
@@ -60,6 +62,10 @@ export const consultingClients: ConsultingClient[] = [
         coverImage: "/images/projects/eria-hero.png",
         summary:
             "Web presence for the San Francisco Bay's most coveted venues and experiences—a luxury events brand featured in Forbes and trusted by Google, Anthropic, Samsung, and Hilton. Live at eria.co and eriaevents.co.",
+        impact: [
+            "Offsites for Anthropic, Google & J&J",
+            "Featured in Forbes",
+        ],
         tags: ["Web", "Events", "Luxury"],
         gradient: g.primaryToRose,
         accent: accentCycle[3],
