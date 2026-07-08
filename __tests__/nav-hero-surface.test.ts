@@ -129,10 +129,13 @@ describe("Navigation wiring (regression)", () => {
     expect(cls).toContain("fixed")
     expect(cls).toContain("inset-x-0")
     expect(cls).toContain("top-0")
-    // Dark gradient fading downward to transparent
+    // Prominent dark gradient fading downward to transparent
     expect(cls).toMatch(/bg-gradient-to-b/)
-    expect(cls).toMatch(/from-black/)
+    expect(cls).toContain("from-black/95")
     expect(cls).toContain("to-transparent")
+    // Tall enough to read as a deliberate scrim band
+    expect(cls).toContain("h-32")
+    expect(cls).toContain("md:h-40")
     // Under the navbar (nav is z-50 / z-[200]) but above page content
     expect(cls).toContain("z-40")
     // Hidden until past hero; never blocks clicks

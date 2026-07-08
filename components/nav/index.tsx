@@ -395,7 +395,7 @@ export function Navigation() {
       <div
         ref={scrimRef}
         aria-hidden="true"
-        className="pointer-events-none fixed inset-x-0 top-0 z-40 h-24 bg-gradient-to-b from-black/85 via-black/45 to-transparent opacity-0 transition-opacity duration-500 ease-fluid md:h-32"
+        className="pointer-events-none fixed inset-x-0 top-0 z-40 h-32 bg-gradient-to-b from-black/95 via-black/55 to-transparent opacity-0 transition-opacity duration-500 ease-fluid md:h-40"
       />
       {/* Main nav bar */}
       <nav
