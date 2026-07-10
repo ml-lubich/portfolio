@@ -41,7 +41,11 @@ export function RoleRotator({
       className="animate-fade-in-up-subtle mx-auto w-full max-w-[min(100%,42rem)] px-1 font-display tracking-tight text-foreground"
       style={{ animationDelay: "0.1s", lineHeight: 1.15 }}
     >
-      <span className="block text-pretty text-4xl font-semibold sm:text-5xl md:text-6xl lg:text-7xl">
+      {/* no-metallic: opt this bold wrapper out of the global `background-clip: text`
+          sheen. On the wrapper it clipped the child letters' glyphs into a stale
+          silver ghost that overlapped the real name — the AnimatedName chars carry
+          their own color instead. */}
+      <span className="no-metallic block text-pretty text-4xl font-semibold sm:text-5xl md:text-6xl lg:text-7xl">
         <AnimatedName
           name="Misha Lubich"
           trigger="mount"
