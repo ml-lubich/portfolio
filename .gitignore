@@ -23,3 +23,6 @@ coverage/
 
 # oh-my-claudecode local agent state
 /.omc/
+
+# TypeScript incremental build info (now written to node_modules/.cache)
+*.tsbuildinfo

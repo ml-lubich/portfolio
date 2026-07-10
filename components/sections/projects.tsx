@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback, useMemo, type CSSProperties } from "react"
+import { memo, useState, useCallback, useMemo, type CSSProperties } from "react"
 import Image from "next/image"
 import { Sparkles, ArrowRight, FlaskConical, Pause, MousePointerClick } from "lucide-react"
 import { DetailPanel } from "../detail-panel"
@@ -35,7 +35,10 @@ interface MarqueeCardProps {
   onExplore: (id: string) => void
 }
 
-function MarqueeCard({ project, onExplore }: MarqueeCardProps) {
+// Memoized: 76 card instances live across the 3 rows — without memo, any
+// state change in Projects (e.g. opening the detail modal) re-renders and
+// re-commits every card, which reads as a visible flicker of the marquee.
+const MarqueeCard = memo(function MarqueeCard({ project, onExplore }: MarqueeCardProps) {
   // No backdrop-blur on the card: 38 cards translate continuously, and a live
   // backdrop filter would re-rasterize every frame. A translucent tint over the
   // dark section reads as glass without the per-frame cost.
@@ -127,7 +130,7 @@ function MarqueeCard({ project, onExplore }: MarqueeCardProps) {
       </div>
     </article>
   )
-}
+})
 
 interface MarqueeRowProps {
   rowProjects: Project[]
@@ -136,7 +139,7 @@ interface MarqueeRowProps {
   onExplore: (id: string) => void
 }
 
-function MarqueeRow({ rowProjects, direction, duration, onExplore }: MarqueeRowProps) {
+const MarqueeRow = memo(function MarqueeRow({ rowProjects, direction, duration, onExplore }: MarqueeRowProps) {
   const [pinned, setPinned] = useState(false)
 
   // Duplicate the set so the -50% translate loops seamlessly.
@@ -179,7 +182,7 @@ function MarqueeRow({ rowProjects, direction, duration, onExplore }: MarqueeRowP
       </div>
     </div>
   )
-}
+})
 
 export function Projects() {
   const [selectedId, setSelectedId] = useState<string | null>(null)

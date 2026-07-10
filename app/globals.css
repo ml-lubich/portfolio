@@ -1299,18 +1299,32 @@ nav[data-nav-scrolled="true"] .nav-shell {
   opacity: 1;
 }
 
-/* ── Hero name color — solid tech blue ──
-   The name letters render as a solid tech blue. A solid `color` needs no
-   `background-clip: text`, so it never triggers the compositor text-clip
-   glitch. The ghosting culprit was actually the *parent* `.font-semibold`
-   span picking up the global bold-metallic `background-clip: text` rule below;
-   that wrapper opts out via `no-metallic` (see role-rotator.tsx). */
+/* ── Hero name color — metallic silver sheen ──
+   Matches the rotating role text (.gradient-text) so the name reads as the
+   same grey/silver treatment. Per-char `background-clip: text` is safe here:
+   the ghosting culprit was the *parent* `.font-semibold` span picking up the
+   global bold-metallic clip rule below; that wrapper opts out via
+   `no-metallic` (see role-rotator.tsx). */
 .animated-name-metallic .animated-name-char {
-  color: hsl(217 100% 68%);
-  -webkit-text-fill-color: hsl(217 100% 68%);
+  background: linear-gradient(120deg,
+      hsl(var(--foreground)) 0%,
+      hsl(220 15% 75%) 20%,
+      hsl(0 0% 100%) 30%,
+      hsl(220 15% 75%) 40%,
+      hsl(var(--foreground)) 55%,
+      hsl(220 15% 75%) 70%,
+      hsl(0 0% 100%) 80%,
+      hsl(220 15% 75%) 90%,
+      hsl(var(--foreground)) 100%);
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-position: 50% center;
   transition:
     transform var(--name-duration, 900ms) cubic-bezier(0.16, 1, 0.3, 1) var(--stagger, 0ms),
-    opacity calc(var(--name-duration, 900ms) * 0.6) ease-out var(--stagger, 0ms);
+    opacity calc(var(--name-duration, 900ms) * 0.6) ease-out var(--stagger, 0ms),
+    background-position 0.1s linear;
 }
 
 @keyframes metallic-shimmer {
@@ -2182,10 +2196,11 @@ article .blog-prose b a[href],
    sections to visually crowd / “lose” vertical rhythm while scrolling on mobile. */
 
 /* ──────────────────────────────────────────────────────────── */
-/*  Skill Storm — orbital constellation of skill pills (lg+)     */
-/*  One rotator spins the whole field via --storm-angle (set by  */
-/*  a single rAF loop); each pill counter-rotates by that same   */
-/*  angle so its label stays upright. Drag to spin either way.   */
+/*  Skill Storm — 3D carousel of skill pills (lg+). One shared   */
+/*  --storm-angle (set by a single rAF loop) drives every pill:  */
+/*  cos() sweeps it across the page, sin() carries it into and   */
+/*  out of the page (translateZ). Pills translate, never rotate, */
+/*  so labels stay upright for free. Drag to spin either way.    */
 /* ──────────────────────────────────────────────────────────── */
 .skill-storm {
   /* Soft radial vignette so pills dissolve toward the edges instead
@@ -2196,25 +2211,38 @@ article .blog-prose b a[href],
   touch-action: none;
 }
 
-/* The rotator fills the storm; rotating it about its centre orbits every
-   pill. JS writes --storm-angle each frame — transform-only, no layout. */
-.skill-storm-rotator {
+/* The scene fills the storm. perspective scales pills up as they swing out
+   of the page and down as they recede; preserve-3d depth-sorts them against
+   each other and the centre title (planted at translateZ(0)). JS writes
+   --storm-angle each frame — transform-only, no layout. */
+.skill-storm-3d {
   position: absolute;
   inset: 0;
-  transform: rotate(var(--storm-angle, 0deg));
-  transform-origin: 50% 50%;
-  will-change: transform;
+  perspective: 1100px;
+  transform-style: preserve-3d;
 }
 
+/* Each pill's spot on its tilted ring, derived from the one shared angle.
+   --d is the depth phase: +1 = swung out of the page toward the viewer
+   (big, bright, in front of the title), −1 = receded into it. The 0.34px
+   vertical factor mirrors RING_SQUASH in skill-storm.tsx — keep in sync. */
 .skill-orbit-item {
   position: absolute;
   left: 50%;
   top: 50%;
-}
-
-.skill-pill-counter {
-  /* Cancels the rotator so the label never tilts, whatever the spin angle. */
-  transform: rotate(calc(-1 * var(--storm-angle, 0deg)));
+  --d: sin(var(--storm-angle, 0deg) + var(--phase, 0deg));
+  transform: translate(-50%, -50%)
+    translate3d(
+      calc(cos(var(--storm-angle, 0deg) + var(--phase, 0deg)) * var(--rx, 0) * 1px),
+      calc(var(--d) * var(--rx, 0) * 0.34px),
+      calc(var(--d) * var(--rx, 0) * 0.35px + var(--lift, 0px))
+    )
+    scale(var(--rs, 1));
+  /* Depth cues: receding pills dim via brightness (stays opaque — no text
+     bleed-through where pills overlap) plus only a whisper of fade. */
+  opacity: calc(0.72 + 0.14 * (var(--d) + 1));
+  filter: brightness(calc(0.55 + 0.225 * (var(--d) + 1)));
+  will-change: transform;
 }
 
 /* Opaque liquid-glass pill: a solid card-tinted base (so overlapping pills
@@ -2236,9 +2264,12 @@ article .blog-prose b a[href],
   transform: scale(1.12);
 }
 
-/* The hovered pill lifts above its neighbours for a clean read. */
+/* The hovered pill swings toward the viewer, above its neighbours and at
+   full brightness, for a clean read wherever it is on the ring. */
 .skill-orbit-item:has(.skill-pill:hover) {
-  z-index: 60 !important;
+  --lift: 260px;
+  opacity: 1;
+  filter: none;
 }
 
 /* ── Project marquee — 3 rows of auto-scrolling project cards ──────────
@@ -2301,22 +2332,4 @@ article .blog-prose b a[href],
     animation: none;
     transform: none;
   }
-}
-
-/* ── Section header titles — solid tech blue ──
-   Matches the hero name (hsl(217 100% 68%)). Overrides the metallic
-   `background-clip: text` sheen that the global bold/gradient-text rules
-   applied to these <h2> titles, so section headers read as a clean,
-   on-brand blue instead of silver/white. Scoped to `.section-title` so
-   other `.gradient-text` highlights (hero roles, inline accents) keep
-   their metallic treatment. */
-.section-title,
-.section-title .animated-text-word,
-.section-title .gradient-text,
-.section-title .gradient-text .animated-text-word {
-  background-image: none !important;
-  -webkit-background-clip: border-box !important;
-  background-clip: border-box !important;
-  color: hsl(217 100% 68%) !important;
-  -webkit-text-fill-color: hsl(217 100% 68%) !important;
 }

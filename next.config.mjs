@@ -30,6 +30,21 @@ const nextConfig = {
     ],
   },
   devIndicators: false,
+  // Dev watcher: also ignore non-source files written into the repo while the
+  // dev server runs (.omc tooling state, stray tsconfig.tsbuildinfo). Without
+  // this, each write triggers a Fast Refresh rebuild → the whole app re-renders
+  // in a loop and animated sections (project marquee) flicker constantly.
+  // Extends Next's default ignore regex (node_modules, .git, .next).
+  webpack: (config, { dev }) => {
+    if (dev) {
+      config.watchOptions = {
+        ...config.watchOptions,
+        ignored:
+          /^((?:[^/]*(?:\/|$))*)(\.(git|next|omc)|node_modules|tsconfig\.tsbuildinfo)(\/((?:[^/]*(?:\/|$))*)(?:$|\/))?/,
+      }
+    }
+    return config
+  },
   // LAN / alternate host dev (Next 16+); silences cross-origin _next warnings on local network.
   allowedDevOrigins: [
     "http://192.168.1.200:3000",
