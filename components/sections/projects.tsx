@@ -2,7 +2,7 @@
 
 import { memo, useState, useCallback, useMemo, type CSSProperties } from "react"
 import Image from "next/image"
-import { Sparkles, ArrowRight, FlaskConical, Pause, MousePointerClick } from "lucide-react"
+import { Sparkles, ArrowRight, FlaskConical, MousePointerClick } from "lucide-react"
 import { DetailPanel } from "../detail-panel"
 import { SectionHeader } from "../layout/section-header"
 import { projects, type Project } from "@/data/projects"
@@ -39,12 +39,26 @@ interface MarqueeCardProps {
 // state change in Projects (e.g. opening the detail modal) re-renders and
 // re-commits every card, which reads as a visible flicker of the marquee.
 const MarqueeCard = memo(function MarqueeCard({ project, onExplore }: MarqueeCardProps) {
+  // The whole card opens the detail panel — not just the Explore CTA.
+  // Hovering (or tabbing into) the card already pauses its row via CSS.
+  const handleCardClick = () => onExplore(project.id)
+
   // No backdrop-blur on the card: 38 cards translate continuously, and a live
   // backdrop filter would re-rasterize every frame. A translucent tint over the
   // dark section reads as glass without the per-frame cost.
   return (
     <article
-      className="marquee-card group/card relative mr-4 w-[270px] shrink-0 overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03] transition-colors duration-500 hover:border-primary/30 hover:bg-white/[0.055] sm:mr-5 sm:w-[320px]"
+      role="button"
+      tabIndex={0}
+      aria-label={`${project.name} — open architecture and details`}
+      onClick={handleCardClick}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault()
+          handleCardClick()
+        }
+      }}
+      className="marquee-card group/card relative mr-4 w-[270px] shrink-0 cursor-pointer overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03] transition-colors duration-500 hover:border-primary/30 hover:bg-white/[0.055] focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary/60 sm:mr-5 sm:w-[320px]"
     >
       {/* Top gradient accent strip */}
       <div className={`h-1 w-full bg-gradient-to-r ${project.gradient} opacity-60 transition-opacity duration-500 group-hover/card:opacity-100`} />
@@ -114,9 +128,11 @@ const MarqueeCard = memo(function MarqueeCard({ project, onExplore }: MarqueeCar
           ))}
         </div>
 
-        {/* Explore CTA — stops the click from also toggling the row pause */}
+        {/* Explore CTA — same action as the card itself, kept as a visual
+            affordance; stopPropagation avoids double-firing via the card */}
         <button
           type="button"
+          tabIndex={-1}
           onClick={(e) => {
             e.stopPropagation()
             onExplore(project.id)
@@ -140,36 +156,17 @@ interface MarqueeRowProps {
 }
 
 const MarqueeRow = memo(function MarqueeRow({ rowProjects, direction, duration, onExplore }: MarqueeRowProps) {
-  const [pinned, setPinned] = useState(false)
-
   // Duplicate the set so the -50% translate loops seamlessly.
   const doubled = useMemo(() => [...rowProjects, ...rowProjects], [rowProjects])
 
-  const togglePinned = useCallback(() => setPinned((v) => !v), [])
-
   return (
     <div className="marquee-row group/row relative">
-      {/* Paused indicator — appears when the row is click-pinned */}
-      <div
-        className={`pointer-events-none absolute right-3 top-1/2 z-20 -translate-y-1/2 rounded-full border border-white/[0.12] bg-black/60 px-2.5 py-1 backdrop-blur-md transition-opacity duration-300 ${
-          pinned ? "opacity-100" : "opacity-0"
-        }`}
-        aria-hidden="true"
-      >
-        <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-white/80">
-          <Pause className="h-3 w-3" />
-          Paused
-        </span>
-      </div>
-
       <div className="marquee-viewport">
-        {/* Clicking anywhere on the track (i.e. a card) toggles the pin.
-            The Explore button stops propagation so it opens the panel instead. */}
+        {/* Hover / focus-within pauses the row (CSS); clicking a card opens
+            its detail panel — the card itself is the button. */}
         <div
-          className={`marquee-track marquee-track--${direction} ${pinned ? "is-paused" : ""} py-2`}
+          className={`marquee-track marquee-track--${direction} py-2`}
           style={{ "--marquee-duration": duration } as CSSProperties}
-          onClick={togglePinned}
-          role="presentation"
         >
           {doubled.map((project, i) => (
             <MarqueeCard
@@ -207,7 +204,7 @@ export function Projects() {
           className="mb-6 md:mb-10"
           label="Featured Projects"
           title={<>Innovative solutions that{" "}<span className="gradient-text">drive real-world impact</span></>}
-          subtitle="A stream of what I've shipped — hover or tap a card to stop the row, then Explore for architecture, tech stack, and animated system diagrams."
+          subtitle="A stream of what I've shipped — hovering pauses a row; click any card to explore architecture, tech stack, and animated system diagrams."
         />
       </div>
 
@@ -225,10 +222,10 @@ export function Projects() {
       </div>
 
       <div className="relative mx-auto max-w-6xl px-3 md:px-4 lg:px-6">
-        {/* Hint: how to stop the marquee */}
+        {/* Hint: whole card is clickable */}
         <p className="mx-auto mt-6 flex items-center justify-center gap-1.5 text-center font-mono text-[11px] uppercase tracking-wider text-muted-foreground/40">
           <MousePointerClick className="h-3.5 w-3.5" aria-hidden />
-          Hover or tap a card to pause its row
+          Click any card for the full story
         </p>
 
         {/* Prototype disclaimer — clarifies the live Vercel demos are proof-of-concept */}
