@@ -538,8 +538,10 @@ function NeuralConstellationImpl({ bars, metrics }: NeuralConstellationProps) {
             <div className="relative grid gap-0 lg:grid-cols-[1.6fr_1fr]">
               {/* canvas */}
               <div className="relative h-[380px] md:h-[460px]" aria-hidden="true">
+                {/* z=5.5: frustum half-height ≈2.28 at the layout plane — clears the
+                    top "PyTorch / TF" label (y≈2.02 + text height); 4.8 clipped it. */}
                 <Canvas
-                  camera={{ position: [0, 0, 4.8], fov: 45 }}
+                  camera={{ position: [0, 0, 5.5], fov: 45 }}
                   dpr={[1, 1.75]}
                   gl={{ antialias: true, alpha: true }}
                   style={{ background: "transparent" }}

@@ -56,6 +56,7 @@ import {
   Coffee,
   Cloud,
   Database,
+  Drama,
   FileCode2,
   Bot,
   Search,
@@ -149,6 +150,8 @@ export const skillIconMap: Record<string, ReactNode> = {
   JUnit:                  <TestTube2 className={cls} />,
   Jest:                   <SiJest className={cls} />,
   Selenium:               <SiSelenium className={cls} />,
+  /* Playwright has no Simple Icons glyph — Lucide's theatre masks echo its logo. */
+  Playwright:             <Drama className={cls} />,
   SonarQube:              <SiSonarqube className={cls} />,
 }
 

@@ -16,43 +16,57 @@ import { papers, type Paper } from "./publications"
  * they should match against. The key itself is always checked too. */
 const skillAliases: Record<string, string[]> = {
     // AI/ML concepts → concrete tools they map to
-    "LLM APIs": ["CrewAI", "LangGraph", "FastAPI", "LLM"],
-    "Agentic Workflows": ["CrewAI", "LangGraph"],
-    "RAG Architectures": ["pgvector", "FAISS", "Pinecone", "Vector"],
+    "LLM APIs": ["CrewAI", "LangGraph", "FastAPI", "LLM", "Claude", "Claude API", "Google Gemini", "MiniMax", "OpenRouter", "Ollama"],
+    "Agentic Workflows": ["Agentic AI", "Agents", "CrewAI", "LangGraph"],
+    "RAG Architectures": ["RAG", "pgvector", "FAISS", "Pinecone", "Vector"],
     "Multi-Agent Orchestration": ["CrewAI", "LangGraph"],
     "MCP Tool Servers": ["CrewAI", "FastAPI"],
-    "Vector Databases": ["pgvector", "FAISS", "Pinecone"],
+    "Vector Databases": ["pgvector", "FAISS", "Pinecone", "Vector"],
     "Fine-tuning": ["PyTorch", "TensorFlow", "scikit-learn"],
-    "Prompt Engineering": ["CrewAI", "LangGraph", "LLM"],
+    "Prompt Engineering": ["CrewAI", "LangGraph", "LLM", "Claude", "Google Gemini", "MiniMax"],
     "Guardrails & Safety": ["CrewAI", "LangGraph", "Prometheus"],
-    "LLM Observability": ["Prometheus", "Grafana", "LangSmith"],
+    "LLM Observability": ["Prometheus", "Grafana", "LangSmith", "Langfuse", "Datadog"],
 
     // Framework groupings
     "Spring Boot": ["Spring Boot", "Spring"],
     "Spring Cloud": ["Spring Cloud", "Spring"],
     "Spring Security": ["Spring Security", "Spring"],
     "Tailwind CSS": ["Tailwind"],
-    "Material UI": ["Material UI", "MUI"],
+    "Material UI": ["Material UI", "MUI", "React", "Angular"],
     "Next.js": ["Next.js", "Next"],
 
     // Cloud shortcuts
     AWS: ["AWS", "Lambda", "ECS", "S3", "RDS", "Bedrock", "DynamoDB", "Amazon"],
-    GCP: ["GCP", "Google Cloud"],
-    Azure: ["Azure"],
+    GCP: ["GCP", "Google Cloud", "Google Vertex", "Google Gemini"],
+    Azure: ["Azure", "AWS", "GCP"],
+    Kubernetes: ["Kubernetes", "Docker", "ECS"],
+    Jenkins: ["Jenkins", "CI/CD", "GitHub Actions"],
+    "Azure DevOps": ["Azure DevOps", "CI/CD", "GitHub Actions"],
 
     // DB / messaging
     "Apache Kafka": ["Kafka"],
     PostgreSQL: ["PostgreSQL", "pgvector"],
+    MySQL: ["MySQL", "SQL"],
+    MongoDB: ["MongoDB"],
+    Oracle: ["Oracle", "SQL"],
+    DynamoDB: ["DynamoDB", "AWS"],
+    RabbitMQ: ["RabbitMQ", "Kafka", "Apache Kafka"],
 
     // Methodology concepts
-    "Agile/Scrum": [],
-    TDD: ["JUnit", "Jest", "Pytest", "Selenium"],
-    "Domain-Driven Design": [],
+    "Agile/Scrum": ["Agile", "Scrum", "Leadership", "Startup", "MVP"],
+    TDD: ["JUnit", "Jest", "Pytest", "Selenium", "Playwright"],
+    "Domain-Driven Design": ["Domain-Driven Design", "System Design", "Spring Boot", "Hibernate", "Apache Kafka"],
     MLOps: ["MLflow", "Airflow", "Docker", "Kubernetes"],
     "CI/CD": ["GitHub Actions", "Jenkins", "CI/CD", "Ansible"],
+    JUnit: ["JUnit", "Java", "Spring Boot"],
+    Jest: ["Jest", "React", "Next.js", "TypeScript"],
+    Selenium: ["Selenium", "Playwright"],
+    Playwright: ["Playwright", "Selenium", "E2E"],
+    SonarQube: ["SonarQube", "CI/CD", "GitHub Actions"],
 
     // Language groupings
     "C++": ["C++", "C"],
+    Rust: ["Rust", "C++", "System Programming", "CLI"],
     SQL: ["SQL", "PostgreSQL", "MySQL", "Oracle", "RDS", "SQLite"],
     YAML: ["Terraform", "Docker", "Kubernetes", "Ansible", "GitHub Actions"],
 
@@ -62,7 +76,7 @@ const skillAliases: Record<string, string[]> = {
     "Production Rollouts": ["AWS", "Kubernetes", "Docker", "Terraform", "ECS", "Lambda"],
     "Agent Skills & Sub-Agents": ["CrewAI", "LangGraph", "MCP"],
     "Eval-Driven Iteration": ["LangSmith", "Prometheus", "Grafana", "MLflow"],
-    "Stakeholder Communication": [],
+    "Stakeholder Communication": ["Leadership", "Startup", "MVP", "B2B"],
     "White-Glove Deployment": ["AWS", "Azure", "Terraform", "Kubernetes"],
     "Reference Architectures": ["CrewAI", "LangGraph", "FastAPI", "AWS", "Terraform"],
 }
@@ -113,33 +127,42 @@ function normalise(s: string): string {
     return s.toLowerCase().replace(/[^a-z0-9+#]/g, "")
 }
 
+function tokens(s: string): string[] {
+    return s
+        .toLowerCase()
+        .split(/[^a-z0-9+#]+/g)
+        .filter(Boolean)
+}
+
+function termMatchesText(term: string, text: string): boolean {
+    const normTerm = normalise(term)
+    const normText = normalise(text)
+    if (normTerm === normText) return true
+
+    const termTokens = tokens(term)
+    const textTokens = tokens(text)
+    return termTokens.length > 0 && termTokens.every((token) => textTokens.includes(token))
+}
+
 function skillMatchesTech(skill: string, techStack: string[]): boolean {
-    const norm = normalise(skill)
-    // Direct match
-    if (techStack.some((t) => normalise(t) === norm)) return true
-    // Check if any tech contains the skill name (partial match for terms like "Python")
-    if (techStack.some((t) => normalise(t).includes(norm) || norm.includes(normalise(t)))) return true
-    // Alias match
+    if (techStack.some((t) => termMatchesText(skill, t))) return true
+
     const aliases = skillAliases[skill]
     if (aliases) {
         for (const alias of aliases) {
-            const normAlias = normalise(alias)
-            if (techStack.some((t) => normalise(t) === normAlias || normalise(t).includes(normAlias))) return true
+            if (techStack.some((t) => termMatchesText(alias, t))) return true
         }
     }
     return false
 }
 
 function matchesPublication(skill: string, paper: Paper): boolean {
-    // Check tags
-    const norm = normalise(skill)
-    if (paper.tags.some((t) => normalise(t) === norm || normalise(t).includes(norm) || norm.includes(normalise(t)))) return true
-    // Check aliases against tags
+    if (paper.tags.some((t) => termMatchesText(skill, t))) return true
+
     const aliases = skillAliases[skill]
     if (aliases) {
         for (const alias of aliases) {
-            const normAlias = normalise(alias)
-            if (paper.tags.some((t) => normalise(t) === normAlias || normalise(t).includes(normAlias))) return true
+            if (paper.tags.some((t) => termMatchesText(alias, t))) return true
         }
     }
     return false

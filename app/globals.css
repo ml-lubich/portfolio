@@ -2014,6 +2014,20 @@ article .blog-prose b a[href],
   }
 }
 
+/* Breathing halo on the last lit node of the expertise constellation
+   meter (SVG geometry `r` — CSS so reduced-motion collapses it) */
+@keyframes constellation-node-pulse {
+
+  0%,
+  100% {
+    r: 5px;
+  }
+
+  50% {
+    r: 7px;
+  }
+}
+
 .panel-stagger {
   opacity: 0;
   animation: panel-slide-up 0.5s ease-out forwards;
@@ -2203,10 +2217,12 @@ article .blog-prose b a[href],
 /*  so labels stay upright for free. Drag to spin either way.    */
 /* ──────────────────────────────────────────────────────────── */
 .skill-storm {
-  /* Soft radial vignette so pills dissolve toward the edges instead
-     of hard-clipping — reads as a weather system, not a clipped box. */
-  -webkit-mask-image: radial-gradient(ellipse 78% 82% at 50% 50%, #000 60%, transparent 97%);
-  mask-image: radial-gradient(ellipse 78% 82% at 50% 50%, #000 60%, transparent 97%);
+  /* Soft radial vignette so pills dissolve right at the edges instead of
+     hard-clipping. Generous radii: the mask is clipped to the border box, so
+     a tight ellipse (or overshooting ring radii) visibly cuts pills apart —
+     the ring field is sized (RINGS × --storm-k) to stay inside this box. */
+  -webkit-mask-image: radial-gradient(ellipse 92% 96% at 50% 50%, #000 68%, transparent 99%);
+  mask-image: radial-gradient(ellipse 92% 96% at 50% 50%, #000 68%, transparent 99%);
   /* Pointer drags rotate the field; never let them scroll the page. */
   touch-action: none;
 }
@@ -2218,14 +2234,27 @@ article .blog-prose b a[href],
 .skill-storm-3d {
   position: absolute;
   inset: 0;
-  perspective: 1100px;
+  perspective: 1200px;
   transform-style: preserve-3d;
+  /* Viewport fit factor: shrinks every ring radius (x/wobble/depth alike) so
+     the outermost pills never cross the storm's border box, where the mask
+     would slice them. Full size only once the max-w-7xl column fits. */
+  --storm-k: 0.72;
+}
+@media (min-width: 1280px) {
+  .skill-storm-3d { --storm-k: 0.86; }
+}
+@media (min-width: 1536px) {
+  .skill-storm-3d { --storm-k: 1; }
 }
 
-/* Each pill's spot on its tilted ring, derived from the one shared angle.
-   --d is the depth phase: +1 = swung out of the page toward the viewer
-   (big, bright, in front of the title), −1 = receded into it. The 0.34px
-   vertical factor mirrors RING_SQUASH in skill-storm.tsx — keep in sync. */
+/* Each pill's spot on its ring, derived from the one shared angle. The ring
+   revolves around the page's VERTICAL axis, seen edge-on (a cross-section of
+   the spin): cos() sweeps the pill across the page, sin() (--d) drives it
+   into/out of the page via translateZ, and the vertical term is a sliver of
+   wobble (0.1px — mirrors RING_SQUASH in skill-storm.tsx, keep in sync)
+   around the ring's tier --ry. +1 = swung out toward the viewer (big,
+   bright, in front of the title), −1 = receded into the page behind it. */
 .skill-orbit-item {
   position: absolute;
   left: 50%;
@@ -2233,15 +2262,15 @@ article .blog-prose b a[href],
   --d: sin(var(--storm-angle, 0deg) + var(--phase, 0deg));
   transform: translate(-50%, -50%)
     translate3d(
-      calc(cos(var(--storm-angle, 0deg) + var(--phase, 0deg)) * var(--rx, 0) * 1px),
-      calc(var(--d) * var(--rx, 0) * 0.34px),
-      calc(var(--d) * var(--rx, 0) * 0.35px + var(--lift, 0px))
+      calc(cos(var(--storm-angle, 0deg) + var(--phase, 0deg)) * var(--rx, 0) * var(--storm-k, 1) * 1px),
+      calc(var(--d) * var(--rx, 0) * var(--storm-k, 1) * 0.1px + var(--ry, 0px)),
+      calc(var(--d) * var(--rx, 0) * var(--storm-k, 1) * 0.55px)
     )
     scale(var(--rs, 1));
   /* Depth cues: receding pills dim via brightness (stays opaque — no text
      bleed-through where pills overlap) plus only a whisper of fade. */
   opacity: calc(0.72 + 0.14 * (var(--d) + 1));
-  filter: brightness(calc(0.55 + 0.225 * (var(--d) + 1)));
+  filter: brightness(calc(0.5 + 0.25 * (var(--d) + 1)));
   will-change: transform;
 }
 
@@ -2255,19 +2284,17 @@ article .blog-prose b a[href],
   -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
   box-shadow: 0 1px 0 hsl(0 0% 100% / 0.05) inset, 0 8px 24px -12px hsl(0 0% 0% / 0.7);
-  transform: scale(1);
 }
 .skill-pill:hover {
   background:
     linear-gradient(180deg, hsl(0 0% 100% / 0.1), hsl(0 0% 100% / 0) 60%),
     hsl(var(--card));
-  transform: scale(1.12);
 }
 
-/* The hovered pill swings toward the viewer, above its neighbours and at
-   full brightness, for a clean read wherever it is on the ring. */
+/* Hover is a pure light-up: the pill brightens to full and glows (border +
+   shadow, set in the component). NO transform/scale/lift — any movement under
+   perspective reads as the pill sliding sideways out from under the cursor. */
 .skill-orbit-item:has(.skill-pill:hover) {
-  --lift: 260px;
   opacity: 1;
   filter: none;
 }

@@ -3,11 +3,11 @@
 import { useState, useCallback, useRef } from "react"
 import dynamic from "next/dynamic"
 import { AnimatedSection } from "../animations/animated-section"
-import { AnimatedBars } from "../animations/animated-bars"
 import { getSkillIcon } from "./skill-icons"
 import { SectionHeader } from "../layout/section-header"
 import { ShimmerOverlay } from "../ui/shimmer-overlay"
-import { skillCategories, proficiencyBars } from "@/data/skills"
+import { skillCategories } from "@/data/skills"
+import { ExpertiseMatrix } from "./expertise-matrix"
 import { hex } from "@/lib/theme"
 import { SkillDetailModal } from "./skill-detail-modal"
 import { SkillStorm } from "./skill-storm"
@@ -108,10 +108,7 @@ export function Skills() {
         {/* Proficiency + category cards: flex gap keeps rhythm (margins + lazy paint were crowding) */}
         <div className="relative z-10 flex flex-col gap-12 md:gap-16 lg:gap-20">
           <AnimatedSection delay={100} className="relative z-10">
-            <div className="rounded-2xl border border-white/[0.04] bg-card/25 p-8 backdrop-blur-xl frosted-panel md:p-9">
-              <h3 className="mb-6 text-lg font-bold text-foreground">Overall Proficiency</h3>
-              <AnimatedBars bars={proficiencyBars} duration={1600} stagger={120} />
-            </div>
+            <ExpertiseMatrix />
           </AnimatedSection>
 
           {/* Desktop (lg+): the skills churn as an orbital "Storm of Skills". */}

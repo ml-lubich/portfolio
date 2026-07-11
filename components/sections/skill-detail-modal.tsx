@@ -157,8 +157,8 @@ export function SkillDetailModal({ skill, open, onOpenChange }: SkillDetailModal
                     <DialogHeader className="relative">
                         <div className="flex items-center gap-3">
                             {/* Icon badge */}
-                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px] bg-gradient-to-br from-primary to-accent text-white shadow-lg shadow-primary/25 ring-1 ring-white/10">
-                                <span className="text-lg">{icon}</span>
+                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[14px] bg-primary/12 text-primary shadow-lg shadow-primary/10">
+                                <span className="flex h-6 w-6 items-center justify-center [&_svg]:!h-6 [&_svg]:!w-6">{icon}</span>
                             </div>
 
                             <div>

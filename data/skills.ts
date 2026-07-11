@@ -67,10 +67,10 @@ export const skillCategories: SkillCategory[] = [
     },
     {
         category: "Methodologies & Testing",
-        items: ["Agile/Scrum", "TDD", "Domain-Driven Design", "MLOps", "CI/CD", "JUnit", "Jest", "Selenium", "SonarQube"],
+        items: ["Agile/Scrum", "TDD", "Domain-Driven Design", "MLOps", "CI/CD", "JUnit", "Jest", "Selenium", "Playwright", "SonarQube"],
         backDetails: [
             "Agile/Scrum — sprint planning, backlog grooming, and velocity-based delivery",
-            "TDD with JUnit 5, Jest, and comprehensive integration test suites",
+            "TDD with JUnit 5, Jest, Playwright, and comprehensive integration test suites",
             "MLOps — model versioning with MLflow, automated evaluation with RAGAS & DeepEval",
             "Domain-Driven Design — bounded contexts, aggregates, and ubiquitous language",
         ],
@@ -255,6 +255,7 @@ export const skillDescriptions: Record<string, string> = {
     JUnit: "Java unit and integration testing with JUnit 5, Mockito, and parameterized test suites.",
     Jest: "JavaScript/TypeScript testing with snapshot tests, mocking, and code coverage reporting.",
     Selenium: "End-to-end browser automation with Page Object patterns and cross-browser test matrices.",
+    Playwright: "Modern end-to-end testing with auto-waiting locators, trace-viewer debugging, and parallel cross-browser CI runs.",
     SonarQube: "Static analysis dashboards for code quality, security vulnerabilities, and technical debt tracking.",
 
     /* ── Enterprise AI Delivery ─────────────── */

@@ -16,6 +16,7 @@ import { consultingClients } from "@/data/consulting-clients"
 import { clientTestimonials } from "@/data/client-testimonials"
 import { workMarqueeSegments } from "@/data/work-marquee"
 import { papers } from "@/data/publications"
+import { getSkillUsage } from "@/data/skill-connections"
 import { skillCategories, proficiencyBars } from "@/data/skills"
 import { blogPosts, BLOG_CATEGORIES, getPostBySlug } from "@/lib/blog-data"
 import { getBlogDateEpochMs } from "@/lib/blog-format"
@@ -224,6 +225,24 @@ describe("Skills data", () => {
     it("should not have duplicate category names", () => {
         const names = skillCategories.map((c) => c.category)
         expect(new Set(names).size).toBe(names.length)
+    })
+
+    it("links skills from the detail-modal regressions to portfolio work", () => {
+        const mongoUsage = getSkillUsage("MongoDB")
+        expect(mongoUsage.items.map((item) => ("name" in item ? item.name : ""))).toEqual(expect.arrayContaining(["EnrichData", "LeadPipe AI"]))
+
+        const domainUsage = getSkillUsage("Domain-Driven Design")
+        expect(domainUsage.items.map((item) => ("company" in item ? item.company : "name" in item ? item.name : ""))).toEqual(
+            expect.arrayContaining(["Walmart", "Gitlet Version Control"]),
+        )
+    })
+
+    it("does not create skill links from arbitrary substrings", () => {
+        const cPlusPlusUsage = getSkillUsage("C++")
+        expect(cPlusPlusUsage.items.map((item) => ("name" in item ? item.name : ""))).toEqual(["Pintos Operating System"])
+
+        const javascriptUsage = getSkillUsage("JavaScript")
+        expect(javascriptUsage.items.map((item) => ("name" in item ? item.name : ""))).not.toContain("Gitlet Version Control")
     })
 })
 

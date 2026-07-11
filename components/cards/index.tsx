@@ -853,10 +853,15 @@ function ScrollStackCardsDesktop({
 
       isScrolling.current = true
       if (scrollTimer.current) clearTimeout(scrollTimer.current)
+      /* Mouse-wheel / trackpad scrolling arrives as discrete bursts with gaps
+       * between notches. A short idle window flips isScrolling false in each gap,
+       * oscillating the opaque↔glass scroll-state swap on every notch (flicker).
+       * Hold the scrolling state well past a typical inter-notch gap so the swap
+       * happens once per gesture, not once per notch. */
       scrollTimer.current = setTimeout(() => {
         isScrolling.current = false
         updateCards()
-      }, 120)
+      }, 260)
       /* One transform pass per frame while scrolling — coalesces burst scroll events. */
       if (!scrollRafId) {
         scrollRafId = requestAnimationFrame(() => {

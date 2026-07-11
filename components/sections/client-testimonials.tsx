@@ -104,11 +104,29 @@ function Avatar({
   name,
   avatarSrc,
   avatarAlt,
+  siteImageSrc,
+  siteImageAlt,
 }: {
   name: string
   avatarSrc?: string
   avatarAlt?: string
+  siteImageSrc?: string
+  siteImageAlt?: string
 }) {
+  if (siteImageSrc != null && siteImageSrc !== "") {
+    return (
+      <div className="relative h-14 w-[7.5rem] shrink-0 overflow-hidden rounded-lg border border-white/10 bg-black/20 ring-1 ring-primary/15 sm:h-16 sm:w-[9.5rem]">
+        <Image
+          src={siteImageSrc}
+          alt={siteImageAlt ?? `${name} — website preview`}
+          width={640}
+          height={400}
+          className="h-full w-full object-cover object-left-top"
+          sizes="152px"
+        />
+      </div>
+    )
+  }
   if (avatarSrc != null && avatarSrc !== "") {
     return (
       <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full border border-white/10 bg-black/20 ring-2 ring-primary/20 sm:h-16 sm:w-16">
@@ -226,7 +244,13 @@ export function ClientTestimonials() {
                     )}
                   >
                     <div className="mb-5 flex items-start justify-between gap-4">
-                      <Avatar name={t.name} avatarSrc={t.avatarSrc} avatarAlt={t.avatarAlt} />
+                      <Avatar
+                        name={t.name}
+                        avatarSrc={t.avatarSrc}
+                        avatarAlt={t.avatarAlt}
+                        siteImageSrc={t.siteImageSrc}
+                        siteImageAlt={t.siteImageAlt}
+                      />
                       <StarRating rating={t.rating} />
                     </div>
                     <blockquote className="flex-1 text-sm leading-relaxed text-muted-foreground/95 sm:text-[15px]">

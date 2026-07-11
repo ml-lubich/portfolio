@@ -14,6 +14,9 @@ export interface ClientTestimonial {
     /** Optional headshot under `public/` */
     avatarSrc?: string
     avatarAlt?: string
+    /** Optional landscape site-preview thumbnail under `public/` (used for org / team attributions) */
+    siteImageSrc?: string
+    siteImageAlt?: string
 }
 
 export const clientTestimonials: ClientTestimonial[] = [
@@ -36,6 +39,8 @@ export const clientTestimonials: ClientTestimonial[] = [
         title: "GTM & product",
         organization: "EnrichData",
         rating: 4.5,
+        siteImageSrc: "/images/testimonials/enrichdata-site.png",
+        siteImageAlt: "EnrichData website",
     },
     {
         id: "going-product",
@@ -45,5 +50,7 @@ export const clientTestimonials: ClientTestimonial[] = [
         title: "Web experience",
         organization: "Going",
         rating: 4,
+        siteImageSrc: "/images/testimonials/going-site.png",
+        siteImageAlt: "Going website",
     },
 ]
