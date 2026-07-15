@@ -73,13 +73,14 @@ export function Hero() {
       <BackgroundOrbs />
       {!mobilePerformanceMode && <ParticleCanvas className="z-[1]" />}
 
-      {/* 3D Brain — deferred for LCP; fades in via CSS (opacity-only, compositor) for performance */}
+      {/* 3D Brain — lower hero underlay. It sits behind the glass actions/stats,
+          while the top fade keeps it out of the name and rotating role. */}
       <div
-        className="pointer-events-none absolute inset-0 z-[3] flex items-center justify-center max-sm:items-start max-sm:justify-center max-sm:pt-[min(12vh,5.25rem)] sm:pt-0"
+        className="hero-brain-underlay pointer-events-none absolute inset-x-0 -bottom-[14%] top-[32%] z-[3] flex items-center justify-center sm:-bottom-[18%] sm:top-[28%]"
         aria-hidden="true"
       >
-        {/* Mobile: large square viewport (was ~94vw/440px cap — too small on phones); sm+ fills layer. */}
-        <div className="aspect-square shrink-0 max-sm:size-[min(96vw,36rem)] max-sm:translate-y-[min(9vh,3.25rem)] sm:h-full sm:w-full sm:translate-y-0">
+        {/* Mobile keeps a large square viewport; larger screens fill the lower underlay. */}
+        <div className="aspect-square shrink-0 max-sm:size-[min(108vw,38rem)] sm:h-full sm:w-full">
           {showBrain && (
             <div className="h-full w-full">
               <Brain3D

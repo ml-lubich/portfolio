@@ -619,6 +619,20 @@ body {
   background-position: 50% center;
 }
 
+/* Keep the hero brain below the headline and reveal it behind the lower glass
+   controls. The mask is static, so the WebGL canvas remains compositor-friendly. */
+.hero-brain-underlay {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, transparent 8%, black 30%, black 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, transparent 8%, black 30%, black 100%);
+}
+
+@media (max-width: 639px) {
+  .hero-brain-underlay {
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, transparent 14%, black 38%, black 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, transparent 14%, black 38%, black 100%);
+  }
+}
+
 /* tiny idle shimmer so text isn't static when not scrolling */
 @keyframes metallic-idle-pulse {
 
@@ -799,6 +813,79 @@ nav[data-nav-scrolled="true"] .nav-shell {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid hsl(var(--border) / 0.5);
+}
+
+/* ── Footer liquid glass ─────────────────────────────────────────────
+   A contained glass surface with transform-only ambient motion. The
+   backdrop-filter itself stays static, avoiding the scroll flicker that an
+   animated blur or filter would introduce. */
+.footer-liquid-glass {
+  border: 1px solid hsl(0 0% 100% / 0.09);
+  background:
+    linear-gradient(145deg, hsl(0 0% 100% / 0.065), hsl(0 0% 100% / 0.025) 48%, hsl(0 0% 100% / 0.045)),
+    hsl(220 20% 6% / 0.82);
+  -webkit-backdrop-filter: blur(24px) saturate(1.35);
+  backdrop-filter: blur(24px) saturate(1.35);
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / 0.13),
+    inset 0 -1px 0 hsl(0 0% 0% / 0.24),
+    0 24px 70px hsl(0 0% 0% / 0.25);
+}
+
+.footer-liquid-glass::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(80% 24% at 50% 0%, hsl(0 0% 100% / 0.075), transparent 72%),
+    linear-gradient(110deg, transparent 28%, hsl(0 0% 100% / 0.025) 46%, transparent 64%);
+  pointer-events: none;
+}
+
+.footer-aurora {
+  position: absolute;
+  z-index: 0;
+  width: 20rem;
+  height: 20rem;
+  border-radius: 9999px;
+  opacity: 0.12;
+  filter: blur(64px);
+  pointer-events: none;
+  will-change: transform;
+}
+
+.footer-aurora-left {
+  left: -8rem;
+  top: -12rem;
+  background: hsl(var(--rainbow-6));
+}
+
+.footer-aurora-right {
+  right: -9rem;
+  bottom: -14rem;
+  background: hsl(var(--rainbow-5));
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes footer-aurora-drift-left {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+    50% { transform: translate3d(3rem, 1.5rem, 0) scale(1.08); }
+  }
+
+  @keyframes footer-aurora-drift-right {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1.05); }
+    50% { transform: translate3d(-3rem, -1rem, 0) scale(0.94); }
+  }
+
+  .footer-aurora-left {
+    animation: footer-aurora-drift-left 12s ease-in-out infinite;
+  }
+
+  .footer-aurora-right {
+    animation: footer-aurora-drift-right 15s ease-in-out infinite;
+  }
 }
 
 /* Grid background pattern */
