@@ -54,7 +54,7 @@ export function DetailPanel({
   return (
     <div
       ref={panelRef}
-      className="relative flex h-full max-h-full w-full flex-col rounded-[28px] border border-white/[0.12] bg-background/70 shadow-2xl shadow-black/20 backdrop-blur-3xl ring-1 ring-white/[0.06] ring-inset"
+      className="relative flex max-h-full min-h-0 w-full flex-col rounded-[28px] border border-white/[0.12] bg-background/70 shadow-2xl shadow-black/20 backdrop-blur-3xl ring-1 ring-white/[0.06] ring-inset"
       style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.06), 0 25px 50px -12px rgba(0,0,0,0.25)' }}
       role="dialog"
       aria-modal="true"

@@ -318,7 +318,7 @@ export function Projects() {
             className="absolute inset-0 bg-black/70 backdrop-blur-sm"
             onClick={handleClose}
           />
-          <div className="detail-panel-scroll relative z-[1] max-h-[86vh] w-full max-w-4xl overflow-y-auto">
+          <div className="relative z-[1] flex max-h-[86vh] w-full max-w-4xl flex-col">
             <DetailPanel data={selected?.detail ?? null} isOpen={isOpen} onClose={handleClose} />
           </div>
         </div>
