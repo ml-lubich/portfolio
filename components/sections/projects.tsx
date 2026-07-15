@@ -2,10 +2,84 @@
 
 import { memo, useState, useCallback, useMemo, type CSSProperties } from "react"
 import Image from "next/image"
-import { Sparkles, ArrowRight, FlaskConical, MousePointerClick } from "lucide-react"
+import {
+  Sparkles,
+  ArrowRight,
+  FlaskConical,
+  MousePointerClick,
+  Workflow,
+  Layers,
+  Brain,
+  Boxes,
+  Bot,
+  GitBranch,
+  type LucideIcon,
+} from "lucide-react"
 import { DetailPanel } from "../detail-panel"
 import { SectionHeader } from "../layout/section-header"
 import { projects, type Project } from "@/data/projects"
+
+/* ── Designed cover for projects with no public screenshot ────────────
+ *  Internal / course / proprietary work has no live site or repo to
+ *  capture, so instead of a faint ghost number we render a branded poster:
+ *  the project's gradient + a domain icon + category label keyed off its
+ *  architecture diagramType, with the headline metric on top. Every card
+ *  gets a real cover, no binary assets required. */
+type DiagramType = NonNullable<Project["detail"]["diagramType"]>
+
+const POSTER_THEME: Record<DiagramType, { icon: LucideIcon; label: string }> = {
+  pipeline: { icon: Workflow, label: "Data pipeline" },
+  "ml-pipeline": { icon: Brain, label: "ML pipeline" },
+  fullstack: { icon: Layers, label: "Full-stack" },
+  microservices: { icon: Boxes, label: "Systems" },
+  agents: { icon: Bot, label: "Agentic AI" },
+  cicd: { icon: GitBranch, label: "CI / CD" },
+}
+const POSTER_FALLBACK = { icon: Workflow, label: "Engineering" }
+
+/** Subtle dot-grid texture reused across posters. */
+const POSTER_DOTS = "radial-gradient(circle, rgba(255,255,255,0.5) 0.5px, transparent 0.5px)"
+
+function ProjectPoster({ project }: { project: Project }) {
+  const theme = POSTER_THEME[project.detail.diagramType ?? ("" as DiagramType)] ?? POSTER_FALLBACK
+  const Icon = theme.icon
+  return (
+    <div className="relative flex h-32 w-full flex-col justify-between overflow-hidden border-b border-white/[0.08] bg-black/30 sm:h-36">
+      {/* Full brand-gradient wash + depth */}
+      <div className={`absolute inset-0 bg-gradient-to-br ${project.gradient} opacity-30`} />
+      <div className="absolute inset-0 opacity-[0.18]" style={{ backgroundImage: POSTER_DOTS, backgroundSize: "14px 14px" }} />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_15%,transparent_10%,rgba(0,0,0,0.55))]" />
+
+      {/* Oversized watermark icon */}
+      <Icon
+        className="pointer-events-none absolute -bottom-4 -right-3 h-28 w-28 transition-transform duration-700 group-hover/card:scale-110"
+        style={{ color: project.accent, opacity: 0.16 }}
+        aria-hidden
+      />
+
+      {/* Top row: category label + ghost number chip */}
+      <div className="relative flex items-center justify-between p-3">
+        <span
+          className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-black/25 px-2.5 py-1 font-mono text-[10px] font-medium uppercase tracking-wider text-white/75 backdrop-blur-sm"
+          style={{ borderColor: `color-mix(in srgb, ${project.accent} 40%, transparent)` }}
+        >
+          <Icon className="h-3 w-3" style={{ color: project.accent }} aria-hidden />
+          {theme.label}
+        </span>
+        <span className="select-none font-mono text-2xl font-black leading-none tracking-tighter text-white/15">
+          {project.number}
+        </span>
+      </div>
+
+      {/* Bottom: headline metric */}
+      <div className="relative px-3 pb-3">
+        <p className="truncate text-sm font-bold text-white/90 drop-shadow-[0_1px_4px_rgba(0,0,0,0.6)] sm:text-[15px]">
+          {project.metric}
+        </p>
+      </div>
+    </div>
+  )
+}
 
 /* ──────────────────────────────────────────────────────────────────────
  *  Projects — a sleek 3-row marquee of project cards.
@@ -77,15 +151,7 @@ const MarqueeCard = memo(function MarqueeCard({ project, onExplore }: MarqueeCar
           />
         </div>
       ) : (
-        <div className="relative flex h-32 w-full items-center justify-center overflow-hidden border-b border-white/[0.08] sm:h-36">
-          <div className={`absolute inset-0 bg-gradient-to-br ${project.gradient} opacity-[0.12]`} />
-          <span
-            className="select-none font-mono text-6xl font-black leading-none tracking-tighter opacity-20"
-            style={{ color: project.accent }}
-          >
-            {project.number}
-          </span>
-        </div>
+        <ProjectPoster project={project} />
       )}
 
       {/* Ambient accent glow on hover */}

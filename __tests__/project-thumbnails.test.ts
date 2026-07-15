@@ -56,11 +56,44 @@ describe("Featured Projects — thumbnails", () => {
         }
     })
 
-    it("projects without a cover carry the ghost-number fallback", () => {
+    it("projects without a cover still carry a 'number' for the poster corner chip", () => {
         for (const p of projects) {
             if (p.coverImage) continue
-            expect(p.number, `${p.id} has no coverImage, so it needs a 'number' for the fallback header`).toBeTruthy()
+            expect(p.number, `${p.id} has no coverImage, so it needs a 'number' for the poster chip`).toBeTruthy()
         }
+    })
+
+    it("every cover-less project resolves to a diagramType the poster can theme", () => {
+        // The designed poster maps detail.diagramType -> a domain icon + label.
+        // A missing/unknown type would fall through to the generic bucket, which
+        // is allowed, but every current cover-less project should have one set so
+        // the poster is intentional rather than accidental.
+        const untyped = projects
+            .filter((p) => !p.coverImage)
+            .filter((p) => !p.detail.diagramType)
+            .map((p) => p.id)
+        expect(untyped, `Cover-less projects missing detail.diagramType:\n${untyped.join("\n")}`).toEqual([])
+    })
+})
+
+describe("Featured Projects — designed poster fallback", () => {
+    const src = fs.readFileSync(PROJECTS_TSX, "utf8")
+
+    it("renders a designed ProjectPoster for cover-less cards (not a bare ghost number)", () => {
+        expect(src).toContain("ProjectPoster")
+    })
+
+    it("the poster themes itself from the project's diagramType", () => {
+        // Poster must key its icon/label off diagramType so each domain reads
+        // distinctly (pipeline vs agentic vs ML vs systems vs full-stack).
+        expect(src).toMatch(/diagramType/)
+        expect(src).toMatch(/POSTER_THEME|posterTheme/)
+    })
+
+    it("the poster surfaces the project metric, not just an opacity-20 number", () => {
+        // The whole point of the change: cover-less cards get a real cover with
+        // the headline metric, replacing the faint standalone number.
+        expect(src).toMatch(/ProjectPoster[\s\S]*metric/)
     })
 })
 
