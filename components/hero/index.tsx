@@ -76,7 +76,7 @@ export function Hero() {
       {/* 3D Brain — lower hero underlay. It sits behind the glass actions/stats,
           while the top fade keeps it out of the name and rotating role. */}
       <div
-        className="hero-brain-underlay pointer-events-none absolute inset-x-0 -bottom-[14%] top-[32%] z-[3] flex items-center justify-center sm:-bottom-[18%] sm:top-[28%]"
+        className="hero-brain-underlay pointer-events-none absolute inset-x-0 bottom-[10%] top-[18%] z-[3] flex items-center justify-center sm:bottom-[8%] sm:top-[16%]"
         aria-hidden="true"
       >
         {/* Mobile keeps a large square viewport; larger screens fill the lower underlay. */}
