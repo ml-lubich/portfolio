@@ -50,15 +50,26 @@ export function BlogHeader() {
   }, [pathname, searchParams])
 
   return (
-    <header
-      className={[
-        "fixed top-0 left-0 right-0 z-50",
-        "transition-all duration-500 ease-fluid",
-        hideNav ? "-translate-y-full opacity-0" : "translate-y-0 opacity-100",
-        scrolled ? "bg-transparent py-2.5" : "bg-transparent py-5",
-      ].join(" ")}
-      role="banner"
-    >
+    <>
+      {/* Top scrim: dark gradient under the navbar, fades in once the page is scrolled. */}
+      <div
+        aria-hidden="true"
+        className={[
+          "pointer-events-none fixed inset-x-0 top-0 z-40 h-32 md:h-40",
+          "bg-gradient-to-b from-black/95 via-black/55 to-transparent",
+          "transition-opacity duration-500 ease-fluid",
+          scrolled ? "opacity-100" : "opacity-0",
+        ].join(" ")}
+      />
+      <header
+        className={[
+          "fixed top-0 left-0 right-0 z-50",
+          "transition-all duration-500 ease-fluid",
+          hideNav ? "-translate-y-full opacity-0" : "translate-y-0 opacity-100",
+          scrolled ? "bg-transparent py-2.5" : "bg-transparent py-5",
+        ].join(" ")}
+        role="banner"
+      >
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6">
         {/* Logo */}
         <Link href="/" className="group flex items-center gap-2">
@@ -167,6 +178,7 @@ export function BlogHeader() {
           </div>
         </div>
       </div>
-    </header>
+      </header>
+    </>
   )
 }
