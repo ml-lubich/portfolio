@@ -1,6 +1,6 @@
 "use client"
 
-import { memo, useState, useCallback, useMemo, type CSSProperties } from "react"
+import { memo, useState, useCallback, useEffect, useMemo, useRef, type CSSProperties } from "react"
 import Image from "next/image"
 import {
   Sparkles,
@@ -222,8 +222,24 @@ interface MarqueeRowProps {
 }
 
 const MarqueeRow = memo(function MarqueeRow({ rowProjects, direction, duration, onExplore }: MarqueeRowProps) {
-  // Duplicate the set so the -50% translate loops seamlessly.
-  const doubled = useMemo(() => [...rowProjects, ...rowProjects], [rowProjects])
+  // The -50% translate loop is seamless only while HALF the track covers the
+  // visible strip; one duplicated set stops covering it on wide monitors (or
+  // zoomed-out browsers), letting a blank gap sweep across the row. Measure
+  // one set and repeat it until half the track spans the viewport. Copy
+  // counts stay even so -50% always lands on a set boundary.
+  const [copies, setCopies] = useState(2)
+  const firstSetRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const update = () => {
+      const setWidth = firstSetRef.current?.scrollWidth ?? 0
+      if (setWidth === 0) return
+      setCopies(Math.max(2, 2 * Math.ceil(window.innerWidth / setWidth)))
+    }
+    update()
+    window.addEventListener("resize", update)
+    return () => window.removeEventListener("resize", update)
+  }, [rowProjects])
 
   return (
     <div className="marquee-row group/row relative">
@@ -234,12 +250,22 @@ const MarqueeRow = memo(function MarqueeRow({ rowProjects, direction, duration, 
           className={`marquee-track marquee-track--${direction} py-2`}
           style={{ "--marquee-duration": duration } as CSSProperties}
         >
-          {doubled.map((project, i) => (
-            <MarqueeCard
-              key={`${project.id}-${i}`}
-              project={project}
-              onExplore={onExplore}
-            />
+          {Array.from({ length: copies }, (_, set) => (
+            <div
+              key={set}
+              ref={set === 0 ? firstSetRef : undefined}
+              className="flex shrink-0"
+              aria-hidden={set > 0 || undefined}
+              inert={set > 0 || undefined}
+            >
+              {rowProjects.map((project) => (
+                <MarqueeCard
+                  key={`${project.id}-${set}`}
+                  project={project}
+                  onExplore={onExplore}
+                />
+              ))}
+            </div>
           ))}
         </div>
       </div>
