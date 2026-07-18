@@ -1,6 +1,7 @@
 "use client"
 
 import { useRef, useCallback, useEffect, useState } from "react"
+import Image from "next/image"
 import {
     SiApple,
     SiHonda,
@@ -32,10 +33,28 @@ function WalmartSpark({ className }: { className?: string }) {
     )
 }
 
+/** Seaside "//" brand mark — from the SEA//SIDE logo-concepts sheet */
+function SeasideMark({ className }: { className?: string }) {
+    return (
+        <svg className={className} viewBox="0 0 256 256" aria-hidden>
+            <circle cx="128" cy="128" r="128" fill="#5B8FCB" />
+            <g stroke="#F5F5F2" strokeWidth={15}>
+                <line x1="102" y1="172" x2="137" y2="84" />
+                <line x1="146" y1="172" x2="181" y2="84" />
+            </g>
+        </svg>
+    )
+}
+
 interface Logo {
     name: string
     icon: React.ReactNode
 }
+
+/** Brand-colored client logos are muted to match the grey strip; the row's
+ *  existing hover (via `group`) restores full color and contrast. */
+const CLIENT_LOGO_IMG =
+    "w-auto opacity-60 grayscale transition-[filter,opacity] duration-300 group-hover:opacity-95 group-hover:grayscale-0"
 
 const LOGOS: Logo[] = [
     { name: "Apple", icon: <SiApple className="h-7 w-7 sm:h-8 sm:w-8" /> },
@@ -43,6 +62,31 @@ const LOGOS: Logo[] = [
     { name: "Lawrence Berkeley Lab", icon: <FlaskConical className="h-7 w-7 sm:h-8 sm:w-8" /> },
     { name: "Honda Innovations", icon: <SiHonda className="h-7 w-7 sm:h-8 sm:w-8" /> },
     { name: "UC Berkeley", icon: <GraduationCap className="h-7 w-7 sm:h-8 sm:w-8" /> },
+    {
+        name: "LUPFR",
+        icon: (
+            <Image
+                src="/logos/lupfr-mark.png"
+                alt="LUPFR Entertainment logo"
+                width={256}
+                height={256}
+                className={`h-7 sm:h-8 ${CLIENT_LOGO_IMG}`}
+            />
+        ),
+    },
+    { name: "Seaside", icon: <SeasideMark className={`h-7 sm:h-8 ${CLIENT_LOGO_IMG}`} /> },
+    {
+        name: "eria.co",
+        icon: (
+            <Image
+                src="/logos/eria-wordmark.png"
+                alt="ERIA Events logo"
+                width={256}
+                height={157}
+                className={`h-6 sm:h-7 ${CLIENT_LOGO_IMG}`}
+            />
+        ),
+    },
 ]
 
 /** Pixels per second for auto-scroll */
@@ -50,7 +94,7 @@ const AUTO_SPEED = 40
 
 function LogoItem({ logo }: { logo: Logo }) {
     return (
-        <div className="flex flex-shrink-0 items-center gap-2.5 px-6 sm:px-8 text-muted-foreground/50 transition-colors duration-300 hover:text-muted-foreground/90 select-none">
+        <div className="group flex flex-shrink-0 items-center gap-2.5 px-6 sm:px-8 text-muted-foreground/50 transition-colors duration-300 hover:text-muted-foreground/90 select-none">
             {logo.icon}
             <span className="whitespace-nowrap text-xs font-medium tracking-wide uppercase sm:text-sm">
                 {logo.name}
