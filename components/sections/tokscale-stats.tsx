@@ -20,8 +20,9 @@ const FLOAT_KEYFRAMES = {
 }
 const FLOAT_TRANSITION = { duration: 7, repeat: Infinity, ease: "easeInOut" as const }
 
-/** Hover pose — the float settles flat, lifts and swells so only the spring tilt moves. */
-const HOVER_POSE = { y: -10, scale: 1.02, rotateX: 0, rotateY: 0 }
+/** Hover pose — the float settles flat and swells in place. No y-lift: moving the
+ *  card away from the cursor un-hovers it at the edges and loops (flicker). */
+const HOVER_POSE = { y: 0, scale: 1.02, rotateX: 0, rotateY: 0 }
 const HOVER_TRANSITION = { type: "spring" as const, stiffness: 220, damping: 26 }
 
 const TILT_SPRING = { stiffness: 260, damping: 28 }
@@ -29,8 +30,9 @@ const TILT_SPRING = { stiffness: 260, damping: 28 }
 /** Live tokscale embed, centered right under the hero brain — a floating 3D panel
  *  with pointer-tracked spring tilt (desktop) and a pulsing emerald aura so it reads
  *  as a hero centerpiece rather than a footnote. Links to the tokscale profile.
- *  Pointer math reads the static scene wrapper (never the transforming card) and the
- *  idle float pauses while hovered, so the tilt can't fight the bob and jitter. */
+ *  Pointer math and the hovered flag both read the static scene wrapper (never the
+ *  transforming card): the bobbing card sliding under a parked cursor would otherwise
+ *  toggle hover on/off and jitter. Hovered = cursor inside the static rect, period. */
 export function TokscaleHeroBadge() {
   const sceneRef = useRef<HTMLDivElement>(null)
   const [hovered, setHovered] = useState(false)
@@ -43,6 +45,15 @@ export function TokscaleHeroBadge() {
       if (reduce || e.pointerType !== "mouse") return
       const rect = sceneRef.current?.getBoundingClientRect()
       if (!rect) return
+      const inside =
+        e.clientX >= rect.left && e.clientX <= rect.right &&
+        e.clientY >= rect.top && e.clientY <= rect.bottom
+      setHovered(inside)
+      if (!inside) {
+        tiltX.set(0)
+        tiltY.set(0)
+        return
+      }
       const px = (e.clientX - rect.left) / rect.width - 0.5
       const py = (e.clientY - rect.top) / rect.height - 0.5
       tiltX.set(-py * 10)
@@ -51,13 +62,7 @@ export function TokscaleHeroBadge() {
     [reduce, tiltX, tiltY]
   )
 
-  const handlePointerEnter = useCallback(
-    (e: React.PointerEvent<HTMLAnchorElement>) => {
-      if (reduce || e.pointerType !== "mouse") return
-      setHovered(true)
-    },
-    [reduce]
-  )
+  const handlePointerEnter = handlePointerMove
 
   const handlePointerLeave = useCallback(() => {
     setHovered(false)

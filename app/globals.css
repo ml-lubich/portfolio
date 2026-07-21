@@ -1020,8 +1020,11 @@ nav[data-nav-scrolled="true"] .nav-shell {
   transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
 }
 
+/* Grow-only hover: translateY moved the element out from under a cursor parked
+   near its bottom edge, re-triggering :hover in a flicker loop. Scale expands
+   the hit box in place, so the hover state stays stable at every edge. */
 .hover-lift:hover {
-  transform: translateY(-6px);
+  transform: scale(1.015);
 }
 
 /* ── Glass Stack Card effect (used inside ScrollStackCards) ── */
@@ -1147,8 +1150,11 @@ nav[data-nav-scrolled="true"] .nav-shell {
   }
 }
 
+/* No translateY here: lifting the card shrinks its hit box upward, so a cursor
+   near the bottom edge toggles :hover on/off in a loop. Scale + tilt only ever
+   grow the box outward, keeping hover stable; the shadow sells the lift. */
 .glass-card-3d:hover {
-  transform: perspective(800px) rotateX(-2deg) rotateY(2deg) translateY(-6px) scale(1.02);
+  transform: perspective(800px) rotateX(-2deg) rotateY(2deg) scale(1.02);
   box-shadow:
     0 20px 40px -12px hsl(var(--primary) / 0.12),
     0 0 0 1px hsl(var(--primary) / 0.08),
