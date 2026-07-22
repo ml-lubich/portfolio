@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <!-- SEA // SIDE icon mark: the "//" in light blue, from the brand
+       logo-concepts sheet (blue & white icon variant). -->
+  <circle cx="128" cy="128" r="128" fill="#5B8FCB"/>
+  <g stroke="#F5F5F2" stroke-width="15">
+    <line x1="102" y1="172" x2="137" y2="84"/>
+    <line x1="146" y1="172" x2="181" y2="84"/>
+  </g>
+</svg>

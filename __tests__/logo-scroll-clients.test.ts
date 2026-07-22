@@ -32,16 +32,28 @@ describe("LogoScroll client brands", () => {
     expect(src).not.toContain("SeasideMark")
   })
 
-  it("wires real logo image assets for the client brands", () => {
+  it("wires each client's real official logo asset", () => {
     for (const asset of [
       "/logos/lupfr-mark.png",
       "/logos/uc-berkeley.svg",
       "/logos/w3sourcing.png",
       "/logos/enrichdata.png",
-      "/logos/eria-wordmark.png",
+      "/logos/eria.png", // ERIA's real emblem from eria.co, not the old wordmark
+      "/logos/seaside.svg", // Seaside's real brand icon from seaside.la
     ]) {
       expect(src).toContain(asset)
     }
+    // The rejected eria wordmark must not be used.
+    expect(src).not.toContain("eria-wordmark")
+  })
+
+  it("is drag-scrollable with click suppression after a drag", () => {
+    expect(src).toContain("onPointerDown")
+    expect(src).toContain("onPointerMove")
+    // A shared drag value moves every row together.
+    expect(src).toMatch(/dragRef/)
+    // A drag must not trigger the logo's link.
+    expect(src).toMatch(/onClickCapture|moved/)
   })
 
   it("every referenced /logos asset exists in public/", () => {

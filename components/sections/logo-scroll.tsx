@@ -1,14 +1,15 @@
 "use client"
 
-import { useRef, useEffect } from "react"
+import { useRef, useEffect, useState, useCallback } from "react"
 import Image from "next/image"
 import { SiApple, SiHonda, SiWalmart, SiGithub } from "react-icons/si"
 import { AnimatedText } from "../animations/animated-text"
 
 /* ──────────────────────────────────────────────────────────────────────
- *  LogoScroll — Three infinite marquee rows of grey company logos.
- *  Each logo is a clickable link. Rows alternate direction (→ ← →).
- *  Placed directly below the Hero section.
+ *  LogoScroll — three compact marquee rows of official brand logos.
+ *  Rows auto-scroll in alternating directions (→ ← →). Drag anywhere to
+ *  scroll ALL rows together; each row keeps its own direction on release.
+ *  Quick taps (no drag) still open the logo's link.
  * ────────────────────────────────────────────────────────────────────── */
 
 interface Logo {
@@ -20,17 +21,22 @@ interface Logo {
     hideLabel?: boolean
 }
 
-const MARK = "h-8 w-8 sm:h-9 sm:w-9"
+const MARK = "h-7 w-7 sm:h-8 sm:w-8"
 
-/** Ghost every brand image to a uniform light silhouette so dark logos stay
- *  visible on the dark strip; hover restores the original full-color logo. */
-const CLIENT_LOGO_IMG =
+/** Single-tone logos: ghost to a light silhouette so they read on the dark
+ *  strip; hover restores full color. */
+const GHOST =
     "w-auto opacity-70 brightness-0 invert transition duration-300 group-hover:opacity-100 group-hover:brightness-100 group-hover:invert-0"
 
+/** Multi-tone logos (internal negative space): grayscale keeps their shape;
+ *  inverting would flatten them to a solid blob. */
+const TONED =
+    "w-auto opacity-75 grayscale transition duration-300 group-hover:opacity-100 group-hover:grayscale-0"
+
 /**
- * Official marks (Simple Icons) where they exist; clean grey wordmarks for
- * institutions/clients that have no monochrome brand mark. Order matters —
- * rows are dealt round-robin, so adjacent entries land on different rows.
+ * Official marks (Simple Icons) and each client's real logo asset. Order
+ * matters — rows are dealt round-robin, so adjacent entries land on
+ * different rows (no brand repeats vertically).
  */
 const LOGOS: Logo[] = [
     { name: "Apple", href: "https://www.apple.com", icon: <SiApple className={MARK} /> },
@@ -40,37 +46,44 @@ const LOGOS: Logo[] = [
         name: "UC Berkeley",
         href: "https://www.berkeley.edu",
         hideLabel: true,
-        icon: <Image src="/logos/uc-berkeley.svg" alt="UC Berkeley" width={430} height={135} className={`h-7 sm:h-8 ${CLIENT_LOGO_IMG}`} />,
+        icon: <Image src="/logos/uc-berkeley.svg" alt="UC Berkeley" width={430} height={135} className={`h-6 sm:h-7 ${GHOST}`} />,
     },
     { name: "Honda Innovations", href: "https://www.hondainnovations.com", icon: <SiHonda className={MARK} /> },
     { name: "Lawrence Berkeley Lab", href: "https://www.lbl.gov", icon: null },
     {
         name: "LUPFR",
         href: "https://lupfr.com",
-        icon: <Image src="/logos/lupfr-mark.png" alt="LUPFR Entertainment logo" width={256} height={256} className={`h-8 sm:h-9 ${CLIENT_LOGO_IMG}`} />,
+        icon: <Image src="/logos/lupfr-mark.png" alt="LUPFR Entertainment logo" width={256} height={256} className={`h-7 sm:h-8 ${GHOST}`} />,
     },
     {
         name: "EnrichData",
         href: "https://www.enrichdata.net/",
-        icon: <Image src="/logos/enrichdata.png" alt="EnrichData logo" width={256} height={256} className={`h-8 sm:h-9 ${CLIENT_LOGO_IMG}`} />,
+        icon: <Image src="/logos/enrichdata.png" alt="EnrichData logo" width={256} height={256} className={`h-7 sm:h-8 ${GHOST}`} />,
     },
     {
         name: "W3 Sourcing",
         href: "https://www.w3sourcing.com/",
         hideLabel: true,
-        icon: <Image src="/logos/w3sourcing.png" alt="W3 Sourcing" width={920} height={360} className={`h-7 sm:h-8 ${CLIENT_LOGO_IMG}`} />,
+        icon: <Image src="/logos/w3sourcing.png" alt="W3 Sourcing" width={920} height={360} className={`h-6 sm:h-7 ${GHOST}`} />,
     },
     {
         name: "eria.co",
         href: "https://www.eria.co/",
-        hideLabel: true,
-        icon: <Image src="/logos/eria-wordmark.png" alt="ERIA Events" width={256} height={157} className={`h-7 sm:h-8 ${CLIENT_LOGO_IMG}`} />,
+        icon: <Image src="/logos/eria.png" alt="ERIA" width={256} height={256} className={`h-7 sm:h-8 ${GHOST}`} />,
     },
-    { name: "Seaside", href: "https://seaside.la", icon: null },
+    {
+        name: "Seaside",
+        href: "https://seaside.la",
+        icon: <Image src="/logos/seaside.svg" alt="Seaside" width={256} height={256} className={`h-7 sm:h-8 ${TONED}`} />,
+    },
 ]
 
 /** Pixels per second for auto-scroll */
-const AUTO_SPEED = 40
+const AUTO_SPEED = 32
+
+/** Shared drag state: `total` is the cumulative horizontal drag applied to
+ *  every row; `active` pauses auto-scroll while the pointer is held down. */
+type DragState = { active: boolean; total: number }
 
 function LogoItem({ logo }: { logo: Logo }) {
     return (
@@ -78,11 +91,12 @@ function LogoItem({ logo }: { logo: Logo }) {
             href={logo.href}
             target="_blank"
             rel="noopener noreferrer"
-            className="group flex flex-shrink-0 items-center gap-2.5 px-6 text-muted-foreground/55 transition-colors duration-300 hover:text-muted-foreground sm:px-9"
+            draggable={false}
+            className="group flex flex-shrink-0 items-center gap-2 px-5 text-muted-foreground/55 transition-colors duration-300 hover:text-muted-foreground sm:px-7"
         >
             {logo.icon}
             {!logo.hideLabel && (
-                <span className="whitespace-nowrap text-sm font-medium uppercase tracking-[0.12em] sm:text-base">
+                <span className="whitespace-nowrap text-xs font-medium uppercase tracking-[0.12em] sm:text-sm">
                     {logo.name}
                 </span>
             )}
@@ -90,21 +104,25 @@ function LogoItem({ logo }: { logo: Logo }) {
     )
 }
 
-/** One auto-scrolling row. Renders the logo set twice and wraps at the
- *  half-width so the loop is seamless in either direction. */
-function MarqueeRow({ logos, direction, speed }: { logos: Logo[]; direction: "left" | "right"; speed: number }) {
+/** One auto-scrolling row. Reads the shared drag ref so all rows move together
+ *  when dragged, while keeping its own auto-scroll direction. */
+function MarqueeRow({
+    logos,
+    direction,
+    speed,
+    dragRef,
+}: {
+    logos: Logo[]
+    direction: "left" | "right"
+    speed: number
+    dragRef: React.RefObject<DragState>
+}) {
     const trackRef = useRef<HTMLDivElement>(null)
-    const offsetRef = useRef(direction === "right" ? -1 : 0) // negative so a rightward row has room to move
+    const offsetRef = useRef(direction === "right" ? -1 : 0)
     const rafRef = useRef(0)
     const lastRef = useRef(0)
-    // Pause sources: offscreen (IntersectionObserver) OR the pointer hovering the
-    // row. Hover-pause is what makes the logos clickable: a moving target slides
-    // out from under the pointer between press and release, so the click never
-    // lands (it reads like the marquee "ignored" you and kept scrolling).
-    // Freezing the row while pointed at holds the link still long enough to click.
+    const lastDragRef = useRef(0)
     const hiddenRef = useRef(false)
-    const hoverRef = useRef(false)
-    const kickRef = useRef<() => void>(() => {})
 
     // Repeat the set so even a short list fills ultrawide viewports.
     const set = [...logos, ...logos, ...logos]
@@ -113,7 +131,7 @@ function MarqueeRow({ logos, direction, speed }: { logos: Logo[]; direction: "le
         const dir = direction === "left" ? -1 : 1
 
         const animate = (t: number) => {
-            if (hiddenRef.current || hoverRef.current) {
+            if (hiddenRef.current) {
                 rafRef.current = 0
                 return
             }
@@ -124,26 +142,30 @@ function MarqueeRow({ logos, direction, speed }: { logos: Logo[]; direction: "le
             const el = trackRef.current
             const half = el ? el.scrollWidth / 2 : 0
             if (half > 1) {
-                offsetRef.current += dir * speed * dt
+                // Apply the shared drag delta uniformly to every row.
+                const drag = dragRef.current
+                offsetRef.current += drag.total - lastDragRef.current
+                lastDragRef.current = drag.total
+                // Auto-scroll only when not actively dragging.
+                if (!drag.active) offsetRef.current += dir * speed * dt
+
                 while (offsetRef.current <= -half) offsetRef.current += half
                 while (offsetRef.current > 0) offsetRef.current -= half
-                if (el) el.style.transform = `translate3d(${offsetRef.current}px, 0, 0)`
+                el!.style.transform = `translate3d(${offsetRef.current}px, 0, 0)`
             }
             rafRef.current = requestAnimationFrame(animate)
         }
 
-        // Start the loop unless something wants it paused (offscreen or hovered).
-        const kick = () => {
-            if (!rafRef.current && !hiddenRef.current && !hoverRef.current) {
+        const start = () => {
+            if (!rafRef.current && !hiddenRef.current) {
                 lastRef.current = 0
                 rafRef.current = requestAnimationFrame(animate)
             }
         }
-        kickRef.current = kick
 
         const root = trackRef.current
         if (!root || typeof IntersectionObserver === "undefined") {
-            kick()
+            start()
             return () => {
                 cancelAnimationFrame(rafRef.current)
                 rafRef.current = 0
@@ -153,9 +175,8 @@ function MarqueeRow({ logos, direction, speed }: { logos: Logo[]; direction: "le
         const io = new IntersectionObserver(
             ([e]) => {
                 hiddenRef.current = !e.isIntersecting
-                if (e.isIntersecting) {
-                    kick()
-                } else {
+                if (e.isIntersecting) start()
+                else {
                     cancelAnimationFrame(rafRef.current)
                     rafRef.current = 0
                 }
@@ -168,28 +189,10 @@ function MarqueeRow({ logos, direction, speed }: { logos: Logo[]; direction: "le
             cancelAnimationFrame(rafRef.current)
             rafRef.current = 0
         }
-    }, [direction, speed])
-
-    // Pause this row while the pointer is over it so its links hold still and are
-    // clickable; resume on leave. Works for touch too: a tap fires enter→leave,
-    // freezing the row for the duration of the press.
-    const pause = () => {
-        hoverRef.current = true
-        cancelAnimationFrame(rafRef.current)
-        rafRef.current = 0
-    }
-    const resume = () => {
-        hoverRef.current = false
-        kickRef.current()
-    }
+    }, [direction, speed, dragRef])
 
     return (
-        <div
-            className="overflow-hidden"
-            onPointerEnter={pause}
-            onPointerLeave={resume}
-            onPointerCancel={resume}
-        >
+        <div className="overflow-hidden">
             <div ref={trackRef} className="flex w-max will-change-transform">
                 {set.map((logo, i) => (
                     <LogoItem key={`${logo.name}-${i}`} logo={logo} />
@@ -203,27 +206,71 @@ function MarqueeRow({ logos, direction, speed }: { logos: Logo[]; direction: "le
 }
 
 export function LogoScroll() {
+    // Shared drag state read by every row's animation loop.
+    const dragRef = useRef<DragState>({ active: false, total: 0 })
+    const gestureRef = useRef({ down: false, startX: 0, startTotal: 0, moved: false })
+    const [grabbing, setGrabbing] = useState(false)
+
+    const onPointerDown = useCallback((e: React.PointerEvent) => {
+        gestureRef.current = { down: true, startX: e.clientX, startTotal: dragRef.current.total, moved: false }
+        dragRef.current.active = true // freeze auto-scroll so a tapped logo holds still
+        setGrabbing(true)
+        // NOTE: don't capture the pointer here — capturing on press swallows the
+        // click event on the inner <a>, breaking taps. Capture only once a drag
+        // actually starts (below).
+    }, [])
+
+    const onPointerMove = useCallback((e: React.PointerEvent) => {
+        const g = gestureRef.current
+        if (!g.down) return
+        const dx = e.clientX - g.startX
+        if (Math.abs(dx) > 4 && !g.moved) {
+            g.moved = true
+            e.currentTarget.setPointerCapture(e.pointerId) // it's a drag now — capture for smooth tracking
+        }
+        dragRef.current.total = g.startTotal + dx
+    }, [])
+
+    const endGesture = useCallback(() => {
+        gestureRef.current.down = false
+        dragRef.current.active = false
+        setGrabbing(false)
+    }, [])
+
+    // Suppress the click that follows a drag so it doesn't open a link.
+    const onClickCapture = useCallback((e: React.MouseEvent) => {
+        if (gestureRef.current.moved) {
+            e.preventDefault()
+            e.stopPropagation()
+        }
+    }, [])
+
     return (
         <section
             id="partners"
-            className="relative w-full overflow-hidden border-b border-border/40 bg-background/40 py-4 md:py-7 lg:py-9 md:backdrop-blur-sm"
+            className="relative w-full overflow-hidden border-b border-border/40 bg-background/40 py-3 md:py-5 lg:py-6 md:backdrop-blur-sm"
             aria-label="Companies and institutions"
         >
-            {/* Heading */}
-            <p className="mb-4 text-center text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground/50 sm:mb-6 sm:text-sm">
+            <p className="mb-3 text-center text-[11px] font-medium uppercase tracking-[0.2em] text-muted-foreground/50 sm:mb-4 sm:text-xs">
                 <AnimatedText text="Trusted & partnered with:" variant="blur-slide" stagger={40} duration={600} />
             </p>
 
             {/* Fade edges */}
-            <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-background/60 to-transparent sm:w-32" />
-            <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-background/60 to-transparent sm:w-32" />
+            <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 bg-gradient-to-r from-background/60 to-transparent sm:w-24" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 bg-gradient-to-l from-background/60 to-transparent sm:w-24" />
 
-            {/* Three rows, alternating direction. Brands are dealt round-robin so
-                no logo appears in more than one row (no vertical repetition). */}
-            <div className="flex flex-col gap-3 sm:gap-4">
-                <MarqueeRow logos={LOGOS.filter((_, i) => i % 3 === 0)} direction="right" speed={AUTO_SPEED} />
-                <MarqueeRow logos={LOGOS.filter((_, i) => i % 3 === 1)} direction="left" speed={AUTO_SPEED * 0.85} />
-                <MarqueeRow logos={LOGOS.filter((_, i) => i % 3 === 2)} direction="right" speed={AUTO_SPEED * 1.1} />
+            {/* Drag surface: all three rows move together, each keeps its direction */}
+            <div
+                className={`flex touch-pan-y flex-col gap-2 sm:gap-3 ${grabbing ? "cursor-grabbing" : "cursor-grab"}`}
+                onPointerDown={onPointerDown}
+                onPointerMove={onPointerMove}
+                onPointerUp={endGesture}
+                onPointerCancel={endGesture}
+                onClickCapture={onClickCapture}
+            >
+                <MarqueeRow logos={LOGOS.filter((_, i) => i % 3 === 0)} direction="right" speed={AUTO_SPEED} dragRef={dragRef} />
+                <MarqueeRow logos={LOGOS.filter((_, i) => i % 3 === 1)} direction="left" speed={AUTO_SPEED * 0.85} dragRef={dragRef} />
+                <MarqueeRow logos={LOGOS.filter((_, i) => i % 3 === 2)} direction="right" speed={AUTO_SPEED * 1.1} dragRef={dragRef} />
             </div>
         </section>
     )
