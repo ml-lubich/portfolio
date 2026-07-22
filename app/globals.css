@@ -282,13 +282,15 @@
   width: var(--orb-size);
   height: var(--orb-size);
   border-radius: 50%;
+  /* Corporate calm: desaturated + dimmed so the cool hues below merge into
+     one subtle accent glow over the near-black base, not a vivid rainbow. */
   background: radial-gradient(circle,
-      hsl(var(--orb-hue) 100% 62% / 0.55) 0%,
-      hsl(var(--orb-hue) 100% 60% / 0.45) 15%,
-      hsl(var(--orb-hue-next) 95% 57% / 0.32) 30%,
-      hsl(var(--orb-hue-next) 90% 55% / 0.18) 45%,
-      hsl(var(--orb-hue-next) 85% 55% / 0.08) 60%,
-      hsl(var(--orb-hue-next) 80% 55% / 0) 75%);
+      hsl(var(--orb-hue) 58% 58% / 0.30) 0%,
+      hsl(var(--orb-hue) 56% 56% / 0.24) 15%,
+      hsl(var(--orb-hue-next) 52% 54% / 0.16) 30%,
+      hsl(var(--orb-hue-next) 48% 52% / 0.09) 45%,
+      hsl(var(--orb-hue-next) 44% 52% / 0.04) 60%,
+      hsl(var(--orb-hue-next) 40% 52% / 0) 75%);
   filter: blur(10vmax);
   will-change: transform;
   transform: translate(-50%, -50%);
@@ -307,8 +309,8 @@
   --orb-x: 10%;
   --orb-y: 20%;
   --orb-size: 60vmax;
-  --orb-hue: 320;
-  --orb-hue-next: 355;
+  --orb-hue: 214;
+  --orb-hue-next: 226;
   --orb-animation: spectrum-drift-a;
   --orb-duration: 52s;
   --orb-mobile-animation: spectrum-drift-mobile-a;
@@ -319,8 +321,8 @@
   --orb-x: 30%;
   --orb-y: 65%;
   --orb-size: 58vmax;
-  --orb-hue: 265;
-  --orb-hue-next: 300;
+  --orb-hue: 232;
+  --orb-hue-next: 244;
   --orb-animation: spectrum-drift-b;
   --orb-duration: 46s;
   --orb-mobile-animation: spectrum-drift-mobile-b;
@@ -331,8 +333,8 @@
   --orb-x: 50%;
   --orb-y: 15%;
   --orb-size: 62vmax;
-  --orb-hue: 210;
-  --orb-hue-next: 245;
+  --orb-hue: 208;
+  --orb-hue-next: 226;
   --orb-animation: spectrum-drift-a;
   --orb-duration: 56s;
   --orb-mobile-animation: spectrum-drift-mobile-a;
@@ -343,8 +345,8 @@
   --orb-x: 70%;
   --orb-y: 55%;
   --orb-size: 56vmax;
-  --orb-hue: 170;
-  --orb-hue-next: 205;
+  --orb-hue: 198;
+  --orb-hue-next: 214;
   --orb-animation: spectrum-drift-b;
   --orb-duration: 44s;
   --orb-mobile-animation: spectrum-drift-mobile-b;
@@ -355,8 +357,8 @@
   --orb-x: 85%;
   --orb-y: 25%;
   --orb-size: 58vmax;
-  --orb-hue: 45;
-  --orb-hue-next: 80;
+  --orb-hue: 220;
+  --orb-hue-next: 234;
   --orb-animation: spectrum-drift-a;
   --orb-duration: 50s;
   --orb-mobile-animation: spectrum-drift-mobile-a;
@@ -367,8 +369,8 @@
   --orb-x: 20%;
   --orb-y: 80%;
   --orb-size: 55vmax;
-  --orb-hue: 140;
-  --orb-hue-next: 175;
+  --orb-hue: 204;
+  --orb-hue-next: 220;
   --orb-animation: spectrum-drift-a;
   --orb-duration: 48s;
   --orb-mobile-animation: spectrum-drift-mobile-a;
@@ -379,8 +381,8 @@
   --orb-x: 75%;
   --orb-y: 80%;
   --orb-size: 56vmax;
-  --orb-hue: 350;
-  --orb-hue-next: 25;
+  --orb-hue: 228;
+  --orb-hue-next: 242;
   --orb-animation: spectrum-drift-b;
   --orb-duration: 42s;
   --orb-mobile-animation: spectrum-drift-mobile-b;
@@ -1801,17 +1803,18 @@ strong:not(.no-metallic) {
 }
 
 .blog-prose h2 {
-  @apply text-2xl font-semibold tracking-tight text-foreground mt-10 mb-4;
+  @apply mt-14 mb-5 text-[1.75rem] font-semibold leading-tight tracking-tight text-foreground;
   -webkit-text-fill-color: currentColor;
 }
 
 .blog-prose h3 {
-  @apply text-xl font-semibold text-foreground mt-8 mb-3;
+  @apply mt-10 mb-4 text-[1.35rem] font-semibold leading-snug text-foreground;
   -webkit-text-fill-color: currentColor;
 }
 
 .blog-prose p {
-  @apply text-base leading-relaxed text-muted-foreground mb-5;
+  @apply mb-7 text-[1.125rem] leading-[1.78];
+  color: hsl(var(--foreground) / 0.78);
 }
 
 /* Opt out of global metallic bold (strong:not(.no-metallic)) — that uses
@@ -1890,19 +1893,33 @@ article .blog-prose b a[href],
 }
 
 .blog-prose ul {
-  @apply my-4 ml-6 list-disc space-y-2;
+  @apply my-6 ml-6 list-disc space-y-3;
 }
 
 .blog-prose ol {
-  @apply my-4 ml-6 list-decimal space-y-2;
+  @apply my-6 ml-6 list-decimal space-y-3;
 }
 
 .blog-prose li {
-  @apply text-base leading-relaxed text-foreground/85;
+  @apply text-[1.0625rem] leading-[1.75] text-foreground/85;
 }
 
 .blog-prose blockquote {
-  @apply my-6 border-l-2 border-primary/30 pl-6 italic text-muted-foreground;
+  @apply my-10 border-l-4 border-primary/45 py-1 pl-6 text-xl font-medium leading-relaxed text-foreground/90;
+  font-style: normal;
+}
+
+.blog-prose blockquote p {
+  @apply mb-0 text-xl leading-relaxed text-foreground/90;
+}
+
+.blog-prose .blog-callout p {
+  @apply mb-0 text-base leading-7;
+  color: hsl(var(--foreground) / 0.74);
+}
+
+.blog-prose .blog-callout strong {
+  @apply text-foreground/95;
 }
 
 .blog-prose hr {
@@ -1917,11 +1934,22 @@ article .blog-prose b a[href],
 }
 
 .blog-prose .blog-figure {
-  @apply my-8;
+  @apply my-10;
 }
 
 .blog-prose .blog-figure figcaption {
-  @apply mt-2 text-center text-sm text-muted-foreground italic;
+  @apply mt-3 text-center text-sm leading-relaxed text-muted-foreground/80;
+  font-style: normal;
+}
+
+@media (max-width: 640px) {
+  .blog-prose p {
+    @apply text-[1.0625rem] leading-[1.72];
+  }
+
+  .blog-prose h2 {
+    @apply mt-12 text-2xl;
+  }
 }
 
 /* Blog fenced code blocks */

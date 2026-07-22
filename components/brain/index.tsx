@@ -34,11 +34,13 @@ class WebGLErrorBoundary extends Component<
 
 function getInitialCam() {
   const w = typeof window !== "undefined" ? window.innerWidth : 1200
-  /* Tighter z + slightly wider FOV on phones so the mesh fills the hero square. */
-  if (w < 480) return { z: 1.62, fov: 46 }
-  if (w < 640) return { z: 1.72, fov: 45 }
-  if (w < 1024) return { z: 2.0, fov: 44 }
-  return { z: 1.85, fov: 42 }
+  /* Camera dollied back ~3.5x vs the original fill distances so the whole brain
+   * (wireframe mesh + neural orbs, which scale ~1/z together) reads ~3–4x smaller
+   * in the hero underlay. FOV unchanged — pure dolly keeps the shrink uniform. */
+  if (w < 480) return { z: 5.7, fov: 46 }
+  if (w < 640) return { z: 6.0, fov: 45 }
+  if (w < 1024) return { z: 7.0, fov: 44 }
+  return { z: 6.5, fov: 42 }
 }
 
 function InitialCamera() {
