@@ -26,7 +26,6 @@ import {
   SiSpringsecurity,
   SiHibernate,
   SiFastapi,
-  SiAmazonwebservices,
   SiGooglecloud,
   SiKubernetes,
   SiDocker,
@@ -38,18 +37,18 @@ import {
   SiMysql,
   SiMongodb,
   SiRedis,
-  SiOracle,
-  SiAmazondynamodb,
   SiApachekafka,
   SiRabbitmq,
   SiPytorch,
   SiTensorflow,
   SiScikitlearn,
-  SiOpenai,
   SiJest,
   SiSelenium,
-  SiSonarqube,
+  SiSonarqubeserver,
 } from "react-icons/si"
+/* AWS, Oracle, DynamoDB, and OpenAI marks were pulled from Simple Icons
+ * (trademark takedowns) — no Si replacement exists, so those four fall
+ * back to a Lucide glyph below, same as Playwright and Azure already do. */
 
 /* ── Lucide icons (for concepts / items without brand logos) ───── */
 import {
@@ -74,6 +73,10 @@ import {
   GitBranch,
   GitMerge,
   Workflow,
+  Sparkles,
+  CloudCog,
+  Cylinder,
+  Boxes,
 } from "lucide-react"
 
 const cls = "h-3.5 w-3.5 shrink-0"
@@ -92,7 +95,7 @@ export const skillIconMap: Record<string, ReactNode> = {
   YAML:        <FileCode2 className={cls} />,
 
   /* ── AI / ML Engineering ────────────── */
-  "LLM APIs":                  <SiOpenai className={cls} />,
+  "LLM APIs":                  <Sparkles className={cls} />,
   "Agentic Workflows":         <Bot className={cls} />,
   "RAG Architectures":         <Search className={cls} />,
   "Multi-Agent Orchestration":  <Network className={cls} />,
@@ -119,7 +122,7 @@ export const skillIconMap: Record<string, ReactNode> = {
   "Material UI":     <SiMui className={cls} />,
 
   /* ── Cloud & DevOps ─────────────────── */
-  AWS:              <SiAmazonwebservices className={cls} />,
+  AWS:              <CloudCog className={cls} />,
   GCP:              <SiGooglecloud className={cls} />,
   Azure:            <Cloud className={cls} />,
   Kubernetes:       <SiKubernetes className={cls} />,
@@ -135,8 +138,8 @@ export const skillIconMap: Record<string, ReactNode> = {
   MySQL:          <SiMysql className={cls} />,
   MongoDB:        <SiMongodb className={cls} />,
   Redis:          <SiRedis className={cls} />,
-  Oracle:         <SiOracle className={cls} />,
-  DynamoDB:       <SiAmazondynamodb className={cls} />,
+  Oracle:         <Cylinder className={cls} />,
+  DynamoDB:       <Boxes className={cls} />,
   Pinecone:       <TreePine className={cls} />,
   "Apache Kafka": <SiApachekafka className={cls} />,
   RabbitMQ:       <SiRabbitmq className={cls} />,
@@ -152,7 +155,7 @@ export const skillIconMap: Record<string, ReactNode> = {
   Selenium:               <SiSelenium className={cls} />,
   /* Playwright has no Simple Icons glyph — Lucide's theatre masks echo its logo. */
   Playwright:             <Drama className={cls} />,
-  SonarQube:              <SiSonarqube className={cls} />,
+  SonarQube:              <SiSonarqubeserver className={cls} />,
 }
 
 /** Helper: return the icon for a given skill name, or null if none mapped */

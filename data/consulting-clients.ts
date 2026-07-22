@@ -19,6 +19,8 @@ export interface ConsultingClient {
     coverImage?: string
     /** Brand/press impact highlights shown as chips on the card (the card links to `href`) */
     impact?: string[]
+    /** Short testimonial line shown as a blockquote on the card, if provided */
+    quote?: string
 }
 
 export const consultingClients: ConsultingClient[] = [

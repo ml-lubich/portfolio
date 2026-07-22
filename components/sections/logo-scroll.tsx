@@ -2,7 +2,7 @@
 
 import { useRef, useEffect, useState, useCallback } from "react"
 import Image from "next/image"
-import { SiApple, SiHonda, SiWalmart, SiGithub } from "react-icons/si"
+import { SiApple, SiHonda, SiGithub } from "react-icons/si"
 import { AnimatedText } from "../animations/animated-text"
 
 /* ──────────────────────────────────────────────────────────────────────
@@ -41,7 +41,7 @@ const TONED =
 const LOGOS: Logo[] = [
     { name: "Apple", href: "https://www.apple.com", icon: <SiApple className={MARK} /> },
     { name: "GitHub", href: "https://github.com", icon: <SiGithub className={MARK} /> },
-    { name: "Walmart", href: "https://www.walmart.com", icon: <SiWalmart className={MARK} /> },
+    { name: "Walmart", href: "https://www.walmart.com", icon: null }, // Simple Icons dropped the Walmart mark (trademark takedown)
     {
         name: "UC Berkeley",
         href: "https://www.berkeley.edu",

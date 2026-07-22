@@ -752,4 +752,43 @@ export const projects: Project[] = [
             link: { label: "GitHub", url: "https://github.com/ml-lubich/imessage-exporter" },
         },
     },
+    {
+        id: "confluence-cli",
+        name: "confluence-cli",
+        metric: "Full legacy wiki migrated",
+        coverImage: "/images/projects/imessage-exporter-hero.png",
+        summary:
+            "Confluence CLI with first-class bulk move/delete and idempotent mirror/migration—built to be safely driven by AI agents. Powers real KB migrations (moved a full legacy telecom wiki into Confluence).",
+        tags: ["Node.js", "Commander", "Atlassian API", "AI-agents"],
+        gradient: g.cyanToPrimary,
+        accent: accentCycle[2],
+        number: "20",
+        detail: {
+            title: "confluence-cli",
+            subtitle: "Bulk Confluence operations for AI agents",
+            description:
+                "A Commander-based CLI over the Atlassian Confluence REST API, purpose-built for bulk move/delete and idempotent mirror/migration operations that are safe to re-run and safe to hand to an AI agent. Used to migrate a full legacy telecom wiki into Confluence.",
+            highlights: [
+                "Bulk move and delete across pages and folders via the Confluence REST API",
+                "Idempotent mirror/migration commands—safe to re-run without duplicating content",
+                "Designed for AI-agent-driven operation: predictable commands, clear exit codes",
+                "Migrated a full legacy telecom wiki into Confluence end to end",
+            ],
+            architecture: [
+                { label: "CLI", icon: "layers", description: "Commander-based command surface" },
+                { label: "Confluence API", icon: "server", description: "Atlassian REST API for pages and spaces" },
+                { label: "Mirror Engine", icon: "cpu", description: "Idempotent sync/migration logic" },
+                { label: "Bulk Ops", icon: "zap", description: "Batch move/delete across pages and folders" },
+            ],
+            techStack: ["Node.js", "Commander", "Atlassian API"],
+            metrics: [
+                { label: "Type", value: "CLI" },
+                { label: "Migration", value: "Legacy wiki → Confluence" },
+            ],
+            diagramType: "cicd",
+            gradient: g.cyanToPrimary,
+            accent: accentCycle[2],
+            link: { label: "GitHub", url: "https://github.com/ml-lubich/confluence-cli" },
+        },
+    },
 ]
