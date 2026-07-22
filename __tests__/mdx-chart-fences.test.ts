@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest"
 import {
+  extractChartFenceBodiesFromMdx,
   isBlogChartJsonString,
   splitMarkdownByBlogChartFences,
   transformChartFences,
@@ -81,6 +82,40 @@ describe("isBlogChartJsonString", () => {
   it("accepts tree payloads", () => {
     expect(isBlogChartJsonString(treeJson)).toBe(true)
   })
+
+  it("rejects non-object and malformed JSON", () => {
+    expect(isBlogChartJsonString("plain text")).toBe(false)
+    expect(isBlogChartJsonString("{ not valid json ")).toBe(false)
+    expect(isBlogChartJsonString('{ "type": "bar" }')).toBe(false)
+  })
+})
+
+describe("extractChartFenceBodiesFromMdx", () => {
+  it("collects chart bodies from mermaid/chart and json fences", () => {
+    const src = `# Title
+
+\`\`\`mermaid
+${treeJson}
+\`\`\`
+
+Prose
+
+\`\`\`json
+{ "type": "pie", "data": [] }
+\`\`\`
+
+\`\`\`json
+{ "error": "not a chart" }
+\`\`\``
+    const bodies = extractChartFenceBodiesFromMdx(src)
+    expect(bodies).toHaveLength(2)
+    expect(bodies[0]).toContain('"type": "tree"')
+    expect(bodies[1]).toContain('"type": "pie"')
+  })
+
+  it("returns nothing when there are no chart fences", () => {
+    expect(extractChartFenceBodiesFromMdx("# Just prose")).toEqual([])
+  })
 })
 
 describe("splitMarkdownByBlogChartFences", () => {
@@ -92,6 +127,16 @@ describe("splitMarkdownByBlogChartFences", () => {
     expect(parts[1].type).toBe("chart")
     expect(parts[1].content).toContain('"type": "tree"')
     expect(parts[2].type).toBe("text")
+  })
+
+  it("returns the whole input as one text part when there are no fences", () => {
+    const parts = splitMarkdownByBlogChartFences("Just some prose, no fences.")
+    expect(parts).toHaveLength(1)
+    expect(parts[0]).toEqual({ type: "text", content: "Just some prose, no fences." })
+  })
+
+  it("returns an empty list for blank input", () => {
+    expect(splitMarkdownByBlogChartFences("   \n  ")).toEqual([])
   })
 
   it("keeps non-json mermaid fences as text content", () => {

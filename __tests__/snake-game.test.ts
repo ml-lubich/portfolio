@@ -5,8 +5,30 @@ import {
   createSnakeGameState,
   getSnakeCells,
   getSnakeDirectionFromKey,
+  setSnakeGameStatus,
+  type SnakeDirection,
   type SnakeGameState,
+  type SnakePoint,
 } from "@/lib/snake-game"
+
+/** State with a 3-cell horizontal snake, ready to advance in any direction. */
+function runningState(overrides: Partial<SnakeGameState> = {}): SnakeGameState {
+  return {
+    boardSize: 8,
+    snake: [
+      { row: 4, col: 4 },
+      { row: 4, col: 3 },
+      { row: 4, col: 2 },
+    ],
+    food: { row: 0, col: 0 },
+    direction: "right",
+    nextDirection: "right",
+    status: "running",
+    score: 0,
+    tick: 0,
+    ...overrides,
+  }
+}
 
 describe("terminal snake game", () => {
   it("starts with food on the board and away from the snake", () => {
@@ -119,5 +141,76 @@ describe("terminal snake game", () => {
 
     expect(advanced.status).toBe("lost")
     expect(advanced.tick).toBe(1)
+  })
+
+  it("moves the head in every direction", () => {
+    const cases: Array<[SnakeDirection, SnakePoint]> = [
+      ["up", { row: 3, col: 4 }],
+      ["down", { row: 5, col: 4 }],
+      ["left", { row: 4, col: 3 }],
+      ["right", { row: 4, col: 5 }],
+    ]
+    for (const [dir, expectedHead] of cases) {
+      // Single-cell snake so no direction turns into a self-collision.
+      const next = advanceSnakeGame(
+        runningState({ snake: [{ row: 4, col: 4 }], direction: dir, nextDirection: dir }),
+      )
+      expect(next.snake[0]).toEqual(expectedHead)
+    }
+  })
+
+  it("wins when the snake fills the board", () => {
+    const boardSize = 6
+    // Boustrophedon path — consecutive cells are always adjacent.
+    const path: SnakePoint[] = []
+    for (let row = 0; row < boardSize; row += 1) {
+      const cols = [...Array(boardSize).keys()]
+      if (row % 2 === 1) cols.reverse()
+      for (const col of cols) path.push({ row, col })
+    }
+    // Snake covers all but path[0]; head at path[1] moves into path[0] and eats.
+    const snake = path.slice(1)
+    const food = path[0]
+    const advanced = advanceSnakeGame(
+      runningState({
+        boardSize,
+        snake,
+        food,
+        direction: "left",
+        nextDirection: "left",
+      }),
+    )
+
+    expect(advanced.status).toBe("won")
+    expect(advanced.food).toBeNull()
+    expect(advanced.snake).toHaveLength(boardSize * boardSize)
+    expect(advanced.score).toBe(10)
+  })
+
+  it("does not advance unless running", () => {
+    const idle = runningState({ status: "idle" })
+    expect(advanceSnakeGame(idle)).toBe(idle)
+  })
+
+  it("freezes direction and status once the game is over", () => {
+    const lost = runningState({ status: "lost" })
+    expect(changeSnakeDirection(lost, "up")).toBe(lost)
+    expect(setSnakeGameStatus(lost, "running")).toBe(lost)
+  })
+
+  it("sets status while the game is live", () => {
+    const paused = setSnakeGameStatus(runningState(), "paused")
+    expect(paused.status).toBe("paused")
+  })
+
+  it("rejects invalid board sizes and impossible food", () => {
+    expect(() => createSnakeGameState({ boardSize: 4 })).toThrow(/at least/)
+    expect(() => createSnakeGameState({ boardSize: 6.5 })).toThrow(/integer/)
+    expect(() =>
+      createSnakeGameState({ boardSize: 8, food: { row: -1, col: 0 } }),
+    ).toThrow(/inside the board/)
+    expect(() =>
+      createSnakeGameState({ boardSize: 8, food: { row: 4, col: 4 } }),
+    ).toThrow(/overlap the snake/)
   })
 })

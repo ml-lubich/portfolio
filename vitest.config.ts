@@ -25,14 +25,15 @@ export default defineConfig({
         "lib/snake-game.ts",
       ],
       thresholds: {
-        // 80% line / statement / function coverage on covered files.
+        // 95% line / statement / function coverage on covered files.
         // Branch threshold is lower because Zod schema branches and
         // snake-game state-machine guards have many defensive paths
-        // that are not worth synthesizing in tests.
-        lines: 80,
-        statements: 80,
-        functions: 80,
-        branches: 70,
+        // (unreachable throws, opposite-direction guards) that are not
+        // worth synthesizing in tests.
+        lines: 95,
+        statements: 95,
+        functions: 95,
+        branches: 85,
       },
     },
   },
