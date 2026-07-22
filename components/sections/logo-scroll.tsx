@@ -25,7 +25,7 @@ const MARK = "h-8 w-8 sm:h-9 sm:w-9"
 /** Ghost every brand image to a uniform light silhouette so dark logos stay
  *  visible on the dark strip; hover restores the original full-color logo. */
 const CLIENT_LOGO_IMG =
-    "w-auto opacity-55 brightness-0 invert transition duration-300 group-hover:opacity-100 group-hover:brightness-100 group-hover:invert-0"
+    "w-auto opacity-70 brightness-0 invert transition duration-300 group-hover:opacity-100 group-hover:brightness-100 group-hover:invert-0"
 
 /**
  * Official marks (Simple Icons) where they exist; clean grey wordmarks for
@@ -40,7 +40,7 @@ const LOGOS: Logo[] = [
         name: "UC Berkeley",
         href: "https://www.berkeley.edu",
         hideLabel: true,
-        icon: <Image src="/logos/uc-berkeley.svg" alt="UC Berkeley" width={430} height={135} className={`h-6 sm:h-7 ${CLIENT_LOGO_IMG}`} />,
+        icon: <Image src="/logos/uc-berkeley.svg" alt="UC Berkeley" width={430} height={135} className={`h-7 sm:h-8 ${CLIENT_LOGO_IMG}`} />,
     },
     { name: "Honda Innovations", href: "https://www.hondainnovations.com", icon: <SiHonda className={MARK} /> },
     { name: "Lawrence Berkeley Lab", href: "https://www.lbl.gov", icon: null },
@@ -58,13 +58,13 @@ const LOGOS: Logo[] = [
         name: "W3 Sourcing",
         href: "https://www.w3sourcing.com/",
         hideLabel: true,
-        icon: <Image src="/logos/w3sourcing.png" alt="W3 Sourcing" width={920} height={360} className={`h-6 sm:h-7 ${CLIENT_LOGO_IMG}`} />,
+        icon: <Image src="/logos/w3sourcing.png" alt="W3 Sourcing" width={920} height={360} className={`h-7 sm:h-8 ${CLIENT_LOGO_IMG}`} />,
     },
     {
         name: "eria.co",
         href: "https://www.eria.co/",
         hideLabel: true,
-        icon: <Image src="/logos/eria-wordmark.png" alt="ERIA Events" width={256} height={157} className={`h-6 sm:h-7 ${CLIENT_LOGO_IMG}`} />,
+        icon: <Image src="/logos/eria-wordmark.png" alt="ERIA Events" width={256} height={157} className={`h-7 sm:h-8 ${CLIENT_LOGO_IMG}`} />,
     },
     { name: "Seaside", href: "https://seaside.la", icon: null },
 ]
