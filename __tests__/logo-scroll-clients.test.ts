@@ -22,14 +22,15 @@ describe("LogoScroll client brands", () => {
     expect(src).toMatch(/eria\.co|ERIA/)
   })
 
-  it("uses the real logo image assets for LUPFR and ERIA", () => {
+  it("uses the LUPFR mark image but no ERIA wordmark", () => {
     expect(src).toContain("/logos/lupfr-mark.png")
-    expect(src).toContain("/logos/eria-wordmark.png")
+    // eria renders as a plain text label — no wordmark PNG.
+    expect(src).not.toContain("eria-wordmark")
   })
 
   it("every referenced /logos asset exists in public/", () => {
     const refs = [...src.matchAll(/["'](\/logos\/[^"']+)["']/g)].map((m) => m[1])
-    expect(refs.length).toBeGreaterThanOrEqual(2)
+    expect(refs.length).toBeGreaterThanOrEqual(1)
     for (const ref of refs) {
       const file = path.join(ROOT, "public", ref)
       expect(fs.existsSync(file), `${ref} missing under public/`).toBe(true)

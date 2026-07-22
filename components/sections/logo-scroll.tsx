@@ -79,20 +79,7 @@ const LOGOS: Logo[] = [
         ),
     },
     { name: "Seaside", href: "https://seaside.la", icon: <SeasideMark className={`h-10 sm:h-12 ${CLIENT_LOGO_IMG}`} /> },
-    {
-        name: "eria.co",
-        href: "https://www.eria.co/",
-        hideLabel: true,
-        icon: (
-            <Image
-                src="/logos/eria-wordmark.png"
-                alt="ERIA Events logo"
-                width={256}
-                height={157}
-                className={`h-9 sm:h-11 ${CLIENT_LOGO_IMG}`}
-            />
-        ),
-    },
+    { name: "eria.co", href: "https://www.eria.co/", icon: null },
 ]
 
 /** Pixels per second for auto-scroll */
