@@ -116,7 +116,14 @@ function MarqueeRow({ logos, direction, speed }: { logos: Logo[]; direction: "le
     const offsetRef = useRef(direction === "right" ? -1 : 0) // negative so a rightward row has room to move
     const rafRef = useRef(0)
     const lastRef = useRef(0)
-    const pausedRef = useRef(false)
+    // Pause sources: offscreen (IntersectionObserver) OR the pointer hovering the
+    // row. Hover-pause is what makes the logos clickable: a moving target slides
+    // out from under the pointer between press and release, so the click never
+    // lands (it reads like the marquee "ignored" you and kept scrolling).
+    // Freezing the row while pointed at holds the link still long enough to click.
+    const hiddenRef = useRef(false)
+    const hoverRef = useRef(false)
+    const kickRef = useRef<() => void>(() => {})
 
     // Repeat the set so even a short list fills ultrawide viewports.
     const set = [...logos, ...logos, ...logos]
@@ -125,7 +132,7 @@ function MarqueeRow({ logos, direction, speed }: { logos: Logo[]; direction: "le
         const dir = direction === "left" ? -1 : 1
 
         const animate = (t: number) => {
-            if (pausedRef.current) {
+            if (hiddenRef.current || hoverRef.current) {
                 rafRef.current = 0
                 return
             }
@@ -144,16 +151,18 @@ function MarqueeRow({ logos, direction, speed }: { logos: Logo[]; direction: "le
             rafRef.current = requestAnimationFrame(animate)
         }
 
-        const start = () => {
-            if (!rafRef.current) {
+        // Start the loop unless something wants it paused (offscreen or hovered).
+        const kick = () => {
+            if (!rafRef.current && !hiddenRef.current && !hoverRef.current) {
                 lastRef.current = 0
                 rafRef.current = requestAnimationFrame(animate)
             }
         }
+        kickRef.current = kick
 
         const root = trackRef.current
         if (!root || typeof IntersectionObserver === "undefined") {
-            start()
+            kick()
             return () => {
                 cancelAnimationFrame(rafRef.current)
                 rafRef.current = 0
@@ -162,11 +171,10 @@ function MarqueeRow({ logos, direction, speed }: { logos: Logo[]; direction: "le
 
         const io = new IntersectionObserver(
             ([e]) => {
+                hiddenRef.current = !e.isIntersecting
                 if (e.isIntersecting) {
-                    pausedRef.current = false
-                    start()
+                    kick()
                 } else {
-                    pausedRef.current = true
                     cancelAnimationFrame(rafRef.current)
                     rafRef.current = 0
                 }
@@ -181,8 +189,26 @@ function MarqueeRow({ logos, direction, speed }: { logos: Logo[]; direction: "le
         }
     }, [direction, speed])
 
+    // Pause this row while the pointer is over it so its links hold still and are
+    // clickable; resume on leave. Works for touch too: a tap fires enter→leave,
+    // freezing the row for the duration of the press.
+    const pause = () => {
+        hoverRef.current = true
+        cancelAnimationFrame(rafRef.current)
+        rafRef.current = 0
+    }
+    const resume = () => {
+        hoverRef.current = false
+        kickRef.current()
+    }
+
     return (
-        <div className="overflow-hidden">
+        <div
+            className="overflow-hidden"
+            onPointerEnter={pause}
+            onPointerLeave={resume}
+            onPointerCancel={resume}
+        >
             <div ref={trackRef} className="flex w-max will-change-transform">
                 {set.map((logo, i) => (
                     <LogoItem key={`${logo.name}-${i}`} logo={logo} />
