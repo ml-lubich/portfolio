@@ -32,10 +32,16 @@ describe("LogoScroll client brands", () => {
     expect(src).not.toContain("SeasideMark")
   })
 
-  it("uses the LUPFR mark image but no ERIA wordmark", () => {
-    expect(src).toContain("/logos/lupfr-mark.png")
-    // eria renders as a plain text label — no wordmark PNG.
-    expect(src).not.toContain("eria-wordmark")
+  it("wires real logo image assets for the client brands", () => {
+    for (const asset of [
+      "/logos/lupfr-mark.png",
+      "/logos/uc-berkeley.svg",
+      "/logos/w3sourcing.png",
+      "/logos/enrichdata.png",
+      "/logos/eria-wordmark.png",
+    ]) {
+      expect(src).toContain(asset)
+    }
   })
 
   it("every referenced /logos asset exists in public/", () => {

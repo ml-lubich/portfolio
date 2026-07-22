@@ -22,10 +22,18 @@ const nextConfig = {
   // Use Next.js image optimization (vercel/cloudflare) in production
   images: {
     formats: ["image/avif", "image/webp"],
+    // Our own trusted brand SVGs (public/logos) rendered via next/image.
+    dangerouslyAllowSVG: true,
+    contentDispositionType: "attachment",
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     remotePatterns: [
       {
         protocol: "https",
         hostname: "images.unsplash.com",
+      },
+      {
+        protocol: "https",
+        hostname: "kimi-file.moonshot.cn",
       },
     ],
   },

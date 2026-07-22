@@ -16,14 +16,16 @@ interface Logo {
     href: string
     /** Official brand mark; null renders a clean text wordmark instead. */
     icon: React.ReactNode
+    /** Logo image already shows the brand name — skip the text label. */
+    hideLabel?: boolean
 }
 
 const MARK = "h-8 w-8 sm:h-9 sm:w-9"
 
-/** Brand-colored client logos are muted to match the grey strip; the row's
- *  existing hover (via `group`) restores full color and contrast. */
+/** Ghost every brand image to a uniform light silhouette so dark logos stay
+ *  visible on the dark strip; hover restores the original full-color logo. */
 const CLIENT_LOGO_IMG =
-    "w-auto opacity-70 grayscale transition-[filter,opacity] duration-300 group-hover:opacity-100 group-hover:grayscale-0"
+    "w-auto opacity-55 brightness-0 invert transition duration-300 group-hover:opacity-100 group-hover:brightness-100 group-hover:invert-0"
 
 /**
  * Official marks (Simple Icons) where they exist; clean grey wordmarks for
@@ -34,25 +36,36 @@ const LOGOS: Logo[] = [
     { name: "Apple", href: "https://www.apple.com", icon: <SiApple className={MARK} /> },
     { name: "GitHub", href: "https://github.com", icon: <SiGithub className={MARK} /> },
     { name: "Walmart", href: "https://www.walmart.com", icon: <SiWalmart className={MARK} /> },
-    { name: "UC Berkeley", href: "https://www.berkeley.edu", icon: null },
+    {
+        name: "UC Berkeley",
+        href: "https://www.berkeley.edu",
+        hideLabel: true,
+        icon: <Image src="/logos/uc-berkeley.svg" alt="UC Berkeley" width={430} height={135} className={`h-6 sm:h-7 ${CLIENT_LOGO_IMG}`} />,
+    },
     { name: "Honda Innovations", href: "https://www.hondainnovations.com", icon: <SiHonda className={MARK} /> },
     { name: "Lawrence Berkeley Lab", href: "https://www.lbl.gov", icon: null },
     {
         name: "LUPFR",
         href: "https://lupfr.com",
-        icon: (
-            <Image
-                src="/logos/lupfr-mark.png"
-                alt="LUPFR Entertainment logo"
-                width={256}
-                height={256}
-                className={`h-8 sm:h-9 ${CLIENT_LOGO_IMG}`}
-            />
-        ),
+        icon: <Image src="/logos/lupfr-mark.png" alt="LUPFR Entertainment logo" width={256} height={256} className={`h-8 sm:h-9 ${CLIENT_LOGO_IMG}`} />,
     },
-    { name: "EnrichData", href: "https://www.enrichdata.net/", icon: null },
-    { name: "W3 Sourcing", href: "https://www.w3sourcing.com/", icon: null },
-    { name: "eria.co", href: "https://www.eria.co/", icon: null },
+    {
+        name: "EnrichData",
+        href: "https://www.enrichdata.net/",
+        icon: <Image src="/logos/enrichdata.png" alt="EnrichData logo" width={256} height={256} className={`h-8 sm:h-9 ${CLIENT_LOGO_IMG}`} />,
+    },
+    {
+        name: "W3 Sourcing",
+        href: "https://www.w3sourcing.com/",
+        hideLabel: true,
+        icon: <Image src="/logos/w3sourcing.png" alt="W3 Sourcing" width={920} height={360} className={`h-6 sm:h-7 ${CLIENT_LOGO_IMG}`} />,
+    },
+    {
+        name: "eria.co",
+        href: "https://www.eria.co/",
+        hideLabel: true,
+        icon: <Image src="/logos/eria-wordmark.png" alt="ERIA Events" width={256} height={157} className={`h-6 sm:h-7 ${CLIENT_LOGO_IMG}`} />,
+    },
     { name: "Seaside", href: "https://seaside.la", icon: null },
 ]
 
@@ -68,9 +81,11 @@ function LogoItem({ logo }: { logo: Logo }) {
             className="group flex flex-shrink-0 items-center gap-2.5 px-6 text-muted-foreground/55 transition-colors duration-300 hover:text-muted-foreground sm:px-9"
         >
             {logo.icon}
-            <span className="whitespace-nowrap text-sm font-medium uppercase tracking-[0.12em] sm:text-base">
-                {logo.name}
-            </span>
+            {!logo.hideLabel && (
+                <span className="whitespace-nowrap text-sm font-medium uppercase tracking-[0.12em] sm:text-base">
+                    {logo.name}
+                </span>
+            )}
         </a>
     )
 }
