@@ -58,7 +58,7 @@ const Footer = dynamic(() => import("@/components/sections/footer").then(m => m.
   loading: () => <SectionSkeleton height="10vh" />,
 })
 /** Same top rhythm as consulting LazySection — separates lazy-mounted sections while scrolling */
-const LAZY_SECTION_TOP = "pt-6 md:pt-14 lg:pt-20"
+const LAZY_SECTION_TOP = "pt-4 md:pt-8 lg:pt-12"
 
 export default function Home() {
   return (
@@ -72,12 +72,21 @@ export default function Home() {
       <div className="relative bg-background">
         <LogoScroll />
 
-        {/* Each LazySection defers rendering until near viewport,
-            preventing 6+ WebGL canvases from booting at once */}
-        <LazySection>
-          <LiveTerminal />
-        </LazySection>
         <ProfileIntro />
+        {/* Business proof comes first; technical depth follows the client outcomes. */}
+        <LazySection sectionId="consulting" className={LAZY_SECTION_TOP}>
+          <ConsultingClients />
+        </LazySection>
+        <LazySection sectionId="testimonials" className={LAZY_SECTION_TOP}>
+          <ClientTestimonials />
+        </LazySection>
+        <WorkMarquee />
+        <LazySection
+          sectionId="projects"
+          className={`mt-4 border-t border-white/[0.06] md:mt-8 lg:mt-10 ${LAZY_SECTION_TOP}`}
+        >
+          <Projects />
+        </LazySection>
         <LazySection sectionId="ai-expertise" className={LAZY_SECTION_TOP}>
           <AIExpertise />
         </LazySection>
@@ -86,31 +95,21 @@ export default function Home() {
         </LazySection>
         <LazySection
           sectionId="journey"
-          className={`${LAZY_SECTION_TOP} mb-8 md:mb-16 lg:mb-20`}
+          className={`${LAZY_SECTION_TOP} mb-5 md:mb-10 lg:mb-12`}
         >
           <Journey />
-        </LazySection>
-        <LazySection sectionId="consulting" className={LAZY_SECTION_TOP}>
-          <ConsultingClients />
-        </LazySection>
-        <WorkMarquee />
-        <LazySection sectionId="testimonials" className={LAZY_SECTION_TOP}>
-          <ClientTestimonials />
-        </LazySection>
-        <LazySection
-          sectionId="projects"
-          className={`mt-5 border-t border-white/[0.06] md:mt-12 lg:mt-16 ${LAZY_SECTION_TOP}`}
-        >
-          <Projects />
         </LazySection>
         <LazySection sectionId="skills" className={LAZY_SECTION_TOP}>
           <Skills />
         </LazySection>
+        <LazySection sectionId="research" className={LAZY_SECTION_TOP}>
+          <Publications />
+        </LazySection>
         <LazySection sectionId="github" className={LAZY_SECTION_TOP}>
           <GitHubStats />
         </LazySection>
-        <LazySection sectionId="research" className={LAZY_SECTION_TOP}>
-          <Publications />
+        <LazySection>
+          <LiveTerminal />
         </LazySection>
         <LazySection
           sectionId="contact"

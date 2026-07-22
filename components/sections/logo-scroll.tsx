@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useCallback, useEffect, useState } from "react"
+import { useRef, useEffect } from "react"
 import Image from "next/image"
 import {
     SiApple,
@@ -10,8 +10,8 @@ import { GraduationCap, FlaskConical } from "lucide-react"
 import { AnimatedText } from "../animations/animated-text"
 
 /* ──────────────────────────────────────────────────────────────────────
- *  LogoScroll — Infinite horizontal marquee of grey company logos
- *  Auto-scrolls continuously AND supports click/touch drag.
+ *  LogoScroll — Three infinite marquee rows of grey company logos.
+ *  Each logo is a clickable link. Rows alternate direction (→ ← →).
  *  Placed directly below the Hero section.
  * ────────────────────────────────────────────────────────────────────── */
 
@@ -48,7 +48,10 @@ function SeasideMark({ className }: { className?: string }) {
 
 interface Logo {
     name: string
+    href: string
     icon: React.ReactNode
+    /** Wordmark images already show the name — skip the text label. */
+    hideLabel?: boolean
 }
 
 /** Brand-colored client logos are muted to match the grey strip; the row's
@@ -57,33 +60,36 @@ const CLIENT_LOGO_IMG =
     "w-auto opacity-60 grayscale transition-[filter,opacity] duration-300 group-hover:opacity-95 group-hover:grayscale-0"
 
 const LOGOS: Logo[] = [
-    { name: "Apple", icon: <SiApple className="h-7 w-7 sm:h-8 sm:w-8" /> },
-    { name: "Walmart", icon: <WalmartSpark className="h-7 w-7 sm:h-8 sm:w-8" /> },
-    { name: "Lawrence Berkeley Lab", icon: <FlaskConical className="h-7 w-7 sm:h-8 sm:w-8" /> },
-    { name: "Honda Innovations", icon: <SiHonda className="h-7 w-7 sm:h-8 sm:w-8" /> },
-    { name: "UC Berkeley", icon: <GraduationCap className="h-7 w-7 sm:h-8 sm:w-8" /> },
+    { name: "Apple", href: "https://www.apple.com", icon: <SiApple className="h-10 w-10 sm:h-12 sm:w-12" /> },
+    { name: "Walmart", href: "https://www.walmart.com", icon: <WalmartSpark className="h-10 w-10 sm:h-12 sm:w-12" /> },
+    { name: "Lawrence Berkeley Lab", href: "https://www.lbl.gov", icon: <FlaskConical className="h-10 w-10 sm:h-12 sm:w-12" /> },
+    { name: "Honda Innovations", href: "https://www.hondainnovations.com", icon: <SiHonda className="h-10 w-10 sm:h-12 sm:w-12" /> },
+    { name: "UC Berkeley", href: "https://www.berkeley.edu", icon: <GraduationCap className="h-10 w-10 sm:h-12 sm:w-12" /> },
     {
         name: "LUPFR",
+        href: "https://lupfr.com",
         icon: (
             <Image
                 src="/logos/lupfr-mark.png"
                 alt="LUPFR Entertainment logo"
                 width={256}
                 height={256}
-                className={`h-7 sm:h-8 ${CLIENT_LOGO_IMG}`}
+                className={`h-10 sm:h-12 ${CLIENT_LOGO_IMG}`}
             />
         ),
     },
-    { name: "Seaside", icon: <SeasideMark className={`h-7 sm:h-8 ${CLIENT_LOGO_IMG}`} /> },
+    { name: "Seaside", href: "https://seaside.la", icon: <SeasideMark className={`h-10 sm:h-12 ${CLIENT_LOGO_IMG}`} /> },
     {
         name: "eria.co",
+        href: "https://www.eria.co/",
+        hideLabel: true,
         icon: (
             <Image
                 src="/logos/eria-wordmark.png"
                 alt="ERIA Events logo"
                 width={256}
                 height={157}
-                className={`h-6 sm:h-7 ${CLIENT_LOGO_IMG}`}
+                className={`h-9 sm:h-11 ${CLIENT_LOGO_IMG}`}
             />
         ),
     },
@@ -92,101 +98,88 @@ const LOGOS: Logo[] = [
 /** Pixels per second for auto-scroll */
 const AUTO_SPEED = 40
 
+/** Rotate a copy of the array so each row starts on a different logo. */
+function rotate<T>(arr: T[], n: number): T[] {
+    const k = ((n % arr.length) + arr.length) % arr.length
+    return [...arr.slice(k), ...arr.slice(0, k)]
+}
+
 function LogoItem({ logo }: { logo: Logo }) {
     return (
-        <div className="group flex flex-shrink-0 items-center gap-2.5 px-6 sm:px-8 text-muted-foreground/50 transition-colors duration-300 hover:text-muted-foreground/90 select-none">
+        <a
+            href={logo.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group flex flex-shrink-0 items-center gap-2.5 px-6 sm:px-8 text-muted-foreground/50 transition-colors duration-300 hover:text-muted-foreground/90"
+        >
             {logo.icon}
-            <span className="whitespace-nowrap text-xs font-medium tracking-wide uppercase sm:text-sm">
-                {logo.name}
-            </span>
-        </div>
+            {!logo.hideLabel && (
+                <span className="whitespace-nowrap text-sm font-medium tracking-wide uppercase sm:text-base">
+                    {logo.name}
+                </span>
+            )}
+        </a>
     )
 }
 
-export function LogoScroll() {
-    const sectionRef = useRef<HTMLElement>(null)
+/** One auto-scrolling row. Renders the logo set twice and wraps at the
+ *  half-width so the loop is seamless in either direction. */
+function MarqueeRow({ logos, direction, speed }: { logos: Logo[]; direction: "left" | "right"; speed: number }) {
     const trackRef = useRef<HTMLDivElement>(null)
-    const offsetRef = useRef(0)           // current translateX (negative = scrolled left)
-    const rafRef = useRef<number>(0)
-    const lastTimeRef = useRef<number>(0)
-    const isDraggingRef = useRef(false)
-    const dragStartXRef = useRef(0)
-    const dragOffsetRef = useRef(0)
-    const velocityRef = useRef(0)
-    const lastPointerXRef = useRef(0)
-    const lastPointerTimeRef = useRef(0)
-    const [dragging, setDragging] = useState(false)
-    const marqueePausedRef = useRef(false)
+    const offsetRef = useRef(direction === "right" ? -1 : 0) // negative so a rightward row has room to move
+    const rafRef = useRef(0)
+    const lastRef = useRef(0)
+    const pausedRef = useRef(false)
 
-    // We render 6 copies so there's always enough to wrap seamlessly
-    const repeated = [...LOGOS, ...LOGOS, ...LOGOS, ...LOGOS, ...LOGOS, ...LOGOS]
+    // Repeat the set so even a short list fills ultrawide viewports.
+    const set = [...logos, ...logos, ...logos]
 
-    /** Apply the current offset to the DOM */
-    const applyTransform = useCallback(() => {
-        if (trackRef.current) {
-            trackRef.current.style.transform = `translateX(${offsetRef.current}px)`
-        }
-    }, [])
+    useEffect(() => {
+        const dir = direction === "left" ? -1 : 1
 
-    /** Wrap offset so it stays within one "set" width */
-    const wrapOffset = useCallback(() => {
-        if (!trackRef.current) return
-        // Width of one set of logos (total / 6)
-        const totalWidth = trackRef.current.scrollWidth
-        const setWidth = totalWidth / 6
-        if (setWidth === 0) return
-        // Keep offset within [-setWidth, 0] range
-        while (offsetRef.current < -setWidth) offsetRef.current += setWidth
-        while (offsetRef.current > 0) offsetRef.current -= setWidth
-    }, [])
-
-    /** Main animation loop */
-    const animate = useCallback(
-        (time: number) => {
-            if (marqueePausedRef.current) {
+        const animate = (t: number) => {
+            if (pausedRef.current) {
                 rafRef.current = 0
                 return
             }
-            if (lastTimeRef.current === 0) lastTimeRef.current = time
-            const dt = (time - lastTimeRef.current) / 1000 // seconds
-            lastTimeRef.current = time
+            if (lastRef.current === 0) lastRef.current = t
+            const dt = (t - lastRef.current) / 1000
+            lastRef.current = t
 
-            if (!isDraggingRef.current) {
-                // If there's residual drag velocity, apply momentum with decay
-                if (Math.abs(velocityRef.current) > 0.5) {
-                    offsetRef.current += velocityRef.current * dt
-                    velocityRef.current *= 0.95 // friction
-                } else {
-                    velocityRef.current = 0
-                }
-                // Always auto-scroll
-                offsetRef.current -= AUTO_SPEED * dt
+            const el = trackRef.current
+            const half = el ? el.scrollWidth / 2 : 0
+            if (half > 1) {
+                offsetRef.current += dir * speed * dt
+                while (offsetRef.current <= -half) offsetRef.current += half
+                while (offsetRef.current > 0) offsetRef.current -= half
+                if (el) el.style.transform = `translate3d(${offsetRef.current}px, 0, 0)`
             }
-
-            wrapOffset()
-            applyTransform()
             rafRef.current = requestAnimationFrame(animate)
-        },
-        [applyTransform, wrapOffset]
-    )
-
-    useEffect(() => {
-        const root = sectionRef.current
-        if (!root || typeof IntersectionObserver === "undefined") {
-            rafRef.current = requestAnimationFrame(animate)
-            return () => cancelAnimationFrame(rafRef.current)
         }
+
+        const start = () => {
+            if (!rafRef.current) {
+                lastRef.current = 0
+                rafRef.current = requestAnimationFrame(animate)
+            }
+        }
+
+        const root = trackRef.current
+        if (!root || typeof IntersectionObserver === "undefined") {
+            start()
+            return () => {
+                cancelAnimationFrame(rafRef.current)
+                rafRef.current = 0
+            }
+        }
+
         const io = new IntersectionObserver(
             ([e]) => {
-                const vis = e.isIntersecting
-                if (vis) {
-                    marqueePausedRef.current = false
-                    if (!rafRef.current) {
-                        lastTimeRef.current = 0
-                        rafRef.current = requestAnimationFrame(animate)
-                    }
+                if (e.isIntersecting) {
+                    pausedRef.current = false
+                    start()
                 } else {
-                    marqueePausedRef.current = true
+                    pausedRef.current = true
                     cancelAnimationFrame(rafRef.current)
                     rafRef.current = 0
                 }
@@ -199,49 +192,31 @@ export function LogoScroll() {
             cancelAnimationFrame(rafRef.current)
             rafRef.current = 0
         }
-    }, [animate])
-
-    /* ── Pointer (mouse + touch) handlers ─────────────────────────── */
-    const onPointerDown = useCallback((e: React.PointerEvent) => {
-        isDraggingRef.current = true
-        setDragging(true)
-        velocityRef.current = 0
-        dragStartXRef.current = e.clientX
-        dragOffsetRef.current = offsetRef.current
-        lastPointerXRef.current = e.clientX
-        lastPointerTimeRef.current = performance.now()
-            ; (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
-    }, [])
-
-    const onPointerMove = useCallback((e: React.PointerEvent) => {
-        if (!isDraggingRef.current) return
-        const dx = e.clientX - dragStartXRef.current
-        offsetRef.current = dragOffsetRef.current + dx
-
-        // Track velocity for momentum
-        const now = performance.now()
-        const timeDelta = (now - lastPointerTimeRef.current) / 1000
-        if (timeDelta > 0) {
-            velocityRef.current = (e.clientX - lastPointerXRef.current) / timeDelta
-        }
-        lastPointerXRef.current = e.clientX
-        lastPointerTimeRef.current = now
-    }, [])
-
-    const onPointerUp = useCallback(() => {
-        isDraggingRef.current = false
-        setDragging(false)
-    }, [])
+    }, [direction, speed])
 
     return (
+        <div className="overflow-hidden">
+            <div ref={trackRef} className="flex w-max will-change-transform">
+                {set.map((logo, i) => (
+                    <LogoItem key={`${logo.name}-${i}`} logo={logo} />
+                ))}
+                {set.map((logo, i) => (
+                    <LogoItem key={`${logo.name}-dup-${i}`} logo={logo} />
+                ))}
+            </div>
+        </div>
+    )
+}
+
+export function LogoScroll() {
+    return (
         <section
-            ref={sectionRef}
             id="partners"
-            className="relative w-full overflow-hidden border-b border-border/40 bg-background/40 py-3 md:py-6 lg:py-8 md:backdrop-blur-sm"
+            className="relative w-full overflow-hidden border-b border-border/40 bg-background/40 py-4 md:py-7 lg:py-9 md:backdrop-blur-sm"
             aria-label="Companies and institutions"
         >
             {/* Heading */}
-            <p className="mb-3 text-center text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground/50 sm:mb-5 sm:text-sm">
+            <p className="mb-4 text-center text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground/50 sm:mb-6 sm:text-sm">
                 <AnimatedText text="Trusted & partnered with:" variant="blur-slide" stagger={40} duration={600} />
             </p>
 
@@ -249,19 +224,11 @@ export function LogoScroll() {
             <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-background/60 to-transparent sm:w-32" />
             <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-background/60 to-transparent sm:w-32" />
 
-            {/* Draggable scrolling track */}
-            <div
-                ref={trackRef}
-                onPointerDown={onPointerDown}
-                onPointerMove={onPointerMove}
-                onPointerUp={onPointerUp}
-                onPointerCancel={onPointerUp}
-                className={`flex will-change-transform touch-pan-y ${dragging ? "cursor-grabbing" : "cursor-grab"}`}
-                style={{ touchAction: "pan-y" }}
-            >
-                {repeated.map((logo, i) => (
-                    <LogoItem key={`${logo.name}-${i}`} logo={logo} />
-                ))}
+            {/* Three rows, alternating direction */}
+            <div className="flex flex-col gap-3 sm:gap-4">
+                <MarqueeRow logos={rotate(LOGOS, 0)} direction="right" speed={AUTO_SPEED} />
+                <MarqueeRow logos={rotate(LOGOS, 3)} direction="left" speed={AUTO_SPEED * 0.85} />
+                <MarqueeRow logos={rotate(LOGOS, 5)} direction="right" speed={AUTO_SPEED * 1.1} />
             </div>
         </section>
     )
