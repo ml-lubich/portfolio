@@ -2,11 +2,7 @@
 
 import { useRef, useEffect } from "react"
 import Image from "next/image"
-import {
-    SiApple,
-    SiHonda,
-} from "react-icons/si"
-import { GraduationCap, FlaskConical } from "lucide-react"
+import { SiApple, SiHonda, SiWalmart, SiGithub } from "react-icons/si"
 import { AnimatedText } from "../animations/animated-text"
 
 /* ──────────────────────────────────────────────────────────────────────
@@ -15,56 +11,32 @@ import { AnimatedText } from "../animations/animated-text"
  *  Placed directly below the Hero section.
  * ────────────────────────────────────────────────────────────────────── */
 
-/** Walmart Spark — the 6-pointed starburst mark */
-function WalmartSpark({ className }: { className?: string }) {
-    return (
-        <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-            {[0, 60, 120, 180, 240, 300].map((angle) => (
-                <ellipse
-                    key={angle}
-                    cx="12"
-                    cy="4.5"
-                    rx="1.8"
-                    ry="4"
-                    transform={`rotate(${angle} 12 12)`}
-                />
-            ))}
-        </svg>
-    )
-}
-
-/** Seaside "//" brand mark — from the SEA//SIDE logo-concepts sheet */
-function SeasideMark({ className }: { className?: string }) {
-    return (
-        <svg className={className} viewBox="0 0 256 256" aria-hidden>
-            <circle cx="128" cy="128" r="128" fill="#5B8FCB" />
-            <g stroke="#F5F5F2" strokeWidth={15}>
-                <line x1="102" y1="172" x2="137" y2="84" />
-                <line x1="146" y1="172" x2="181" y2="84" />
-            </g>
-        </svg>
-    )
-}
-
 interface Logo {
     name: string
     href: string
+    /** Official brand mark; null renders a clean text wordmark instead. */
     icon: React.ReactNode
-    /** Wordmark images already show the name — skip the text label. */
-    hideLabel?: boolean
 }
+
+const MARK = "h-8 w-8 sm:h-9 sm:w-9"
 
 /** Brand-colored client logos are muted to match the grey strip; the row's
  *  existing hover (via `group`) restores full color and contrast. */
 const CLIENT_LOGO_IMG =
-    "w-auto opacity-60 grayscale transition-[filter,opacity] duration-300 group-hover:opacity-95 group-hover:grayscale-0"
+    "w-auto opacity-70 grayscale transition-[filter,opacity] duration-300 group-hover:opacity-100 group-hover:grayscale-0"
 
+/**
+ * Official marks (Simple Icons) where they exist; clean grey wordmarks for
+ * institutions/clients that have no monochrome brand mark. Order matters —
+ * rows are dealt round-robin, so adjacent entries land on different rows.
+ */
 const LOGOS: Logo[] = [
-    { name: "Apple", href: "https://www.apple.com", icon: <SiApple className="h-10 w-10 sm:h-12 sm:w-12" /> },
-    { name: "Walmart", href: "https://www.walmart.com", icon: <WalmartSpark className="h-10 w-10 sm:h-12 sm:w-12" /> },
-    { name: "Lawrence Berkeley Lab", href: "https://www.lbl.gov", icon: <FlaskConical className="h-10 w-10 sm:h-12 sm:w-12" /> },
-    { name: "Honda Innovations", href: "https://www.hondainnovations.com", icon: <SiHonda className="h-10 w-10 sm:h-12 sm:w-12" /> },
-    { name: "UC Berkeley", href: "https://www.berkeley.edu", icon: <GraduationCap className="h-10 w-10 sm:h-12 sm:w-12" /> },
+    { name: "Apple", href: "https://www.apple.com", icon: <SiApple className={MARK} /> },
+    { name: "GitHub", href: "https://github.com", icon: <SiGithub className={MARK} /> },
+    { name: "Walmart", href: "https://www.walmart.com", icon: <SiWalmart className={MARK} /> },
+    { name: "UC Berkeley", href: "https://www.berkeley.edu", icon: null },
+    { name: "Honda Innovations", href: "https://www.hondainnovations.com", icon: <SiHonda className={MARK} /> },
+    { name: "Lawrence Berkeley Lab", href: "https://www.lbl.gov", icon: null },
     {
         name: "LUPFR",
         href: "https://lupfr.com",
@@ -74,22 +46,18 @@ const LOGOS: Logo[] = [
                 alt="LUPFR Entertainment logo"
                 width={256}
                 height={256}
-                className={`h-10 sm:h-12 ${CLIENT_LOGO_IMG}`}
+                className={`h-8 sm:h-9 ${CLIENT_LOGO_IMG}`}
             />
         ),
     },
-    { name: "Seaside", href: "https://seaside.la", icon: <SeasideMark className={`h-10 sm:h-12 ${CLIENT_LOGO_IMG}`} /> },
+    { name: "EnrichData", href: "https://www.enrichdata.net/", icon: null },
+    { name: "W3 Sourcing", href: "https://www.w3sourcing.com/", icon: null },
     { name: "eria.co", href: "https://www.eria.co/", icon: null },
+    { name: "Seaside", href: "https://seaside.la", icon: null },
 ]
 
 /** Pixels per second for auto-scroll */
 const AUTO_SPEED = 40
-
-/** Rotate a copy of the array so each row starts on a different logo. */
-function rotate<T>(arr: T[], n: number): T[] {
-    const k = ((n % arr.length) + arr.length) % arr.length
-    return [...arr.slice(k), ...arr.slice(0, k)]
-}
 
 function LogoItem({ logo }: { logo: Logo }) {
     return (
@@ -97,14 +65,12 @@ function LogoItem({ logo }: { logo: Logo }) {
             href={logo.href}
             target="_blank"
             rel="noopener noreferrer"
-            className="group flex flex-shrink-0 items-center gap-2.5 px-6 sm:px-8 text-muted-foreground/50 transition-colors duration-300 hover:text-muted-foreground/90"
+            className="group flex flex-shrink-0 items-center gap-2.5 px-6 text-muted-foreground/55 transition-colors duration-300 hover:text-muted-foreground sm:px-9"
         >
             {logo.icon}
-            {!logo.hideLabel && (
-                <span className="whitespace-nowrap text-sm font-medium tracking-wide uppercase sm:text-base">
-                    {logo.name}
-                </span>
-            )}
+            <span className="whitespace-nowrap text-sm font-medium uppercase tracking-[0.12em] sm:text-base">
+                {logo.name}
+            </span>
         </a>
     )
 }
@@ -237,11 +203,12 @@ export function LogoScroll() {
             <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-background/60 to-transparent sm:w-32" />
             <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-background/60 to-transparent sm:w-32" />
 
-            {/* Three rows, alternating direction */}
+            {/* Three rows, alternating direction. Brands are dealt round-robin so
+                no logo appears in more than one row (no vertical repetition). */}
             <div className="flex flex-col gap-3 sm:gap-4">
-                <MarqueeRow logos={rotate(LOGOS, 0)} direction="right" speed={AUTO_SPEED} />
-                <MarqueeRow logos={rotate(LOGOS, 3)} direction="left" speed={AUTO_SPEED * 0.85} />
-                <MarqueeRow logos={rotate(LOGOS, 5)} direction="right" speed={AUTO_SPEED * 1.1} />
+                <MarqueeRow logos={LOGOS.filter((_, i) => i % 3 === 0)} direction="right" speed={AUTO_SPEED} />
+                <MarqueeRow logos={LOGOS.filter((_, i) => i % 3 === 1)} direction="left" speed={AUTO_SPEED * 0.85} />
+                <MarqueeRow logos={LOGOS.filter((_, i) => i % 3 === 2)} direction="right" speed={AUTO_SPEED * 1.1} />
             </div>
         </section>
     )

@@ -16,10 +16,20 @@ describe("LogoScroll client brands", () => {
     "utf8",
   )
 
-  it("includes LUPFR, Seaside, and ERIA entries", () => {
+  it("includes LUPFR, Seaside, ERIA, and W3 Sourcing entries", () => {
     expect(src).toContain("LUPFR")
     expect(src).toContain("Seaside")
     expect(src).toMatch(/eria\.co|ERIA/)
+    expect(src).toContain("W3 Sourcing")
+  })
+
+  it("uses official Simple Icons brand marks, not hand-drawn clip-art", () => {
+    // The childish generic icons (grad cap, flask, hand-rolled spark) are gone.
+    expect(src).toMatch(/SiApple|SiWalmart|SiHonda|SiGithub/)
+    expect(src).not.toContain("GraduationCap")
+    expect(src).not.toContain("FlaskConical")
+    expect(src).not.toContain("WalmartSpark")
+    expect(src).not.toContain("SeasideMark")
   })
 
   it("uses the LUPFR mark image but no ERIA wordmark", () => {
@@ -37,8 +47,10 @@ describe("LogoScroll client brands", () => {
     }
   })
 
-  it("renders the Seaside \"//\" brand mark inline", () => {
-    // Seaside ships an SVG mark (circle + double slash), not a raster file
-    expect(src).toMatch(/SeasideMark|seaside-mark/i)
+  it("deals brands across rows with no vertical repetition", () => {
+    // Each row is a distinct round-robin slice of LOGOS, so no brand shows twice.
+    expect(src).toMatch(/i % 3 === 0/)
+    expect(src).toMatch(/i % 3 === 1/)
+    expect(src).toMatch(/i % 3 === 2/)
   })
 })
