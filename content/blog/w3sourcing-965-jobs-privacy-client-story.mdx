@@ -1,0 +1,146 @@
+---
+title: "We Published 965 Jobs. Then the Client Asked Me to Hide the Companies."
+excerpt: "A W3Sourcing client story about moving fast, protecting recruiter relationships, and rebuilding a public jobs product around the business model instead of the raw data."
+date: "2026-07-14"
+category: "Client Stories"
+tags: ["Consulting", "W3 Sourcing", "Recruiting", "Privacy", "Client Story"]
+---
+
+The first version did exactly what the data suggested.
+
+It loaded 965 live roles, made them searchable by title, technology, and location, and gave candidates a direct path to respond.
+
+It also exposed information that could let people route around the recruiter.
+
+That made it technically successful and commercially wrong.
+
+<Figure src="/images/projects/w3sourcing-hero.png" alt="W3 Sourcing website and recruiting experience" caption="W3Sourcing needed the reach of a public jobs product without giving away the relationships that make the business valuable." />
+
+## The project began with an emergency, not a roadmap
+
+My work with [W3 Sourcing](https://www.w3sourcing.com/) started in a very practical way: email and website problems were blocking critical work.
+
+Perry Barrow runs a principal-led recruiting business across time zones and specialized markets. When email fails, it is not a cosmetic issue. Candidate conversations stop. Client work slows. The business loses its operating surface.
+
+We got the site working that night, made the requested changes, and moved on to the more interesting product question: could we combine the reach of large recruiting marketplaces with the judgment and relationship model of a specialist recruiter?
+
+The answer began with ranking.
+
+Perry had candidate and role data from several systems. The goal was not to automate recruiting into a black box. It was to reduce the search space so a human could spend time on the most plausible matches.
+
+That distinction shaped everything that followed.
+
+## A good ranking system starts with golden cases
+
+Before tuning a model, I asked for examples of candidates Perry already considered strong.
+
+Those records become golden cases: not perfect truth, but concrete examples of the business judgment the system is meant to support.
+
+Without them, “rank the candidates” is philosophy. With them, it becomes an evaluation problem.
+
+You can ask:
+
+- Does the system recover known strong matches?
+- Which requirements are treated as mandatory versus helpful?
+- Does location or work authorization correctly change the order?
+- Can the explanation point to evidence in the profile?
+- Where does the ranking disagree with the recruiter, and why?
+
+Perry also pushed for rule-based requirements rather than vague prose. That was exactly right. A recruiting engine needs explicit inputs and outputs before it needs a clever model.
+
+> The AI should narrow the field. The recruiter still owns the judgment and the relationship.
+
+## The public jobs page changed the risk
+
+The internal ranking project and the public jobs page used related data, but they had different trust boundaries.
+
+Internally, client names and detailed descriptions help match candidates. Publicly, the same fields can reveal enough for a candidate—or another recruiter—to identify the hiring company and bypass W3 Sourcing.
+
+The first release carried too much source data into the public surface.
+
+Perry spotted the issue quickly and asked to take the page out of public view while we corrected it. The revised brief was precise:
+
+- remove company names
+- remove identifying company descriptions
+- retain role title, experience, stack, broad location, work type, and salary
+- assign a W3 reference
+- route requests for details back to Perry
+
+This was not “redact a field.” It was a product-policy decision about how much value to reveal before a person enters the recruiter’s process.
+
+```mermaid
+{
+  "type": "pipeline",
+  "title": "Public Role Publishing at W3 Sourcing",
+  "steps": [
+    { "label": "Source roles", "annotation": "full client data", "color": "blue" },
+    { "label": "Privacy transform", "annotation": "remove identifying fields", "color": "purple" },
+    { "label": "W3 reference", "annotation": "stable public identity", "color": "cyan" },
+    { "label": "Searchable listing", "annotation": "useful candidate facts", "color": "amber" },
+    { "label": "Contact Perry", "annotation": "relationship stays intact", "color": "green" }
+  ]
+}
+```
+
+## Rebuilding around the business model
+
+The corrected page preserved candidate usefulness without exposing the client relationship.
+
+All 965 roles remained searchable. A candidate could still decide whether a position was relevant based on title, essential requirements, technology, location, work arrangement, and compensation. Each listing received a W3 reference instead of a public company identity.
+
+The call to action did not send people into a generic application void. It created a direct route to Perry through LinkedIn or a prefilled email quoting the role reference.
+
+That small detail made the privacy layer operationally useful. Masking the company would have been frustrating if incoming messages said only “I’m interested in that engineering job.” The reference gave both sides a shared handle without disclosing the client.
+
+<Callout type="info" title="Redaction should preserve workflow">
+Removing sensitive data is only half the design. The remaining public identifier must still let the business locate, discuss, and update the underlying record.
+</Callout>
+
+## Why speed mattered—and where it did not
+
+Perry’s response after the revised version went live was short:
+
+> “Excellent, perfect. Incredible work, can’t believe you did that so fast.”
+
+Speed mattered because the public exposure was time-sensitive. It did not justify skipping the policy question.
+
+The fast path was possible because the corrected requirement was concrete. We knew exactly which fields crossed the public boundary, exactly which fields remained private, and exactly where the user should go next.
+
+This is a recurring pattern in consulting: urgency becomes manageable when the decision is explicit.
+
+“Make it private” is vague.
+
+“Publish these six fields, replace identity with this reference, and route contact here” is executable.
+
+## What I would build next
+
+The public jobs layer is only one piece of the larger W3 system.
+
+The next useful layer is not a generic recruiting chatbot. It is a private ranking and outreach workspace that combines:
+
+- explicit eligibility rules
+- golden candidate examples
+- profile evidence with provenance
+- role-to-candidate ranking
+- recruiter overrides captured as feedback
+- controlled outreach economics
+
+Voice automation came up during the work. It can be valuable, but ElevenLabs or similar infrastructure adds real per-call cost and compliance questions. Candidate ranking can run locally or through lower-cost inference and improves the quality of every later outreach channel.
+
+So the sequence matters: rank first, then spend on contact.
+
+That is the kind of prioritization I bring to consulting. The flashy feature is not always the next feature.
+
+## The broader lesson
+
+Data products do not become safe because they hide a database.
+
+Every public field expresses a business decision. In recruiting, a company description may be marketing content in one context and relationship leakage in another. The correct schema depends on who is looking and what they are allowed to do next.
+
+W3Sourcing’s jobs page became better when it showed less.
+
+Candidates still received enough information to evaluate fit. Perry retained control of the client relationship. The system gained a stable reference layer that made private follow-up clearer.
+
+That is not merely a privacy fix.
+
+It is software aligned with how the business earns trust.

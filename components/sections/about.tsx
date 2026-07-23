@@ -150,9 +150,9 @@ export function About() {
 
       <div className="relative mx-auto max-w-7xl px-3 md:px-4 lg:px-6">
         <SectionHeader
-          label="About Me"
-          title={<>Building at the intersection of{" "}<span className="gradient-text">AI and Engineering</span></>}
-          subtitle="Senior Software Engineer specializing in AI-driven, cloud-native applications. Led the design and deployment of a production AI platform with multi-agent orchestration and RAG pipelines, achieving sub-second latency for millions of users."
+          label="Engineering Partner"
+          title={<>Strategy that reaches <span className="gradient-text">production</span></>}
+          subtitle="I scope, architect, build, and stabilize AI and software products for teams that need senior engineering judgment without assembling a large agency."
         />
 
         {/* Bio — terminal (OpenClaw + claw live under #consulting) */}

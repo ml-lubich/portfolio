@@ -162,12 +162,12 @@ function BlogPageInner({
                         </div>
                     </div>
                     <h1 className="mt-4 text-4xl font-bold tracking-tight text-foreground md:text-5xl lg:text-6xl">
-                        AI Engineering{" "}
-                        <span className="gradient-text">Perspectives</span>
+                        Engineering & Consulting{" "}
+                        <span className="gradient-text">Field Notes</span>
                     </h1>
                     <p className="mt-3 max-w-2xl text-lg text-muted-foreground">
-                        Controversial takes, hard-won lessons, and unfiltered opinions on modern
-                        AI engineering. No hype — just what actually works in production.
+                        Long-form analysis, client delivery stories, and practical decisions from
+                        building AI systems and software products in production.
                     </p>
                 </div>
 

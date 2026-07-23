@@ -25,7 +25,7 @@ describe("LogoScroll client brands", () => {
 
   it("uses official Simple Icons brand marks, not hand-drawn clip-art", () => {
     // The childish generic icons (grad cap, flask, hand-rolled spark) are gone.
-    expect(src).toMatch(/SiApple|SiWalmart|SiHonda|SiGithub/)
+    expect(src).toMatch(/SiApple|SiHonda|SiGithub/)
     expect(src).not.toContain("GraduationCap")
     expect(src).not.toContain("FlaskConical")
     expect(src).not.toContain("WalmartSpark")
@@ -47,13 +47,10 @@ describe("LogoScroll client brands", () => {
     expect(src).not.toContain("eria-wordmark")
   })
 
-  it("is drag-scrollable with click suppression after a drag", () => {
-    expect(src).toContain("onPointerDown")
-    expect(src).toContain("onPointerMove")
-    // A shared drag value moves every row together.
-    expect(src).toMatch(/dragRef/)
-    // A drag must not trigger the logo's link.
-    expect(src).toMatch(/onClickCapture|moved/)
+  it("renders one quiet, logo-only marquee", () => {
+    expect(src).toContain("logo-marquee-track")
+    expect(src).toContain("aria-label={logo.name}")
+    expect(src).not.toContain("{logo.name}</span>")
   })
 
   it("every referenced /logos asset exists in public/", () => {
@@ -65,10 +62,8 @@ describe("LogoScroll client brands", () => {
     }
   })
 
-  it("deals brands across rows with no vertical repetition", () => {
-    // Each row is a distinct round-robin slice of LOGOS, so no brand shows twice.
-    expect(src).toMatch(/i % 3 === 0/)
-    expect(src).toMatch(/i % 3 === 1/)
-    expect(src).toMatch(/i % 3 === 2/)
+  it("duplicates one complete strip for a seamless loop", () => {
+    expect(src).toContain("<LogoSet />")
+    expect(src).toContain("<LogoSet hidden />")
   })
 })

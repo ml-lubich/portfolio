@@ -59,8 +59,8 @@ export function Callout({
 }) {
     const style = calloutStyles[type]
     return (
-        <div
-            className={`my-6 rounded-xl border ${style.border} ${style.bg} p-5 backdrop-blur-sm`}
+        <aside
+            className={`blog-callout my-8 rounded-lg border ${style.border} ${style.bg} px-5 py-4 backdrop-blur-sm sm:px-6`}
         >
             <div className="flex items-start gap-3">
                 <span className={`text-lg ${style.iconColor} mt-0.5`} aria-hidden="true">{style.icon}</span>
@@ -71,7 +71,7 @@ export function Callout({
                     {children}
                 </div>
             </div>
-        </div>
+        </aside>
     )
 }
 
@@ -98,7 +98,7 @@ export function Video({
     }
 
     return (
-        <figure className="my-8">
+        <figure className="blog-figure my-10 md:-mx-12">
             <div className="relative overflow-hidden rounded-xl border border-white/[0.06] bg-black/20 shadow-lg">
                 <div className="aspect-video">
                     <iframe
@@ -139,7 +139,7 @@ export function Figure({
     const isExternal = src.startsWith("http")
 
     return (
-        <figure className="my-8">
+        <figure className="blog-figure my-10 md:-mx-12">
             <div className="overflow-hidden rounded-xl border border-white/[0.06] shadow-lg">
                 {isExternal ? (
                     // eslint-disable-next-line @next/next/no-img-element

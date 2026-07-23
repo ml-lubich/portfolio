@@ -10,7 +10,7 @@ const blogNavLinks = [
   { label: "All Posts", href: "/blog", category: "All" },
   { label: "AI Architecture", href: "/blog?category=AI+Architecture", category: "AI Architecture" },
   { label: "Engineering Culture", href: "/blog?category=Engineering+Culture", category: "Engineering Culture" },
-  { label: "Hot Takes", href: "/blog?category=Hot+Takes", category: "Hot Takes" },
+  { label: "Client Stories", href: "/blog?category=Client+Stories", category: "Client Stories" },
 ]
 
 export function BlogHeader() {

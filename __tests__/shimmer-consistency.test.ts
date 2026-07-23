@@ -16,7 +16,6 @@ function source(rel: string) {
 const SHIMMER_SECTIONS = [
   "components/sections/about.tsx",
   "components/sections/skills.tsx",
-  "components/sections/ai-expertise.tsx",
   "components/sections/consulting-clients.tsx",
 ]
 

@@ -2,7 +2,7 @@ import dynamic from "next/dynamic"
 import Link from "next/link"
 import { Navigation } from "@/components/nav"
 import { Hero } from "@/components/hero"
-import { ProfileIntro, LogoScroll, WorkMarquee } from "@/components/sections"
+import { ProfileIntro, LogoScroll } from "@/components/sections"
 import { LazySection } from "@/components/layout"
 
 /* ── Skeleton placeholder while chunks load ─────────────────────────── */
@@ -80,7 +80,6 @@ export default function Home() {
         <LazySection sectionId="testimonials" className={LAZY_SECTION_TOP}>
           <ClientTestimonials />
         </LazySection>
-        <WorkMarquee />
         <LazySection
           sectionId="projects"
           className={`mt-4 border-t border-white/[0.06] md:mt-8 lg:mt-10 ${LAZY_SECTION_TOP}`}

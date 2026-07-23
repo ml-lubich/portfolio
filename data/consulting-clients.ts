@@ -19,7 +19,7 @@ export interface ConsultingClient {
     coverImage?: string
     /** Brand/press impact highlights shown as chips on the card (the card links to `href`) */
     impact?: string[]
-    /** Short testimonial line shown as a blockquote on the card, if provided */
+    /** Short, approved client proof shown on the engagement card. */
     quote?: string
 }
 
@@ -52,7 +52,9 @@ export const consultingClients: ConsultingClient[] = [
         href: "https://www.w3sourcing.com/",
         coverImage: "/images/projects/w3sourcing-hero.png",
         summary:
-            "Public web experience for a principal-led executive search firm serving VC-backed technology, legal, and finance leadership markets across the US, UK, EU, UAE, and Asia.",
+            "Built the public site and a searchable layer over 965 live recruiting roles, with client identities masked to protect the firm's relationships and every response routed back to its principal.",
+        impact: ["965 roles indexed", "Client identities protected"],
+        quote: "Incredible work—can't believe you did that so fast.",
         tags: ["Web", "Recruiting", "Next.js"],
         gradient: g.primaryToCyan,
         accent: accentCycle[2],
@@ -68,6 +70,7 @@ export const consultingClients: ConsultingClient[] = [
             "Offsites for Anthropic, Google & J&J",
             "Featured in Forbes",
         ],
+        quote: "This looks so amazing. The collaboration was 1000× appreciated.",
         tags: ["Web", "Events", "Luxury"],
         gradient: g.primaryToRose,
         accent: accentCycle[3],

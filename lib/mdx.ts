@@ -163,6 +163,7 @@ export function getAllCategories(): string[] {
         "Engineering Culture",
         "MLOps",
         "AI Products",
+        "Client Stories",
         "Open Source",
         "Hot Takes",
     ]

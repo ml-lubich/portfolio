@@ -93,17 +93,14 @@ export function ProfileIntro() {
                                     style={{ background: profileOrbs.photoRing }}
                                     aria-hidden="true"
                                 />
-                                <div
-                                    className="h-72 w-52 overflow-hidden border border-white/[0.1] shadow-xl shadow-black/30 transition-shadow duration-500 group-hover:shadow-2xl group-hover:shadow-black/40 sm:h-96 sm:w-64"
-                                    style={{ borderRadius: "50% / 46%" }}
-                                >
+                                <div className="h-64 w-52 overflow-hidden rounded-2xl border border-white/[0.12] shadow-xl shadow-black/30 transition-shadow duration-500 group-hover:shadow-2xl group-hover:shadow-black/40 sm:h-80 sm:w-64">
                                     <Image
-                                        src="/profile.jpg"
+                                        src="/profile_blog.png"
                                         alt="Misha Lubich"
-                                        width={412}
-                                        height={628}
-                                        sizes="(max-width: 640px) 208px, 412px"
-                                        className="h-full w-full object-cover object-top brightness-[0.72] contrast-[0.95] saturate-[1.05] transition-all duration-500 group-hover:brightness-[0.78] group-hover:saturate-[1.1]"
+                                        width={512}
+                                        height={512}
+                                        sizes="(max-width: 640px) 208px, 256px"
+                                        className="h-full w-full object-cover object-center contrast-[1.02] transition-transform duration-500 group-hover:scale-[1.02]"
                                         priority={false}
                                     />
                                 </div>
@@ -112,20 +109,24 @@ export function ProfileIntro() {
                             {/* Open letter intro */}
                             <div className="text-center sm:text-left">
                                 <h2 className="section-title font-display text-2xl font-light tracking-tight text-foreground sm:text-3xl">
-                                    <AnimatedText text="Hello, I'm Misha" variant="blur-slide" stagger={70} duration={800} />
+                                    <AnimatedText text="Engineering judgment, hands-on delivery" variant="blur-slide" stagger={45} duration={800} />
                                 </h2>
 
                                 <div className="mx-auto mt-3 h-px w-12 bg-gradient-to-r from-transparent via-primary/40 to-transparent sm:mx-0 sm:w-16" />
 
                                 <p className="mt-5 text-base font-light leading-relaxed tracking-normal text-muted-foreground sm:text-lg">
                                     <AnimatedText variant="fade-up" delay={300} stagger={20} duration={600}>
-                                        I architect AI-driven, cloud-native applications that scale to millions of users&mdash;from
-                                        multi-agent orchestration and RAG pipelines to production systems shipping at{" "}
+                                        I work directly with founders and operators to turn ambiguous, high-pressure ideas into reliable software&mdash;from
+                                        AI workflows and ranking systems to public product experiences. I bring the same production discipline used at{" "}
                                         <span className="font-normal text-foreground/90">Apple</span> and{" "}
-                                        <span className="font-normal text-foreground/90">Walmart</span>.{" "}
-                                        {"If you're exploring the frontier of intelligent software, I'd love to connect."}
+                                        <span className="font-normal text-foreground/90">Walmart</span>, without the handoff layers of a large consultancy.
                                     </AnimatedText>
                                 </p>
+
+                                <blockquote className="mt-6 border-l-2 border-primary/35 pl-4 text-left text-sm leading-relaxed text-foreground/75">
+                                    “This is something to be proud of. The collaboration was 1000× appreciated.”
+                                    <footer className="mt-1 font-mono text-[10px] uppercase tracking-wider text-muted-foreground/60">Nikita Khandheria · ERIA</footer>
+                                </blockquote>
 
                                 <p className="mt-5 font-mono text-xs tracking-widest uppercase text-muted-foreground/50">
                                     <AnimatedText text="Berkeley CS · 6 published papers · 100 M+ users impacted" variant="fade-up" delay={600} stagger={30} duration={600} />

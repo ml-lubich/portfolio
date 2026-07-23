@@ -160,6 +160,38 @@
     "shipping-crm-enrichment-solo": {
       "views": "1k",
       "coverImage": "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&h=630&fit=crop"
+    },
+    "the-60-hour-workday-belongs-to-software": {
+      "views": "1k",
+      "coverImage": "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=1200&h=630&fit=crop"
+    },
+    "sandbox-is-the-new-api-boundary": {
+      "views": "1k",
+      "coverImage": "https://images.unsplash.com/photo-1516321165247-4aa89a48be28?w=1200&h=630&fit=crop"
+    },
+    "ai-code-review-bottleneck": {
+      "views": "1k",
+      "coverImage": "https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=1200&h=630&fit=crop"
+    },
+    "non-engineers-are-building-software-now": {
+      "views": "1k",
+      "coverImage": "https://images.unsplash.com/photo-1556761175-b413da4baf72?w=1200&h=630&fit=crop"
+    },
+    "agents-need-finops-before-scale": {
+      "views": "1k",
+      "coverImage": "https://images.unsplash.com/photo-1553877522-43269d4ea984?w=1200&h=630&fit=crop"
+    },
+    "kimi-k3-benchmarks-buyers-should-care-about": {
+      "views": "1k",
+      "coverImage": "https://kimi-file.moonshot.cn/prod-chat-kimi/kfs/4/2/2026-07-17/d9cs7176rtp4tqfofnsg?x-tos-process=image%2Fauto-orient%2C1%2Fstrip%2Fignore-error%2C1%2Fformat%2Cwebp%2Fresize%2Cw_1040"
+    },
+    "eria-client-story-design-engineering-alignment": {
+      "views": "1k",
+      "coverImage": "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=1200&h=630&fit=crop"
+    },
+    "w3sourcing-965-jobs-privacy-client-story": {
+      "views": "1k",
+      "coverImage": "https://images.unsplash.com/photo-1573497491208-6b1acb260507?w=1200&h=630&fit=crop"
     }
   }
 }

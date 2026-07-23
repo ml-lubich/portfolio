@@ -46,10 +46,10 @@ export function SectionHeader({
   className,
 }: SectionHeaderProps) {
   return (
-    <div className={cn("mb-5 text-center md:mb-12", className)}>
+    <div className={cn("mx-auto mb-6 max-w-4xl text-center md:mb-10", className)}>
       <span
         className={cn(
-          "font-mono text-xs uppercase tracking-widest text-primary",
+          "font-mono text-[10px] font-medium uppercase tracking-[0.2em] text-muted-foreground/70",
           icon ? "inline-flex items-center gap-2" : "inline-block",
         )}
       >
@@ -61,13 +61,13 @@ export function SectionHeader({
         <div className="mt-2 flex justify-center md:mt-2.5">{afterLabel}</div>
       )}
 
-      <h2 className="section-title mt-2 font-display text-3xl font-light text-foreground sm:text-4xl lg:text-5xl text-balance md:mt-4">
+      <h2 className="section-title mt-2 text-balance font-display text-2xl font-normal tracking-[-0.025em] text-foreground sm:text-3xl lg:text-4xl md:mt-3">
         <AnimatedText variant="blur-slide" delay={150} stagger={55} duration={750}>
           {title}
         </AnimatedText>
       </h2>
 
-      <p className="mx-auto mt-2 max-w-2xl text-sm text-muted-foreground sm:text-base md:mt-4">
+      <p className="mx-auto mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground/80 md:mt-3">
         <AnimatedText text={subtitle} variant="fade-up" delay={400} stagger={20} duration={600} />
       </p>
     </div>

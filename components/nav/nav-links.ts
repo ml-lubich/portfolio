@@ -13,14 +13,14 @@ export interface LiveTool {
 }
 
 export const navLinks: NavLink[] = [
-  { label: "About", href: "#about" },
-  { label: "Journey", href: "#journey" },
   { label: "Consulting", href: "#consulting" },
   { label: "Clients", href: "#testimonials" },
   { label: "Projects", href: "#projects" },
+  { label: "About", href: "#about" },
+  { label: "Journey", href: "#journey" },
   { label: "Skills", href: "#skills" },
-  { label: "Stats", href: "#github" },
   { label: "Research", href: "#research" },
+  { label: "Stats", href: "#github" },
   { label: "Blog", href: "/blog" },
   { label: "Contact", href: "#contact" },
 ]
@@ -41,6 +41,12 @@ export const liveTools: LiveTool[] = [
 ]
 
 export const liveGames: LiveTool[] = [
+  {
+    href: "/games",
+    label: "All Games",
+    description: "Browse every playable experiment in one place",
+    badge: "5 Live",
+  },
   {
     href: "/games/token-invaders",
     label: "Token Invaders",

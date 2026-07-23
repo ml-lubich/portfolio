@@ -1,0 +1,124 @@
+---
+title: "AI Can Write the PR. It Cannot Make You Care About Reviewing It."
+excerpt: "Code generation keeps getting faster while human attention stays stubbornly finite. The next engineering crisis is not a shortage of code. It is review debt."
+date: "2026-07-09"
+category: "Engineering Culture"
+tags: ["AI Coding", "Code Review", "Developer Productivity", "Quality", "Engineering Leadership"]
+---
+
+The pull request looked normal from a distance: green checks, tidy description, no obvious red flags.
+
+Then I opened the diff.
+
+It was 2,400 lines.
+
+That is the new shape of a very old problem. Software teams have always been able to produce more change than they can thoughtfully absorb. AI coding agents remove the last bit of friction that used to keep the imbalance visible.
+
+A person once had to spend a day writing the 2,400 lines. Now an agent can generate them while the reviewer is in a meeting. The code arrives faster. The obligation to understand it does not.
+
+<Figure src="https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=1200&h=630&fit=crop" alt="Engineers working in a busy open office" caption="Generation scales with compute. Review still scales with attention." />
+
+## We automated the supply side
+
+Most developer-tool benchmarks ask whether a model can solve an issue, pass tests, or complete a terminal task. Those are useful capability measures. They say almost nothing about what happens when a team adopts the tool aggressively.
+
+The organizational system has two sides:
+
+1. producing candidate changes
+2. building enough confidence to accept them
+
+AI made the first side dramatically cheaper. In June, OpenAI reported that developers were moving toward [longer-horizon, parallel Codex work](https://openai.com/index/how-agents-are-transforming-work/). Anthropic's 2026 agentic coding report similarly describes a shift toward humans orchestrating agents and automated review.
+
+But review is not one task that a stronger model simply deletes. It is a bundle of responsibilities: checking behavior, noticing architectural drift, protecting security boundaries, judging maintainability, and confirming that the change should exist at all.
+
+Some of that can be automated. Ownership cannot.
+
+## Green is not the same as understood
+
+The dangerous AI-generated PR is rarely nonsense. Nonsense is easy to reject.
+
+The dangerous one is locally plausible. Functions are named well. Tests pass. The implementation matches the ticket. Somewhere in the middle, it duplicates a capability that already exists, weakens an authorization check, mishandles a retry, or quietly changes an invariant the ticket never mentioned.
+
+Reviewers are especially vulnerable to plausible volume. Once a diff crosses the threshold where reading every line feels unrealistic, people switch strategies. They skim the shape, check the tests, and search for anything surprising.
+
+AI is very good at making changes look unsurprising.
+
+```mermaid
+{
+  "type": "pipeline",
+  "title": "How Review Debt Accumulates",
+  "steps": [
+    { "label": "Agent drafts quickly", "color": "blue" },
+    { "label": "Large diff arrives", "annotation": "looks coherent", "color": "purple" },
+    { "label": "Reviewer skims", "annotation": "attention ceiling", "color": "amber" },
+    { "label": "Green CI reassures", "annotation": "partial evidence", "color": "amber" },
+    { "label": "Unknown assumptions ship", "color": "red" }
+  ]
+}
+```
+
+This is not an argument that humans must hand-inspect every generated character. That would throw away the benefit. It is an argument that teams need a review strategy designed for abundant code.
+
+## Smaller is still the best review tool
+
+The highest-leverage rule is almost embarrassingly old: keep changes small.
+
+Ask an agent for one independently verifiable outcome, not an entire roadmap item. Separate the mechanical migration from the behavior change. Land tests that characterize the old system before asking for the refactor. Do not let a successful run expand its own scope because it noticed three adjacent improvements.
+
+Agents have no natural discomfort with large diffs. Humans do. The workflow should optimize for the person carrying the accountability.
+
+I would rather review four 300-line changes with crisp boundaries than one 1,200-line masterpiece. The line count is not the point; separability is. Can I understand why this exists, what invariant it changes, and how to reverse it without loading the entire project into my head?
+
+## Review the claim, not the prose
+
+Generated PR descriptions can be dangerously soothing. They summarize intention, not necessarily behavior.
+
+A stronger review artifact is a claim backed by evidence:
+
+- “All callers now pass an explicit tenant ID” plus a search result showing the callers
+- “Behavior is unchanged for valid inputs” plus characterization tests
+- “This query no longer performs an N+1 fetch” plus before-and-after traces
+- “No production permission changed” plus the policy diff
+
+The reviewer should not have to rediscover the proof from scratch. The agent did the work; make it bring receipts.
+
+<Callout type="tip" title="A useful acceptance test">
+If the change cannot explain its riskiest assumption and point to the evidence that supports it, it is not ready for human review.
+</Callout>
+
+## Let machines review machines—carefully
+
+Automated review will become normal because there is no other economical way to handle the volume. Linters, type systems, dependency scanners, policy checks, test generation, and a second model looking for failure modes can remove a large amount of low-value inspection.
+
+The mistake is treating an AI reviewer as an independent witness when it shares the same blind spots as the authoring agent.
+
+Use diversity deliberately. A deterministic policy check is better than a model's opinion for forbidden dependencies. A property test is better for parser invariants. A different model or prompt can be useful for adversarial review, but it is still probabilistic evidence. For risky changes, ask the reviewer to construct a failing scenario, not to rate the code's general quality.
+
+The goal is not an AI approval stamp. It is to compress the uncertainty a human must resolve.
+
+## Stop rewarding raw output
+
+Teams will get the behavior they celebrate. If leadership shares a dashboard of agent-written lines or merged PRs, people will optimize for visible production. The repository will fill up. Reviewers will quietly burn out. Deletion and restraint will look unproductive.
+
+Better measures are closer to outcomes:
+
+- lead time from accepted task to verified release
+- escaped defects and rollback frequency
+- time a PR waits for meaningful review
+- percentage of generated changes substantially rewritten
+- code removed versus code added
+- reviewer load across the team
+
+None is perfect. Together they discourage the fiction that more code automatically means more progress.
+
+## The scarce resource is belief
+
+Engineering organizations do not ship code because it exists. They ship because somebody has enough justified belief that it will improve the system without breaking something more important.
+
+AI makes candidate solutions abundant. That is genuinely valuable. It also means the difficult part moves downstream, toward verification and judgment.
+
+The teams that handle this well will not ban agent-written pull requests. They will make them smaller, evidence-rich, easy to reverse, and cheap to reject. They will protect reviewers from volume and refuse to confuse a green pipeline with understanding.
+
+Writing the PR is becoming the inexpensive part.
+
+Caring enough to review it is the work.

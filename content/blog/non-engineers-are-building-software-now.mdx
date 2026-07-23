@@ -1,0 +1,117 @@
+---
+title: "Your Next Internal Tool Will Be Built by Someone in Finance"
+excerpt: "Agentic tools are crossing the technical boundary faster than most companies are ready for. That is good news—if platform teams stop acting like gatekeepers and start building paved roads."
+date: "2026-07-05"
+category: "AI Products"
+tags: ["Knowledge Work", "Internal Tools", "Agents", "Future of Work", "Governance"]
+---
+
+The most important developer trend of 2026 may have very little to do with developers.
+
+OpenAI's recent usage analysis says adoption of Codex among non-developers has been growing faster than among developers. Inside the company, finance, legal, recruiting, and operations are using an agent that began as a coding tool for work that crosses traditional job boundaries.
+
+The headline is tempting: everyone is a programmer now.
+
+I think that is the wrong conclusion.
+
+Most people do not want to become programmers. They want the weekly reconciliation to stop taking Friday morning. They want a clean way to compare contracts, reshape a messy export, investigate a surprising number, or connect two systems that procurement bought three years apart.
+
+They want software-shaped outcomes without adopting software development as an identity.
+
+<Figure src="https://images.unsplash.com/photo-1556761175-b413da4baf72?w=1200&h=630&fit=crop" alt="Colleagues collaborating in a meeting room" caption="The people closest to operational pain can increasingly build the first version of the fix." />
+
+## The queue was always the product problem
+
+Every company has a shadow backlog of small tools that would save time but never become important enough for engineering.
+
+A CSV cleanup script. A report that joins billing data to account ownership. A dashboard for an audit question asked twice a year. A form that turns an email ritual into a structured approval.
+
+These are valuable locally and invisible globally. A central engineering team rationally prioritizes customer features and shared systems. The operations person keeps copying cells.
+
+Agents change the economics of that backlog. A domain expert can describe the workflow, provide examples, and iterate toward a working artifact without waiting for a formal project to clear planning.
+
+[OpenAI's June 2026 report](https://openai.com/index/how-agents-are-transforming-work/) found that over a quarter of Codex output for business-function workers fell into engineering or coding categories. The exact taxonomy is less interesting than the direction: technical execution is diffusing into roles where the context already lives.
+
+That is powerful because requirements transfer is expensive. The finance analyst knows why one region's revenue recognition is weird. The recruiter knows which exceptions make the candidate pipeline report lie. When those people can test an idea directly, less knowledge gets flattened into a ticket.
+
+## Shadow IT, but faster
+
+There is an obvious downside. Companies already struggle with spreadsheets that became production databases. Agent-built tools can create the same problem at much higher velocity.
+
+A script begins as a one-time cleanup. It works. A teammate asks to use it. Someone adds credentials. It becomes a scheduled job. Three months later, the author changes roles and nobody knows why a hard-coded exception exists.
+
+The agent did not create this lifecycle. It compressed it.
+
+```mermaid
+{
+  "type": "comparison",
+  "title": "Two Responses to Citizen-Built Software",
+  "left": {
+    "title": "Gatekeeping",
+    "color": "red",
+    "steps": ["Block tool access", "Work moves underground", "No visibility", "Spreadsheet becomes infrastructure"]
+  },
+  "right": {
+    "title": "Paved roads",
+    "color": "green",
+    "steps": ["Safe workspace", "Approved data connectors", "Ownership metadata", "Promote what becomes critical"]
+  }
+}
+```
+
+The worst response is pretending this work can be prohibited into nonexistence. If the pain is real and the tools are accessible, people will find a route. The organization then gets all the risk and none of the visibility.
+
+## Platform teams need a new customer
+
+Internal platform teams usually design for application engineers. Their next customer is the capable domain expert who can describe a workflow but should not have to understand IAM policy, secrets rotation, deployment topology, or data retention law.
+
+A paved road for that person might include:
+
+- a sandbox with approved libraries and strict network access
+- read-only connectors to common business systems
+- synthetic or masked data for development
+- a simple way to declare an owner and expected lifetime
+- automatic logs, budgets, and expiration
+- a promotion path when a prototype becomes operationally important
+
+That last item matters. Not every useful script deserves production engineering. Some tools are genuinely temporary. The platform should let them expire honestly instead of forcing every experiment into either “forbidden” or “mission critical.”
+
+<Callout type="info" title="A lifecycle beats a ban">
+Give small tools an owner, an expiry date, and a clear threshold for engineering review. Temporary software is fine. Accidental permanent software is the problem.
+</Callout>
+
+## Domain expertise becomes executable
+
+There is a deeper shift here. For years, companies treated domain knowledge and technical implementation as separate assets that had to meet through requirements documents, meetings, and tickets.
+
+Agentic tools make domain knowledge partially executable.
+
+An attorney can turn a review checklist into a repeatable document-analysis workflow. A finance partner can encode the reconciliation logic they normally perform by hand. A recruiter can build a structured research step around the actual signals their team values.
+
+This does not eliminate engineering. It changes where engineering creates leverage. Instead of personally building every small workflow, engineers can provide trustworthy primitives: identity, data access, observability, reusable connectors, review gates, and a route to production.
+
+The best platform work will feel less like controlling a factory and more like city planning. Build roads, mark dangerous zones, make utilities reliable, and inspect structures that become large enough to affect everyone.
+
+## Who owns the result?
+
+The cultural question is harder than the technical one.
+
+When a finance employee creates an agent workflow that produces a monthly forecast adjustment, is it software? Is it analysis? Who validates it when upstream data changes? Who answers during an audit?
+
+“The agent built it” is never an acceptable owner.
+
+Every artifact that affects a decision needs a named human owner, a visible data lineage, and a way to reproduce the result. Higher-impact workflows need separation of duties: the person who creates the automation should not be the only person who can approve its output.
+
+This is familiar governance applied earlier in the creation process. The novelty is that far more people can now create things worth governing.
+
+## The future is not no-code
+
+No-code promised a similar democratization, but it often replaced programming with a visual language that eventually became programming with boxes. Agents are different because natural language is not the final artifact. The agent can generate scripts, queries, tests, and interfaces using the same underlying technologies engineers already operate.
+
+That creates a better promotion path. A useful prototype does not have to be thrown away solely because it was born outside engineering. It can be reviewed, tested, moved into a repository, and given conventional ownership.
+
+The boundary between “user” and “builder” is getting porous. Companies can fight that and accumulate hidden automation, or embrace it and make safe creation a platform capability.
+
+Your next internal tool may be built by someone in finance.
+
+The important question is whether engineering gave them a safe place to put it.

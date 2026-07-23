@@ -1,0 +1,144 @@
+---
+title: "The Website Was Beautiful. Then We Had to Make 21 Events Agree."
+excerpt: "A client story about ERIA, a Sunday launch, a broken CMS workflow, and the small operational decision that turned hours of screenshot matching into a repeatable publishing system."
+date: "2026-07-16"
+category: "Client Stories"
+tags: ["Consulting", "ERIA", "Client Story", "Web Engineering", "Delivery"]
+---
+
+At 3:01 on a Sunday afternoon, I sent a message I had been waiting to send:
+
+> “Okay, I finally got it.”
+
+The answer came back almost immediately.
+
+> “This looks so amazing. Wow. It looks so good.”
+
+That was the satisfying part of the ERIA launch—the moment a demanding visual idea finally looked right in a real browser.
+
+The less cinematic part began about an hour later, when we still had venue photography to reorder, cover images to replace, a mailing-list error to investigate, and a portfolio of event pages that needed to match the founder’s exact editorial sequence.
+
+That second part is a better description of consulting.
+
+<Figure src="/images/projects/eria-hero.jpg" alt="ERIA Events website shown across desktop and mobile layouts" caption="ERIA’s public experience had to carry a luxury brand across venues, portfolios, menus, and inquiry paths." />
+
+## The work was not “build a website”
+
+[ERIA](https://www.eria.co/) is a fast-growing Bay Area events company with multiple venues and a visual standard closer to hospitality editorial than ordinary venue software.
+
+The website had to make a large amount of photography feel intentional. A kitchen image could not accidentally represent the Marina. A cover had to express the right space before a visitor read a word. The ordering of 21 event stories was part of the brand narrative, not database trivia.
+
+The engineering brief included the normal things—responsive pages, links, navigation, deployment—but the actual job was translation.
+
+Nikita controlled the design and visual sequence. I controlled implementation, performance, and the mechanics that made those decisions repeatable.
+
+When that boundary was clear, the work moved quickly.
+
+When it was not, both of us did unnecessary work.
+
+## The CMS had become an expensive screenshot
+
+The existing Sanity workflow was out of quota and unreliable for this stage of the project. Design choices were visible there, but I could not use it as a dependable source of truth.
+
+The replacement source material lived in Dropbox. The problem was not access to the photos; it was mapping them.
+
+A screenshot can show a designer which image belongs first. It cannot reliably tell an engineering workflow which file that image is.
+
+Initially, I was manually matching visual thumbnails to files across event folders. That is slow, but speed was not the main problem. It is error-prone. Two photographs of the same venue can look nearly identical at thumbnail size, and one wrong match changes the first impression of the page.
+
+The fix was almost embarrassingly small: label the intended image `cover` inside each event’s Dropbox folder.
+
+```mermaid
+{
+  "type": "comparison",
+  "title": "The Content Handoff",
+  "left": {
+    "title": "Before",
+    "color": "red",
+    "steps": ["Design screenshot", "Manual visual matching", "Ambiguous filenames", "Review every page again"]
+  },
+  "right": {
+    "title": "After",
+    "color": "green",
+    "steps": ["Cover file labeled", "Event folder is source", "Deterministic mapping", "Verify once in browser"]
+  }
+}
+```
+
+No new CMS. No migration project. No custom asset database.
+
+Just a convention both people could understand.
+
+## The uncomfortable conversation improved the product
+
+There was pressure. ERIA was growing quickly and wanted the site ready before people returned to work on Monday. I was balancing the engagement with a full-time engineering role. Design had already spent hours organizing the visual plan. Engineering could see a shorter implementation path that had not been communicated early enough.
+
+We disagreed about the handoff.
+
+The useful outcome was not that one side “won.” We made ownership explicit:
+
+- design chooses and labels the image
+- engineering makes that choice render correctly and reliably
+- Linear holds the complete implementation request
+- Dropbox holds the actual source asset
+- the live browser is where we verify the result together
+
+That process let us move from frustration back into delivery.
+
+<Callout type="tip" title="A good handoff is executable">
+The best design instruction is not merely clear to another person. It maps cleanly to the files, fields, and acceptance checks used to ship the work.
+</Callout>
+
+## Twenty-one covers, in the intended order
+
+Once the convention was in place, the remaining work became mechanical.
+
+I verified all 21 leading cards against Nikita’s sequence: Sausalito first floor, ground floor, Marina, Corte Madera, then the individual celebrations and launches. We changed the specific covers that did not express the right space, removed duplicated events, and moved weaker or more intimate work lower in the portfolio.
+
+The difference was not a new feature. It was editorial confidence.
+
+A prospective client could scan the grid and understand ERIA’s range without encountering accidental repetition or the wrong venue image. Design intent survived the trip through the data layer.
+
+That is an engineering outcome, even if the final artifact is visual.
+
+## The launch also exposed what was outside the page
+
+Soon after deployment, the mailing-list submission produced an error. The website looked finished, but one operational path depended on access I did not yet have in Vercel.
+
+This is why I am careful with the phrase “the site is done.”
+
+A page can be visually complete while the business system around it remains unfinished. Forms, email routing, analytics, deployment ownership, and third-party quotas are part of the product. A polished interface does not make those dependencies disappear.
+
+For consulting clients, I now bring those questions forward:
+
+- Who owns the production account?
+- Can the engineer inspect failed submissions?
+- Where do content assets live after launch?
+- Which vendor limits can stop publishing?
+- Who can reverse a bad deployment?
+
+These are not enterprise-process questions. Small teams need the answers more because there may be no platform department waiting behind the scenes.
+
+## What the client actually valued
+
+The best feedback was not about a framework or performance score.
+
+Nikita wrote that the result was “1000× appreciated,” called the collaboration great, and wanted to credit “the mind behind this” publicly.
+
+I value that because the project was not frictionless. The work earned trust by surviving friction.
+
+We found the misalignment, named the boundary between design and engineering, simplified the process, and still shipped the result.
+
+That is the consulting work I want more of: not pretending every input arrives perfectly, but building enough clarity that a fast-moving team can keep moving without sacrificing the quality that made the project worth doing.
+
+## The takeaway
+
+ERIA did not need a more sophisticated content stack.
+
+It needed a website that respected the design, an engineer willing to work through the final 10%, and a handoff process simple enough to use on the next event.
+
+The most valuable piece of architecture in the final stretch was one word in Dropbox:
+
+`cover`.
+
+Everything after that became easier to ship.

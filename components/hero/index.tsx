@@ -9,8 +9,6 @@ import { RoleRotator, HeroSubtitle, HERO_NAME_REVEAL } from "./role-rotator"
 import { HeroCTAs, SocialLinks } from "./hero-actions"
 import { heroOverlay } from "@/lib/theme"
 import { navigateTo } from "@/components/nav/woosh-scroll"
-import { RotatingStats } from "./rotating-stats"
-import { TokscaleHeroBadge } from "@/components/sections/tokscale-stats"
 
 const MOBILE_PERFORMANCE_QUERY = "(max-width: 767px), (pointer: coarse), (hover: none)"
 
@@ -73,14 +71,12 @@ export function Hero() {
       <BackgroundOrbs />
       {!mobilePerformanceMode && <ParticleCanvas className="z-[1]" />}
 
-      {/* 3D Brain — large hero underlay (pre–Jul 15 sizing). Sits behind glass
-          actions/stats; top fade keeps it out of the name and rotating role. */}
+      {/* Keep the full brain visible instead of using it as a cropped backdrop. */}
       <div
-        className="hero-brain-underlay pointer-events-none absolute inset-x-0 -bottom-[14%] top-[32%] z-[3] flex items-center justify-center sm:-bottom-[18%] sm:top-[28%]"
+        className="hero-brain-underlay pointer-events-none absolute inset-x-0 bottom-[11%] top-[49%] z-[3] flex items-center justify-center sm:bottom-[9%] sm:top-[46%]"
         aria-hidden="true"
       >
-        {/* Mobile keeps a large square viewport; larger screens fill the lower underlay. */}
-        <div className="aspect-square shrink-0 max-sm:size-[min(120vw,42rem)] sm:h-full sm:w-full">
+        <div className="h-full w-[min(92vw,920px)]">
           {showBrain && (
             <div className="h-full w-full">
               <Brain3D
@@ -108,8 +104,6 @@ export function Hero() {
         <HeroSubtitle />
         <HeroCTAs />
         <SocialLinks />
-        <TokscaleHeroBadge />
-        <RotatingStats />
       </div>
 
       {/* Scroll indicator — flex centering avoids transform clash with animate-fade-in-up-subtle (which overwrites translate-x) */}

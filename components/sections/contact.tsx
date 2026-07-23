@@ -48,9 +48,9 @@ export function Contact() {
 
       <div className="relative mx-auto max-w-4xl px-3 md:px-6">
         <SectionHeader
-          label="Let's Connect"
-          title={<>Ready to collaborate on{" "}<span className="gradient-text">innovative projects</span></>}
-          subtitle="Ready to collaborate on innovative projects and drive technical excellence"
+          label="Start a Conversation"
+          title={<>Bring me the <span className="gradient-text">difficult part</span></>}
+          subtitle="Tell me what is blocked, fragile, or still only an idea. I will help you define the shortest credible path to a working result."
         />
 
         <div className="grid gap-4 sm:grid-cols-2 md:gap-6">
@@ -85,9 +85,9 @@ export function Contact() {
           {/* Social + Calendar */}
           <AnimatedSection delay={200}>
             <div className="flex h-full flex-col gap-4 rounded-2xl border border-border bg-card p-6">
-              <h3 className="text-sm font-semibold text-foreground">Schedule a Meeting</h3>
+              <h3 className="text-sm font-semibold text-foreground">Book a focused consultation</h3>
               <p className="text-sm text-muted-foreground">
-                {"Book a time that works best for you - let's discuss your project or collaboration opportunities"}
+                {"Bring the product goal, technical constraint, or delivery problem. We will leave with concrete next steps."}
               </p>
 
               <div className="flex flex-1 flex-col justify-end gap-3">

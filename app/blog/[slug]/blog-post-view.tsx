@@ -22,7 +22,7 @@ export function BlogPostView({ post, relatedPosts, children }: BlogPostViewProps
 
   return (
     <>
-      <article className="relative mx-auto max-w-4xl overflow-x-hidden px-6 py-12" itemScope itemType="https://schema.org/BlogPosting">
+      <article className="relative mx-auto max-w-5xl overflow-x-hidden px-6 py-12" itemScope itemType="https://schema.org/BlogPosting">
         {/* Ambient gradient orbs */}
         <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
           <div className="absolute -top-[300px] right-0 h-[500px] w-[500px] rounded-full bg-primary/[0.03] blur-[120px]" />
@@ -32,7 +32,7 @@ export function BlogPostView({ post, relatedPosts, children }: BlogPostViewProps
         <div className="relative z-10">
           {/* Breadcrumb */}
           <nav
-            className="mb-8 flex items-center gap-2 text-sm text-muted-foreground"
+            className="mx-auto mb-8 flex max-w-3xl items-center gap-2 text-sm text-muted-foreground"
             aria-label="Breadcrumb"
           >
             <Link href="/blog" className="transition-colors hover:text-foreground">
@@ -43,7 +43,7 @@ export function BlogPostView({ post, relatedPosts, children }: BlogPostViewProps
           </nav>
 
           {/* Header */}
-          <header className="mb-10">
+          <header className="mx-auto mb-10 max-w-3xl">
             <div className="flex flex-wrap items-center gap-2 mb-4">
               <span className="inline-flex items-center rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-medium text-primary backdrop-blur-sm" itemProp="articleSection">
                 {post.category}
@@ -92,7 +92,7 @@ export function BlogPostView({ post, relatedPosts, children }: BlogPostViewProps
           </header>
 
           {/* Cover image */}
-          <div className="relative mb-12 overflow-hidden rounded-2xl border border-white/[0.06]">
+          <div className="relative mx-auto mb-14 max-w-4xl overflow-hidden rounded-lg border border-white/[0.08]">
             <Image
               src={post.coverImage}
               alt={post.title}
@@ -107,14 +107,14 @@ export function BlogPostView({ post, relatedPosts, children }: BlogPostViewProps
 
           {/* Content */}
           <div
-            className="blog-content"
+            className="blog-content mx-auto max-w-[700px]"
             itemProp="articleBody"
           >
             {children}
           </div>
 
           {/* Tags */}
-          <div className="mt-16 flex flex-wrap gap-2 border-t border-white/[0.06] pt-8">
+          <div className="mx-auto mt-16 flex max-w-[700px] flex-wrap gap-2 border-t border-white/[0.06] pt-8">
             {post.tags.map((tag) => (
               <Link
                 key={tag}
@@ -127,7 +127,7 @@ export function BlogPostView({ post, relatedPosts, children }: BlogPostViewProps
           </div>
 
           {/* Share & back */}
-          <div className="mt-8 flex items-center justify-between border-t border-white/[0.06] pt-8">
+          <div className="mx-auto mt-8 flex max-w-[700px] items-center justify-between border-t border-white/[0.06] pt-8">
             <Link
               href="/blog"
               className="group flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"

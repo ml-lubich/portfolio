@@ -8,34 +8,31 @@ export const statSets = [
     { value: "5+", label: "Years Experience" },
   ],
   [
-    { value: "1", label: "FAANG Company (Apple)" },
+    { value: "2", label: "Apple & Walmart" },
     { value: "15+", label: "ML Models Deployed" },
     { value: "99.5%", label: "System Uptime" },
     { value: "5x", label: "Cost Reduction" },
   ],
   [
-    { value: "10+", label: "AI Products Shipped" },
-    { value: "200K+", label: "Lines of Code" },
-    { value: "1", label: "UC Berkeley Degree" },
-    { value: "24/7", label: "Production AI Systems" },
+    { value: "4", label: "Active Client Brands" },
+    { value: "965", label: "Recruiting Roles Indexed" },
+    { value: "21", label: "Event Stories Rebuilt" },
+    { value: "320+", label: "Enrichment Fields Live" },
   ],
   [
-    { value: "4", label: "AI Frameworks Mastered" },
-    { value: "500+", label: "GitHub Contributions" },
-    { value: "8+", label: "Tech Talks Given" },
-    { value: "3", label: "Platforms Architected" },
+    { value: "5K+", label: "Students Reached" },
+    { value: "1.5K+", label: "Startup Users" },
+    { value: "25%", label: "Hiring Bias Reduced" },
+    { value: "8", label: "Engineers Led" },
   ],
 ]
 
 export const roles = [
+  "AI Engineering Consultant",
   "Senior Software Engineer",
-  "AI & Machine Learning Engineer",
-  "ML Systems Architect",
-  "Full-Stack Software Architect",
-  "Applied AI Research Engineer",
-  "Engineering Lead",
-  "Vibe Coder",
-  "Vibe Cleanup Specialist",
+  "Agent Systems Architect",
+  "Applied Machine Learning Engineer",
+  "Technical Product Partner",
 ]
 
 /** ms between stat set changes */

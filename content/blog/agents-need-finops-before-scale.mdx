@@ -1,0 +1,146 @@
+---
+title: "Your Agent Team Needs FinOps Before It Needs More Agents"
+excerpt: "Parallel agent work makes compute feel like labor and labor feel limitless. Without budgets tied to outcomes, teams can scale activity much faster than value."
+date: "2026-06-29"
+category: "MLOps"
+tags: ["FinOps", "Agents", "AI Costs", "Observability", "Unit Economics"]
+---
+
+There is something psychologically dangerous about an agent working in the background.
+
+You do not hear a fan spin up. You do not see a person staying late. You assign the task, close the tab, and come back to an artifact. The cost is delayed, bundled, and abstract.
+
+This makes agent labor feel free right up until the invoice develops a personality.
+
+The industry is moving quickly toward longer, parallel runs. New model releases emphasize stronger tool use, longer task horizons, and better efficiency. Platform research shows power users delegating many hours of estimated work each day. All of that expands what one person can attempt.
+
+It also expands how quickly one person can spend.
+
+<Figure src="https://images.unsplash.com/photo-1553877522-43269d4ea984?w=1200&h=630&fit=crop" alt="A team reviewing charts on a large screen" caption="Agent activity is easy to scale. Outcome economics require more discipline." />
+
+## Tokens are the beginning of the bill
+
+Teams often start cost control with input and output tokens. That is necessary and insufficient.
+
+An agent run may also pay for:
+
+- web search and third-party API calls
+- ephemeral compute and storage
+- repository checkout and dependency installation
+- retries after tool or model failures
+- multiple candidate approaches
+- evaluator or reviewer model calls
+- human review and rework
+
+The model invoice is only the most visible line item. A “cheap” run that creates forty minutes of confusing review work can cost more than an expensive run that produces a clean, verifiable answer.
+
+This is why per-token optimization eventually hits a wall. The useful denominator is not tokens. It is an accepted outcome.
+
+## Cost per accepted outcome
+
+Suppose two agents attempt the same migration.
+
+Agent A costs $1.20, finishes quickly, and produces a patch that a senior engineer spends an hour repairing. Agent B costs $8.00, runs tests, documents its assumptions, and produces a patch accepted after ten minutes of review.
+
+Which one is cheaper?
+
+The answer depends on your labor cost and the value of time, but it is almost certainly not obvious from the API dashboard.
+
+```mermaid
+{
+  "type": "pipeline",
+  "title": "The Real Cost of an Agent Outcome",
+  "steps": [
+    { "label": "Inference", "annotation": "tokens + reasoning", "color": "blue" },
+    { "label": "Tools", "annotation": "search + APIs + compute", "color": "purple" },
+    { "label": "Retries", "annotation": "failure amplification", "color": "amber" },
+    { "label": "Human review", "annotation": "scarce attention", "color": "cyan" },
+    { "label": "Accepted result", "annotation": "the denominator", "color": "green" }
+  ]
+}
+```
+
+A practical cost metric needs to follow the work far enough to know whether the result was accepted, revised, abandoned, or caused a rollback. Anything earlier rewards activity.
+
+## Parallelism hides waste beautifully
+
+Parallel agents can reduce wall-clock time, especially when tasks are independent. They can also duplicate exploration and generate more output than anyone can evaluate.
+
+If five agents investigate the same issue, the team did not necessarily save five times the time. It purchased five search paths. That can be a good trade for a high-value decision. It is a bad default for routine work.
+
+Set the parallelism level according to the value of reducing uncertainty:
+
+- **one agent** for well-specified, reversible work
+- **two approaches** when implementation tradeoffs matter
+- **several independent attempts** for high-value research or difficult diagnosis
+- **a hard stop** when nobody has capacity to compare the outputs
+
+The last point is the one most teams miss. Compute can fan out instantly. Review cannot.
+
+## Budgets belong in the run, not the spreadsheet
+
+A monthly finance alert arrives too late to influence an individual agent's behavior. Budgets should exist at runtime.
+
+Give each job limits for:
+
+- total spend
+- wall-clock duration
+- model calls
+- tool calls
+- retries per failure class
+- concurrent sandboxes
+- maximum artifact size
+
+When a run reaches a limit, it should return its current state and ask for a decision. Silent budget expansion is just an infinite loop wearing a blazer.
+
+<Callout type="warning" title="Retries multiply bills">
+Cap retries by error type. Retrying a transient timeout may help; retrying an authorization failure ten times only converts a configuration bug into spend.
+</Callout>
+
+## Route by uncertainty, not prestige
+
+Frontier models are valuable when the task requires them. Using one for every step is like hiring your most senior engineer to rename files because they type accurately.
+
+A good agent system routes work at several levels:
+
+1. deterministic code handles validation, parsing, and policy checks
+2. smaller models handle classification and routine transformations
+3. stronger models handle ambiguous planning and difficult synthesis
+4. escalation happens when evidence shows the cheaper path is failing
+
+The release of more efficient coding models makes this easier, but model selection alone will not fix bad orchestration. An agent that repeatedly reloads the same context, calls tools without narrowing the search, or produces artifacts nobody uses remains wasteful at any token price.
+
+## Cache facts, not judgment
+
+Caching can lower cost, but it needs a freshness model. Stable artifacts—repository maps, schema descriptions, policy documents identified by version—are good candidates. Decisions based on changing data are not.
+
+The useful pattern is to cache evidence with provenance and expiration, then let the agent reason over it again. Caching a final judgment risks preserving an answer after the world that supported it has changed.
+
+This is especially important for long-running jobs. A task that resumes tomorrow should know which observations remain valid and which tools must be called again.
+
+## Put cost next to quality
+
+Cost dashboards become harmful when they are separated from quality. Teams celebrate a 40% reduction in spend without noticing that acceptance fell and human rework increased.
+
+The smallest useful operating view puts these together:
+
+- cost per run
+- cost per accepted outcome
+- acceptance and substantial-rewrite rate
+- human review time
+- retry and tool-failure rate
+- spend by workflow, team, and risk class
+
+Once those numbers share a screen, sensible tradeoffs become possible. You may discover that a more expensive model reduces total cost for complex migrations, while a small model is perfect for triage. You may find that one workflow should be deleted because humans reject most of its output.
+
+Deletion is an underrated FinOps strategy.
+
+## Scale the result, not the motion
+
+Agent systems make it possible to buy a startling amount of attempted work. That is not the same as buying progress.
+
+The teams with durable economics will attach budgets to jobs, cap failure amplification, route by difficulty, and measure the full path to an accepted result. They will treat human attention as a cost because it is the one resource a model provider cannot discount next quarter.
+
+Before you add more agents, make one agent's economics legible.
+
+Otherwise you are not scaling a workforce. You are scaling a mystery.

@@ -26,6 +26,7 @@ export const BLOG_CATEGORIES = [
   "Engineering Culture",
   "MLOps",
   "AI Products",
+  "Client Stories",
   "Open Source",
   "Hot Takes",
 ] as const

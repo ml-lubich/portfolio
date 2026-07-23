@@ -1,0 +1,119 @@
+---
+title: "The 60-Hour Workday Is Here. It Belongs to Software."
+excerpt: "Parallel agents can now compress days of delegated work into one person's afternoon. That sounds like a productivity miracle until you ask who scopes, reviews, and owns all of it."
+date: "2026-07-15"
+category: "Engineering Culture"
+tags: ["Agents", "Future of Work", "Productivity", "Engineering Leadership", "Codex"]
+---
+
+There is a statistic in OpenAI's latest research that I have not been able to shake: at the extreme end of usage, people are generating more than **60 hours of agent work in a day**.
+
+Not 60 hours of sitting at a keyboard. Sixty hours of tasks running across several agents while one human moves between them.
+
+The obvious reaction is to call this a productivity breakthrough. It is. But that description is incomplete in the same way that calling cloud computing “a way to buy servers faster” was incomplete. The important change is not raw speed. It is that the unit of work has changed.
+
+We spent the chatbot era asking for answers. The agent era is about commissioning work.
+
+<Figure src="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=1200&h=630&fit=crop" alt="A team working together around laptops" caption="When execution becomes parallel, judgment becomes the scarce resource." />
+
+## The number is directional. The shift is not.
+
+[OpenAI's June 2026 analysis of Codex usage](https://openai.com/index/how-agents-are-transforming-work/) says that more than 70% of sampled individual users had assigned at least one task estimated to require over an hour of human work. A quarter assigned something estimated above eight hours. The company is careful to say those human-time estimates come from a model and should be treated as directional.
+
+That caveat matters. “Sixty hours” is not a time sheet. An agent can spend twenty minutes wandering through a repository and call it work. Tokens are not labor, and runtime is not value.
+
+Still, the behavioral change is unmistakable. People are no longer only using AI to finish the sentence in front of them. They are starting jobs, walking away, checking another job, correcting a third, and returning later to inspect the result.
+
+That is less like autocomplete and more like running a tiny organization.
+
+## Productivity moves to the edges
+
+Imagine an engineer with four agents running at once:
+
+- one traces a production bug
+- one updates a dependency and repairs the tests
+- one writes a migration plan
+- one audits a feature for accessibility problems
+
+The engineer is not writing four times faster. They are doing a different job. Their time moves away from producing the first draft and toward defining the work, supplying context, resolving ambiguity, and deciding whether the result is acceptable.
+
+This is where the “AI makes everyone 10x” conversation usually becomes unserious. Output can scale quickly. Good judgment does not.
+
+```mermaid
+{
+  "type": "comparison",
+  "title": "Where the Work Moves",
+  "left": {
+    "title": "One task at a time",
+    "color": "blue",
+    "steps": ["Understand", "Implement", "Test", "Ship"]
+  },
+  "right": {
+    "title": "Parallel agent work",
+    "color": "purple",
+    "steps": ["Specify four jobs", "Unblock two", "Review four outputs", "Own every result"]
+  }
+}
+```
+
+The bottleneck migrates to the edges of execution. At the front: can you state the goal and constraints precisely enough that independent work is useful? At the back: can you verify several plausible-looking outputs without becoming the human equivalent of a rubber stamp?
+
+The middle gets cheap. The edges get expensive.
+
+## The hidden queue behind every agent
+
+Parallel work feels free because computers do not stand beside your desk asking questions. The queue is still there; it is simply quieter.
+
+Every agent run creates potential review work. Some runs also create decisions, follow-up tasks, merge conflicts, new assumptions, and operational risk. Launch enough work at once and you can create a personal management crisis by lunch.
+
+This is why I do not believe the best agent users will be the people who keep the most sessions open. They will be the people who close loops.
+
+A useful run ends in one of four states:
+
+1. accepted and integrated
+2. rejected with a reason
+3. revised against specific feedback
+4. intentionally abandoned
+
+“I have twelve agents working” is not a state. It is inventory.
+
+Manufacturing learned a long time ago that work in progress can hide dysfunction. Software is about to relearn that lesson with prettier terminal windows.
+
+## This changes management before it changes headcount
+
+The near-term organizational effect is not as simple as “one engineer replaces ten.” It is that individual contributors inherit pieces of management.
+
+They delegate. They allocate compute. They decide which work can run unsupervised. They set acceptance criteria. They intervene when a task drifts. They reconcile competing outputs. None of this requires a direct report, but all of it requires management judgment.
+
+Managers change too. Counting tickets or pull requests becomes even less useful when the cost of producing a draft approaches zero. A team can look extraordinarily busy while filling the repository with review debt.
+
+The questions that matter become more outcome-oriented:
+
+- Did cycle time improve without increasing escaped defects?
+- Did the agent remove toil or merely relocate it to review?
+- Are people taking on more valuable work, or just supervising more work?
+- Can the team explain why a change exists and who owns it?
+
+<Callout type="warning" title="Agent hours are not human hours">
+Runtime is an input metric. Treating it as productivity rewards long, expensive runs whether or not they create anything worth keeping.
+</Callout>
+
+## A sane operating rhythm
+
+I think the practical answer looks less like a swarm and more like a good production board.
+
+Keep the number of meaningful concurrent jobs small. Write down the expected artifact before starting. Give every run a risk class. Reserve uninterrupted review time. Prefer small outputs that can be accepted independently. Kill work that is drifting instead of rescuing it forever because the sunk tokens feel expensive.
+
+Most importantly, separate *delegation capacity* from *review capacity*. If you can start ten tasks but only seriously review three, your real capacity is three.
+
+This sounds conservative only because the software industry is in the exciting part of the adoption curve, when launching work feels more impressive than finishing it. The novelty will wear off. The queue will remain.
+
+## The actual opportunity
+
+I am optimistic about this shift. A person who can explore several paths in parallel, test a risky migration before touching the real system, and hand off mechanical work should be able to spend more time on the parts of engineering that require taste and responsibility.
+
+But the value does not come from squeezing 60 metaphorical hours into a calendar day. It comes from choosing 60 hours of work that deserved to happen, then having the discipline to throw away the output that did not earn its way into the product.
+
+The agent era will produce an absurd amount of software. Volume is no longer the flex.
+
+Knowing what should survive is.

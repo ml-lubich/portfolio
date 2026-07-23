@@ -1,0 +1,114 @@
+---
+title: "The Sandbox Is the New API Boundary"
+excerpt: "Once agents can run code, inspect files, and act across systems, permission prompts are not a security model. The execution environment becomes part of the product."
+date: "2026-07-12"
+category: "AI Architecture"
+tags: ["Agent Security", "Sandboxes", "Architecture", "Tool Use", "Containment"]
+---
+
+For most of the SaaS era, the API was the line engineers obsessed over. What comes in? What can go out? Which token can call which endpoint? Where does rate limiting live?
+
+Agents make that line fuzzy.
+
+An agent can read a document, write a script, execute it, inspect the result, open another tool, and change its plan. The danger is not any single request. It is the composition. Five individually reasonable actions can add up to something nobody intended.
+
+That is why the most important agent infrastructure trend in 2026 is not a smarter prompt or a larger context window. It is containment.
+
+<Figure src="https://images.unsplash.com/photo-1516321165247-4aa89a48be28?w=1200&h=630&fit=crop" alt="Rows of servers in a secured data center" caption="An agent's environment is now a security boundary, not implementation detail." />
+
+## “Ask before running” does not scale
+
+The first generation of coding agents borrowed a familiar desktop pattern: when the model wants to do something risky, show the user a permission dialog.
+
+That is sensible for a few actions. It breaks down over a long run.
+
+After the tenth request to execute a test command, the human is not evaluating risk. They are clearing a modal. The interface technically preserves consent while functionally training the user to stop reading.
+
+The answer cannot simply be “fewer prompts,” because removing friction without changing the environment increases the blast radius. The better move is to make common actions safe enough that they do not need ceremony, and make dangerous actions structurally difficult.
+
+Anthropic's recent write-up on [containing Claude across its products](https://www.anthropic.com/engineering/how-we-contain-claude) frames the problem around blast radius: capabilities, user expertise, and the reversibility of an action should determine the containment strategy. OpenAI's [updated Agents SDK architecture](https://openai.com/index/the-next-evolution-of-the-agents-sdk/) makes a similar bet by separating the agent harness from sandboxed compute and externalizing state.
+
+Two competitors, same architectural conclusion: the environment has to carry more of the safety burden.
+
+## Separate the brain, hands, and memory
+
+The cleanest mental model I have found has three parts:
+
+- **brain:** the model and the loop deciding what to do next
+- **hands:** sandboxes and tools that perform actions
+- **memory:** the durable event log and state needed to resume or audit work
+
+Anthropic describes a version of this split in its [Managed Agents architecture](https://www.anthropic.com/engineering/managed-agents). It is useful because each part fails differently.
+
+The model can reason badly. A tool can be over-permissioned. A container can disappear. A session log can omit the one event an incident reviewer needs. Packing all of that into one long-lived process makes failures harder to isolate and recovery harder to trust.
+
+```mermaid
+{
+  "type": "pipeline",
+  "title": "A Contained Agent Run",
+  "steps": [
+    { "label": "Durable session", "annotation": "intent + event log", "color": "blue" },
+    { "label": "Agent harness", "annotation": "plans and routes", "color": "purple" },
+    { "label": "Policy gate", "annotation": "identity + capability", "color": "amber" },
+    { "label": "Ephemeral sandbox", "annotation": "isolated execution", "color": "cyan" },
+    { "label": "Reviewed artifact", "annotation": "promoted deliberately", "color": "green" }
+  ]
+}
+```
+
+The agent should be able to lose a hand without losing its mind. A sandbox can time out, be destroyed, or be replaced by a different execution target. The work continues from durable state, not from whatever happened to survive inside a container.
+
+## Credentials are radioactive context
+
+The easiest agent system to build is also one of the most dangerous: put the model, repository, network access, and cloud credentials in the same environment, then tell it to be careful.
+
+Do not do this.
+
+Model-generated code is untrusted code even when the model is helpful. Retrieved text is untrusted input even when it came from an internal wiki. A tool response can contain an instruction the developer never wrote. If credentials are available to the execution environment, an indirect prompt injection has something valuable to steal.
+
+A safer design issues narrow, short-lived capabilities at the moment of use. The sandbox does not inherit the operator's entire identity. Network egress is denied by default or restricted to an allowlist. Secrets are brokered by a layer the model cannot inspect. High-impact writes require a separate approval path and produce an append-only audit event.
+
+<Callout type="danger" title="The prompt is not the policy">
+“Never reveal secrets” is a useful instruction. It is not a substitute for keeping secrets out of the environment that runs model-generated code.
+</Callout>
+
+## Reversibility is an architecture feature
+
+Teams often describe human approval as the universal answer to agent risk. It helps, but approval quality depends on what the human can understand.
+
+Approving “run tests” is easy. Approving a generated shell command with nested substitutions, network calls, and filesystem mutations is not. The more expertise required to evaluate an action, the less confidence you should place in a hurried click.
+
+Reversibility gives you another lever:
+
+- write to a branch, not the default branch
+- draft the email, do not send it
+- stage the database change, do not commit it
+- create a proposed CRM update with a diff
+- generate an infrastructure plan before apply
+
+This is not just a UX preference. It changes the worst-case outcome. A flawed draft costs review time. A flawed irreversible action costs an incident.
+
+## What production readiness looks like
+
+A production agent sandbox does not need to be a grand internal platform. It needs a few boring properties that are easy to test:
+
+1. **Isolation:** one run cannot inspect another run's files or processes.
+2. **Least privilege:** tools and credentials are scoped to the actual task.
+3. **Controlled egress:** outbound access is explicit and observable.
+4. **Durable state:** losing compute does not erase the audit trail.
+5. **Resource limits:** time, memory, storage, and spend have hard ceilings.
+6. **Artifact promotion:** outputs cross into trusted systems through a deliberate gate.
+
+If any one of those exists only as a sentence in the system prompt, it does not exist.
+
+## The boundary moved
+
+APIs still matter. Authentication still matters. The difference is that an agent can dynamically combine capabilities inside an environment that behaves more like a junior operator's laptop than a traditional stateless service.
+
+The execution environment is where model reasoning becomes consequence. That makes the sandbox part of the user experience, part of reliability, and part of the security model.
+
+The best agent products will make containment almost invisible. Safe actions will feel fast. Risky actions will arrive with a legible diff. Failures will be recoverable. Operators will not need to understand containers to benefit from isolation.
+
+We spent a decade treating the API gateway as the front door. Agents added a workshop behind it.
+
+Now we have to secure the tools.
