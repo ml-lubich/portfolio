@@ -30,13 +30,13 @@ export type BrainOrbViewportTier = {
  */
 export function getBrainMeshViewportScale(viewportWidth: number): number {
   const w = viewportWidth
-  if (w < 480) return 0.42
-  if (w < 640) return 0.46
-  if (w < 1024) return 0.48
-  return 0.54
+  if (w < 480) return 0.52
+  if (w < 640) return 0.56
+  if (w < 1024) return 0.6
+  return 0.68
 }
 
-const DESKTOP_MESH_SCALE = 0.54
+const DESKTOP_MESH_SCALE = 0.68
 
 export function getBrainOrbViewportTier(viewportWidth: number): BrainOrbViewportTier {
   const w = viewportWidth

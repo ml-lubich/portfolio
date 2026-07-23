@@ -6,7 +6,7 @@ import { ArrowDown } from "lucide-react"
 import { BackgroundOrbs } from "@/components/background-orbs"
 import { ParticleCanvas } from "./particle-canvas"
 import { RoleRotator, HeroSubtitle, HERO_NAME_REVEAL } from "./role-rotator"
-import { HeroCTAs, SocialLinks } from "./hero-actions"
+import { HeroCTAs, HeroProof, SocialLinks } from "./hero-actions"
 import { heroOverlay } from "@/lib/theme"
 import { navigateTo } from "@/components/nav/woosh-scroll"
 import { RotatingStats } from "./rotating-stats"
@@ -73,14 +73,14 @@ export function Hero() {
       <BackgroundOrbs />
       {!mobilePerformanceMode && <ParticleCanvas className="z-[1]" />}
 
-      {/* 3D Brain — lower hero underlay. It sits behind the glass actions/stats,
-          while the top fade keeps it out of the name and rotating role. */}
+      {/* 3D Brain — large hero underlay (pre–Jul 15 sizing). Sits behind glass
+          actions/stats; top fade keeps it out of the name and rotating role. */}
       <div
-        className="hero-brain-underlay pointer-events-none absolute inset-x-0 bottom-[10%] top-[18%] z-[3] flex items-center justify-center sm:bottom-[8%] sm:top-[16%]"
+        className="hero-brain-underlay pointer-events-none absolute inset-x-0 -bottom-[14%] top-[32%] z-[3] flex items-center justify-center sm:-bottom-[18%] sm:top-[28%]"
         aria-hidden="true"
       >
         {/* Mobile keeps a large square viewport; larger screens fill the lower underlay. */}
-        <div className="aspect-square shrink-0 max-sm:size-[min(108vw,38rem)] sm:h-full sm:w-full">
+        <div className="aspect-square shrink-0 max-sm:size-[min(120vw,42rem)] sm:h-full sm:w-full">
           {showBrain && (
             <div className="h-full w-full">
               <Brain3D
@@ -107,6 +107,7 @@ export function Hero() {
         <RoleRotator />
         <HeroSubtitle />
         <HeroCTAs />
+        <HeroProof />
         <SocialLinks />
         <TokscaleHeroBadge />
         <RotatingStats />
