@@ -65,29 +65,11 @@ export function Hero() {
   return (
     <section
       id="hero"
-      className="relative flex min-h-[90svh] flex-col items-center justify-center overflow-hidden pb-16 max-sm:pt-[8.75rem] sm:pt-16 md:min-h-screen md:pb-24 md:pt-24"
+      className="relative min-h-[min(100svh,960px)] overflow-hidden"
     >
       {/* Spectrum lives only in this section (not fixed to viewport) — avoids mobile scroll seam / mask repaint */}
       <BackgroundOrbs />
       {!mobilePerformanceMode && <ParticleCanvas className="z-[1]" />}
-
-      {/* Keep the full brain visible instead of using it as a cropped backdrop. */}
-      <div
-        className="hero-brain-underlay pointer-events-none absolute inset-x-0 bottom-[11%] top-[49%] z-[3] flex items-center justify-center sm:bottom-[9%] sm:top-[46%]"
-        aria-hidden="true"
-      >
-        <div className="h-full w-[min(92vw,920px)]">
-          {showBrain && (
-            <div className="h-full w-full">
-              <Brain3D
-                className="h-full w-full pointer-events-auto"
-                revealGate={brainRevealGate}
-                fadeDurationMs={BRAIN_FADE_MS}
-              />
-            </div>
-          )}
-        </div>
-      </div>
 
       {/* Vignette */}
       <div
@@ -98,12 +80,24 @@ export function Hero() {
         }}
       />
 
-      {/* Content */}
-      <div className="relative z-10 mx-auto w-full max-w-6xl px-3 text-center pointer-events-none md:px-6">
-        <RoleRotator />
-        <HeroSubtitle />
-        <HeroCTAs />
-        <SocialLinks />
+      {/* Copy and visual stay in separate columns—no overlap or viewport-height drift. */}
+      <div className="relative z-10 mx-auto grid w-full max-w-7xl items-center gap-4 px-4 pb-24 pt-28 sm:px-6 sm:pt-40 lg:grid-cols-[1.2fr_0.8fr] lg:gap-10 lg:pt-44">
+        <div className="hero-copy pointer-events-none text-center lg:text-left">
+          <RoleRotator />
+          <HeroSubtitle />
+          <HeroCTAs />
+          <SocialLinks />
+        </div>
+
+        <div className="hero-brain-underlay pointer-events-none h-[220px] sm:h-[360px] lg:h-[500px]" aria-hidden="true">
+          {showBrain && (
+            <Brain3D
+              className="h-full w-full pointer-events-auto"
+              revealGate={brainRevealGate}
+              fadeDurationMs={BRAIN_FADE_MS}
+            />
+          )}
+        </div>
       </div>
 
       {/* Scroll indicator — flex centering avoids transform clash with animate-fade-in-up-subtle (which overwrites translate-x) */}

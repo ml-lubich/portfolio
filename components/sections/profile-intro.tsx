@@ -38,7 +38,7 @@ export function ProfileIntro() {
     }, [])
 
     return (
-        <section id="profile" className="relative py-10 sm:py-24 overflow-hidden">
+        <section id="profile" className="relative overflow-hidden py-8 sm:py-14">
             <div className="mx-auto max-w-3xl px-3 md:px-6">
                 <AnimatedSection>
                     {/* Floating liquid-glass card with 3D tilt */}

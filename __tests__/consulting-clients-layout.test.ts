@@ -73,3 +73,17 @@ describe("ConsultingClients impact data", () => {
     expect(eria!.href).toContain("eria.co")
   })
 })
+
+describe("ClientTestimonials continuous proof rail", () => {
+  const src = fs.readFileSync(
+    path.join(ROOT, "components/sections/client-testimonials.tsx"),
+    "utf8",
+  )
+
+  it("uses the shared continuous marquee with a pause control and hidden duplicate", () => {
+    expect(src).toContain("client-carousel")
+    expect(src).toContain("client-carousel-track")
+    expect(src).toMatch(/data-paused=\{paused/)
+    expect(src).toMatch(/aria-hidden="true"[\s\S]{0,80}inert/)
+  })
+})

@@ -89,6 +89,9 @@ export default function Home() {
         <LazySection sectionId="ai-expertise" className={LAZY_SECTION_TOP}>
           <AIExpertise />
         </LazySection>
+        <LazySection>
+          <LiveTerminal />
+        </LazySection>
         <LazySection sectionId="about" className={LAZY_SECTION_TOP}>
           <About />
         </LazySection>
@@ -106,9 +109,6 @@ export default function Home() {
         </LazySection>
         <LazySection sectionId="github" className={LAZY_SECTION_TOP}>
           <GitHubStats />
-        </LazySection>
-        <LazySection>
-          <LiveTerminal />
         </LazySection>
         <LazySection
           sectionId="contact"

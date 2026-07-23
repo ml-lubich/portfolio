@@ -9,7 +9,7 @@ import { SocialIcons } from "@/components/social-icons"
 export function HeroCTAs() {
   return (
     <div
-      className="mt-10 flex animate-fade-in-up flex-wrap items-center justify-center gap-3 sm:gap-4 pointer-events-auto"
+      className="hero-ctas mt-7 flex animate-fade-in-up flex-wrap items-center justify-center gap-3 pointer-events-auto sm:mt-10 lg:justify-start"
       style={{ animationDelay: "0.35s", opacity: 0 }}
     >
       <button
@@ -63,7 +63,7 @@ export function HeroProof() {
 export function SocialLinks() {
   return (
     <div
-      className="mt-6 flex animate-fade-in-up items-center justify-center gap-3 pointer-events-auto"
+      className="hero-socials mt-4 flex animate-fade-in-up items-center justify-center gap-3 pointer-events-auto sm:mt-6 lg:justify-start"
       style={{ animationDelay: "0.5s", opacity: 0 }}
     >
       <SocialIcons size="md" />

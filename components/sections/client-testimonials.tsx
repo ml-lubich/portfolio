@@ -1,18 +1,10 @@
 "use client"
 
-import { useCallback, useEffect, useId, useState } from "react"
+import { useId, useState } from "react"
 import Image from "next/image"
-import { Quote, Star } from "lucide-react"
+import { Pause, Play, Quote, Star } from "lucide-react"
 import { AnimatedSection } from "../animations/animated-section"
 import { SectionHeader } from "../layout/section-header"
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-  type CarouselApi,
-} from "@/components/ui/carousel"
 import { clientTestimonials } from "@/data/client-testimonials"
 import { cn } from "@/lib/utils"
 
@@ -156,152 +148,88 @@ function Avatar({
   )
 }
 
-const AUTOPLAY_MS = 5200
-
 export function ClientTestimonials() {
-  const [api, setApi] = useState<CarouselApi>()
-  const [selected, setSelected] = useState(0)
   const [paused, setPaused] = useState(false)
 
-  const onSelect = useCallback((embla: CarouselApi | undefined) => {
-    if (embla == null) return
-    setSelected(embla.selectedScrollSnap())
-  }, [])
-
-  useEffect(() => {
-    if (api == null) return
-    onSelect(api)
-    api.on("reInit", onSelect)
-    api.on("select", onSelect)
-    return () => {
-      api.off("select", onSelect)
-      api.off("reInit", onSelect)
-    }
-  }, [api, onSelect])
-
-  useEffect(() => {
-    if (api == null || paused) return
-    const id = window.setInterval(() => {
-      api.scrollNext()
-    }, AUTOPLAY_MS)
-    return () => window.clearInterval(id)
-  }, [api, paused])
+  const cards = clientTestimonials.map((t) => (
+    <li key={t.id} className="flex w-[320px] shrink-0 sm:w-[420px] lg:w-[460px]">
+      <figure className="flex h-full min-h-[310px] w-full flex-col rounded-2xl bg-white/[0.035] p-5 ring-1 ring-inset ring-white/[0.07] transition-colors hover:bg-white/[0.05] sm:min-h-[330px] sm:p-7">
+        <div className="mb-5 flex items-start justify-between gap-4">
+          <Avatar
+            name={t.name}
+            avatarSrc={t.avatarSrc}
+            avatarAlt={t.avatarAlt}
+            siteImageSrc={t.siteImageSrc}
+            siteImageAlt={t.siteImageAlt}
+          />
+          <StarRating rating={t.rating} />
+        </div>
+        <blockquote className="line-clamp-[8] flex-1 text-sm leading-7 text-muted-foreground/90">
+          <span className="text-foreground/35">“</span>
+          {t.quote}
+          <span className="text-foreground/35">”</span>
+        </blockquote>
+        <figcaption className="mt-6 border-t border-white/[0.06] pt-4">
+          <cite className="not-italic">
+            <span className="block font-medium tracking-tight text-foreground">{t.name}</span>
+            <span className="mt-1 block text-xs text-muted-foreground/65">
+              {t.title} · {t.organization}
+            </span>
+          </cite>
+        </figcaption>
+      </figure>
+    </li>
+  ))
 
   return (
     <AnimatedSection
       id="testimonials"
-      className="relative scroll-mt-28 px-3 py-8 pb-10 md:px-6 md:py-20 md:pb-24 lg:py-28 lg:pb-32"
+      className="relative scroll-mt-28 overflow-hidden py-10 md:py-16 lg:py-20"
     >
-      <div className="pointer-events-none absolute left-1/3 top-1/4 h-72 w-72 rounded-full bg-primary/[0.05] blur-[90px]" aria-hidden />
-      <div className="pointer-events-none absolute bottom-1/4 right-1/4 h-64 w-64 rounded-full bg-accent/[0.05] blur-[80px]" aria-hidden />
-
-      <div className="relative mx-auto max-w-6xl">
+      <div className="relative mx-auto max-w-6xl px-4 md:px-6">
         <SectionHeader
           icon={<Quote className="h-4 w-4 text-primary" aria-hidden />}
-          label="Client work"
+          label="Client proof"
           title={
             <>
-              Past engagements,{" "}
-              <span className="gradient-text">honest feedback</span>
+              Trusted by teams that{" "}
+              <span className="gradient-text">expect quality</span>
             </>
           }
-          subtitle="Short notes from people I’ve actually shipped with—sites, product web, pragmatic AI where it earns its place, and workflow automation. Direct relationships, not paid review widgets; no fabricated dollar figures."
+          subtitle="Direct feedback from founders and operators I’ve shipped with—real relationships, real products, and accountable delivery."
         />
 
-        <div
-          className="relative px-4 sm:px-14 md:px-16"
-          onMouseEnter={() => setPaused(true)}
-          onMouseLeave={() => setPaused(false)}
-          onFocusCapture={() => setPaused(true)}
-          onBlurCapture={(e) => {
-            if (!e.currentTarget.contains(e.relatedTarget)) setPaused(false)
-          }}
-        >
-          <Carousel
-            setApi={setApi}
-            opts={{
-              loop: true,
-              align: "center",
-              duration: 18,
-              skipSnaps: false,
-              dragFree: false,
-            }}
-            className="w-full"
+        <div className="mb-4 flex justify-end">
+          <button
+            type="button"
+            onClick={() => setPaused((value) => !value)}
+            aria-pressed={paused}
+            className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.04] px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground transition-colors hover:text-foreground"
           >
-            <CarouselContent className="-ml-3 sm:-ml-4">
-              {clientTestimonials.map((t) => (
-                <CarouselItem
-                  key={t.id}
-                  className={cn(
-                    "pl-3 sm:pl-4",
-                    "basis-[88%] sm:basis-[82%] md:basis-[72%] lg:basis-[58%]",
-                  )}
-                >
-                  <figure
-                    className={cn(
-                      "flex h-full min-h-[240px] flex-col rounded-2xl border border-white/[0.1] bg-gradient-to-b from-card/40 to-card/[0.12] p-5 shadow-[0_20px_50px_-24px_rgba(0,0,0,0.65)] backdrop-blur-xl transition-[border-color,box-shadow] duration-300 sm:min-h-[340px] sm:p-8",
-                      "hover:border-primary/25 hover:shadow-[0_24px_60px_-20px_hsl(var(--primary)/0.12)]",
-                    )}
-                  >
-                    <div className="mb-5 flex items-start justify-between gap-4">
-                      <Avatar
-                        name={t.name}
-                        avatarSrc={t.avatarSrc}
-                        avatarAlt={t.avatarAlt}
-                        siteImageSrc={t.siteImageSrc}
-                        siteImageAlt={t.siteImageAlt}
-                      />
-                      <StarRating rating={t.rating} />
-                    </div>
-                    <blockquote className="flex-1 text-sm leading-relaxed text-muted-foreground/95 sm:text-[15px]">
-                      <span className="text-primary/45">“</span>
-                      {t.quote}
-                      <span className="text-primary/45">”</span>
-                    </blockquote>
-                    <figcaption className="mt-6 border-t border-white/[0.07] pt-5">
-                      <cite className="not-italic">
-                        <span className="block font-semibold tracking-tight text-foreground">{t.name}</span>
-                        <span className="mt-1 block text-xs text-muted-foreground sm:text-sm">
-                          {t.title} · {t.organization}
-                        </span>
-                      </cite>
-                    </figcaption>
-                  </figure>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <CarouselPrevious
-              variant="outline"
-              className="left-0 border-white/15 bg-background/80 text-foreground shadow-md backdrop-blur-md hover:bg-background hover:text-primary disabled:opacity-40"
-            />
-            <CarouselNext
-              variant="outline"
-              className="right-0 border-white/15 bg-background/80 text-foreground shadow-md backdrop-blur-md hover:bg-background hover:text-primary disabled:opacity-40"
-            />
-          </Carousel>
+            {paused ? <Play className="h-3 w-3" aria-hidden /> : <Pause className="h-3 w-3" aria-hidden />}
+            {paused ? "Play" : "Pause"}
+          </button>
+        </div>
+      </div>
 
-          <div
-            className="mt-8 flex justify-center gap-2"
-            role="tablist"
-            aria-label="Choose testimonial"
+      <div
+        className="client-carousel relative"
+        data-paused={paused ? "true" : "false"}
+        style={{ "--carousel-duration": `${clientTestimonials.length * 18}s` } as React.CSSProperties}
+      >
+        <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-12 bg-gradient-to-r from-background to-transparent sm:w-24" aria-hidden />
+        <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-12 bg-gradient-to-l from-background to-transparent sm:w-24" aria-hidden />
+        <div className="client-carousel-track flex w-max items-stretch">
+          <ul className="flex items-stretch gap-4 pl-4 md:gap-5 md:pl-6">
+            {cards}
+          </ul>
+          <ul
+            className="flex items-stretch gap-4 pl-4 md:gap-5 md:pl-6"
+            aria-hidden="true"
+            inert
           >
-            {clientTestimonials.map((t, i) => (
-              <button
-                key={t.id}
-                type="button"
-                role="tab"
-                aria-selected={selected === i}
-                aria-label={`Show review ${i + 1}: ${t.name}`}
-                className={cn(
-                  "h-2 rounded-full transition-all duration-300 ease-out",
-                  selected === i
-                    ? "w-8 bg-primary"
-                    : "w-2 bg-muted-foreground/30 hover:bg-muted-foreground/50",
-                )}
-                onClick={() => api?.scrollTo(i)}
-              />
-            ))}
-          </div>
+            {cards}
+          </ul>
         </div>
       </div>
     </AnimatedSection>

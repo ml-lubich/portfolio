@@ -9,8 +9,8 @@ type Logo = {
   mark: React.ReactNode
 }
 
-const iconClass = "h-6 w-6 sm:h-7 sm:w-7"
-const imageClass = "h-6 w-auto object-contain sm:h-7"
+const iconClass = "h-7 w-7 sm:h-8 sm:w-8"
+const imageClass = "h-7 w-auto object-contain sm:h-8"
 
 const LOGOS: Logo[] = [
   { name: "Apple", href: "https://www.apple.com", mark: <SiApple className={iconClass} /> },
@@ -60,7 +60,7 @@ function LogoSet({ hidden = false }: { hidden?: boolean }) {
           target="_blank"
           rel="noopener noreferrer"
           tabIndex={hidden ? -1 : undefined}
-          className="flex h-14 min-w-24 shrink-0 items-center justify-center px-7 text-foreground opacity-35 grayscale transition duration-300 hover:opacity-80 hover:grayscale-0 sm:min-w-32 sm:px-9"
+          className="flex h-16 min-w-32 shrink-0 items-center justify-center px-8 text-foreground opacity-55 grayscale transition duration-300 hover:opacity-90 hover:grayscale-0 sm:min-w-40 sm:px-10"
           aria-label={logo.name}
         >
           {logo.mark}
@@ -74,7 +74,7 @@ export function LogoScroll() {
   return (
     <section
       id="partners"
-      className="relative overflow-hidden border-b border-white/[0.045] bg-background py-2"
+      className="relative overflow-hidden border-y border-white/[0.055] bg-background py-1"
       aria-label="Companies and institutions"
     >
       <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-background to-transparent sm:w-28" />

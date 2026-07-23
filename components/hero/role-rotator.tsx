@@ -38,7 +38,7 @@ export function RoleRotator({
 
   return (
     <h1
-      className="animate-fade-in-up-subtle mx-auto w-full max-w-[min(100%,42rem)] px-1 font-display tracking-tight text-foreground"
+      className="animate-fade-in-up-subtle mx-auto w-full max-w-[min(100%,42rem)] px-1 font-display tracking-tight text-foreground lg:mx-0 lg:text-left"
       style={{ animationDelay: "0.1s", lineHeight: 1.15 }}
     >
       {/* no-metallic: opt this bold wrapper out of the global `background-clip: text`
@@ -77,7 +77,7 @@ export function RoleRotator({
           return (
             <span
               key={role}
-              className="absolute inset-x-0 top-0 flex items-start justify-center"
+              className="absolute inset-x-0 top-0 flex items-start justify-center lg:justify-start"
               style={{
                 opacity,
                 transform: `translateY(${translateY}) ${scale}`,
@@ -91,7 +91,7 @@ export function RoleRotator({
                   defeating whitespace-nowrap and clipping long roles in the
                   fixed-height slot. lg size caps at 2.6rem so the longest role
                   ("AI & Machine Learning Engineer") stays on one line. */}
-              <span className="gradient-text mx-auto px-2 text-center font-light whitespace-nowrap text-[clamp(0.95rem,4.2vw,1.5rem)] sm:text-3xl md:text-4xl lg:text-[2.6rem]">
+              <span className="gradient-text mx-auto px-2 text-center font-light whitespace-nowrap text-[clamp(0.95rem,4.2vw,1.5rem)] sm:text-3xl md:text-4xl lg:mx-0 lg:px-0 lg:text-left lg:text-[2.6rem]">
                 {role}
               </span>
             </span>
@@ -107,7 +107,7 @@ export function RoleRotator({
 
 export function HeroSubtitle() {
   return (
-    <p className="hero-subtitle mx-auto mt-5 max-w-3xl text-pretty text-sm leading-relaxed text-white/95 sm:mt-6 sm:text-base md:mt-7 md:text-lg">
+    <p className="hero-subtitle mx-auto mt-5 max-w-3xl text-pretty text-sm leading-relaxed text-white/95 sm:mt-6 sm:text-base md:mt-7 md:text-lg lg:mx-0 lg:max-w-xl lg:text-left">
       <AnimatedText variant="blur-slide" delay={1200} stagger={30} duration={650}>
         {"I design and ship "}
         <span className="font-semibold text-foreground">AI products, agent systems, and high-stakes web platforms</span>
