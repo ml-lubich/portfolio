@@ -44,7 +44,7 @@ import {
   SiScikitlearn,
   SiJest,
   SiSelenium,
-  SiSonarqubeserver,
+  SiSonarqube,
 } from "react-icons/si"
 /* AWS, Oracle, DynamoDB, and OpenAI marks were pulled from Simple Icons
  * (trademark takedowns) — no Si replacement exists, so those four fall
@@ -155,7 +155,7 @@ export const skillIconMap: Record<string, ReactNode> = {
   Selenium:               <SiSelenium className={cls} />,
   /* Playwright has no Simple Icons glyph — Lucide's theatre masks echo its logo. */
   Playwright:             <Drama className={cls} />,
-  SonarQube:              <SiSonarqubeserver className={cls} />,
+  SonarQube:              <SiSonarqube className={cls} />,
 }
 
 /** Helper: return the icon for a given skill name, or null if none mapped */

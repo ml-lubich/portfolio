@@ -791,4 +791,43 @@ export const projects: Project[] = [
             link: { label: "GitHub", url: "https://github.com/ml-lubich/confluence-cli" },
         },
     },
+    {
+        id: "twig",
+        name: "twig",
+        metric: "Agent-first worktree CLI",
+        coverImage: "/images/projects/twig-hero.png",
+        summary:
+            "Fast Git worktree CLI for humans and agents — one-command create/jump/clean, JSON on every command, real shell-hook cd, and a Rust hot path for agent swarms. pipx install twig-cli.",
+        tags: ["Python", "Rust", "Typer", "Git", "AI-agents"],
+        gradient: g.primaryToAccent,
+        accent: accentCycle[0],
+        number: "21",
+        detail: {
+            title: "twig",
+            subtitle: "Agent-first Git worktree CLI",
+            description:
+                "A Typer + Rich + Pydantic CLI with an optional Rust (PyO3) core for hot paths. Built for multi-agent workflows: flocking, parallel foreach, batch create, and --json on every command so agents can drive worktrees safely.",
+            highlights: [
+                "One-command worktree create, jump, prune, rename, lock/unlock, and batch-new",
+                "JSON output on every command plus agent schema/guide for LLM tooling",
+                "Real shell-hook cd (TWIG_CD) so go/open actually change the terminal directory",
+                "Rust-accelerated validate/glob/porcelain/template path with pure-Python fallback",
+            ],
+            architecture: [
+                { label: "CLI", icon: "layers", description: "Typer + Rich command surface" },
+                { label: "Rust core", icon: "zap", description: "PyO3 hot path for validate/glob/parse" },
+                { label: "Git ops", icon: "cpu", description: "Worktree create/list/remove with flocking" },
+                { label: "Agent API", icon: "server", description: "--json + schema for swarm automation" },
+            ],
+            techStack: ["Python", "Rust", "Typer", "Rich", "Pydantic", "maturin"],
+            metrics: [
+                { label: "Install", value: "pipx install twig-cli" },
+                { label: "Type", value: "CLI" },
+            ],
+            diagramType: "cicd",
+            gradient: g.primaryToAccent,
+            accent: accentCycle[0],
+            link: { label: "GitHub", url: "https://github.com/ml-lubich/twig" },
+        },
+    },
 ]
