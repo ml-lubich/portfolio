@@ -6,7 +6,7 @@ import { ArrowDown } from "lucide-react"
 import { BackgroundOrbs } from "@/components/background-orbs"
 import { ParticleCanvas } from "./particle-canvas"
 import { RoleRotator, HeroSubtitle, HERO_NAME_REVEAL } from "./role-rotator"
-import { HeroCTAs, HeroProof, SocialLinks } from "./hero-actions"
+import { HeroCTAs, SocialLinks } from "./hero-actions"
 import { heroOverlay } from "@/lib/theme"
 import { navigateTo } from "@/components/nav/woosh-scroll"
 import { RotatingStats } from "./rotating-stats"
@@ -107,7 +107,6 @@ export function Hero() {
         <RoleRotator />
         <HeroSubtitle />
         <HeroCTAs />
-        <HeroProof />
         <SocialLinks />
         <TokscaleHeroBadge />
         <RotatingStats />
