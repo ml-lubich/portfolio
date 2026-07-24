@@ -3,7 +3,13 @@ import nextCoreWebVitals from "eslint-config-next/core-web-vitals"
 /** @type {import("eslint").Linter.Config[]} */
 const config = [
   {
-    ignores: [".next/**", "coverage/**", "node_modules/**", "tsconfig.tsbuildinfo"],
+    ignores: [
+      ".next/**",
+      ".next.stale*/**",
+      "coverage/**",
+      "node_modules/**",
+      "tsconfig.tsbuildinfo",
+    ],
   },
   ...nextCoreWebVitals,
   {

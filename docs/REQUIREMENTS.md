@@ -14,3 +14,10 @@ Append new constraints or decisions as new bullets or dated subsections; do not 
 ### 2026-05-05 — Terminal Snake Mode
 
 - The homepage terminal includes a playable Snake mode from the existing terminal surface; it must support laptop keyboard input through arrow keys and WASD, expose visible start/pause/reset controls, and keep gameplay local to the browser.
+
+### 2026-07-24 — Agent OSS family, denser storm, valuemaxxing
+
+- Skill Storm must remain dense (target ≥110 unique skill pills), tuned toward theodouwes-site layout constants (`PILL_SPACING≈88`, denser ring tiers).
+- Featured open-source projects include the agent family: `imsg-mcp`, `imail-mcp`, `inotes-mcp`, `wa-mcp`, plus `bitbucket-cli` (CLI-named exception — not `*-mcp`), and related tools (`twig`, `confluence-cli`, `like-fable` as applicable).
+- Homepage includes `#value-maxxing` (valuemaxxing ≠ tokenmaxxing) and `#tool-matrix` (honest CLI/MCP comparison).
+- Do not invent coverage % or market claims; keep matrix cells conservative (`partial` when incomplete).

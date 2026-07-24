@@ -17,7 +17,7 @@ export interface SkillCategory {
 export const skillCategories: SkillCategory[] = [
     {
         category: "Languages",
-        items: ["Java", "Python", "JavaScript", "TypeScript", "Go", "Rust", "C++", "SQL", "YAML"],
+        items: ["Java", "Python", "JavaScript", "TypeScript", "Go", "Rust", "C++", "SQL", "YAML", "Bash"],
         backDetails: [
             "Python — primary language for ML pipelines, FastAPI services, and data engineering",
             "Java — enterprise microservices with Spring Boot serving millions of daily requests",
@@ -27,27 +27,47 @@ export const skillCategories: SkillCategory[] = [
     },
     {
         category: "AI/ML Engineering",
-        items: ["LLM APIs", "Agentic Workflows", "RAG Architectures", "Multi-Agent Orchestration", "MCP Tool Servers", "Vector Databases", "Fine-tuning", "Prompt Engineering", "Guardrails & Safety", "LLM Observability", "PyTorch", "TensorFlow", "scikit-learn"],
+        items: [
+            "LLM APIs",
+            "Agentic Workflows",
+            "RAG Architectures",
+            "Multi-Agent Orchestration",
+            "MCP Tool Servers",
+            "Vector Databases",
+            "Fine-tuning",
+            "Prompt Engineering",
+            "Guardrails & Safety",
+            "LLM Observability",
+            "PyTorch",
+            "TensorFlow",
+            "scikit-learn",
+            "LangGraph",
+            "CrewAI",
+            "pgvector",
+            "FAISS",
+            "LangSmith",
+            "Langfuse",
+        ],
         backDetails: [
             "Production LLM integrations with GPT-4o, Claude, Gemini — multi-model routing",
             "Multi-agent orchestration with CrewAI, LangGraph, and MCP tool servers",
             "RAG pipelines with pgvector, FAISS, Pinecone — adaptive chunking & re-ranking",
-            "PyTorch/TensorFlow model training, LoRA fine-tuning, and LLM observability with LangSmith",
+            "PyTorch/TensorFlow model training, LoRA fine-tuning, and LLM observability with LangSmith & Langfuse",
         ],
     },
     {
         category: "Frameworks & Frontend",
-        items: ["Spring Boot", "Spring Cloud", "Spring Security", "Hibernate", "React", "Angular", "Next.js", "FastAPI", "Tailwind CSS", "Material UI"],
+        items: ["Spring Boot", "Spring Cloud", "Spring Security", "Hibernate", "React", "Angular", "Next.js", "FastAPI", "Tailwind CSS", "Material UI", "Zod", "tRPC", "Bun", "httpx"],
         backDetails: [
             "Spring Boot microservices with Cloud config, Security OAuth2/JWT, and Hibernate ORM",
             "React & Next.js — SSR, API routes, ISR, and complex interactive UIs with Three.js",
             "FastAPI — async Python APIs with auto-generated OpenAPI docs and Pydantic validation",
-            "Tailwind CSS & Material UI — custom design systems and accessible component libraries",
+            "Zod, tRPC, Bun, and httpx — type-safe contracts and fast runtimes across the stack",
         ],
     },
     {
         category: "Cloud & DevOps",
-        items: ["AWS", "GCP", "Azure", "Kubernetes", "Docker", "Terraform", "GitHub Actions", "Jenkins", "Vercel", "Azure DevOps"],
+        items: ["AWS", "GCP", "Azure", "Kubernetes", "Docker", "Terraform", "GitHub Actions", "Jenkins", "Vercel", "Azure DevOps", "Helm"],
         backDetails: [
             "AWS (ECS, Lambda, RDS, S3, Bedrock) — full-stack cloud for ML and web workloads",
             "Terraform IaC for multi-cloud provisioning with state management and modules",
@@ -67,7 +87,7 @@ export const skillCategories: SkillCategory[] = [
     },
     {
         category: "Methodologies & Testing",
-        items: ["Agile/Scrum", "TDD", "Domain-Driven Design", "MLOps", "CI/CD", "JUnit", "Jest", "Selenium", "Playwright", "SonarQube"],
+        items: ["Agile/Scrum", "TDD", "Domain-Driven Design", "MLOps", "CI/CD", "JUnit", "Jest", "Vitest", "Selenium", "Playwright", "SonarQube", "GitHub CLI"],
         backDetails: [
             "Agile/Scrum — sprint planning, backlog grooming, and velocity-based delivery",
             "TDD with JUnit 5, Jest, Playwright, and comprehensive integration test suites",
@@ -92,6 +112,59 @@ export const skillCategories: SkillCategory[] = [
             "Translate ambiguous business problems into technical artifacts — MCP servers, sub-agents, and reusable agent skills",
             "Eval-driven iteration: build offline + online evals, feed signal back into prompts, tools, and model selection",
             "Codify repeatable deployment patterns into playbooks, reference architectures, and internal building blocks",
+        ],
+    },
+    {
+        category: "Agent Tooling & CLIs",
+        items: [
+            "MCP",
+            "FastMCP",
+            "stdio MCP",
+            "Cursor",
+            "Claude Code",
+            "Typer",
+            "Rich",
+            "Pydantic",
+            "uv",
+            "pipx",
+            "Hatchling",
+            "maturin",
+            "PyO3",
+            "Agent Schema",
+            "Sub-Agents",
+            "JSON Schema",
+            "Ollama",
+            "CLI-First Design",
+            "CliRunner",
+            "pytest-cov",
+        ],
+        backDetails: [
+            "Shipped a family of local-first CLI + MCP tools (imsg-mcp, imail-mcp, inotes-mcp, twig, bitbucket-cli) with Typer, Rich, and Pydantic",
+            "Rust hot paths via PyO3/maturin for performance-critical CLI cores, with a pure-Python fallback",
+            "Packaged and published with uv, pipx, and Hatchling; TDD with pytest-cov and Typer's CliRunner",
+            "Agent-first design: JSON output, agent schema/guide commands, and stdio MCP servers so LLM tools can drive the CLI safely",
+        ],
+    },
+    {
+        category: "macOS & Cross-Platform Automation",
+        items: [
+            "AppleScript",
+            "Mail.app",
+            "Notes.app",
+            "Exchange",
+            "iMessage",
+            "WhatsApp Bridge",
+            "Homebrew",
+            "Bitbucket CLI",
+            "Confluence CLI",
+            "Atlassian MCP",
+            "Account Walls",
+        ],
+        backDetails: [
+            "AppleScript automation over Mail.app, Notes.app, and Messages.app for local-first agent tooling",
+            "Account walls that hard-separate work (Exchange/Polaris) and personal mail so agents can never cross-send",
+            "Go-bridged WhatsApp automation and Homebrew tap packaging for the *-mcp CLI family",
+            "gh-style Bitbucket CLI and Confluence CLI built for safe, idempotent, agent-driven operation",
         ],
     },
 ]
@@ -195,6 +268,7 @@ export const skillDescriptions: Record<string, string> = {
     "C++": "Numerical computing, legacy system integration, and systems-level programming.",
     SQL: "Complex analytical queries, window functions, CTEs, and database performance tuning.",
     YAML: "Infrastructure-as-Code configs, CI/CD pipelines, Kubernetes manifests, and Helm charts.",
+    Bash: "Shell scripting for setup scripts, CLI installers, and CI automation across the *-mcp tool family.",
 
     /* ── AI/ML Engineering ─────────────────── */
     "LLM APIs": "Production integrations with GPT-4o, Claude, Gemini — multi-model routing for cost & latency optimization.",
@@ -210,6 +284,12 @@ export const skillDescriptions: Record<string, string> = {
     PyTorch: "Deep learning model development, custom training loops, and GPU-accelerated inference pipelines.",
     TensorFlow: "Production model serving with TF Serving, TFLite mobile deployments, and TensorBoard monitoring.",
     "scikit-learn": "Classical ML — clustering, tree-based models, and hyperparameter tuning for environmental science.",
+    LangGraph: "Graph-orchestrated agents — gather, reason with tools, extract, and gate every write with deterministic checks.",
+    CrewAI: "Multi-agent crews (Architect, Generator, Auditor, Reporter) chained sequentially for synthetic data and reporting pipelines.",
+    pgvector: "Postgres extension for embedding storage and similarity search inside existing relational schemas.",
+    FAISS: "Local vector index for RAG retrieval — adaptive chunking, re-ranking, and offline evaluation.",
+    LangSmith: "Trace and evaluate LLM chains — latency, cost, and quality regressions caught before shipping.",
+    Langfuse: "Self-hosted LLM observability — full run traces for agentic pipelines like the Case Triage Agent.",
 
     /* ── Frameworks & Frontend ─────────────── */
     "Spring Boot": "Enterprise microservices with auto-configuration, actuator monitoring, and production hardening.",
@@ -222,6 +302,10 @@ export const skillDescriptions: Record<string, string> = {
     FastAPI: "Async Python APIs with auto-generated OpenAPI docs, dependency injection, and Pydantic validation.",
     "Tailwind CSS": "Utility-first styling with custom design systems, dark mode, and responsive layouts.",
     "Material UI": "Themed component libraries with accessible, production-ready enterprise UI patterns.",
+    Zod: "Runtime schema validation and type inference for API boundaries and form input.",
+    tRPC: "End-to-end type-safe APIs between Next.js frontends and Node backends, no codegen step.",
+    Bun: "Fast JS/TS runtime and package manager — this portfolio's dev server and test runner.",
+    httpx: "Async-capable Python HTTP client for FastAPI services and CLI tools that call external APIs.",
 
     /* ── Cloud & DevOps ────────────────────── */
     AWS: "ECS, Lambda, RDS, S3, Bedrock — full-stack cloud architecture for ML and web workloads.",
@@ -234,6 +318,7 @@ export const skillDescriptions: Record<string, string> = {
     Jenkins: "Enterprise build pipelines with shared libraries, parallel stages, and artifact management.",
     Vercel: "Edge-first deployments with preview environments, analytics, and serverless functions.",
     "Azure DevOps": "Enterprise ALM with boards, pipelines, and artifact feeds for large-scale team delivery.",
+    Helm: "Kubernetes package management — templated charts, releases, and rollbacks across environments.",
 
     /* ── Databases & Messaging ─────────────── */
     PostgreSQL: "Advanced indexing, partitioning, pgvector for embeddings, and high-availability clustering.",
@@ -257,6 +342,8 @@ export const skillDescriptions: Record<string, string> = {
     Selenium: "End-to-end browser automation with Page Object patterns and cross-browser test matrices.",
     Playwright: "Modern end-to-end testing with auto-waiting locators, trace-viewer debugging, and parallel cross-browser CI runs.",
     SonarQube: "Static analysis dashboards for code quality, security vulnerabilities, and technical debt tracking.",
+    Vitest: "Fast unit/integration test runner — data-integrity, component-export, and regression suites for this site.",
+    "GitHub CLI": "gh-style terminal workflows for PRs, issues, and releases — the ergonomics bitbucket-cli mirrors for Bitbucket.",
 
     /* ── Enterprise AI Delivery ─────────────── */
     "Customer Discovery": "Embedded discovery with engineering and domain stakeholders to map workflows, constraints, and success metrics.",
@@ -267,4 +354,39 @@ export const skillDescriptions: Record<string, string> = {
     "Stakeholder Communication": "Translating model behavior and trade-offs for executives, product, and engineering — low ego, high clarity.",
     "White-Glove Deployment": "Hands-on deployment support inside customer environments with strict security, IT, and compliance constraints.",
     "Reference Architectures": "Codifying repeatable deployment patterns into playbooks, building blocks, and internal reference architectures.",
+
+    /* ── Agent Tooling & CLIs ───────────────── */
+    MCP: "Model Context Protocol — stdio tool servers exposing local data and actions to Claude, Cursor, and other agent clients.",
+    FastMCP: "Python framework for standing up MCP servers quickly with typed tool schemas.",
+    "stdio MCP": "MCP transport over stdin/stdout — the default for local-first tool servers like imsg-mcp and wa-mcp.",
+    Cursor: "Primary agentic IDE — MCP client, multi-file edits, and subagent orchestration for this entire tool family.",
+    "Claude Code": "CLI coding agent used for autonomous multi-step implementation and MCP tool integration.",
+    Typer: "Type-hint-driven Python CLI framework powering the imsg / imail / inotes / twig command surfaces.",
+    Rich: "Terminal formatting — tables, progress bars, and colorized output across the CLI family.",
+    Pydantic: "Typed request/response and config models for CLIs and FastAPI services.",
+    uv: "Fast Python package/venv manager — primary install path for the *-mcp CLI family.",
+    pipx: "Isolated global installs for Python CLIs (e.g. `pipx install twig-cli`) without polluting system Python.",
+    Hatchling: "PEP 517 build backend for packaging pure-Python CLI projects for PyPI.",
+    maturin: "Builds and publishes Rust (PyO3) extensions as installable Python wheels — used for imsg's Rust core.",
+    PyO3: "Rust ⇄ Python bindings — the hot path behind imsg's 3.4× faster message search.",
+    "Agent Schema": "Machine-readable command contracts (e.g. `imail agent schema`) so LLM tools can discover a CLI's full surface.",
+    "Sub-Agents": "Delegated, scoped agent workers orchestrated by a parent agent for search, implementation, and review.",
+    "JSON Schema": "Structured contracts for CLI --json output and MCP tool parameters that agents can validate against.",
+    Ollama: "Local LLM runtime — provider-agnostic chat backend alongside cloud APIs in the RAG Knowledge Base.",
+    "CLI-First Design": "CLI as the primary agent interface (saves tokens vs. MCP round-trips); MCP layered on top only where needed.",
+    CliRunner: "Typer/Click test harness for invoking CLI commands in-process and asserting on output and exit codes.",
+    "pytest-cov": "Coverage-gated pytest runs — the ≥90% bar enforced on imsg-mcp's test suite.",
+
+    /* ── macOS & Cross-Platform Automation ──── */
+    AppleScript: "Automation layer driving Mail.app, Notes.app, and Messages.app from CLI tools without private APIs.",
+    "Mail.app": "Local mail client automated by imail — accounts, list, send, and organize via AppleScript.",
+    "Notes.app": "Local notes client automated by inotes — list, search, show, and create via AppleScript.",
+    Exchange: "Corporate mail account type routed through Mail.app and kept behind imail's account walls.",
+    iMessage: "Local Messages database (chat.db) read-only search/export, with sends isolated through Messages.app.",
+    "WhatsApp Bridge": "Go (whatsmeow) bridge authenticating via QR and syncing WhatsApp history to a local SQLite store.",
+    Homebrew: "macOS package manager — distribution tap (`ml-lubich/tap`) for the imsg/inotes CLI family.",
+    "Bitbucket CLI": "gh-style terminal client (`bb`) for Bitbucket Cloud and Data Center — PRs, repos, issues, pipelines.",
+    "Confluence CLI": "Idempotent bulk move/mirror/migration CLI over the Confluence REST API, safe for agents to re-run.",
+    "Atlassian MCP": "Jira + Confluence tool access over MCP for agent-driven ticket and wiki workflows.",
+    "Account Walls": "Hard separation between work and personal mail accounts so an agent can never cross-send.",
 }

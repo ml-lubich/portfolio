@@ -49,6 +49,26 @@ import {
   SiJest,
   SiSelenium,
   SiSonarqube,
+  SiZod,
+  SiTrpc,
+  SiBun,
+  SiHomebrew,
+  SiApple,
+  SiHelm,
+  SiPytest,
+  SiGnubash,
+  SiWhatsapp,
+  SiBitbucket,
+  SiConfluence,
+  SiAtlassian,
+  SiPydantic,
+  SiUv,
+  SiPipx,
+  SiOllama,
+  SiAnthropic,
+  SiTyper,
+  SiRich,
+  SiVitest,
 } from "react-icons/si"
 
 /* ── Lucide icons (for concepts / items without brand logos) ───── */
@@ -74,6 +94,15 @@ import {
   GitBranch,
   GitMerge,
   Workflow,
+  Terminal,
+  MousePointer2,
+  Braces,
+  Users,
+  Package,
+  StickyNote,
+  MessageCircle,
+  Building2,
+  Activity,
 } from "lucide-react"
 
 const cls = "h-3.5 w-3.5 shrink-0"
@@ -90,6 +119,7 @@ export const skillIconMap: Record<string, ReactNode> = {
   "C++":       <SiCplusplus className={cls} />,
   SQL:         <Database className={cls} />,
   YAML:        <FileCode2 className={cls} />,
+  Bash:        <SiGnubash className={cls} />,
 
   /* ── AI / ML Engineering ────────────── */
   "LLM APIs":                  <SiOpenai className={cls} />,
@@ -105,6 +135,12 @@ export const skillIconMap: Record<string, ReactNode> = {
   PyTorch:                      <SiPytorch className={cls} />,
   TensorFlow:                   <SiTensorflow className={cls} />,
   "scikit-learn":               <SiScikitlearn className={cls} />,
+  LangGraph:                    <Workflow className={cls} />,
+  CrewAI:                       <Users className={cls} />,
+  pgvector:                     <SiPostgresql className={cls} />,
+  FAISS:                        <Search className={cls} />,
+  LangSmith:                    <Eye className={cls} />,
+  Langfuse:                     <Activity className={cls} />,
 
   /* ── Frameworks & Frontend ──────────── */
   "Spring Boot":     <SiSpringboot className={cls} />,
@@ -117,6 +153,10 @@ export const skillIconMap: Record<string, ReactNode> = {
   FastAPI:           <SiFastapi className={cls} />,
   "Tailwind CSS":    <SiTailwindcss className={cls} />,
   "Material UI":     <SiMui className={cls} />,
+  Zod:               <SiZod className={cls} />,
+  tRPC:              <SiTrpc className={cls} />,
+  Bun:               <SiBun className={cls} />,
+  httpx:             <Network className={cls} />,
 
   /* ── Cloud & DevOps ─────────────────── */
   AWS:              <SiAmazonwebservices className={cls} />,
@@ -129,6 +169,7 @@ export const skillIconMap: Record<string, ReactNode> = {
   Jenkins:          <SiJenkins className={cls} />,
   Vercel:           <SiVercel className={cls} />,
   "Azure DevOps":   <GitMerge className={cls} />,
+  Helm:             <SiHelm className={cls} />,
 
   /* ── Databases & Messaging ──────────── */
   PostgreSQL:     <SiPostgresql className={cls} />,
@@ -153,6 +194,43 @@ export const skillIconMap: Record<string, ReactNode> = {
   /* Playwright has no Simple Icons glyph — Lucide's theatre masks echo its logo. */
   Playwright:             <Drama className={cls} />,
   SonarQube:              <SiSonarqube className={cls} />,
+  Vitest:                 <SiVitest className={cls} />,
+  "GitHub CLI":           <Terminal className={cls} />,
+
+  /* ── Agent Tooling & CLIs ───────────── */
+  MCP:                    <Server className={cls} />,
+  FastMCP:                <Server className={cls} />,
+  "stdio MCP":            <Terminal className={cls} />,
+  Cursor:                 <MousePointer2 className={cls} />,
+  "Claude Code":          <SiAnthropic className={cls} />,
+  Typer:                  <SiTyper className={cls} />,
+  Rich:                   <SiRich className={cls} />,
+  Pydantic:               <SiPydantic className={cls} />,
+  uv:                     <SiUv className={cls} />,
+  pipx:                   <SiPipx className={cls} />,
+  Hatchling:              <Package className={cls} />,
+  maturin:                <SiRust className={cls} />,
+  PyO3:                   <SiRust className={cls} />,
+  "Agent Schema":         <Braces className={cls} />,
+  "Sub-Agents":           <Network className={cls} />,
+  "JSON Schema":          <Braces className={cls} />,
+  Ollama:                 <SiOllama className={cls} />,
+  "CLI-First Design":     <Terminal className={cls} />,
+  CliRunner:              <TestTube2 className={cls} />,
+  "pytest-cov":           <SiPytest className={cls} />,
+
+  /* ── macOS & Cross-Platform Automation ── */
+  AppleScript:            <SiApple className={cls} />,
+  "Mail.app":              <Building2 className={cls} />,
+  "Notes.app":             <StickyNote className={cls} />,
+  Exchange:               <Building2 className={cls} />,
+  iMessage:               <MessageCircle className={cls} />,
+  "WhatsApp Bridge":      <SiWhatsapp className={cls} />,
+  Homebrew:               <SiHomebrew className={cls} />,
+  "Bitbucket CLI":        <SiBitbucket className={cls} />,
+  "Confluence CLI":       <SiConfluence className={cls} />,
+  "Atlassian MCP":        <SiAtlassian className={cls} />,
+  "Account Walls":        <ShieldCheck className={cls} />,
 }
 
 /** Helper: return the icon for a given skill name, or null if none mapped */

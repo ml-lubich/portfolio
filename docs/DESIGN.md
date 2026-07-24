@@ -16,3 +16,13 @@
 - `components/terminal/index.tsx` owns the homepage terminal chrome and mode switch. The animated session feed stays the default mode, while Snake mounts as a local client-only panel inside the same terminal body.
 - Live code lines render through a preformatted `<pre><code>` pair so indentation in generated snippets is preserved before and after syntax highlighting.
 - `lib/snake-game.ts` contains the pure Snake state transitions so movement, collision, growth, and keyboard mapping can be tested independently from React rendering.
+
+## Skill Storm density (2026-07-24)
+
+- Visual reference: `theodouwes-site` SkillStorm (CSS 3D carousel). Portfolio uses the same ring-band idea with denser pill packing so a larger skill bank reads as a cloud, not a sparse ring.
+- Data: `data/skills.ts` is the storm source (`skillCategories.flatMap(items)`).
+
+## Agent tooling sections (2026-07-24)
+
+- `#value-maxxing` — short manifesto (valuemaxxing over tokenmaxxing).
+- `#tool-matrix` — table from `data/tool-matrix.ts`; yes / partial / — cells only.

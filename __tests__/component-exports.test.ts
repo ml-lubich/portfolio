@@ -85,8 +85,13 @@ describe("Homepage imports resolve", () => {
 
     describe("Dynamic imports", () => {
         for (const imp of dynamicImports) {
-            it(`${imp.from} resolves (exports ${imp.name})`, () => {
+            it(`${imp.from} resolves (exports ${imp.name})`, async () => {
                 expect(moduleExists(imp.from), `Module "${imp.from}" not found`).toBe(true)
+                const imported = await import(/* @vite-ignore */ imp.from)
+                expect(
+                    imported[imp.name],
+                    `"${imp.from}" does not export a component named "${imp.name}"`,
+                ).toBeTypeOf("function")
             })
         }
     })

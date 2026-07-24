@@ -32,7 +32,7 @@ import { skillCategories } from "@/data/skills"
    bands instead of collapsing into one line. Keep RING_SQUASH in sync with
    the 0.1px factor on .skill-orbit-item in globals.css. */
 const RING_SQUASH = 0.1
-const PILL_SPACING = 104 // px of perimeter budgeted per pill → ring capacity
+const PILL_SPACING = 88 // px of perimeter budgeted per pill → ring capacity (denser than the 104 default)
 
 /** Idle drift, drag feel, and how a fling bleeds off. */
 const IDLE_DRIFT = 0.03 // deg/frame gentle churn when untouched
@@ -56,17 +56,17 @@ interface RingSpec {
    narrower screens for the same reason. Tiers alternate above/below the
    centre title so the stack stays balanced. */
 const RINGS: RingSpec[] = [
-  { rx: 132, scale: 1.0, y: -48 },
-  { rx: 232, scale: 0.97, y: 62 },
-  { rx: 320, scale: 0.93, y: -96 },
-  { rx: 400, scale: 0.89, y: 126 },
-  { rx: 468, scale: 0.85, y: -150 },
-  { rx: 524, scale: 0.82, y: 184 },
+  { rx: 132, scale: 1.0, y: -44 },
+  { rx: 232, scale: 0.97, y: 52 },
+  { rx: 320, scale: 0.93, y: -84 },
+  { rx: 400, scale: 0.89, y: 108 },
+  { rx: 468, scale: 0.85, y: -128 },
+  { rx: 524, scale: 0.82, y: 150 },
 ]
 
 /* Particle-cloud scatter: each pill drifts off its tier by a stable ±px so
    the bands dissolve into a cloud and pills rarely sit on top of each other. */
-const SCATTER_Y = 84
+const SCATTER_Y = 76
 
 /** Ramanujan ellipse-perimeter approximation → how many pills a ring fits. */
 function ringCapacity(rx: number): number {

@@ -42,6 +42,14 @@ const ClientTestimonials = dynamic(
 const Projects = dynamic(() => import("@/components/sections/projects").then(m => m.Projects), {
   loading: () => <SectionSkeleton />,
 })
+const ValueMaxxing = dynamic(
+  () => import("@/components/sections/value-maxxing").then(m => m.ValueMaxxing),
+  { loading: () => <SectionSkeleton height="24vh" /> },
+)
+const ToolMatrix = dynamic(
+  () => import("@/components/sections/tool-matrix").then(m => m.ToolMatrix),
+  { loading: () => <SectionSkeleton /> },
+)
 const Skills = dynamic(() => import("@/components/sections/skills").then(m => m.Skills), {
   loading: () => <SectionSkeleton />,
 })
@@ -102,6 +110,12 @@ export default function Home() {
           className={`mt-5 border-t border-white/[0.06] md:mt-12 lg:mt-16 ${LAZY_SECTION_TOP}`}
         >
           <Projects />
+        </LazySection>
+        <LazySection sectionId="value-maxxing" className={LAZY_SECTION_TOP}>
+          <ValueMaxxing />
+        </LazySection>
+        <LazySection sectionId="tool-matrix" className={LAZY_SECTION_TOP}>
+          <ToolMatrix />
         </LazySection>
         <LazySection sectionId="skills" className={LAZY_SECTION_TOP}>
           <Skills />
