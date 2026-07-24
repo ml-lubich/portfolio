@@ -1,0 +1,99 @@
+---
+title: "Account Walls: How imail Stopped Me Mixing Work and Personal Mail"
+excerpt: "Apple Mail already had all my accounts. What it didn't have was a hard wall an agent (or a tired human) couldn't accidentally cross. Here's how I built imail around that constraint — and why it made inbox chaos quieter."
+date: "2026-07-21"
+category: "Open Source"
+tags: ["MCP", "CLI", "Mail", "macOS", "Productivity", "Case Study"]
+---
+
+I have a boring, adult problem: multiple email identities on one Mac.
+
+Work lives on Exchange (`mlubich@polariswireless.com`). Personal lives on Google (`michaelle.lubich@gmail.com`) plus a couple of other domains. Mail.app already handles the accounts. The failure mode wasn't "I need another mail client." The failure mode was **accidental context bleed** — the kind that happens when you're tired, multitasking, or letting an agent "just send that reply."
+
+So I built [`imail-mcp`](https://github.com/ml-lubich/imail) around a simple invariant:
+
+> Work and personal are walls. Crossing them requires explicit intent.
+
+Not a vibes-based folder suggestion. A real gate.
+
+<Figure src="https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=1200&h=630&fit=crop" alt="Laptop on a desk" caption="Same Mac. Different walls. Explicit --from." />
+
+## The wall model
+
+`imail` knows my accounts. It also knows which wall each account belongs to — WORK vs PERSONAL. Sending requires `--from`. Organizing respects account boundaries. Agents don't get a free-for-all "whatever mailbox is selected in the UI" API.
+
+That sounds pedantic until the first time you almost reply to a recruiter from your work address, or an agent helpfully drafts a personal note using the last selected account in Mail.app. Pedantry is a feature.
+
+```mermaid
+{
+  "type": "tree",
+  "title": "imail Send Gate",
+  "color": "blue",
+  "steps": [
+    "imail send requested",
+    {
+      "label": "--from provided?",
+      "branches": [
+        {
+          "condition": "No",
+          "color": "red",
+          "steps": ["Refuse", "Tell operator to pick an identity"]
+        },
+        {
+          "condition": "Yes",
+          "color": "green",
+          "steps": ["Resolve account wall", "Send only from that identity"]
+        }
+      ]
+    }
+  ]
+}
+```
+
+## Organize is where life got easier
+
+The flashy demo would be "AI writes your emails." The useful feature is **organize**.
+
+I run organization across Mail.app accounts with rules that match how I actually live: work triage stays on the work wall; personal noise stays personal. No himalaya. No mystery IMAP client. Mail.app is the system of record — `imail` is the operator interface.
+
+That choice mattered. Every "modern mail CLI" I tried wanted me to re-home my identity into *its* config universe. I already had a universe: Apple Mail. Fighting it was a waste of a weekend. Driving it was a weekend well spent.
+
+<Callout type="warning">
+If your automation layer invents a second source of truth for mail, you will spend the rest of your year reconciling folders. Ask me how I know. Actually don't — just don't do it.
+</Callout>
+
+## Agent-shaped, human-usable
+
+`imail` is a Typer CLI. Agents can call it through MCP when that's the right interface. Humans can run it in a terminal when MCP would be a token-burning Rube Goldberg machine.
+
+Stay-paste workflows win here. I don't want a digest of my inbox shoved into iMessage. I want a command I choose to run, with output I can skim, and actions that require an explicit from-address.
+
+That's the difference between "AI that interrupts your life" and "AI that shows up when invited."
+
+## What changed in practice
+
+Qualitatively — and I'm not going to invent fake "47% inbox zero" metrics — the difference felt like this:
+
+- Fewer near-miss wrong-account sends
+- Cleanup became a script, not a Saturday mood
+- Agents could help *inside* a wall instead of pretending all mail is one soup
+- I stopped installing "mail productivity" apps that wanted OAuth to my entire existence
+
+The best tooling disappears into muscle memory. `imail walls` and `imail send --from ...` became that.
+
+## Build notes (short)
+
+Stack choices that kept me honest:
+
+- **AppleScript / Mail.app** as the integration surface (local, already authenticated)
+- **Typer + Rich** for CLI UX humans can actually read
+- **Pydantic-ish structured outputs** where agents need schemas
+- **Tests with a high coverage bar** so "oops, wrong account" stays a refused command, not a production incident
+
+Open source on purpose. If you have the same multi-identity Mac life, you shouldn't need a venture-backed inbox coach to get walls.
+
+## Takeaway
+
+The product wasn't "AI email." The product was **identity discipline with an agent-friendly API**.
+
+Once that existed, the rest of the local tool family made more sense: Messages, Notes, WhatsApp — same philosophy. Meet the apps where they already are. Put hard edges around what can cross. Prefer CLI for bulk. Prefer MCP for conversation. Prefer quiet days over clever demos.

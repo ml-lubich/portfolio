@@ -1,0 +1,92 @@
+---
+title: "I Built Local-First Agent Tools — And They Actually Run My Day"
+excerpt: "Not another cloud agent demo. A family of CLI + MCP tools that talk to Messages, Mail, Notes, and WhatsApp on my Mac — so agents help with real life without shipping my inbox to a stranger's SaaS."
+date: "2026-07-20"
+category: "Open Source"
+tags: ["MCP", "CLI", "Open Source", "Agents", "macOS", "Case Study"]
+---
+
+Most "AI agent" demos end the same way: a polished GIF, a cloud OAuth screen, and a quiet feeling that you just offered your personal life to a vendor with a Series B and a privacy policy written by optimism.
+
+I didn't want that. I wanted something boring and local: my Mac already has Messages, Mail.app, Notes, and WhatsApp Desktop. The data is already on disk. The missing piece was a clean interface agents (and humans) could call without inventing a new SaaS for every surface.
+
+So I built a small family of local-first tools — each one a real CLI first, with an MCP server on top when an agent needs it:
+
+- [`imsg-mcp`](https://github.com/ml-lubich/imsg) — Messages (`imsg` / `imsg-mcp`)
+- [`imail-mcp`](https://github.com/ml-lubich/imail) — Apple Mail (`imail`)
+- [`inotes-mcp`](https://github.com/ml-lubich/inotes) — Apple Notes (`inotes`)
+- [`wa-mcp`](https://github.com/ml-lubich/whatsapp-mcp) — WhatsApp Desktop (`wa` / `wa-mcp`)
+
+Naming rule of thumb: if it's in the agent family, it's `*-mcp`. The one intentional exception is [`bitbucket-cli`](https://github.com/ml-lubich/bitbucket-cli) — that's a plain Bitbucket CLI (`bb`), not an MCP product, and I left it alone on purpose.
+
+<Figure src="https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=1200&h=630&fit=crop" alt="Code on a monitor" caption="Local tools. Local data. Agents optional." />
+
+## Why this made my life easier (not just cooler)
+
+Before these existed, "ask an agent to help with my day" meant copy-paste hell:
+
+1. Screenshot a thread
+2. Paste into chat
+3. Hope the model doesn't invent a reply I never sent
+4. Manually do the actual send/archive/note myself
+
+Now the loop is shorter. An agent can *search* recent messages, *list* chats, *draft* with context, and — only when I allow it — send. Mail can be organized by rules that respect account walls. Notes stay out of the way unless I explicitly ask. WhatsApp is available without me becoming a human USB cable between Desktop and Claude.
+
+The win isn't "full autonomy." The win is **less friction between intention and action**.
+
+```mermaid
+{
+  "type": "pipeline",
+  "title": "How a Tuesday Actually Works Now",
+  "steps": [
+    { "label": "Need context", "annotation": "search local apps", "color": "blue" },
+    { "label": "Agent reads tools", "annotation": "MCP or CLI", "color": "cyan" },
+    { "label": "I approve action", "annotation": "send / organize", "color": "amber" },
+    { "label": "Done on device", "annotation": "no new SaaS", "color": "green" }
+  ]
+}
+```
+
+## CLI first, MCP second
+
+Every tool in this family is usable without an LLM. That sounds obvious until you watch teams build "MCP-only" products that are unusable from a shell and impossible to script.
+
+My rule: if I can't do the bulk job with a one-liner, the MCP surface is a toy.
+
+Examples of the boring jobs that actually matter:
+
+- Organize Mail across accounts without mixing work and personal
+- Search Messages for a phone number or thread without opening the UI
+- Dump a Notes folder for a weekly review
+- List WhatsApp chats when I'm mid-task in a terminal
+
+MCP is for the agent loop. CLI is for the operator loop. Both matter. If you only ship MCP, you optimized for demos. If you only ship CLI, you optimized for humans who already know what they want. Shipping both is valuemaxxing.
+
+## What I actually enforced
+
+A few non-negotiables that kept this from becoming vaporware:
+
+1. **Typer CLIs** with real `--help` and JSON-friendly output where it counts
+2. **Coverage gates** (the family sits at a ≥90% pytest bar — not vibes)
+3. **Publish paths** that a stranger can install (PyPI `mac-*` names today; Homebrew tap formulas)
+4. **Hard walls** between accounts (especially mail — work Exchange stays work)
+
+<Callout type="tip">
+If your agent tool can't be installed with `pipx` / Homebrew and exercised without an IDE, it isn't a tool yet. It's a README with aspirations.
+</Callout>
+
+## The emotional part (yes, really)
+
+The first week I used `imail organize` across every Mail.app account, I felt something rare in AI tooling: relief. Not "wow, AGI." Just fewer tabs, fewer half-done cleanup Saturdays, fewer "did I reply to that?" loops at 11pm.
+
+Same with Messages. Being able to say "find the last thread with X" without scrolling like a raccoon in a dumpster is a quality-of-life upgrade that compounds. Tiny minutes, every day.
+
+That's the product thesis: **local-first agent tools should feel like better plumbing, not a new religion.**
+
+## What's next
+
+I'm still iterating on packaging (PyPI naming got rate-limited — classic), docs, and the portfolio comparison matrix so people can see what these tools do versus cloud-only alternatives. The code is open. The binary names stay short (`imsg`, `imail`, `inotes`, `wa`). The philosophy stays simple:
+
+> Agents should meet your life where it already lives.
+
+If you want the short version: I stopped waiting for a vendor to "integrate my life" and wrote the adapters myself. It made my days quieter. That was the whole point.

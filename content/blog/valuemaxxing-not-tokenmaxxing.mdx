@@ -1,0 +1,110 @@
+---
+title: "Valuemaxxing, Not Tokenmaxxing: Why My Agents Prefer CLIs"
+excerpt: "MCP is great until every 'list my inbox' costs a novella of tool schema. Here's the operating rule I use for local agent tools: CLI for bulk, MCP for dialogue, and measure value by minutes saved — not tokens burned."
+date: "2026-07-22"
+category: "AI Products"
+tags: ["MCP", "CLI", "Agents", "Productivity", "Open Source"]
+---
+
+There's a new status game in AI tooling: how many tools can you expose over MCP, how often can the agent call them, and how impressive does the trace look in a dashboard.
+
+I call that **tokenmaxxing**.
+
+I'm optimizing for something else: **valuemaxxing** — minutes of real life recovered per unit of complexity (and yes, per dollar of tokens when a model is in the loop).
+
+That sounds soft until you watch an agent burn a context window re-listing the same WhatsApp chats because somebody wrapped `ls` as twelve JSON tools with essays for descriptions.
+
+<Figure src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=1200&h=630&fit=crop" alt="Abstract technology" caption="Tokens are a cost center. Value is the point." />
+
+## The local stack that forced the lesson
+
+I ship a family of local-first tools for macOS life surfaces:
+
+| Tool | Human binary | Agent surface | Job |
+|------|--------------|---------------|-----|
+| imsg-mcp | `imsg` | `imsg-mcp` | Messages |
+| imail-mcp | `imail` | Apple Mail MCP | Mail |
+| inotes-mcp | `inotes` | Apple Notes MCP | Notes |
+| wa-mcp | `wa` | `wa-mcp` | WhatsApp |
+| bitbucket-cli | `bb` | *(CLI only — intentional)* | Bitbucket |
+
+Notice the pattern: **CLI is not an afterthought.** For Bitbucket I didn't even pretend MCP was required. Sometimes a sharp CLI is the whole product.
+
+## When MCP is the wrong default
+
+MCP shines when:
+
+- the task is conversational ("find the thread with Alex about Thursday")
+- the agent needs structured tools mid-reasoning
+- the human is already in an IDE agent loop
+
+MCP is the wrong default when:
+
+- you're organizing 12 mailboxes
+- you're exporting a notes folder
+- you're doing the same search for the 40th time in a script
+- you care about repeatability more than vibes
+
+```mermaid
+{
+  "type": "comparison",
+  "title": "Same Job, Two Interfaces",
+  "left": {
+    "title": "Tokenmax path",
+    "color": "amber",
+    "steps": [
+      "Open agent chat",
+      "Load fat tool schemas",
+      "Model re-discovers flags",
+      "One mailbox... maybe",
+      "Repeat tomorrow"
+    ]
+  },
+  "right": {
+    "title": "Value path",
+    "color": "green",
+    "steps": [
+      "Write a shell one-liner",
+      "Run across accounts",
+      "Commit the script",
+      "Reuse forever",
+      "Invite agent only if stuck"
+    ]
+  }
+}
+```
+
+## Stay-paste as a product principle
+
+I have a personal rule for life automation: **stay-paste**. Don't invent notification theater. Don't auto-DM me digests. Don't "helpfully" surface my inbox into another inbox.
+
+If I want mail organized, I run `imail`. If I want to self-test Messages, I send to my own number on purpose. If Notes shouldn't be touched, agents don't touch Notes.
+
+This isn't anti-AI. It's anti-interruption dressed up as intelligence.
+
+<Callout type="tip">
+Valuemaxxing question: does this automation reduce a recurring pain, or does it create a new feed I now have to manage? If it's a new feed, delete it.
+</Callout>
+
+## Coverage and installability are part of value
+
+A tool that only works in my head is not valuemaxxing. It's cosplay.
+
+So the family gets:
+
+- real `--help`
+- install paths (PyPI / Homebrew)
+- tests with a coverage floor
+- explicit account walls where identity matters
+
+The portfolio now has a tools comparison matrix for the same reason — not to dunk on every product on the market, but to make the tradeoffs legible: local vs cloud, CLI vs MCP-only, agent-ready vs human-scriptable.
+
+## The punchline
+
+Tokenmaxxing asks: *how much can the model do in one session?*
+
+Valuemaxxing asks: *how little do I have to think about this next month?*
+
+My answer for personal ops was a boring set of local CLIs with MCP adapters — Messages, Mail, Notes, WhatsApp — plus a Bitbucket CLI that never needed the MCP costume.
+
+If you're building agent tools in 2026, try this constraint for a week: every MCP server must have a CLI that a sleep-deprived human can run without a model. If you can't, you don't have a tool. You have a demo that invoices you for tokens.

@@ -4,6 +4,10 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+### Added
+
+- Three July 2026 blog posts on the local-first agent tool family: building CLI+MCP adapters for Messages/Mail/Notes/WhatsApp, `imail` account walls, and valuemaxxing (CLI-first) vs tokenmaxxing.
+
 ### Fixed
 
 - Nav "Stats" link (and the hero "Explore" arrow) actually scroll now: `GitHubStats` and `AIExpertise` LazySections were missing `sectionId`, so their anchors had no pre-mount placeholder and `navigateTo()` silently no-opped. New `__tests__/nav-scroll-targets.test.ts` gates every in-page anchor against this regression class (part of `vitest run`, which Vercel executes before every deployment).
