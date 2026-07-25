@@ -1064,4 +1064,82 @@ export const projects: Project[] = [
             link: { label: "GitHub", url: "https://github.com/ml-lubich/like-fable" },
         },
     },
+    {
+        id: "pdfify-md",
+        name: "pdfify-md",
+        metric: "Markdown/Mermaid → clean PDF",
+        coverImage: "/images/projects/imessage-exporter-hero.png",
+        summary:
+            "Cross-platform CLI that renders Markdown (including Mermaid diagrams) to a clean, print-ready PDF — tables that fit the page, wrapped code blocks, no mid-word breaks. npm i -g pdfify-md.",
+        tags: ["Node.js", "Markdown", "Mermaid", "PDF", "CLI"],
+        gradient: g.primaryToRose,
+        accent: accentCycle[5],
+        number: "28",
+        detail: {
+            title: "pdfify-md",
+            subtitle: "Markdown/Mermaid to clean PDF, cross-platform",
+            description:
+                "A CLI that converts Markdown (including Mermaid diagrams) into a clean, print-ready PDF — built to fix the usual pain points: tables that overflow the page, code blocks that get cut off mid-word, and diagrams that don't render. Works cross-platform via Node.js.",
+            highlights: [
+                "Renders Mermaid diagrams inline alongside Markdown content",
+                "Print CSS tuned so tables fit the page and code wraps instead of clipping",
+                "Cross-platform CLI — npm i -g pdfify-md, no native dependencies to compile",
+                "Headless-Chrome rendering pipeline for pixel-accurate PDF output",
+            ],
+            architecture: [
+                { label: "CLI", icon: "layers", description: "pdfify-md — convert one or many Markdown files to PDF" },
+                { label: "Mermaid", icon: "cpu", description: "Diagram blocks rendered inline before PDF export" },
+                { label: "Print CSS", icon: "zap", description: "Layout tuned for tables/code that fit the printed page" },
+                { label: "Renderer", icon: "server", description: "Headless-Chrome pipeline for accurate PDF output" },
+            ],
+            techStack: ["Node.js", "Markdown", "Mermaid", "Puppeteer", "CLI"],
+            metrics: [
+                { label: "Install", value: "npm i -g pdfify-md" },
+                { label: "Type", value: "CLI" },
+            ],
+            diagramType: "cicd",
+            gradient: g.primaryToRose,
+            accent: accentCycle[5],
+            link: { label: "GitHub", url: "https://github.com/ml-lubich/pdfify-md" },
+        },
+    },
+    {
+        id: "jenkins-mcp",
+        name: "jenkins-mcp",
+        metric: "Jenkins CLI + MCP server",
+        coverImage: "/images/projects/imessage-exporter-hero.png",
+        summary:
+            "Jenkins CLI and MCP server for querying jobs, builds, and console logs — built so coding agents can check CI status without shelling into Jenkins directly. pip install jenkins-mcp-cli.",
+        tags: ["CLI", "MCP", "Python", "Jenkins", "CI/CD"],
+        gradient: g.primaryToCyan,
+        accent: accentCycle[4],
+        number: "29",
+        detail: {
+            title: "jenkins-mcp",
+            subtitle: "Jenkins CLI + MCP server for agents",
+            description:
+                "A CLI and MCP server over the Jenkins REST API — list jobs, inspect builds, and tail console logs, exposed both as terminal commands and as MCP tools so an agent can check CI status and diagnose failing builds without shell access to Jenkins.",
+            highlights: [
+                "CLI surface for jobs/builds/console logs against the Jenkins REST API",
+                "MCP server exposes the same operations as agent-callable tools",
+                "Built for agents to triage CI failures without direct Jenkins shell access",
+                "Distributed on PyPI as jenkins-mcp-cli",
+            ],
+            architecture: [
+                { label: "CLI", icon: "layers", description: "Jobs, builds, and console-log commands" },
+                { label: "Jenkins API", icon: "server", description: "REST client over the Jenkins API" },
+                { label: "MCP server", icon: "cpu", description: "Exposes job/build/log tools to agents over stdio" },
+                { label: "Auth", icon: "shield", description: "Token-based Jenkins auth" },
+            ],
+            techStack: ["Python", "Jenkins API", "MCP"],
+            metrics: [
+                { label: "Install", value: "pip install jenkins-mcp-cli" },
+                { label: "Type", value: "CLI + MCP" },
+            ],
+            diagramType: "cicd",
+            gradient: g.primaryToCyan,
+            accent: accentCycle[4],
+            link: { label: "GitHub", url: "https://github.com/ml-lubich/jenkins-mcp" },
+        },
+    },
 ]
