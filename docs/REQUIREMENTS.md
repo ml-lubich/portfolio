@@ -21,3 +21,9 @@ Append new constraints or decisions as new bullets or dated subsections; do not 
 - Featured open-source projects include the agent family: `imsg-mcp`, `imail-mcp`, `inotes-mcp`, `wa-mcp`, plus `bitbucket-cli` (CLI-named exception — not `*-mcp`), and related tools (`twig`, `confluence-cli`, `like-fable` as applicable).
 - Homepage includes `#value-maxxing` (valuemaxxing ≠ tokenmaxxing) and `#tool-matrix` (honest CLI/MCP comparison).
 - Do not invent coverage % or market claims; keep matrix cells conservative (`partial` when incomplete).
+
+### 2026-07-25 — Open-Source Showcase (public-only, no invented metrics)
+
+- The Open-Source Showcase (`#projects`, `components/sections/open-source-showcase.tsx`) covers public `ml-lubich` repos only — no proprietary, internal, or employer content.
+- Each demo's terminal script (`data/oss-demos.ts`) must use real, documented commands for that tool with plausible, representative output — not fabricated benchmark numbers or invented flags.
+- `stats` values shown per card must be real (e.g. published test coverage, measured speedups) or omitted; do not invent metrics to fill a stat slot.

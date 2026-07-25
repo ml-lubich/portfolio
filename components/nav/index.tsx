@@ -425,7 +425,7 @@ export function Navigation() {
             title="Back to top"
           >
             <div
-              className="logo-flip-hover relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.04] shadow-[inset_0_1px_0_rgba(255,255,255,0.16)] transition-all duration-300 group-hover:scale-[1.03] group-hover:bg-white/[0.08] sm:h-11 sm:w-11"
+              className="logo-flip-hover relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-2xl border border-white/[0.16] bg-white/[0.06] shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] transition-all duration-300 group-hover:scale-[1.03] group-hover:border-white/[0.24] group-hover:bg-white/[0.10] sm:h-11 sm:w-11"
               onMouseEnter={(e) => {
                 const el = e.currentTarget
                 if (!el.classList.contains('is-flipping')) {
@@ -447,7 +447,7 @@ export function Navigation() {
           </a>
 
           {/* Desktop links */}
-          <div className="relative hidden items-center gap-1 rounded-full border border-white/[0.06] bg-black/[0.12] p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] lg:flex">
+          <div className="relative hidden items-center gap-1 rounded-full border border-white/[0.06] bg-black/[0.12] p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] xl:flex">
             {navLinks.filter((l) => l.href !== "#contact").map((link) => {
               const isExternal = link.href.startsWith("/")
               const isActive = !isExternal && activeSection === link.href.replace("#", "")
@@ -489,7 +489,7 @@ export function Navigation() {
           <button
             type="button"
             onClick={() => setMobileOpen((o) => !o)}
-            className="flex min-h-[48px] min-w-[48px] items-center justify-center rounded-2xl border border-white/[0.08] bg-white/[0.05] p-3 text-muted-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] transition-all duration-300 hover:border-white/[0.14] hover:bg-white/[0.09] hover:text-foreground lg:hidden"
+            className="flex min-h-[48px] min-w-[48px] items-center justify-center rounded-2xl border border-white/[0.08] bg-white/[0.05] p-3 text-muted-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] transition-all duration-300 hover:border-white/[0.14] hover:bg-white/[0.09] hover:text-foreground xl:hidden"
             aria-expanded={mobileOpen ? "true" : "false"}
             aria-controls="mobile-nav-overlay"
             aria-label="Toggle menu"
@@ -511,7 +511,7 @@ export function Navigation() {
       {mobileOpen ? (
         <div
           id="mobile-nav-overlay"
-          className="fixed inset-0 z-[180] flex flex-col lg:hidden"
+          className="fixed inset-0 z-[180] flex flex-col xl:hidden"
           role="dialog"
           aria-modal="true"
           aria-label="Site navigation"

@@ -6,9 +6,13 @@ All notable changes to this project are documented here.
 
 ### Added
 
+- Open-Source Showcase leading `#projects`: animated terminal demos of the public CLI/MCP tool family (imsg-mcp, imail-mcp, inotes-mcp, wa-mcp, bitbucket-cli, twig, confluence-cli, like-fable) using real documented commands with plausible output, per-project stats, copyable install strings, and DetailPanel architecture deep-dives. Only one demo types at a time (highest-intersection card); `prefers-reduced-motion` renders finished frames with no typing loop. New layers: `data/oss-demos.ts` → `lib/demo-terminal.ts` (pure scheduler) → `components/terminal/demo-terminal.tsx` → `oss-demo-card.tsx` → `open-source-showcase.tsx`; the existing marquee remains below as "Selected Work".
 - Three July 2026 blog posts on the local-first agent tool family: building CLI+MCP adapters for Messages/Mail/Notes/WhatsApp, `imail` account walls, and valuemaxxing (CLI-first) vs tokenmaxxing.
 
 ### Fixed
+
+- Navbar no longer clips "Get In Touch" on iPads: the inline link row assumed desktop from `lg:` (1024px) while 11 links + two dropdowns + the CTA need ≥1280px. The link row, hamburger toggle, and mobile overlay all moved to `xl:` together (the overlay's `lg:hidden` alone would have force-hidden the opened menu in exactly that band). New `e2e/tablet-responsive.spec.ts` guards five tablet widths against nav clipping and horizontal page overflow.
+- Journey/Research card details no longer open below the fold on tablets: the scroll-stack detail panel rendered inline under the full card column and relied on a `scrollIntoView` nudge (the "made to scroll down, flaky" bug). At compact widths ≥768px it is now a fixed right-edge drawer — in-viewport by construction — with the phone full-viewport layer and desktop centered modal unchanged; duplicated dismiss/height bookkeeping in the two scroll-stack variants collapsed into one shared hook.
 
 - Nav "Stats" link (and the hero "Explore" arrow) actually scroll now: `GitHubStats` and `AIExpertise` LazySections were missing `sectionId`, so their anchors had no pre-mount placeholder and `navigateTo()` silently no-opped. New `__tests__/nav-scroll-targets.test.ts` gates every in-page anchor against this regression class (part of `vitest run`, which Vercel executes before every deployment).
 - Language Distribution card no longer shows a block of dead space: the legend is now full-width rows with per-language progress bars that fill the card, and the "Building on GitHub" footer pins to the bottom.
@@ -19,6 +23,8 @@ All notable changes to this project are documented here.
 
 ### Changed
 
+- Logo mark rebuilt as a crisp inline-SVG "ML" monogram in a higher-contrast nav tile (was a low-contrast raster in a near-invisible liquid-glass tile); same prop contract across all five consumers.
+- Section vertical rhythm tightened to a single shared knob (`LAZY_SECTION_TOP`: `pt-4 md:pt-8 lg:pt-10`), removing per-section ad-hoc margins — most visible in the previously oversized Skills → GitHub stats gap. Guarded by `__tests__/section-rhythm.test.ts`.
 - Hero: live tokscale token-usage panel docked on the right on xl+ viewports (`TokscaleHeroPanel` — live embed + profile link); the centered pill badge now shows only below xl so there is one tokscale presence per viewport.
 - Contribution Activity card: six prominent stat tiles (year total, all-time, current streak, best streak, active days, avg per active day) with animated count-up.
 - Navbar: new "Stats" link scrolling to the GitHub stats section (`#github`), placed between Skills and Research to match page order.

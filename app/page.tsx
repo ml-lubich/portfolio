@@ -65,8 +65,8 @@ const Contact = dynamic(() => import("@/components/sections/contact").then(m => 
 const Footer = dynamic(() => import("@/components/sections/footer").then(m => m.Footer), {
   loading: () => <SectionSkeleton height="10vh" />,
 })
-/** Same top rhythm as consulting LazySection — separates lazy-mounted sections while scrolling */
-const LAZY_SECTION_TOP = "pt-6 md:pt-14 lg:pt-20"
+/** Shared top rhythm for every LazySection boundary — keep this the single spacing knob. */
+const LAZY_SECTION_TOP = "pt-4 md:pt-8 lg:pt-10"
 
 export default function Home() {
   return (
@@ -92,10 +92,7 @@ export default function Home() {
         <LazySection sectionId="about" className={LAZY_SECTION_TOP}>
           <About />
         </LazySection>
-        <LazySection
-          sectionId="journey"
-          className={`${LAZY_SECTION_TOP} mb-8 md:mb-16 lg:mb-20`}
-        >
+        <LazySection sectionId="journey" className={LAZY_SECTION_TOP}>
           <Journey />
         </LazySection>
         <LazySection sectionId="consulting" className={LAZY_SECTION_TOP}>
@@ -107,7 +104,7 @@ export default function Home() {
         </LazySection>
         <LazySection
           sectionId="projects"
-          className={`mt-5 border-t border-white/[0.06] md:mt-12 lg:mt-16 ${LAZY_SECTION_TOP}`}
+          className={`border-t border-white/[0.06] ${LAZY_SECTION_TOP}`}
         >
           <Projects />
         </LazySection>

@@ -38,12 +38,24 @@ function withPhoneDetailBackButton(node: ReactNode): ReactNode {
   })
 }
 
-/** `useIsMobile` (<768): full-viewport detail + body scroll lock. Above `z-50` nav. */
-function ScrollStackPhoneDetailLayer({
+/**
+ * Shared "not the desktop sticky stack" detail-panel presentation — phones AND
+ * tablets (both `ScrollStackCardsMobile` and `ScrollStackCardsGrid` route here
+ * whenever they're not the desktop 3D stack). Rendering it as a fixed, portalled
+ * overlay — rather than inline in document flow + `scrollIntoView` — guarantees
+ * it's always fully in the viewport the instant it opens; no below-the-fold
+ * scroll race on iPad-class widths. `useIsMobile` (<768) gets the old full-viewport
+ * treatment; tablets get a right-edge drawer instead. Entrance motion uses
+ * `tailwindcss-animate` utilities, which the global `prefers-reduced-motion`
+ * rule already collapses to ~0 — no extra reduced-motion branching needed.
+ */
+function ScrollStackDetailOverlay({
   open,
+  isPhone,
   detailContent,
 }: {
   open: boolean
+  isPhone: boolean
   detailContent: ReactNode
 }) {
   useEffect(() => {
@@ -59,7 +71,11 @@ function ScrollStackPhoneDetailLayer({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[100] flex flex-col bg-background/95 backdrop-blur-xl supports-[backdrop-filter]:bg-background/85"
+      className={`fixed z-[100] flex flex-col bg-background/95 backdrop-blur-xl supports-[backdrop-filter]:bg-background/85 animate-in fade-in-0 duration-300 ${
+        isPhone
+          ? "inset-0"
+          : "inset-y-4 right-0 w-[min(440px,92vw)] rounded-l-[28px] border-l border-white/[0.12] shadow-2xl shadow-black/40 slide-in-from-right-8 lg:inset-y-8 lg:w-[480px]"
+      }`}
       style={{
         paddingTop: "env(safe-area-inset-top, 0px)",
         paddingBottom: "env(safe-area-inset-bottom, 0px)",
@@ -67,7 +83,7 @@ function ScrollStackPhoneDetailLayer({
     >
       <div className="flex min-h-0 flex-1 flex-col px-2 pb-2 pt-1">
         <div className="min-h-0 flex-1 overflow-hidden [&>div]:h-full">
-          {withPhoneDetailBackButton(detailContent)}
+          {isPhone ? withPhoneDetailBackButton(detailContent) : detailContent}
         </div>
       </div>
     </div>,
@@ -75,28 +91,23 @@ function ScrollStackPhoneDetailLayer({
   )
 }
 
-/** Phones, tablets, and coarse-pointer viewports: plain column — no sticky scroll-stack runway. */
-function ScrollStackCardsMobile({
-  cards,
-  className = "",
-  header,
-  activeCardId = null,
-  onScrollDismiss,
-  detailContent,
-}: ScrollStackCardsProps) {
-  const isPhone = useIsMobile()
-  const isExpanded = !!activeCardId
-  const phoneFullscreenOpen = isPhone && isExpanded && !!detailContent
-  const phoneFullscreenRef = useRef(phoneFullscreenOpen)
-  phoneFullscreenRef.current = phoneFullscreenOpen
-
+/** Auto-dismiss the detail panel if the user scrolls the page while it's open
+ *  (background scroll — not relevant once `ScrollStackDetailOverlay` is showing,
+ *  since body scroll is locked, but kept as a defensive no-op guard). Shared by
+ *  the mobile column and grid variants — was previously duplicated verbatim. */
+function useScrollStackDetailDismiss(
+  activeCardId: string | null | undefined,
+  onScrollDismiss: (() => void) | undefined,
+  overlayOpen: boolean,
+) {
   const activeCardIdRef = useRef(activeCardId)
   activeCardIdRef.current = activeCardId
   const onScrollDismissRef = useRef(onScrollDismiss)
   onScrollDismissRef.current = onScrollDismiss
+  const overlayOpenRef = useRef(overlayOpen)
+  overlayOpenRef.current = overlayOpen
   const expandedScrollY = useRef(0)
   const detailOpenedAtRef = useRef(0)
-  const detailWrapperRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (activeCardId) {
@@ -111,7 +122,7 @@ function ScrollStackCardsMobile({
 
   useEffect(() => {
     const onScroll = () => {
-      if (phoneFullscreenRef.current) return
+      if (overlayOpenRef.current) return
       if (activeCardIdRef.current && onScrollDismissRef.current) {
         if (Date.now() - detailOpenedAtRef.current < DETAIL_SCROLL_DISMISS_GRACE_MS) return
         const delta = Math.abs(window.scrollY - expandedScrollY.current)
@@ -123,36 +134,21 @@ function ScrollStackCardsMobile({
     window.addEventListener("scroll", onScroll, { passive: true })
     return () => window.removeEventListener("scroll", onScroll)
   }, [])
+}
 
-  useEffect(() => {
-    if (phoneFullscreenOpen) return
-    const el = detailWrapperRef.current
-    if (!el || !isExpanded) return
-
-    const recalcHeight = () => {
-      const top = el.getBoundingClientRect().top
-      const available = window.innerHeight - top - 24
-      const h = `${Math.max(200, available)}px`
-      el.style.height = h
-      el.style.maxHeight = h
-    }
-
-    requestAnimationFrame(() => requestAnimationFrame(recalcHeight))
-    window.addEventListener("resize", recalcHeight, { passive: true })
-    return () => window.removeEventListener("resize", recalcHeight)
-  }, [isExpanded, phoneFullscreenOpen])
-
-  useEffect(() => {
-    if (phoneFullscreenOpen) return
-    if (!activeCardId || !detailWrapperRef.current) return
-    const el = detailWrapperRef.current
-    const id = requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        el.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" })
-      })
-    })
-    return () => cancelAnimationFrame(id)
-  }, [activeCardId, phoneFullscreenOpen])
+/** Phones, tablets, and coarse-pointer viewports: plain column — no sticky scroll-stack runway. */
+function ScrollStackCardsMobile({
+  cards,
+  className = "",
+  header,
+  activeCardId = null,
+  onScrollDismiss,
+  detailContent,
+}: ScrollStackCardsProps) {
+  const isPhone = useIsMobile()
+  const isExpanded = !!activeCardId
+  const overlayOpen = isExpanded && !!detailContent
+  useScrollStackDetailDismiss(activeCardId, onScrollDismiss, overlayOpen)
 
   return (
     <div className={className || undefined}>
@@ -164,19 +160,7 @@ function ScrollStackCardsMobile({
           </div>
         ))}
       </div>
-      {!phoneFullscreenOpen && detailContent ? (
-        <div
-          ref={detailWrapperRef}
-          className={
-            isExpanded
-              ? "mt-6 w-full min-h-0 overflow-hidden rounded-[28px]"
-              : "hidden h-0 overflow-hidden"
-          }
-        >
-          {detailContent}
-        </div>
-      ) : null}
-      <ScrollStackPhoneDetailLayer open={phoneFullscreenOpen} detailContent={detailContent ?? null} />
+      <ScrollStackDetailOverlay open={overlayOpen} isPhone={isPhone} detailContent={detailContent ?? null} />
     </div>
   )
 }
@@ -192,73 +176,8 @@ function ScrollStackCardsGrid({
 }: ScrollStackCardsProps) {
   const isPhone = useIsMobile()
   const isExpanded = !!activeCardId
-  const phoneFullscreenOpen = isPhone && isExpanded && !!detailContent
-  const phoneFullscreenRef = useRef(phoneFullscreenOpen)
-  phoneFullscreenRef.current = phoneFullscreenOpen
-
-  const activeCardIdRef = useRef(activeCardId)
-  activeCardIdRef.current = activeCardId
-  const onScrollDismissRef = useRef(onScrollDismiss)
-  onScrollDismissRef.current = onScrollDismiss
-  const expandedScrollY = useRef(0)
-  const detailOpenedAtRef = useRef(0)
-  const detailWrapperRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (activeCardId) {
-      detailOpenedAtRef.current = Date.now()
-      expandedScrollY.current = window.scrollY
-      const t = window.setTimeout(() => {
-        expandedScrollY.current = window.scrollY
-      }, DETAIL_SCROLL_DISMISS_GRACE_MS)
-      return () => clearTimeout(t)
-    }
-  }, [activeCardId])
-
-  useEffect(() => {
-    const onScroll = () => {
-      if (phoneFullscreenRef.current) return
-      if (activeCardIdRef.current && onScrollDismissRef.current) {
-        if (Date.now() - detailOpenedAtRef.current < DETAIL_SCROLL_DISMISS_GRACE_MS) return
-        const delta = Math.abs(window.scrollY - expandedScrollY.current)
-        if (delta > 25) {
-          onScrollDismissRef.current()
-        }
-      }
-    }
-    window.addEventListener("scroll", onScroll, { passive: true })
-    return () => window.removeEventListener("scroll", onScroll)
-  }, [])
-
-  useEffect(() => {
-    if (phoneFullscreenOpen) return
-    const el = detailWrapperRef.current
-    if (!el || !isExpanded) return
-
-    const recalcHeight = () => {
-      const top = el.getBoundingClientRect().top
-      const available = window.innerHeight - top - 24
-      const h = `${Math.max(200, available)}px`
-      el.style.height = h
-      el.style.maxHeight = h
-    }
-
-    requestAnimationFrame(() => requestAnimationFrame(recalcHeight))
-    window.addEventListener("resize", recalcHeight, { passive: true })
-    return () => window.removeEventListener("resize", recalcHeight)
-  }, [isExpanded, phoneFullscreenOpen])
-
-  useEffect(() => {
-    if (phoneFullscreenOpen) return
-    if (!activeCardId || !detailWrapperRef.current) return
-    const el = detailWrapperRef.current
-    const id = requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        el.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" })
-      })
-    })
-    return () => cancelAnimationFrame(id)
-  }, [activeCardId, phoneFullscreenOpen])
+  const overlayOpen = isExpanded && !!detailContent
+  useScrollStackDetailDismiss(activeCardId, onScrollDismiss, overlayOpen)
 
   return (
     <div className={className || undefined}>
@@ -270,19 +189,7 @@ function ScrollStackCardsGrid({
           </div>
         ))}
       </div>
-      {!phoneFullscreenOpen && detailContent ? (
-        <div
-          ref={detailWrapperRef}
-          className={
-            isExpanded
-              ? "mt-6 w-full min-h-0 overflow-hidden rounded-[28px]"
-              : "hidden h-0 overflow-hidden"
-          }
-        >
-          {detailContent}
-        </div>
-      ) : null}
-      <ScrollStackPhoneDetailLayer open={phoneFullscreenOpen} detailContent={detailContent ?? null} />
+      <ScrollStackDetailOverlay open={overlayOpen} isPhone={isPhone} detailContent={detailContent ?? null} />
     </div>
   )
 }
