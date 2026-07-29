@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import dynamic from "next/dynamic"
 import { ArrowDown } from "lucide-react"
 import { BackgroundOrbs } from "@/components/background-orbs"
+import { GlassBlobField } from "@/components/glass-blob-field"
 import { ParticleCanvas } from "./particle-canvas"
 import { RoleRotator, HeroSubtitle, HERO_NAME_REVEAL } from "./role-rotator"
 import { HeroCTAs, SocialLinks } from "./hero-actions"
@@ -71,6 +72,8 @@ export function Hero() {
     >
       {/* Spectrum lives only in this section (not fixed to viewport) — avoids mobile scroll seam / mask repaint */}
       <BackgroundOrbs />
+      {/* Liquid-glass metaball field — frosted blobs melt together behind the spectrum. Low intensity so it never fights the brain or headline. */}
+      <GlassBlobField className="z-[1]" intensity={0.35} />
       {!mobilePerformanceMode && <ParticleCanvas className="z-[1]" />}
 
       {/* 3D Brain — lower hero underlay. It sits behind the glass actions/stats,

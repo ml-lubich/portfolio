@@ -17,6 +17,7 @@ import {
 } from "lucide-react"
 import { DetailPanel } from "../detail-panel"
 import { SectionHeader } from "../layout/section-header"
+import { OpenSourceShowcase } from "./open-source-showcase"
 import { projects, type Project } from "@/data/projects"
 
 /* ── Designed cover for projects with no public screenshot ────────────
@@ -285,6 +286,10 @@ export function Projects() {
 
   return (
     <section id="projects" className="relative scroll-mt-24 py-5 md:py-14 lg:py-20">
+      {/* Tier 1: curated open-source demos — self-contained section, own header/FX/modal */}
+      <OpenSourceShowcase />
+
+      {/* Tier 2: the marquee — everything else I've shipped, breadth over depth */}
       {/* Background FX */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
         <div className="absolute left-1/4 top-20 h-[500px] w-[500px] rounded-full bg-accent/5 blur-[120px]" />
@@ -294,9 +299,9 @@ export function Projects() {
       <div className="relative mx-auto max-w-6xl px-3 md:px-4 lg:px-6">
         <SectionHeader
           className="mb-6 md:mb-10"
-          label="Featured Projects"
+          label="Selected Work"
           title={<>Innovative solutions that{" "}<span className="gradient-text">drive real-world impact</span></>}
-          subtitle="A stream of what I've shipped — hovering pauses a row; click any card to explore architecture, tech stack, and animated system diagrams."
+          subtitle="Beyond the live demos above: the full breadth of what I've shipped. Hover pauses a row — click any card for architecture, tech stack, and animated system diagrams."
         />
       </div>
 

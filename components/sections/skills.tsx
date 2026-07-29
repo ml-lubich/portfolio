@@ -7,7 +7,6 @@ import { getSkillIcon } from "./skill-icons"
 import { SectionHeader } from "../layout/section-header"
 import { ShimmerOverlay } from "../ui/shimmer-overlay"
 import { skillCategories } from "@/data/skills"
-import { ExpertiseMatrix } from "./expertise-matrix"
 import { hex } from "@/lib/theme"
 import { SkillDetailModal } from "./skill-detail-modal"
 import { SkillStorm } from "./skill-storm"
@@ -105,11 +104,8 @@ export function Skills() {
           subtitle="Deep proficiency in modern AI/ML frameworks, cloud infrastructure, and full-stack development with a focus on building production-grade scalable systems."
         />
 
-        {/* Proficiency + category cards: flex gap keeps rhythm (margins + lazy paint were crowding) */}
+        {/* Category cards & orbital skills storm */}
         <div className="relative z-10 flex flex-col gap-12 md:gap-16 lg:gap-20">
-          <AnimatedSection delay={100} className="relative z-10">
-            <ExpertiseMatrix />
-          </AnimatedSection>
 
           {/* Desktop (lg+): the skills churn as an orbital "Storm of Skills". */}
           <div className="hidden lg:block">

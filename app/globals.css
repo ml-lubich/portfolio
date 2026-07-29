@@ -2447,3 +2447,65 @@ article .blog-prose b a[href],
     transform: none;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   Liquid-glass metaball field (GlassBlobField)
+   Frosted blobs flow together + apart, welded by the #liquid-goo filter,
+   for the WWDC "glass melting into glass" read. Transform-only motion,
+   decorative, frozen under reduced-motion.
+   ══════════════════════════════════════════════════════════════════ */
+.glass-blob-field__goo {
+  position: absolute;
+  inset: 0;
+  filter: url(#liquid-goo);
+  /* Isolate so the goo threshold only fuses blobs inside this field. */
+  isolation: isolate;
+}
+
+.glass-blob {
+  position: absolute;
+  border-radius: 50%;
+  /* Frosted-glass sphere: hot specular top-left falling to translucent edge. */
+  background:
+    radial-gradient(circle at 34% 28%,
+      hsl(0 0% 100% / 0.92),
+      hsl(0 0% 100% / 0.42) 42%,
+      hsl(220 30% 82% / 0.18) 66%,
+      hsl(220 30% 70% / 0) 74%);
+  will-change: transform;
+}
+
+/* Sizes/positions chosen so pairs overlap the goo threshold as they drift,
+   producing the merge-and-separate "melt". vmax keeps proportions stable. */
+.glass-blob--1 { width: 34vmax; height: 34vmax; left: 8%;  top: 12%; animation: glass-blob-drift-a 26s ease-in-out infinite; }
+.glass-blob--2 { width: 28vmax; height: 28vmax; left: 30%; top: 30%; animation: glass-blob-drift-b 32s ease-in-out infinite; }
+.glass-blob--3 { width: 30vmax; height: 30vmax; left: 58%; top: 16%; animation: glass-blob-drift-c 29s ease-in-out infinite; }
+.glass-blob--4 { width: 24vmax; height: 24vmax; left: 72%; top: 44%; animation: glass-blob-drift-d 35s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes glass-blob-drift-a {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+    33%      { transform: translate3d(14%, 8%, 0) scale(1.08); }
+    66%      { transform: translate3d(4%, 16%, 0) scale(0.96); }
+  }
+  @keyframes glass-blob-drift-b {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+    40%      { transform: translate3d(-12%, 6%, 0) scale(1.1); }
+    70%      { transform: translate3d(8%, -6%, 0) scale(0.94); }
+  }
+  @keyframes glass-blob-drift-c {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+    35%      { transform: translate3d(-10%, 12%, 0) scale(0.92); }
+    68%      { transform: translate3d(-16%, 2%, 0) scale(1.06); }
+  }
+  @keyframes glass-blob-drift-d {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+    45%      { transform: translate3d(10%, -10%, 0) scale(1.12); }
+    75%      { transform: translate3d(-6%, -4%, 0) scale(0.9); }
+  }
+}
+
+/* Reduced motion: hold a pleasant static merged arrangement — no drift. */
+@media (prefers-reduced-motion: reduce) {
+  .glass-blob { animation: none !important; }
+}

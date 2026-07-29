@@ -1,13 +1,17 @@
 "use client"
 
-import Image from "next/image"
-
-/** Single source of truth for header-style logo markup (SSR + client must match). */
+/**
+ * Single source of truth for header-style logo markup (SSR + client must match).
+ *
+ * Renders the metallic chrome "ML" monogram (`/logo.png`) — the real brand mark.
+ * Same prop contract every consumer (nav, footer, blog-header, tools, llm-prices)
+ * relies on; `sizes`/`loading` map straight onto the underlying <img>.
+ */
 export function SiteLogoMark({
   width,
   height,
   sizes,
-  className = "h-full w-full object-cover",
+  className = "h-full w-full object-contain",
   alt = "Misha Lubich logo",
   loading,
   suppressHydrationWarning,
@@ -21,15 +25,16 @@ export function SiteLogoMark({
   suppressHydrationWarning?: boolean
 }) {
   return (
-    <Image
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
       src="/logo.png"
-      alt={alt}
       width={width}
       height={height}
       sizes={sizes}
+      loading={loading}
+      alt={alt}
       className={className}
-      {...(loading ? { loading } : {})}
-      {...(suppressHydrationWarning ? { suppressHydrationWarning: true } : {})}
+      suppressHydrationWarning={suppressHydrationWarning}
     />
   )
 }

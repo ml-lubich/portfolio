@@ -81,3 +81,18 @@ The terminal section has three modes: **live** (day-in-the-life playback), **sna
 ### Invariant
 
 `lib/virtual-fs.ts` is pure (no React imports). `lib/shell-interpreter.ts` is pure (no React imports). All state mutation is in the component layer only.
+
+## Open-Source Showcase
+
+| Layer | Location | Notes |
+|--------|-----------|--------|
+| **Data** | `data/oss-demos.ts` | Public `ml-lubich` projects only. Each entry's terminal script (`demo: Line[]`) and `stats`. Gradient/accent/tags/detail content are NOT duplicated here — looked up on `data/projects.ts` by matching `id`. |
+| **Scheduler** | `lib/demo-terminal.ts` | Pure, no DOM — `Line[]` + a "characters revealed" count in, a render-ready frame out. `cmd`/`code` lines type character-by-character; `out`/`hdr`/`gap` render instantly. |
+| **Primitive** | `components/terminal/demo-terminal.tsx` | `"use client"`. Wraps the scheduler with an IntersectionObserver (starts typing once in view) + rAF loop gated by an `active` prop. Under `prefers-reduced-motion: reduce`, skips the scroll gate and typing loop entirely and renders the fully-revealed frame on first paint. |
+| **Card** | `components/sections/oss-demo-card.tsx` | Glass card matching `MarqueeCard`'s visual language; header (repo link + install copy), a `DemoTerminal`, and a stats/tags footer. Takes `active` and forwards it straight through — does not own any typing state itself. |
+| **Container** | `components/sections/open-source-showcase.tsx` | Renders one `OssDemoCard` per `oss-demos` entry. An IntersectionObserver tracks the card nearest viewport center and is the single source of truth for which card's `active` prop is `true`; every other card renders its static final frame. Reuses `DetailPanel` in the same fixed-overlay modal pattern as `projects.tsx`. |
+| **Integration** | `components/sections/projects.tsx` | `<OpenSourceShowcase />` renders at the top of `#projects`, above the existing marquee. |
+
+### Invariant
+
+At most one `DemoTerminal` types at a time — the container's IntersectionObserver-driven `activeId` is the only thing that sets a card's `active` prop to `true`. Do not give a card its own scroll-based `active` state; that would let two terminals type concurrently.

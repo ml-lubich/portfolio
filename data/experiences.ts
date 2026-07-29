@@ -23,6 +23,50 @@ export interface Experience {
 
 export const experiences: Experience[] = [
     {
+        id: "polaris",
+        title: "Platform & AI Software Engineer",
+        company: "Polaris Wireless",
+        period: "Sep 2024 – Present",
+        location: "Santa Clara, CA",
+        summary:
+            "Architected agentic data engine (AigisQuery) using MCP tools, optimized open-weight model inference (vLLM) under 200ms latency over carrier-scale spatial datasets (Kafka, ClickHouse).",
+        tags: ["Python", "Rust", "vLLM", "MCP", "ClickHouse", "Kafka", "Postgres"],
+        gradient: g.cyanToPrimary,
+        accent: accentCycle[0],
+        number: "01",
+        detail: {
+            title: "Platform & AI Software Engineer",
+            subtitle: "Polaris Wireless",
+            period: "September 2024 – Present",
+            location: "Santa Clara, CA",
+            description:
+                "Architected distributed multi-agent systems and carrier-scale spatial data platforms processing billions of real-time records. Built autonomous query engines using MCP tool servers and deployed open-weight models (DeepSeek, Qwen) via vLLM with strict execution safety guardrails.",
+            highlights: [
+                "Built autonomous query platform (AigisQuery) using Model Context Protocol (MCP) tool servers, enabling plain-English querying over complex spatial datasets",
+                "Deployed open-weight models (DeepSeek, Qwen) via vLLM on multi-GPU nodes with deterministic RAG guardrails, driving SQL syntax errors to near zero",
+                "Scaled Kafka, ClickHouse, and ElasticSearch pipelines processing billions of real-time spatial records with query latencies locked under 200ms",
+                "Engineered automated AI test-generation pipelines, expanding regression coverage from 40 to 300+ edge-case scenarios",
+                "Implemented deterministic loop-detection, step-budget limits, and prompt-injection defenses into agent runtimes",
+            ],
+            architecture: [
+                { label: "MCP Query Engine", icon: "layers", description: "AigisQuery platform for natural-language spatial data querying" },
+                { label: "vLLM Inference", icon: "cpu", description: "Multi-GPU open-weight model serving with deterministic RAG guardrails" },
+                { label: "Spatial Pipelines", icon: "database", description: "Kafka + ClickHouse + ElasticSearch sub-200ms real-time ingestion" },
+                { label: "Execution Safety", icon: "shield", description: "Loop-detection, step budget limits, and prompt-injection defenses" },
+            ],
+            techStack: ["Python", "Rust", "vLLM", "Model Context Protocol", "ClickHouse", "Apache Kafka", "ElasticSearch", "Postgres", "Docker"],
+            metrics: [
+                { label: "Query Latency", value: "<200ms" },
+                { label: "Test Coverage", value: "300+ Edge Cases" },
+                { label: "Data Scale", value: "Billions of Records" },
+            ],
+            diagramType: "agents",
+            gradient: g.cyanToPrimary,
+            accent: accentCycle[0],
+            link: { label: "Polaris Wireless", url: "https://www.polariswireless.com" },
+        },
+    },
+    {
         id: "ai-consulting",
         title: "AI Engineering Consultant",
         company: "Independent / On-Prem Engagements",
@@ -33,7 +77,7 @@ export const experiences: Experience[] = [
         tags: ["Knowledge Graphs", "Agents", "On-Prem", "RAG", "LLM"],
         gradient: g.cyanToPrimary,
         accent: accentCycle[2],
-        number: "01",
+        number: "02",
         detail: {
             title: "AI Engineering Consultant",
             subtitle: "Independent / On-Prem Engagements",
@@ -71,18 +115,18 @@ export const experiences: Experience[] = [
         id: "apple",
         title: "Software Development Engineer in Test",
         company: "Apple",
-        period: "Jan 2023 \u2013 Jul 2024",
+        period: "Jan 2023 – Jul 2024",
         location: "Cupertino, CA",
         summary:
             "Migrated 20+ legacy Python test scripts with AI pipelines, maintained stable APFS deployments for macOS filesystem releases impacting 100M+ users.",
         tags: ["Python", "Ansible", "Docker", "APFS", "LLM"],
         gradient: g.accentToCyan,
         accent: accentCycle[1],
-        number: "02",
+        number: "03",
         detail: {
             title: "Software Development Engineer in Test",
             subtitle: "Apple",
-            period: "January 2023 \u2013 July 2024",
+            period: "January 2023 – July 2024",
             location: "Cupertino, CA",
             description:
                 "Owned the test automation strategy for APFS filesystem releases on macOS, impacting 100M+ devices. Leveraged custom AI pipelines to modernize legacy test infrastructure and prototyped LLM-powered internal tooling.",
@@ -121,16 +165,16 @@ export const experiences: Experience[] = [
         tags: ["Java", "Spring Boot", "AWS Lambda", "Angular", "Kafka"],
         gradient: g.cyanToPrimary,
         accent: accentCycle[2],
-        number: "03",
+        number: "04",
         detail: {
             title: "Software Engineer",
             subtitle: "Walmart",
-            period: "May 2022 \u2013 August 2022",
+            period: "May 2022 – August 2022",
             location: "Sunnyvale, CA",
             description:
                 "Designed and optimized serverless microservices achieving a 300% throughput increase, built responsive UIs, and integrated enterprise monitoring across the Walmart e-commerce platform.",
             highlights: [
-                "Designed and optimized serverless REST and gRPC APIs on AWS Lambda, RDS, and Redis \u2014 improving data-retrieval speed and reliability",
+                "Designed and optimized serverless REST and gRPC APIs on AWS Lambda, RDS, and Redis — improving data-retrieval speed and reliability",
                 "Engineered backend services increasing throughput by 300% using Java, Spring Boot, Hibernate with Kafka and Datadog/Grafana monitoring",
                 "Created user flows in Figma and built responsive Angular frontend integrating REST APIs and Keycloak authentication",
             ],
@@ -156,18 +200,18 @@ export const experiences: Experience[] = [
         id: "lbnl",
         title: "Software Engineer",
         company: "Lawrence Berkeley National Laboratory",
-        period: "May 2021 \u2013 Aug 2021",
+        period: "May 2021 – Aug 2021",
         location: "Berkeley, CA",
         summary:
-            "Built containerized ML pipelines with scikit-learn, Docker, Airflow \u2014 saving 200+ hours annually through automated reporting.",
+            "Built containerized ML pipelines with scikit-learn, Docker, Airflow — saving 200+ hours annually through automated reporting.",
         tags: ["Python", "scikit-learn", "Docker", "Airflow", "MLflow"],
         gradient: g.primaryToMagenta,
         accent: accentCycle[3],
-        number: "04",
+        number: "05",
         detail: {
             title: "Software Engineer",
             subtitle: "Lawrence Berkeley National Laboratory",
-            period: "May 2021 \u2013 August 2021",
+            period: "May 2021 – August 2021",
             location: "Berkeley, CA",
             description:
                 "Developed clustering models and end-to-end ML pipelines for scientific research, building automated visualization dashboards that saved 200+ hours of manual work annually.",
@@ -199,14 +243,14 @@ export const experiences: Experience[] = [
         id: "honda",
         title: "Software Engineer Intern",
         company: "Honda Innovations",
-        period: "Jan 2021 \u2013 May 2021",
+        period: "Jan 2021 – May 2021",
         location: "Mountain View, CA",
         summary:
             "Engineered predictive route-optimization for medical-supply delivery using ML, automated full CI/CD pipeline with GitHub Actions + Terraform.",
         tags: ["scikit-learn", "Kafka", "GitHub Actions", "Docker", "Terraform"],
         gradient: g.magentaToAccent,
         accent: accentCycle[4],
-        number: "05",
+        number: "06",
         detail: {
             title: "Software Engineer Intern",
             subtitle: "Honda Innovations",

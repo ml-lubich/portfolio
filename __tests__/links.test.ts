@@ -55,6 +55,14 @@ const BOT_BLOCKED_DOMAINS = [
   "linkedin.com",
 ]
 
+/**
+ * TEMPORARY (added 2026-07-25): the ml-lubich GitHub account is spam-flagged and
+ * hidden — every profile/repo URL returns 404 to the public even though the repos
+ * exist and are public (support appeal pending). REMOVE this list as soon as
+ * https://github.com/ml-lubich resolves 200 again so link rot is caught normally.
+ */
+const TEMP_HIDDEN_URL_PREFIXES = ["https://github.com/ml-lubich"]
+
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
 function walk(dir: string): string[] {
@@ -250,6 +258,7 @@ describe("Link smoke tests", () => {
       if (EXTERNAL_ALLOWLIST.has(url)) continue // preconnect / dns-prefetch — no page at root
       const host = new URL(url).hostname
       if (BOT_BLOCKED_DOMAINS.some((d) => host === d || host.endsWith(`.${d}`))) continue
+      if (TEMP_HIDDEN_URL_PREFIXES.some((p) => url.startsWith(p))) continue // see TEMP note above
       const where = locs.map((l) => `${l.file}:${l.line}`).join(", ")
       const short = url.length > 60 ? url.slice(0, 57) + "…" : url
       it(`${short}  (${where})`, async () => {
