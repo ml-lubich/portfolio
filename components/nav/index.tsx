@@ -425,7 +425,7 @@ export function Navigation() {
             title="Back to top"
           >
             <div
-              className="logo-flip-hover relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-2xl border border-white/[0.16] bg-white/[0.06] shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] transition-all duration-300 group-hover:scale-[1.03] group-hover:border-white/[0.24] group-hover:bg-white/[0.10] sm:h-11 sm:w-11"
+              className="logo-flip-hover relative flex h-12 w-12 items-center justify-center transition-transform duration-300 group-hover:scale-[1.05] sm:h-14 sm:w-14"
               onMouseEnter={(e) => {
                 const el = e.currentTarget
                 if (!el.classList.contains('is-flipping')) {
@@ -437,10 +437,10 @@ export function Navigation() {
               }}
             >
               <SiteLogoMark
-                width={48}
-                height={48}
-                sizes="44px"
-                alt="Misha Lubich logo"
+                width={56}
+                height={56}
+                sizes="56px"
+                alt="Misha Lubich — home"
                 suppressHydrationWarning
               />
             </div>
