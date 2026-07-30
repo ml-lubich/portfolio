@@ -326,4 +326,13 @@ describe("Navigation links", () => {
         const labels = navLinks.map((l) => l.label)
         expect(new Set(labels).size).toBe(labels.length)
     })
+
+    // The desktop bar renders navLinks alongside the "Tools" / "Games" dropdown
+    // triggers, so a section link sharing either label ships two identical
+    // buttons in one row.
+    it("should not collide with the dropdown trigger labels", () => {
+        const labels = navLinks.map((l) => l.label)
+        expect(labels).not.toContain("Tools")
+        expect(labels).not.toContain("Games")
+    })
 })

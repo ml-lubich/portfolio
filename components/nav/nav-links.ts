@@ -19,7 +19,7 @@ export const navLinks: NavLink[] = [
   { label: "Clients", href: "#testimonials" },
   { label: "Projects", href: "#projects" },
   { label: "Value", href: "#value-maxxing" },
-  { label: "Tools", href: "#tool-matrix" },
+  { label: "OSS", href: "#tool-matrix" },
   { label: "Skills", href: "#skills" },
   { label: "Stats", href: "#github" },
   { label: "Research", href: "#research" },

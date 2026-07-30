@@ -89,7 +89,7 @@ function ToolsDropdown() {
         type="button"
         onClick={() => setOpen(o => !o)}
         className={[
-          "group/link relative isolate flex items-center gap-1 overflow-hidden whitespace-nowrap rounded-full border px-3 py-2 text-[13px] tracking-[0.01em] transition-all duration-300 xl:px-3.5 xl:text-[14px]",
+          "group/link relative isolate flex items-center gap-1 overflow-hidden whitespace-nowrap rounded-full border px-3 py-2 text-[13px] tracking-[0.01em] transition-all duration-300 2xl:px-3.5 2xl:text-[14px]",
           open
             ? "border-white/[0.12] bg-white/[0.10] font-medium text-foreground shadow-[0_10px_30px_-18px_rgba(255,255,255,0.8)]"
             : "border-transparent text-muted-foreground hover:border-white/[0.08] hover:bg-white/[0.06] hover:text-foreground",
@@ -178,7 +178,7 @@ function GamesDropdown() {
         type="button"
         onClick={() => setOpen(o => !o)}
         className={[
-          "group/link relative isolate flex items-center gap-1 overflow-hidden whitespace-nowrap rounded-full border px-3 py-2 text-[13px] tracking-[0.01em] transition-all duration-300 xl:px-3.5 xl:text-[14px]",
+          "group/link relative isolate flex items-center gap-1 overflow-hidden whitespace-nowrap rounded-full border px-3 py-2 text-[13px] tracking-[0.01em] transition-all duration-300 2xl:px-3.5 2xl:text-[14px]",
           open
             ? "border-white/[0.12] bg-white/[0.10] font-medium text-foreground shadow-[0_10px_30px_-18px_rgba(255,255,255,0.8)]"
             : "border-transparent text-muted-foreground hover:border-white/[0.08] hover:bg-white/[0.06] hover:text-foreground",
@@ -406,7 +406,9 @@ export function Navigation() {
       >
         <div
           className={[
-            "nav-shell pointer-events-auto mx-auto flex w-[calc(100%_-_1rem)] max-w-6xl items-center justify-between px-3 py-2 sm:w-[calc(100%_-_2rem)] sm:px-4",
+            // xl:max-w-7xl — the desktop link row turns on at xl (1280px) and
+            // needs more than max-w-6xl (1152px) can give it, or the CTA clips.
+            "nav-shell pointer-events-auto mx-auto flex w-[calc(100%_-_1rem)] max-w-6xl items-center justify-between px-3 py-2 sm:w-[calc(100%_-_2rem)] sm:px-4 xl:max-w-7xl",
             mobileOpen ? "relative z-[110]" : "",
           ].join(" ")}
         >
@@ -462,7 +464,7 @@ export function Navigation() {
                   onClick={(e) => handleLinkClick(e, link.href)}
                   title={link.label}
                   className={[
-                    "group/link relative isolate overflow-hidden whitespace-nowrap rounded-full border px-3 py-2 text-[13px] tracking-[0.01em] transition-all duration-300 xl:px-3.5 xl:text-[14px]",
+                    "group/link relative isolate overflow-hidden whitespace-nowrap rounded-full border px-3 py-2 text-[13px] tracking-[0.01em] transition-all duration-300 2xl:px-3.5 2xl:text-[14px]",
                     isActive
                       ? "border-white/[0.12] bg-white/[0.10] font-medium text-foreground shadow-[0_10px_30px_-18px_rgba(255,255,255,0.8)]"
                       : "border-transparent text-muted-foreground hover:border-white/[0.08] hover:bg-white/[0.06] hover:text-foreground",
@@ -479,7 +481,7 @@ export function Navigation() {
               onClick={(e) => handleLinkClick(e, "#contact")}
               aria-label="Get In Touch"
               title="Get In Touch"
-              className="group/link relative isolate ml-2 overflow-hidden whitespace-nowrap rounded-full border border-white/[0.16] bg-foreground px-4 py-2 text-[13px] font-semibold text-background shadow-[0_14px_34px_-18px_rgba(255,255,255,0.8)] transition-all duration-300 before:absolute before:inset-0 before:-z-10 before:bg-[linear-gradient(120deg,rgba(255,255,255,0.95),rgba(255,255,255,0.72))] hover:scale-[1.03] hover:shadow-[0_18px_46px_-18px_rgba(255,255,255,0.9)] active:scale-[0.98] xl:ml-3 xl:px-4 xl:text-[14px]"
+              className="group/link relative isolate ml-2 overflow-hidden whitespace-nowrap rounded-full border border-white/[0.16] bg-foreground px-4 py-2 text-[13px] font-semibold text-background shadow-[0_14px_34px_-18px_rgba(255,255,255,0.8)] transition-all duration-300 before:absolute before:inset-0 before:-z-10 before:bg-[linear-gradient(120deg,rgba(255,255,255,0.95),rgba(255,255,255,0.72))] hover:scale-[1.03] hover:shadow-[0_18px_46px_-18px_rgba(255,255,255,0.9)] active:scale-[0.98] 2xl:ml-3 2xl:px-4 2xl:text-[14px]"
             >
               <ExpandingText text="Get In Touch" />
             </a>
