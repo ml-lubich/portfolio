@@ -98,29 +98,31 @@ export function RotatingStats() {
       className="mx-auto mt-8 w-full max-w-2xl animate-fade-in-up-subtle pointer-events-auto"
       style={{ animationDelay: "0.45s" }}
     >
-      <div className="grid grid-cols-2 gap-2.5 sm:gap-3 lg:grid-cols-4">
+      {/* Mobile: first 2 stats only, as bare numbers on the background — no card
+          chrome. Card treatment returns at sm+. Extra stats are hidden with CSS
+          (not unmounted) so SSR and client markup stay identical. */}
+      <div className="grid grid-cols-2 gap-x-6 gap-y-4 sm:gap-3 lg:grid-cols-4">
         {currentStats.map((stat, i) => (
           <div
             key={`card-${i}`}
-            className="group relative overflow-hidden rounded-xl border border-white/[0.08] p-3 sm:p-4 glass-card-3d hover:border-primary/20 hover:shadow-lg hover:shadow-primary/10 hover-lift spotlight"
+            className={`group relative p-0 sm:overflow-hidden sm:rounded-xl sm:border sm:border-white/[0.08] sm:p-4 sm:glass-card-3d sm:hover:border-primary/20 sm:hover:shadow-lg sm:hover:shadow-primary/10 sm:hover-lift sm:spotlight${i >= 2 ? " max-sm:hidden" : ""}`}
             style={{
               ...getCardStyle(cardPhases[i]),
               perspective: "600px",
-              background: isMobile
-                ? "hsla(220, 20%, 12%, 0.92)"
-                : "hsla(220, 20%, 16%, 0.35)",
               ...(isMobile
                 ? {}
                 : {
+                    background: "hsla(220, 20%, 16%, 0.35)",
                     backdropFilter: "blur(24px) saturate(1.6)",
                     WebkitBackdropFilter: "blur(24px) saturate(1.6)",
+                    boxShadow:
+                      "0 2px 16px -4px hsla(0,0%,0%,0.25), inset 0 1px 0 0 hsla(0,0%,100%,0.06)",
                   }),
-              boxShadow: "0 2px 16px -4px hsla(0,0%,0%,0.25), inset 0 1px 0 0 hsla(0,0%,100%,0.06)",
             }}
           >
-            <div className="absolute inset-0 rounded-xl bg-primary/[0.04] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+            <div className="absolute inset-0 rounded-xl bg-primary/[0.04] opacity-0 transition-opacity duration-500 group-hover:opacity-100 max-sm:hidden" />
             <div
-              className="pointer-events-none absolute inset-0 -translate-x-full bg-white/[0.04]"
+              className="pointer-events-none absolute inset-0 -translate-x-full bg-white/[0.04] max-sm:hidden"
               style={{
                 animation: cardPhases[i] === "enter"
                   ? `shimmer-sweep 0.8s ${i * 0.1}s ease-out forwards`
@@ -132,14 +134,14 @@ export function RotatingStats() {
                 key={`counter-${i}-${counterKeys[i]}`}
                 value={stat.value}
                 duration={1800}
-                className="text-2xl font-display font-light gradient-text sm:text-3xl lg:text-4xl"
+                className="text-3xl font-display font-light gradient-text sm:text-3xl lg:text-4xl"
               />
               <div className="mt-1 text-[11px] font-medium text-muted-foreground sm:text-xs">
                 {stat.label}
               </div>
             </div>
-            <div className="absolute -bottom-4 -right-4 h-16 w-16 rounded-full bg-primary/5 blur-2xl transition-all duration-700 group-hover:scale-150 group-hover:bg-primary/10" />
-            <div className="absolute -top-8 -left-8 h-14 w-14 rounded-full bg-accent/5 blur-2xl opacity-0 transition-all duration-700 group-hover:opacity-100 group-hover:scale-150" />
+            <div className="absolute -bottom-4 -right-4 h-16 w-16 rounded-full bg-primary/5 blur-2xl transition-all duration-700 group-hover:scale-150 group-hover:bg-primary/10 max-sm:hidden" />
+            <div className="absolute -top-8 -left-8 h-14 w-14 rounded-full bg-accent/5 blur-2xl opacity-0 transition-all duration-700 group-hover:opacity-100 group-hover:scale-150 max-sm:hidden" />
           </div>
         ))}
       </div>

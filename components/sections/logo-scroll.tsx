@@ -5,6 +5,7 @@ import Image from "next/image"
 import {
     SiApple,
     SiHonda,
+    SiWalmart,
 } from "react-icons/si"
 import { GraduationCap, FlaskConical } from "lucide-react"
 import { AnimatedText } from "../animations/animated-text"
@@ -14,24 +15,6 @@ import { AnimatedText } from "../animations/animated-text"
  *  Auto-scrolls continuously AND supports click/touch drag.
  *  Placed directly below the Hero section.
  * ────────────────────────────────────────────────────────────────────── */
-
-/** Walmart Spark — the 6-pointed starburst mark */
-function WalmartSpark({ className }: { className?: string }) {
-    return (
-        <svg className={className} viewBox="0 0 24 24" fill="currentColor">
-            {[0, 60, 120, 180, 240, 300].map((angle) => (
-                <ellipse
-                    key={angle}
-                    cx="12"
-                    cy="4.5"
-                    rx="1.8"
-                    ry="4"
-                    transform={`rotate(${angle} 12 12)`}
-                />
-            ))}
-        </svg>
-    )
-}
 
 /** Seaside "//" brand mark — from the SEA//SIDE logo-concepts sheet */
 function SeasideMark({ className }: { className?: string }) {
@@ -58,7 +41,7 @@ const CLIENT_LOGO_IMG =
 
 const LOGOS: Logo[] = [
     { name: "Apple", icon: <SiApple className="h-7 w-7 sm:h-8 sm:w-8" /> },
-    { name: "Walmart", icon: <WalmartSpark className="h-7 w-7 sm:h-8 sm:w-8" /> },
+    { name: "Walmart", icon: <SiWalmart className="h-7 w-7 sm:h-8 sm:w-8" /> },
     { name: "Lawrence Berkeley Lab", icon: <FlaskConical className="h-7 w-7 sm:h-8 sm:w-8" /> },
     { name: "Honda Innovations", icon: <SiHonda className="h-7 w-7 sm:h-8 sm:w-8" /> },
     { name: "UC Berkeley", icon: <GraduationCap className="h-7 w-7 sm:h-8 sm:w-8" /> },

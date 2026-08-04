@@ -103,6 +103,16 @@ export function RoleRotator({
   )
 }
 
+/* ── Hero tagline — positioning statement under the rotating role ──── */
+
+export function HeroTagline() {
+  return (
+    <p className="animate-fade-in-up-subtle mx-auto mt-4 max-w-2xl text-balance text-center font-medium uppercase tracking-[0.18em] text-white/70 text-[clamp(0.62rem,2.6vw,0.8rem)] sm:mt-5 sm:tracking-[0.22em] sm:text-sm">
+      AI Software Engineering, Consulting &amp; Solutions
+    </p>
+  )
+}
+
 /* ── Hero subtitle ────────────────────────────────────────────────── */
 
 export function HeroSubtitle() {
