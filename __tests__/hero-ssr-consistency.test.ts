@@ -31,7 +31,10 @@ describe("Hero SSR consistency", () => {
   it("renders the full ambient orb tree during SSR", async () => {
     const { Hero } = await import("@/components/hero")
     const html = renderToString(createElement(Hero))
-    expect(html.match(/data-ambient-orb="true"/g)?.length).toBe(7)
+    // Three, not the old seven: the field is one cool hue family now, not a
+    // rainbow spectrum. The point of this assertion is that every orb renders
+    // during SSR (no client-only orbs), not the specific count.
+    expect(html.match(/data-ambient-orb="true"/g)?.length).toBe(3)
   })
 
   it("hero shell does not use viewport hooks for className (hydration-safe layout)", () => {

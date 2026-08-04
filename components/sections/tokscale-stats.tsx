@@ -87,7 +87,11 @@ export function TokscaleHeroBadge() {
             onPointerEnter={handlePointerEnter}
             onPointerLeave={handlePointerLeave}
             style={{ rotateX: tiltX, rotateY: tiltY, transformPerspective: 900 }}
-            className="group relative block overflow-hidden rounded-2xl border border-white/[0.14] bg-[hsla(222,25%,10%,0.34)] p-2.5 shadow-[0_18px_50px_-12px_rgba(16,185,129,0.22),0_8px_24px_-8px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-xl backdrop-saturate-150 transition-[border-color,box-shadow,background-color] duration-500 hover:border-emerald-300/40 hover:bg-[hsla(222,25%,10%,0.42)] hover:shadow-[0_24px_64px_-12px_rgba(16,185,129,0.35),0_8px_24px_-8px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.14)]"
+            /* Surface lives in `.tokscale-hero-card` (globals.css). It was
+               `bg-[hsla(222,25%,10%,0.34)]`, which Tailwind never emitted a
+               rule for - the card rendered fully transparent and the 3D brain
+               behind it ran straight through the token numbers. */
+            className="tokscale-hero-card group relative block overflow-hidden rounded-2xl border border-white/[0.14] p-2.5 shadow-[0_18px_50px_-12px_rgba(16,185,129,0.22),0_8px_24px_-8px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-xl backdrop-saturate-150 transition-[border-color,box-shadow,background-color] duration-500 hover:border-emerald-300/40 hover:shadow-[0_24px_64px_-12px_rgba(16,185,129,0.35),0_8px_24px_-8px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.14)]"
           >
             <div
               className="absolute inset-x-4 top-0 h-[2px] bg-gradient-to-r from-transparent via-emerald-300/80 to-transparent"

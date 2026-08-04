@@ -63,7 +63,7 @@ describe("mobile performance guardrails", () => {
   })
 
   it("keeps lighter mobile ambient orb count", () => {
-    expect(source("components/background-orbs.tsx")).toContain("MOBILE_ORB_COUNT = 4")
+    expect(source("components/background-orbs.tsx")).toContain("MOBILE_ORB_COUNT = 2")
   })
 
   it("keeps ambient orbs transform-only", () => {

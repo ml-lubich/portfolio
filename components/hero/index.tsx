@@ -7,7 +7,7 @@ import { BackgroundOrbs } from "@/components/background-orbs"
 import { ParticleCanvas } from "./particle-canvas"
 import { RoleRotator, HeroTagline, HeroSubtitle, HERO_NAME_REVEAL } from "./role-rotator"
 import { HeroCTAs, SocialLinks } from "./hero-actions"
-import { heroOverlay } from "@/lib/theme"
+import { heroOverlay, heroContentScrim } from "@/lib/theme"
 import { navigateTo } from "@/components/nav/woosh-scroll"
 import { RotatingStats } from "./rotating-stats"
 import { TokscaleHeroBadge } from "@/components/sections/tokscale-stats"
@@ -100,6 +100,17 @@ export function Hero() {
         style={{
           background: heroOverlay,
         }}
+      />
+
+      {/* Content scrim — sits ABOVE the brain (z-3), below the copy (z-10).
+          The vignette below can only darken the orbs: the brain paints over
+          it, which is why the wireframe used to run straight through the CTA
+          row and the Tokscale card. This darkens the centre column the copy
+          occupies while leaving the brain's silhouette readable at the edges. */}
+      <div
+        className="pointer-events-none absolute inset-0 z-[4]"
+        aria-hidden="true"
+        style={{ background: heroContentScrim }}
       />
 
       {/* Content */}

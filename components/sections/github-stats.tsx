@@ -857,7 +857,7 @@ export function GitHubStats() {
                     <AnimatedSection delay={560}>
                         <div className="relative h-full overflow-hidden rounded-2xl border border-white/[0.03] bg-white/[0.01] backdrop-blur-2xl p-5 sm:p-6 transition-all duration-500 hover:border-primary/20 hover:bg-white/[0.02] glass-card-3d">
                             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/6 to-transparent" />
-                            <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-[hsl(280,70%,55%)]/40 via-primary/40 to-accent/40 opacity-60" />
+                            <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-[hsl(280_70%_55%)]/40 via-primary/40 to-accent/40 opacity-60" />
                             <h3 className="mb-4 flex items-center gap-2 text-lg font-bold text-foreground">
                                 <PieChart className="h-4 w-4 text-purple-400" />
                                 Event Breakdown
@@ -918,7 +918,7 @@ export function GitHubStats() {
                     <AnimatedSection delay={640}>
                         <div className="relative h-full overflow-hidden rounded-2xl border border-white/[0.03] bg-white/[0.01] backdrop-blur-2xl p-5 sm:p-6 transition-all duration-500 hover:border-primary/20 hover:bg-white/[0.02] glass-card-3d">
                             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/6 to-transparent" />
-                            <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-primary/40 via-[hsl(180,70%,50%)]/40 to-primary/40 opacity-60" />
+                            <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-primary/40 via-[hsl(180_70%_50%)]/40 to-primary/40 opacity-60" />
                             <h3 className="mb-5 flex items-center gap-2 text-lg font-bold text-foreground">
                                 <Tag className="h-4 w-4 text-cyan-400" />
                                 Tech Topics
@@ -958,7 +958,7 @@ export function GitHubStats() {
                     <AnimatedSection delay={720}>
                         <div className="relative h-full overflow-hidden rounded-2xl border border-white/[0.03] bg-white/[0.01] backdrop-blur-2xl p-5 sm:p-6 transition-all duration-500 hover:border-primary/20 hover:bg-white/[0.02] glass-card-3d">
                             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/6 to-transparent" />
-                            <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-accent/40 via-[hsl(340,75%,55%)]/40 to-accent/40 opacity-60" />
+                            <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-accent/40 via-[hsl(340_75%_55%)]/40 to-accent/40 opacity-60" />
                             <h3 className="mb-5 flex items-center gap-2 text-lg font-bold text-foreground">
                                 <Circle className="h-4 w-4 text-pink-400" />
                                 Repo Sizes

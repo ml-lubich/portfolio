@@ -224,6 +224,12 @@ export const terminalChrome = {
 export const heroOverlay =
     "radial-gradient(ellipse 60% 50% at 50% 45%, rgba(10,12,20,0.35) 0%, transparent 100%)"
 
+/** Painted above the 3D brain, below the hero copy. Keeps the centre column
+ *  legible without hiding the brain — it stays visible at the edges, where
+ *  nothing is written on top of it. */
+export const heroContentScrim =
+    "radial-gradient(ellipse 52% 56% at 50% 48%, rgba(6,8,14,0.86) 0%, rgba(6,8,14,0.68) 45%, rgba(6,8,14,0.26) 72%, transparent 90%)"
+
 /* ── Architecture diagram colors ─────────────────────────────────── */
 
 export const archDiagram = {

@@ -282,13 +282,17 @@
   width: var(--orb-size);
   height: var(--orb-size);
   border-radius: 50%;
+  /* Desaturated and dimmed against the old 100%/0.55 spectrum: at full
+     saturation these orbs bleached the white type and tinted every glass
+     surface they sat behind a different colour. This is ambient light,
+     not a subject. */
   background: radial-gradient(circle,
-      hsl(var(--orb-hue) 100% 62% / 0.55) 0%,
-      hsl(var(--orb-hue) 100% 60% / 0.45) 15%,
-      hsl(var(--orb-hue-next) 95% 57% / 0.32) 30%,
-      hsl(var(--orb-hue-next) 90% 55% / 0.18) 45%,
-      hsl(var(--orb-hue-next) 85% 55% / 0.08) 60%,
-      hsl(var(--orb-hue-next) 80% 55% / 0) 75%);
+      hsl(var(--orb-hue) 42% 55% / 0.22) 0%,
+      hsl(var(--orb-hue) 40% 52% / 0.17) 15%,
+      hsl(var(--orb-hue-next) 38% 50% / 0.12) 30%,
+      hsl(var(--orb-hue-next) 35% 48% / 0.07) 45%,
+      hsl(var(--orb-hue-next) 32% 46% / 0.03) 60%,
+      hsl(var(--orb-hue-next) 30% 45% / 0) 75%);
   filter: blur(10vmax);
   will-change: transform;
   transform: translate(-50%, -50%);
@@ -304,11 +308,11 @@
 }
 
 .ambient-orb--0 {
-  --orb-x: 10%;
-  --orb-y: 20%;
-  --orb-size: 60vmax;
-  --orb-hue: 320;
-  --orb-hue-next: 355;
+  --orb-x: 18%;
+  --orb-y: 22%;
+  --orb-size: 62vmax;
+  --orb-hue: 225;
+  --orb-hue-next: 240;
   --orb-animation: spectrum-drift-a;
   --orb-duration: 52s;
   --orb-mobile-animation: spectrum-drift-mobile-a;
@@ -316,11 +320,11 @@
 }
 
 .ambient-orb--1 {
-  --orb-x: 30%;
-  --orb-y: 65%;
+  --orb-x: 72%;
+  --orb-y: 30%;
   --orb-size: 58vmax;
-  --orb-hue: 265;
-  --orb-hue-next: 300;
+  --orb-hue: 245;
+  --orb-hue-next: 228;
   --orb-animation: spectrum-drift-b;
   --orb-duration: 46s;
   --orb-mobile-animation: spectrum-drift-mobile-b;
@@ -328,63 +332,15 @@
 }
 
 .ambient-orb--2 {
-  --orb-x: 50%;
-  --orb-y: 15%;
-  --orb-size: 62vmax;
+  --orb-x: 45%;
+  --orb-y: 82%;
+  --orb-size: 60vmax;
   --orb-hue: 210;
-  --orb-hue-next: 245;
+  --orb-hue-next: 232;
   --orb-animation: spectrum-drift-a;
   --orb-duration: 56s;
   --orb-mobile-animation: spectrum-drift-mobile-a;
   --orb-mobile-duration: 30.8s;
-}
-
-.ambient-orb--3 {
-  --orb-x: 70%;
-  --orb-y: 55%;
-  --orb-size: 56vmax;
-  --orb-hue: 170;
-  --orb-hue-next: 205;
-  --orb-animation: spectrum-drift-b;
-  --orb-duration: 44s;
-  --orb-mobile-animation: spectrum-drift-mobile-b;
-  --orb-mobile-duration: 24.2s;
-}
-
-.ambient-orb--4 {
-  --orb-x: 85%;
-  --orb-y: 25%;
-  --orb-size: 58vmax;
-  --orb-hue: 45;
-  --orb-hue-next: 80;
-  --orb-animation: spectrum-drift-a;
-  --orb-duration: 50s;
-  --orb-mobile-animation: spectrum-drift-mobile-a;
-  --orb-mobile-duration: 27.5s;
-}
-
-.ambient-orb--5 {
-  --orb-x: 20%;
-  --orb-y: 80%;
-  --orb-size: 55vmax;
-  --orb-hue: 140;
-  --orb-hue-next: 175;
-  --orb-animation: spectrum-drift-a;
-  --orb-duration: 48s;
-  --orb-mobile-animation: spectrum-drift-mobile-a;
-  --orb-mobile-duration: 26.4s;
-}
-
-.ambient-orb--6 {
-  --orb-x: 75%;
-  --orb-y: 80%;
-  --orb-size: 56vmax;
-  --orb-hue: 350;
-  --orb-hue-next: 25;
-  --orb-animation: spectrum-drift-b;
-  --orb-duration: 42s;
-  --orb-mobile-animation: spectrum-drift-mobile-b;
-  --orb-mobile-duration: 23.1s;
 }
 
 @media (max-width: 767px),
@@ -624,6 +580,10 @@ body {
 .hero-brain-underlay {
   -webkit-mask-image: linear-gradient(to bottom, transparent 0%, transparent 8%, black 30%, black 100%);
   mask-image: linear-gradient(to bottom, transparent 0%, transparent 8%, black 30%, black 100%);
+  /* A backdrop, not a subject. At full strength the wireframe and its bright
+     neural orbs punched through the CTA labels and the Tokscale card sitting
+     on top of it - no scrim can rescue text from a light source behind it. */
+  opacity: 0.55;
 }
 
 @media (max-width: 639px) {
@@ -705,10 +665,17 @@ body {
   isolation: isolate;
   border-radius: 1.75rem;
   border: 1px solid transparent;
+  /* The gradient layers top out at 0.32 alpha and this bar carries no
+     backdrop blur (deliberately - an animated blur layer here repainted every
+     frame on scroll, commits c2afc91 / 7287ce4). Without an opaque base under
+     them, page content scrolled straight through the bar and stayed fully
+     legible behind the links. The flat colour below is that base: static
+     paint, no filter, no per-frame cost. */
   background:
-    linear-gradient(135deg, hsl(220 22% 10% / 0.32), hsl(220 22% 7% / 0.22)),
-    radial-gradient(circle at 18% 0%, hsl(var(--rainbow-6) / 0.1), transparent 44%),
-    radial-gradient(circle at 82% 0%, hsl(var(--rainbow-5) / 0.09), transparent 42%);
+    linear-gradient(135deg, hsl(220 22% 12% / 0.4), hsl(220 22% 8% / 0.3)),
+    radial-gradient(circle at 18% 0%, hsl(0 0% 100% / 0.06), transparent 44%),
+    radial-gradient(circle at 82% 0%, hsl(0 0% 100% / 0.05), transparent 42%),
+    hsl(220 20% 6% / 0.88);
   box-shadow:
     inset 0 1px 0 hsl(0 0% 100% / 0.14),
     inset 0 0 0 1px hsl(0 0% 100% / 0.05),
@@ -739,10 +706,15 @@ body {
 
 /* Past the hero the tint deepens without changing compositing mode. */
 nav[data-nav-scrolled="true"] .nav-shell {
+  /* This state re-declares `background`, so it needs its own opaque base -
+     without one the scrolled bar was three translucent white washes and the
+     page ran visibly through the links. The white sheen stays; it now sits on
+     something. */
   background:
-    linear-gradient(135deg, hsl(0 0% 100% / 0.13), hsl(0 0% 100% / 0.05)),
-    radial-gradient(circle at 18% 0%, hsl(var(--rainbow-6) / 0.14), transparent 36%),
-    radial-gradient(circle at 82% 0%, hsl(var(--rainbow-5) / 0.12), transparent 34%);
+    linear-gradient(135deg, hsl(0 0% 100% / 0.11), hsl(0 0% 100% / 0.04)),
+    radial-gradient(circle at 18% 0%, hsl(0 0% 100% / 0.08), transparent 36%),
+    radial-gradient(circle at 82% 0%, hsl(0 0% 100% / 0.07), transparent 34%),
+    hsl(220 20% 7% / 0.92);
   box-shadow:
     inset 0 1px 0 hsl(0 0% 100% / 0.18),
     inset 0 0 0 1px hsl(0 0% 100% / 0.06),
@@ -1162,13 +1134,28 @@ nav[data-nav-scrolled="true"] .nav-shell {
   perspective: 900px;
 }
 
+/* Hero badge surface. Kept here rather than as a Tailwind arbitrary value:
+   `bg-[hsla(222,25%,10%,0.34)]` silently produced no rule at all, leaving the
+   card transparent over the 3D brain. Near-opaque on purpose - the embed
+   inside it is a transparent image, so the card is the only thing standing
+   between the wireframe and the numbers. */
+.tokscale-hero-card {
+  background-color: hsla(222, 25%, 9%, 0.92);
+}
+
+.tokscale-hero-card:hover {
+  background-color: hsla(222, 25%, 11%, 0.95);
+}
+
 .tokscale-aura {
   pointer-events: none;
   background:
     radial-gradient(60% 70% at 30% 30%, hsl(160 84% 39% / 0.32), transparent 70%),
     radial-gradient(55% 65% at 75% 70%, hsl(var(--primary) / 0.28), transparent 70%);
   filter: blur(26px);
-  opacity: 0.55;
+  /* Dimmed: this emerald bloom was spilling onto the brain behind the card
+     and reading as a green smear across the hero. */
+  opacity: 0.3;
 }
 
 /* Reduced motion: the token progress bar sits static at partial width. */
