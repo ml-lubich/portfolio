@@ -7,7 +7,6 @@ import {
     SiHonda,
     SiWalmart,
 } from "react-icons/si"
-import { GraduationCap, FlaskConical } from "lucide-react"
 import { AnimatedText } from "../animations/animated-text"
 
 /* ──────────────────────────────────────────────────────────────────────
@@ -32,6 +31,9 @@ function SeasideMark({ className }: { className?: string }) {
 interface Logo {
     name: string
     icon: React.ReactNode
+    /** True when the asset is a wordmark that already spells the brand out —
+     *  the text label is then redundant and is dropped (name still read by SRs). */
+    wordmark?: boolean
 }
 
 /** Brand-colored client logos are muted to match the grey strip; the row's
@@ -42,9 +44,35 @@ const CLIENT_LOGO_IMG =
 const LOGOS: Logo[] = [
     { name: "Apple", icon: <SiApple className="h-7 w-7 sm:h-8 sm:w-8" /> },
     { name: "Walmart", icon: <SiWalmart className="h-7 w-7 sm:h-8 sm:w-8" /> },
-    { name: "Lawrence Berkeley Lab", icon: <FlaskConical className="h-7 w-7 sm:h-8 sm:w-8" /> },
+    {
+        name: "Lawrence Berkeley Lab",
+        wordmark: true,
+        icon: (
+            <Image
+                src="/logos/berkeley-lab.svg"
+                alt="Lawrence Berkeley National Laboratory logo"
+                width={366}
+                height={79}
+                unoptimized
+                className={`h-6 sm:h-7 ${CLIENT_LOGO_IMG}`}
+            />
+        ),
+    },
     { name: "Honda Innovations", icon: <SiHonda className="h-7 w-7 sm:h-8 sm:w-8" /> },
-    { name: "UC Berkeley", icon: <GraduationCap className="h-7 w-7 sm:h-8 sm:w-8" /> },
+    {
+        name: "UC Berkeley",
+        wordmark: true,
+        icon: (
+            <Image
+                src="/logos/uc-berkeley.svg"
+                alt="University of California, Berkeley logo"
+                width={215}
+                height={68}
+                unoptimized
+                className={`h-6 sm:h-7 ${CLIENT_LOGO_IMG}`}
+            />
+        ),
+    },
     {
         name: "LUPFR",
         icon: (
@@ -79,7 +107,9 @@ function LogoItem({ logo }: { logo: Logo }) {
     return (
         <div className="group flex flex-shrink-0 items-center gap-2.5 px-6 sm:px-8 text-muted-foreground/50 transition-colors duration-300 hover:text-muted-foreground/90 select-none">
             {logo.icon}
-            <span className="whitespace-nowrap text-xs font-medium tracking-wide uppercase sm:text-sm">
+            <span
+                className={`whitespace-nowrap text-xs font-medium tracking-wide uppercase sm:text-sm${logo.wordmark ? " sr-only" : ""}`}
+            >
                 {logo.name}
             </span>
         </div>
