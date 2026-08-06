@@ -4,7 +4,6 @@ import Link from "next/link"
 import { ArrowUpRight } from "lucide-react"
 import { AnimatedSection } from "../animations/animated-section"
 import { SiteLogoMark } from "../site-logo-mark"
-import { GlassBlobField } from "../glass-blob-field"
 import { SOCIAL_LINKS } from "../social-icons"
 
 const footerLinks = [
@@ -28,7 +27,6 @@ export function Footer() {
         <div className="footer-liquid-glass relative isolate overflow-hidden rounded-[1.75rem] px-5 py-6 sm:px-7 sm:py-7 lg:px-9">
           <div className="footer-aurora footer-aurora-left" aria-hidden="true" />
           <div className="footer-aurora footer-aurora-right" aria-hidden="true" />
-          <GlassBlobField intensity={0.22} />
 
           <div className="relative z-10 grid gap-8 lg:grid-cols-[1.1fr_1.45fr_auto] lg:items-start lg:gap-12">
             <div>

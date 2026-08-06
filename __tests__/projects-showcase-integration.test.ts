@@ -13,12 +13,11 @@ const ROOT = path.resolve(__dirname, "..")
 const src = fs.readFileSync(path.join(ROOT, "components/sections/projects.tsx"), "utf8")
 
 describe("Projects — Open Source showcase integration", () => {
-  it("imports OpenSourceShowcase", () => {
-    expect(src).toMatch(/import\s+\{\s*OpenSourceShowcase\s*\}\s+from\s+["']\.\/open-source-showcase["']/)
-  })
-
-  it("renders <OpenSourceShowcase />", () => {
-    expect(src).toMatch(/<OpenSourceShowcase\s*\/>/)
+  // OpenSourceShowcase was lifted out of projects.tsx into its own top-level
+  // LazySection in app/page.tsx, so the "OSS" nav anchor resolves without
+  // waiting for the projects section to lazily mount.
+  it("no longer owns the open-source showcase", () => {
+    expect(src).not.toMatch(/OpenSourceShowcase/)
   })
 
   it("still renders the marquee track structure", () => {

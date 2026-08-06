@@ -48,12 +48,15 @@ describe("agent OSS portfolio surface", () => {
     )
   })
 
-  it("wires value-maxxing and tool-matrix into the homepage", () => {
+  it("wires value-maxxing and the open-source showcase into the homepage", () => {
     const page = fs.readFileSync(path.join(ROOT, "app/page.tsx"), "utf8")
     expect(page).toMatch(/ValueMaxxing/)
-    expect(page).toMatch(/ToolMatrix/)
     expect(page).toMatch(/value-maxxing/)
-    expect(page).toMatch(/tool-matrix/)
+    // The CLI/MCP comparison table was removed; OSS is now its own top-level
+    // section so the "OSS" nav anchor resolves without waiting on projects.
+    expect(page).toMatch(/OpenSourceShowcase/)
+    expect(page).toMatch(/sectionId="open-source"/)
+    expect(page).not.toMatch(/ToolMatrix/)
   })
 
   it("ships section components", () => {

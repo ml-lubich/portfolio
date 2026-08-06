@@ -46,8 +46,8 @@ const ValueMaxxing = dynamic(
   () => import("@/components/sections/value-maxxing").then(m => m.ValueMaxxing),
   { loading: () => <SectionSkeleton height="24vh" /> },
 )
-const ToolMatrix = dynamic(
-  () => import("@/components/sections/tool-matrix").then(m => m.ToolMatrix),
+const OpenSourceShowcase = dynamic(
+  () => import("@/components/sections/open-source-showcase").then(m => m.OpenSourceShowcase),
   { loading: () => <SectionSkeleton /> },
 )
 const Skills = dynamic(() => import("@/components/sections/skills").then(m => m.Skills), {
@@ -111,8 +111,8 @@ export default function Home() {
         <LazySection sectionId="value-maxxing" className={LAZY_SECTION_TOP}>
           <ValueMaxxing />
         </LazySection>
-        <LazySection sectionId="tool-matrix" className={LAZY_SECTION_TOP}>
-          <ToolMatrix />
+        <LazySection sectionId="open-source" className={LAZY_SECTION_TOP}>
+          <OpenSourceShowcase />
         </LazySection>
         <LazySection sectionId="skills" className={LAZY_SECTION_TOP}>
           <Skills />

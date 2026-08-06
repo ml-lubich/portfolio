@@ -3,13 +3,28 @@
 import React, { useEffect, useRef, useState, useCallback } from "react"
 import { AnimatedSection } from "../animations/animated-section"
 import { AnimatedText } from "../animations/animated-text"
-import { Terminal, Clock, Zap, Activity, Play, Gamepad2 } from "lucide-react"
+import {
+  Terminal, Clock, Zap, Activity, Play, Gamepad2,
+  User, Coffee, Bot, Rocket, Brain, Wrench, Satellite, RefreshCw, Globe, Target,
+  type LucideIcon,
+} from "lucide-react"
 import { sessions } from "./session-data"
 import { highlight } from "./syntax-highlight"
 import { SnakeTerminal } from "./snake-terminal"
 import InteractiveTerminal from "./interactive-terminal"
 import type { DisplayLine } from "./types"
 import { terminalChrome } from "@/lib/theme"
+
+/** Session glyphs are lucide icons, not emoji — keyed by the string in session-data. */
+const SESSION_ICONS: Record<string, LucideIcon> = {
+  user: User, coffee: Coffee, bot: Bot, rocket: Rocket, brain: Brain, zap: Zap,
+  wrench: Wrench, satellite: Satellite, refresh: RefreshCw, globe: Globe, target: Target,
+}
+
+function SessionIcon({ name, className }: { name?: string; className?: string }) {
+  const Icon = name ? SESSION_ICONS[name] : undefined
+  return Icon ? <Icon className={className} aria-hidden /> : null
+}
 
 const S = sessions
 type TerminalMode = "live" | "snake" | "shell"
@@ -242,7 +257,7 @@ export function LiveTerminal() {
                 }
               `}
             >
-              <span className="text-sm">{s.icon}</span>
+              <SessionIcon name={s.icon} className="h-3.5 w-3.5 shrink-0" />
               <span className="hidden sm:inline">{s.time}</span>
             </button>
           ))}
@@ -346,8 +361,11 @@ export function LiveTerminal() {
           <div className="px-2.5 sm:px-4 py-1 bg-white/[0.02] border-b border-white/[0.04] flex items-center justify-between gap-2 min-w-0">
             <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-[11px] min-w-0">
               <Clock className="w-3 h-3 text-primary/30 shrink-0" />
+              {!isSnakeMode && !isShellMode && (
+                <SessionIcon name={cur?.icon} className="w-3 h-3 text-primary/40 shrink-0" />
+              )}
               <span className="font-mono text-foreground/50 truncate min-w-0">
-                {isSnakeMode ? "snake --play" : isShellMode ? "interactive shell" : `${cur?.icon} ${cur?.time} — ${cur?.label}`}
+                {isSnakeMode ? "snake --play" : isShellMode ? "interactive shell" : `${cur?.time} — ${cur?.label}`}
               </span>
             </div>
             <span className="text-[10px] font-mono text-muted-foreground/25 shrink-0">

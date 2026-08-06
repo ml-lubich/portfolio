@@ -7,7 +7,7 @@ import type { Session } from "./types"
 export const sessions: Session[] = [
   /* 0 ── experience bio */
   {
-    time: "06:00 AM", label: "whoami", icon: "👤",
+    time: "06:00 AM", label: "whoami", icon: "user",
     lines: [
       { t: "cmd", s: "cat ~/.bio" },
       { t: "out", s: "Experience at Apple, Walmart, LBNL, and Honda Innovations.", d: 60 },
@@ -19,7 +19,7 @@ export const sessions: Session[] = [
   },
   /* 1 ── morning boot */
   {
-    time: "06:42 AM", label: "Morning Boot", icon: "☕",
+    time: "06:42 AM", label: "Morning Boot", icon: "coffee",
     lines: [
       { t: "cmd", s: "cd ~/agents && source .venv/bin/activate" },
       { t: "out", s: "(venv) ✓ Python 3.12.4 — torch 2.3.1+cu121 — CUDA 12.1", d: 60 },
@@ -36,7 +36,7 @@ export const sessions: Session[] = [
   },
   /* 1 ── code-review agent */
   {
-    time: "07:15 AM", label: "Code-Review Agent", icon: "🤖",
+    time: "07:15 AM", label: "Code-Review Agent", icon: "bot",
     lines: [
       { t: "hdr", s: "# agents/code_review.py" },
       { t: "code", s: "class CodeReviewAgent(BaseAgent):" },
@@ -60,7 +60,7 @@ export const sessions: Session[] = [
   },
   /* 2 ── RAG pipeline */
   {
-    time: "09:30 AM", label: "RAG Pipeline Deploy", icon: "🚀",
+    time: "09:30 AM", label: "RAG Pipeline Deploy", icon: "rocket",
     lines: [
       { t: "cmd", s: "kubectl apply -f k8s/rag-pipeline.yaml" },
       { t: "out", s: "deployment.apps/rag-embedder created", d: 40 },
@@ -78,7 +78,7 @@ export const sessions: Session[] = [
   },
   /* 3 ── fine-tuning */
   {
-    time: "11:00 AM", label: "Model Fine-Tuning", icon: "🧠",
+    time: "11:00 AM", label: "Model Fine-Tuning", icon: "brain",
     lines: [
       { t: "cmd", s: "accelerate launch train.py \\" },
       { t: "cmd", s: "  --model meta-llama/Llama-4-Maverick \\" },
@@ -95,7 +95,7 @@ export const sessions: Session[] = [
   },
   /* 4 ── agent swarm */
   {
-    time: "01:30 PM", label: "Agent Swarm Orchestrator", icon: "⚡",
+    time: "01:30 PM", label: "Agent Swarm Orchestrator", icon: "zap",
     lines: [
       { t: "hdr", s: "# orchestrator/swarm.py" },
       { t: "code", s: "class AgentSwarm:" },
@@ -123,7 +123,7 @@ export const sessions: Session[] = [
   },
   /* 5 ── tool-use agent */
   {
-    time: "03:00 PM", label: "Tool-Use Agent Build", icon: "🛠️",
+    time: "03:00 PM", label: "Tool-Use Agent Build", icon: "wrench",
     lines: [
       { t: "hdr", s: "# agents/tool_agent.py" },
       { t: "code", s: "class ToolUseAgent(ReActAgent):" },
@@ -152,7 +152,7 @@ export const sessions: Session[] = [
   },
   /* 6 ── streaming inference */
   {
-    time: "04:45 PM", label: "Streaming Inference API", icon: "📡",
+    time: "04:45 PM", label: "Streaming Inference API", icon: "satellite",
     lines: [
       { t: "hdr", s: "// api/inference/stream.ts" },
       { t: "code", s: "export async function* streamInference(" },
@@ -175,7 +175,7 @@ export const sessions: Session[] = [
   },
   /* 7 ── data pipeline */
   {
-    time: "05:30 PM", label: "Data Pipeline ETL", icon: "🔄",
+    time: "05:30 PM", label: "Data Pipeline ETL", icon: "refresh",
     lines: [
       { t: "cmd", s: "python -m pipeline.run --source kafka --sink bigquery" },
       { t: "out", s: "Connecting to kafka://prod-cluster:9092...", d: 60 },
@@ -197,7 +197,7 @@ export const sessions: Session[] = [
   },
   /* 8 ── sub-agent spawning */
   {
-    time: "06:15 PM", label: "Sub-Agent Spawner", icon: "🌐",
+    time: "06:15 PM", label: "Sub-Agent Spawner", icon: "globe",
     lines: [
       { t: "hdr", s: "# agents/spawner.py" },
       { t: "code", s: "class AgentSpawner:" },
@@ -223,7 +223,7 @@ export const sessions: Session[] = [
   },
   /* 9 ── shipping */
   {
-    time: "07:30 PM", label: "Ship & Monitor", icon: "🎯",
+    time: "07:30 PM", label: "Ship & Monitor", icon: "target",
     lines: [
       { t: "cmd", s: "git add -A && git commit -m 'feat: agent swarm v2 + streaming api'" },
       { t: "out", s: "[main e7b4d08] feat: agent swarm v2 + streaming api", d: 50 },

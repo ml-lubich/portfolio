@@ -17,7 +17,6 @@ import {
 } from "lucide-react"
 import { DetailPanel } from "../detail-panel"
 import { SectionHeader } from "../layout/section-header"
-import { OpenSourceShowcase } from "./open-source-showcase"
 import { projects, type Project } from "@/data/projects"
 
 /* ── Designed cover for projects with no public screenshot ────────────
@@ -286,9 +285,6 @@ export function Projects() {
 
   return (
     <section id="projects" className="relative scroll-mt-24 py-5 md:py-14 lg:py-20">
-      {/* Tier 1: curated open-source demos — self-contained section, own header/FX/modal */}
-      <OpenSourceShowcase />
-
       {/* Tier 2: the marquee — everything else I've shipped, breadth over depth */}
       {/* Background FX */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
