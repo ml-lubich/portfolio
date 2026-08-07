@@ -1,0 +1,62 @@
+---
+title: "Hard Lessons from Production: Why Execution Boundaries Beat Optimistic Unit Tests"
+excerpt: "Local unit tests passing tells you your syntax works. It tells you nothing about concurrency spikes, DB connection starvation, or LLM state mutations under real traffic."
+date: "2026-08-06"
+category: "MLOps"
+tags: ["Production", "Distributed Systems", "Agentic Workflows", "Reliability", "vLLM"]
+---
+
+## The Illusion of Local Green Checkmarks
+
+Unit tests passing locally on a laptop gives engineers a false sense of security. A synthetic test suite in an isolated environment tests your expected happy path syntax—it tells you virtually nothing about how your system behaves under real production load.
+
+When real traffic hits your services at scale, hidden system behaviors immediately surface:
+- Database connection pool starvation under concurrent request spikes
+- Race conditions between asynchronous state mutations
+- Unhandled retries causing cascading failure loops
+- LLM agents proposing unvalidated write mutations against production schemas
+
+Here are three hard-earned architectural lessons from shipping enterprise microservices and production AI agents at scale.
+
+---
+
+## 1. Never Allow Autonomous LLM Writes Without a Deterministic Allowlist
+
+Allowing an AI model or LLM agent to construct and execute arbitrary writes directly against your production database is an immediate reliability failure mode.
+
+Regardless of how high your prompt eval score is, LLMs are non-deterministic. In production, write operations must be gated by a **deterministic execution allowlist**:
+
+- **Model Proposes, Code Decides**: The LLM suggests an action payload (e.g. updating a customer record).
+- **Schema Validation**: A strict Python/Type-safe validator checks the payload against a fixed field allowlist and 30+ business logic gates.
+- **Least-Privilege Execution**: The database driver executes the write under least-privilege service accounts with zero raw SQL execution privileges.
+
+By enforcing this boundary, we ran an agentic support platform processing over 10,000 cases per month with a **zero hallucinated-write rate**, cutting cost per case from $2.00 down to ~$0.02.
+
+---
+
+## 2. Hard Execution Budgets & Loop Detectors Are Mandatory
+
+In distributed systems and agentic loops, recursive or un-bounded execution is dangerous. Under unexpected upstream network latency or tool timeouts, an agentic loop will gladly burn through compute attempting to resolve the same step infinitely.
+
+Every production loop must enforce:
+- **Hard Step Budgets**: Maximum allowable tool iterations per turn (e.g., 5 steps max).
+- **Deterministic Loop Detection**: Hashes of recent tool parameters to catch infinite retry loops immediately.
+- **Global Timeout Boundaries**: Strict execution timeouts at the API gateway layer.
+
+---
+
+## 3. On-Prem Open Weights + Strict Context Beats Expensive Cloud APIs
+
+A common trap in early AI engineering is assuming that throwing a larger, more expensive cloud API at a problem solves reliability issues.
+
+In practice, pairing **open-weight models (Qwen, DeepSeek)** running on multi-GPU **vLLM** nodes with **deterministic RAG grounding** consistently beats raw API calls on latency, cost, and syntax precision:
+
+- **Sub-200ms Tool Query Latency**: By hosting open-weight models on-prem alongside carrier-scale ClickHouse and Postgres clusters, tool-calling overhead drops dramatically.
+- **Cost Reduction**: Inference costs drop by 95%+ compared to commercial APIs.
+- **Auditability**: Complete control over model weights, context window budgeting, and prompt injection defense.
+
+---
+
+## Takeaway
+
+Production reliability is not achieved by hoping your prompt or your local unit tests hold up under load. It is built by establishing **strict execution boundaries**, gating database mutations with deterministic code, and enforcing hard resource budgets at every layer of your stack.
