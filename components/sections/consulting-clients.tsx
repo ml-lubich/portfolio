@@ -84,7 +84,7 @@ function ClientCard({
         }}
       >
         {/* ── Front ─────────────────────────────────────────── */}
-        <div className={face} aria-hidden={flipped || undefined} {...(flipped ? { inert: "" as never } : {})}>
+        <div className={face} aria-hidden={flipped || undefined} inert={flipped}>
           {/* Scanning accent rail */}
           <div
             className={`h-[2px] w-full shrink-0 bg-gradient-to-r ${client.gradient} opacity-80`}
@@ -203,7 +203,7 @@ function ClientCard({
         <div
           className={`${face} [transform:rotateY(180deg)]`}
           aria-hidden={!flipped || undefined}
-          {...(!flipped ? { inert: "" as never } : {})}
+          inert={!flipped}
         >
           <div className={`h-[2px] w-full shrink-0 bg-gradient-to-r ${client.gradient}`} />
           <div
@@ -603,7 +603,7 @@ export function ConsultingClients() {
               key={copy}
               className="flex items-stretch gap-4 pl-4 md:gap-6 md:pl-6"
               aria-hidden={copy > 0 || undefined}
-              {...(copy > 0 ? { inert: "" as never } : {})}
+              inert={copy > 0}
             >
               {renderSet(copy)}
             </ul>

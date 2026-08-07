@@ -89,7 +89,7 @@ function ToolsDropdown() {
         type="button"
         onClick={() => setOpen(o => !o)}
         className={[
-          "group/link relative isolate flex items-center gap-1 overflow-hidden whitespace-nowrap rounded-full border px-3 py-2 text-[13px] tracking-[0.01em] transition-all duration-300 2xl:px-3.5 2xl:text-[14px]",
+          "group/link relative isolate flex items-center gap-1 overflow-hidden whitespace-nowrap rounded-full border px-3 py-2 text-[13px] tracking-[0.01em] transition-[color,background-color,border-color,box-shadow] duration-150 ease-out 2xl:px-3.5 2xl:text-[14px]",
           open
             ? "border-white/[0.12] bg-white/[0.10] font-medium text-foreground shadow-[0_10px_30px_-18px_rgba(255,255,255,0.8)]"
             : "border-transparent text-muted-foreground hover:border-white/[0.08] hover:bg-white/[0.06] hover:text-foreground",
@@ -107,7 +107,7 @@ function ToolsDropdown() {
       {/* Dropdown panel */}
       <div
         className={[
-          "absolute left-1/2 top-full z-[300] min-w-[220px] pt-2 -translate-x-1/2 transition-all duration-200 ease-fluid",
+          "absolute left-1/2 top-full z-[300] min-w-[220px] pt-2 -translate-x-1/2 transition-[opacity,transform,visibility] duration-150 ease-out",
           open ? "pointer-events-auto translate-y-0 opacity-100" : "pointer-events-none -translate-y-1 opacity-0",
         ].join(" ")}
       >
@@ -178,7 +178,7 @@ function GamesDropdown() {
         type="button"
         onClick={() => setOpen(o => !o)}
         className={[
-          "group/link relative isolate flex items-center gap-1 overflow-hidden whitespace-nowrap rounded-full border px-3 py-2 text-[13px] tracking-[0.01em] transition-all duration-300 2xl:px-3.5 2xl:text-[14px]",
+          "group/link relative isolate flex items-center gap-1 overflow-hidden whitespace-nowrap rounded-full border px-3 py-2 text-[13px] tracking-[0.01em] transition-[color,background-color,border-color,box-shadow] duration-150 ease-out 2xl:px-3.5 2xl:text-[14px]",
           open
             ? "border-white/[0.12] bg-white/[0.10] font-medium text-foreground shadow-[0_10px_30px_-18px_rgba(255,255,255,0.8)]"
             : "border-transparent text-muted-foreground hover:border-white/[0.08] hover:bg-white/[0.06] hover:text-foreground",
@@ -196,7 +196,7 @@ function GamesDropdown() {
       {/* Dropdown panel */}
       <div
         className={[
-          "absolute left-1/2 top-full z-[300] min-w-[220px] pt-2 -translate-x-1/2 transition-all duration-200 ease-fluid",
+          "absolute left-1/2 top-full z-[300] min-w-[220px] pt-2 -translate-x-1/2 transition-[opacity,transform,visibility] duration-150 ease-out",
           open ? "pointer-events-auto translate-y-0 opacity-100" : "pointer-events-none -translate-y-1 opacity-0",
         ].join(" ")}
       >
@@ -464,7 +464,7 @@ export function Navigation() {
                   onClick={(e) => handleLinkClick(e, link.href)}
                   title={link.label}
                   className={[
-                    "group/link relative isolate overflow-hidden whitespace-nowrap rounded-full border px-3 py-2 text-[13px] tracking-[0.01em] transition-all duration-300 2xl:px-3.5 2xl:text-[14px]",
+                    "group/link relative isolate overflow-hidden whitespace-nowrap rounded-full border px-3 py-2 text-[13px] tracking-[0.01em] transition-[color,background-color,border-color,box-shadow] duration-150 ease-out 2xl:px-3.5 2xl:text-[14px]",
                     isActive
                       ? "border-white/[0.12] bg-white/[0.10] font-medium text-foreground shadow-[0_10px_30px_-18px_rgba(255,255,255,0.8)]"
                       : "border-transparent text-muted-foreground hover:border-white/[0.08] hover:bg-white/[0.06] hover:text-foreground",
@@ -481,7 +481,7 @@ export function Navigation() {
               onClick={(e) => handleLinkClick(e, "#contact")}
               aria-label="Get In Touch"
               title="Get In Touch"
-              className="group/link relative isolate ml-2 overflow-hidden whitespace-nowrap rounded-full border border-white/[0.16] bg-foreground px-4 py-2 text-[13px] font-semibold text-background shadow-[0_14px_34px_-18px_rgba(255,255,255,0.8)] transition-all duration-300 before:absolute before:inset-0 before:-z-10 before:bg-[linear-gradient(120deg,rgba(255,255,255,0.95),rgba(255,255,255,0.72))] hover:scale-[1.03] hover:shadow-[0_18px_46px_-18px_rgba(255,255,255,0.9)] active:scale-[0.98] 2xl:ml-3 2xl:px-4 2xl:text-[14px]"
+              className="group/link relative isolate ml-2 overflow-hidden whitespace-nowrap rounded-full border border-white/[0.16] bg-foreground px-4 py-2 text-[13px] font-semibold text-background shadow-[0_14px_34px_-18px_rgba(255,255,255,0.8)] transition-[transform,box-shadow,background-color] duration-150 ease-out before:absolute before:inset-0 before:-z-10 before:bg-[linear-gradient(120deg,rgba(255,255,255,0.95),rgba(255,255,255,0.72))] hover:scale-[1.03] hover:shadow-[0_18px_46px_-18px_rgba(255,255,255,0.9)] active:scale-[0.98] 2xl:ml-3 2xl:px-4 2xl:text-[14px]"
             >
               <ExpandingText text="Get In Touch" />
             </a>
@@ -491,7 +491,7 @@ export function Navigation() {
           <button
             type="button"
             onClick={() => setMobileOpen((o) => !o)}
-            className="flex min-h-[48px] min-w-[48px] items-center justify-center rounded-2xl border border-white/[0.08] bg-white/[0.05] p-3 text-muted-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] transition-all duration-300 hover:border-white/[0.14] hover:bg-white/[0.09] hover:text-foreground xl:hidden"
+            className="flex min-h-[48px] min-w-[48px] items-center justify-center rounded-2xl border border-white/[0.08] bg-white/[0.05] p-3 text-muted-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.12)] transition-[color,background-color,border-color] duration-150 ease-out hover:border-white/[0.14] hover:bg-white/[0.09] hover:text-foreground xl:hidden"
             aria-expanded={mobileOpen ? "true" : "false"}
             aria-controls="mobile-nav-overlay"
             aria-label="Toggle menu"

@@ -94,7 +94,7 @@ export function ProfileIntro() {
                                     aria-hidden="true"
                                 />
                                 <div
-                                    className="h-72 w-52 overflow-hidden border border-white/[0.1] shadow-xl shadow-black/30 transition-shadow duration-500 group-hover:shadow-2xl group-hover:shadow-black/40 sm:h-96 sm:w-64"
+                                    className="relative h-72 w-52 overflow-hidden border border-white/[0.1] shadow-xl shadow-black/30 transition-shadow duration-500 group-hover:shadow-2xl group-hover:shadow-black/40 sm:h-96 sm:w-64"
                                     style={{ borderRadius: "50% / 46%" }}
                                 >
                                     <Image
@@ -103,8 +103,19 @@ export function ProfileIntro() {
                                         width={412}
                                         height={628}
                                         sizes="(max-width: 640px) 208px, 412px"
-                                        className="h-full w-full object-cover object-top brightness-[0.72] contrast-[0.95] saturate-[1.05] transition-all duration-500 group-hover:brightness-[0.78] group-hover:saturate-[1.1]"
+                                        className="h-full w-full object-cover object-top brightness-[0.52] contrast-[1.08] saturate-[0.9] transition-all duration-500 group-hover:brightness-[0.62] group-hover:saturate-[1]"
                                         priority={false}
+                                    />
+                                    {/* The source frame blows out around the stairwell lighting, so the
+                                        highlights get pulled down twice: once by the filter above, and
+                                        again by this vignette that darkens the rim toward the card. */}
+                                    <div
+                                        className="pointer-events-none absolute inset-0 transition-opacity duration-500 group-hover:opacity-80"
+                                        style={{
+                                            background:
+                                                "radial-gradient(ellipse at 50% 38%, transparent 28%, rgba(6,8,14,0.45) 68%, rgba(6,8,14,0.88) 100%)",
+                                        }}
+                                        aria-hidden="true"
                                     />
                                 </div>
                             </div>

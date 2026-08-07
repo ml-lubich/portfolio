@@ -1,6 +1,8 @@
 "use client"
 
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import dynamic from "next/dynamic"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 import { AnimatedSection } from "../animations/animated-section"
 import { type BarItem } from "../animations/animated-bars"
 import { SectionHeader } from "../layout/section-header"
@@ -130,6 +132,217 @@ const techBars: BarItem[] = [
   },
 ]
 
+/* ── DomainRing — the four AI domains suspended on a rotating 3D carousel.
+ *
+ *  Stacked cards ate most of a screen each and read as a flat list. Here the
+ *  panels sit on a ring in real 3D space (preserve-3d, one rotateY step per
+ *  panel), floating over a vertex mesh that echoes the hero brain's wireframe.
+ *  One panel faces the viewer at a time; the rest angle away, so the section
+ *  costs one viewport instead of four.
+ * ── */
+
+/** Gap between a panel's edge and the ring radius, in px */
+const RING_PADDING = 60
+
+function RingMesh() {
+  /* Static wireframe — deterministic so SSR and client agree. */
+  const { nodes, edges } = useMemo(() => {
+    const pts = Array.from({ length: 26 }, (_, i) => {
+      const a = (i / 26) * Math.PI * 2
+      const r = 18 + ((i * 37) % 23)
+      return { x: 50 + Math.cos(a) * r, y: 50 + Math.sin(a) * r * 0.55 }
+    })
+    const lines: [number, number][] = []
+    for (let i = 0; i < pts.length; i++) {
+      for (let j = i + 1; j < pts.length; j++) {
+        if (Math.hypot(pts[i].x - pts[j].x, pts[i].y - pts[j].y) < 15) lines.push([i, j])
+      }
+    }
+    return { nodes: pts, edges: lines }
+  }, [])
+
+  return (
+    <svg
+      viewBox="0 0 100 100"
+      preserveAspectRatio="none"
+      className="pointer-events-none absolute inset-0 h-full w-full opacity-[0.30]"
+      aria-hidden
+    >
+      {edges.map(([a, b], i) => (
+        <line
+          key={i}
+          x1={nodes[a].x}
+          y1={nodes[a].y}
+          x2={nodes[b].x}
+          y2={nodes[b].y}
+          stroke="rgba(223,226,236,0.35)"
+          strokeWidth={0.12}
+        />
+      ))}
+      {nodes.map((n, i) => (
+        <circle key={i} cx={n.x} cy={n.y} r={0.35} fill="rgba(255,255,255,0.8)">
+          <animate
+            attributeName="opacity"
+            values="0.2;0.9;0.2"
+            dur="4s"
+            begin={`${(i % 8) * 0.5}s`}
+            repeatCount="indefinite"
+          />
+        </circle>
+      ))}
+    </svg>
+  )
+}
+
+function DomainRing() {
+  const [index, setIndex] = useState(0)
+  const [radius, setRadius] = useState(360)
+  const stageRef = useRef<HTMLDivElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
+  const count = aiDomains.length
+  const step = 360 / count
+
+  /* The ring only reads correctly when its radius matches the panel width —
+     too small and neighbours punch through the front panel. */
+  useEffect(() => {
+    const measure = () => {
+      const w = panelRef.current?.offsetWidth
+      if (w) setRadius(Math.round(w / 2 / Math.tan(Math.PI / count)) + RING_PADDING)
+    }
+    measure()
+    if (typeof ResizeObserver === "undefined") return
+    const ro = new ResizeObserver(measure)
+    if (stageRef.current) ro.observe(stageRef.current)
+    return () => ro.disconnect()
+  }, [count])
+
+  const go = useCallback((delta: number) => setIndex((i) => i + delta), [])
+
+  /** Active panel is the ring position congruent to `index`, so it keeps
+   *  spinning the same direction instead of unwinding on wrap. */
+  const activeSlot = ((index % count) + count) % count
+
+  return (
+    <div className="relative">
+      <RingMesh />
+
+      <div
+        ref={stageRef}
+        className="relative h-[600px] sm:h-[520px]"
+        style={{ perspective: "1800px" }}
+      >
+        <div
+          className="absolute inset-0"
+          style={{
+            transformStyle: "preserve-3d",
+            transform: `translateZ(-${radius}px) rotateY(${-index * step}deg)`,
+            transition: "transform 900ms cubic-bezier(0.16, 1, 0.3, 1)",
+          }}
+        >
+          {aiDomains.map((domain, i) => {
+            const isActive = i === activeSlot
+            return (
+              <article
+                key={domain.title}
+                ref={i === 0 ? panelRef : undefined}
+                aria-hidden={!isActive || undefined}
+                inert={!isActive}
+                className={`absolute left-1/2 top-0 w-[min(88vw,560px)] overflow-hidden rounded-3xl border bg-[#0a0c14]/85 backdrop-blur-2xl transition-[opacity,border-color,box-shadow] duration-700 ${
+                  isActive
+                    ? "border-white/25 opacity-100 shadow-[0_40px_120px_-40px_rgba(0,0,0,0.95)]"
+                    : "pointer-events-none border-white/[0.08] opacity-35"
+                }`}
+                style={{
+                  transform: `translateX(-50%) rotateY(${i * step}deg) translateZ(${radius}px)`,
+                }}
+              >
+                <div className={`h-[2px] w-full bg-gradient-to-r ${domain.gradient}`} />
+                <ShimmerOverlay className="rounded-3xl" />
+
+                {/* Corner brackets */}
+                <span className="pointer-events-none absolute left-4 top-5 h-4 w-4 border-l border-t border-white/30" aria-hidden />
+                <span className="pointer-events-none absolute bottom-4 right-4 h-4 w-4 border-b border-r border-white/30" aria-hidden />
+
+                <div className="relative p-6 sm:p-8">
+                  <div className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground/50">
+                    <span className="text-foreground/70">{String(i + 1).padStart(2, "0")}</span>
+                    <span className="h-px flex-1 bg-white/10" aria-hidden />
+                    <span>Domain</span>
+                  </div>
+
+                  <div className="mt-5 flex items-start gap-4">
+                    <div className="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-primary/10 border border-primary/30 text-primary">
+                      <domain.icon className="h-6 w-6" aria-hidden />
+                    </div>
+                    <h3 className="font-display text-lg font-light leading-snug text-foreground sm:text-xl">
+                      {domain.title}
+                    </h3>
+                  </div>
+
+                  <p className="mt-4 text-[13px] leading-relaxed text-muted-foreground/80">
+                    {domain.description}
+                  </p>
+
+                  <ul className="mt-5 space-y-2.5">
+                    {domain.details.map((detail) => (
+                      <li
+                        key={detail}
+                        className="flex items-start gap-3 rounded-xl border border-primary/15 bg-secondary/40 px-3.5 py-2.5"
+                      >
+                        <span
+                          className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-primary shadow-[0_0_8px_1px_hsl(var(--primary)/0.6)]"
+                          aria-hidden
+                        />
+                        <span className="text-[12.5px] leading-relaxed text-foreground/85">{detail}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </article>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* Ring controls */}
+      <div className="mt-4 flex items-center justify-center gap-4">
+        <button
+          type="button"
+          onClick={() => go(-1)}
+          aria-label="Previous AI domain"
+          className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/[0.12] bg-white/[0.04] text-muted-foreground transition-[color,background-color,border-color] duration-150 hover:border-white/30 hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary"
+        >
+          <ChevronLeft className="h-4 w-4" aria-hidden />
+        </button>
+
+        <div className="flex items-center gap-2">
+          {aiDomains.map((domain, i) => (
+            <button
+              key={domain.title}
+              type="button"
+              onClick={() => go(i - activeSlot)}
+              aria-label={`Show ${domain.title}`}
+              aria-current={i === activeSlot}
+              className={`h-1.5 rounded-full transition-all duration-300 ${
+                i === activeSlot ? "w-7 bg-foreground/80" : "w-1.5 bg-white/25 hover:bg-white/50"
+              }`}
+            />
+          ))}
+        </div>
+
+        <button
+          type="button"
+          onClick={() => go(1)}
+          aria-label="Next AI domain"
+          className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/[0.12] bg-white/[0.04] text-muted-foreground transition-[color,background-color,border-color] duration-150 hover:border-white/30 hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary"
+        >
+          <ChevronRight className="h-4 w-4" aria-hidden />
+        </button>
+      </div>
+    </div>
+  )
+}
+
 export function AIExpertise() {
   return (
     <AnimatedSection id="ai-expertise" className="relative py-6 md:py-14 lg:py-20">
@@ -171,64 +384,10 @@ export function AIExpertise() {
           <NeuralConstellation bars={techBars} metrics={metrics} />
         </AnimatedSection>
 
-        {/* AI Domains — Step-by-step cards */}
-        <div className="relative">
-          {/* Vertical connector line (visible on lg) */}
-          <div className="absolute left-1/2 top-0 bottom-0 hidden w-px -translate-x-1/2 bg-primary/20 lg:block" aria-hidden="true" />
-
-          <div className="grid gap-6 md:gap-8 lg:grid-cols-2">
-            {aiDomains.map((domain, i) => (
-              <AnimatedSection key={domain.title} delay={i * 150}>
-                <div className="group relative h-full overflow-hidden rounded-2xl border border-primary/20 bg-card/60 backdrop-blur-2xl transition-all duration-500 hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/20 glass-card-3d spotlight">
-                  {/* Top edge light */}
-                  <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
-                  {/* Hover overlay */}
-                  <div className="absolute inset-0 rounded-2xl bg-primary/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-                  <ShimmerOverlay className="rounded-2xl" />
-
-                  {/* Top glowing accent bar */}
-                  <div className="h-1 w-full bg-gradient-to-r from-primary via-accent to-primary" />
-
-                  <div className="relative p-6 md:p-8">
-                    {/* Step number + icon header */}
-                    <div className="flex items-start gap-4">
-                      <div className="relative shrink-0">
-                        <div className="rounded-xl bg-primary/10 border border-primary/30 p-3.5 text-primary transition-all duration-500 group-hover:scale-105 group-hover:bg-primary group-hover:text-primary-foreground group-hover:shadow-lg group-hover:shadow-primary/30">
-                          <domain.icon className="h-6 w-6 transition-all duration-500" />
-                        </div>
-                        {/* Step number badge */}
-                        <div className="absolute -top-2.5 -right-2.5 flex h-7 w-7 items-center justify-center rounded-full border border-primary/40 bg-background font-mono text-xs font-bold text-primary shadow-md transition-transform duration-500 group-hover:scale-110 group-hover:border-primary group-hover:bg-primary group-hover:text-primary-foreground">
-                          {i + 1}
-                        </div>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="text-xl font-display font-semibold text-foreground transition-colors duration-300 group-hover:text-primary">{domain.title}</h3>
-                        <p className="mt-2 text-sm leading-relaxed text-muted-foreground/90">
-                          {domain.description}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Details — elevated contrast containers */}
-                    <div className="mt-6 space-y-3">
-                      <div className="h-px bg-border/60" />
-                      {domain.details.map((detail, idx) => (
-                        <div
-                          key={idx}
-                          className="flex items-start gap-3 rounded-xl border border-primary/15 bg-secondary/40 p-3.5 transition-all duration-300 hover:border-primary/40 hover:bg-secondary/70 hover:translate-x-1"
-                          style={{ transitionDelay: `${idx * 50}ms` }}
-                        >
-                          <div className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary shadow-[0_0_8px_1px_hsl(var(--primary)/0.6)]" />
-                          <p className="text-sm font-medium leading-normal text-foreground/90 transition-colors duration-300 group-hover:text-foreground">{detail}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </AnimatedSection>
-            ))}
-          </div>
-        </div>
+        {/* AI Domains — suspended 3D ring */}
+        <AnimatedSection delay={100}>
+          <DomainRing />
+        </AnimatedSection>
 
         {/* Bottom CTA */}
         <AnimatedSection delay={600}>

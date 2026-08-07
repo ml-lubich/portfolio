@@ -77,6 +77,7 @@ function cmdHelp(): CommandResult {
     "git       git shortcuts",
     "python    run python (or show version)",
     "make      run Makefile target",
+    "bun       run package scripts — try 'bun run dev' (also npm/pnpm/yarn)",
     "clear     clear the terminal",
     "neofetch  system information",
     "snake     launch snake game",
@@ -645,6 +646,96 @@ function cmdInstall(_state: ShellState, args: string[]): CommandResult {
   return { lines: [mkOut(`Installing ${pkg}...`), mkOut("Added 1 package in 0.3s")] }
 }
 
+// ── package runner (bun / npm / pnpm / yarn) ─────────────────
+//
+// `bun run dev` is the first thing most visitors type, and a bare
+// "command not found" reads as a broken demo rather than a simulation.
+// The scripts below mirror this repo's real package.json targets.
+
+const PKG_SCRIPTS: Record<string, string[]> = {
+  dev: [
+    "$ next dev",
+    "  ▲ Next.js 16.1.6 (Turbopack)",
+    "  - Local:        http://localhost:3000",
+    "  - Network:      http://192.168.1.24:3000",
+    "",
+    " ✓ Ready in 812ms",
+    " ○ Compiling / ...",
+    " ✓ Compiled / in 1.4s (1892 modules)",
+  ],
+  build: [
+    "$ next build",
+    "  ▲ Next.js 16.1.6",
+    "   Creating an optimized production build ...",
+    " ✓ Compiled successfully in 4.8s",
+    "   Running TypeScript ...",
+    " ✓ Generating static pages (66/66)",
+    "",
+    "  Route (app)                     Size     First Load JS",
+    "  ┌ ○ /                           58.1 kB         214 kB",
+    "  ├ ○ /blog                       3.2 kB          142 kB",
+    "  └ ○ /tools                      2.9 kB          141 kB",
+  ],
+  test: [
+    "$ vitest run",
+    "  ✓ __tests__/data-integrity.test.ts (434 tests)",
+    "  ✓ __tests__/shell-interpreter.test.ts (35 tests)",
+    "  ✓ __tests__/nav-responsiveness.test.ts (5 tests)",
+    "",
+    "  Test Files  47 passed (47)",
+    "       Tests  1006 passed (1006)",
+  ],
+  lint: ["$ eslint .", "", "✔ No ESLint warnings or errors"],
+  start: [
+    "$ next start",
+    "  ▲ Next.js 16.1.6",
+    "  - Local:        http://localhost:3000",
+    "",
+    " ✓ Ready in 214ms",
+  ],
+}
+
+const PKG_INSTALL: Record<string, string[]> = {
+  bun: ["bun install v1.2.4", "", " + next@16.1.6", " + react@19.2.0", "", " 412 packages installed [1.21s]"],
+  npm: ["", "added 412 packages in 9s", ""],
+  pnpm: ["Packages: +412", "Progress: resolved 412, reused 400, downloaded 12, added 412, done"],
+  yarn: ["yarn install v1.22.22", "success Saved lockfile.", "✨  Done in 8.14s."],
+}
+
+/** `args` arrives without the command name, so `bun run dev` is ["run","dev"]. */
+function cmdPkg(pm: string, args: string[]): CommandResult {
+  const rest = args.filter(a => !a.startsWith("-"))
+  const flags = args.filter(a => a.startsWith("-"))
+  const first = rest[0]
+
+  if (flags.includes("--version") || flags.includes("-v")) {
+    const versions: Record<string, string> = { bun: "1.2.4", npm: "10.9.2", pnpm: "9.15.0", yarn: "1.22.22" }
+    return { lines: [mkOut(versions[pm] ?? "1.0.0")] }
+  }
+
+  if (!first || first === "install" || first === "i" || first === "add") {
+    // `bun add <pkg>` installs one package; a bare install restores the lockfile
+    const pkg = rest[1]
+    if (pkg) return { lines: [mkOut(`Installing ${pkg}...`), mkOut(`+ ${pkg}@latest`), mkOut("1 package installed")] }
+    return { lines: (PKG_INSTALL[pm] ?? PKG_INSTALL.npm).map(mkOut) }
+  }
+
+  // `bun run dev` and the bare `bun dev` shorthand both resolve a script
+  const script = first === "run" || first === "exec" ? rest[1] : first
+  if (!script) return { lines: [mkErr(`${pm}: no script specified`)] }
+
+  const output = PKG_SCRIPTS[script]
+  if (!output) {
+    return {
+      lines: [
+        mkErr(`${pm}: script "${script}" not found in package.json`),
+        mkOut(`Available scripts: ${Object.keys(PKG_SCRIPTS).join(", ")}`),
+      ],
+    }
+  }
+  return { lines: output.map(mkOut) }
+}
+
 // ── which / type ──────────────────────────────────────────────
 
 function cmdWhich(args: string[]): CommandResult {
@@ -730,7 +821,12 @@ const COMMANDS: Record<string, CommandFn> = {
   man: (s, a) => cmdMan(s, a),
   make: (s, a) => cmdMake(s, a),
   sudo: () => cmdSudo(),
-  npm: (s, a) => cmdInstall(s, a.slice(1)),
+  bun: (_s, a) => cmdPkg("bun", a),
+  bunx: (_s, a) => cmdPkg("bun", a),
+  npm: (_s, a) => cmdPkg("npm", a),
+  npx: (_s, a) => cmdPkg("npm", a),
+  pnpm: (_s, a) => cmdPkg("pnpm", a),
+  yarn: (_s, a) => cmdPkg("yarn", a),
   pip: (s, a) => cmdInstall(s, a.slice(1)),
   which: (_s, a) => cmdWhich(a),
   type: (_s, a) => cmdType(a),

@@ -170,3 +170,59 @@ describe("shell-interpreter", () => {
     expect(lines.some(l => l.text.includes("HOME="))).toBe(true)
   })
 })
+
+/**
+ * Package-manager scripts. Visitors reach for `bun run dev` before anything
+ * else, and "bun: command not found" reads like the demo is broken rather
+ * than like a simulation.
+ */
+describe("package runner", () => {
+  const run = (cmd: string) => runCommand(createShellState(), cmd).lines.map(l => l.text).join("\n")
+
+  it("bun is a known command, not 'command not found'", () => {
+    expect(run("bun --version")).not.toMatch(/command not found/)
+  })
+
+  it("bun run dev boots a dev server with a local URL and ready time", () => {
+    const out = run("bun run dev")
+    expect(out).toMatch(/Next\.js/)
+    expect(out).toMatch(/localhost:3000/)
+    expect(out).toMatch(/Ready in/)
+  })
+
+  it("bare `bun dev` works the same as `bun run dev`", () => {
+    expect(run("bun dev")).toMatch(/localhost:3000/)
+  })
+
+  it("bun run build reports a compiled build, not a dev server", () => {
+    const out = run("bun run build")
+    expect(out).toMatch(/Compiled successfully/)
+    expect(out).not.toMatch(/localhost:3000/)
+  })
+
+  it("bun test reports a passing suite", () => {
+    expect(run("bun test")).toMatch(/tests? passed|passed/)
+  })
+
+  it("bun install reports installed packages", () => {
+    expect(run("bun install")).toMatch(/packages installed|Installing/)
+  })
+
+  it("npm/pnpm/yarn run the same scripts", () => {
+    for (const pm of ["npm", "pnpm", "yarn"]) {
+      expect(run(`${pm} run dev`), `${pm} run dev`).toMatch(/localhost:3000/)
+    }
+  })
+
+  it("an unknown script is reported as missing, not silently faked", () => {
+    expect(run("bun run nope")).toMatch(/nope/)
+  })
+
+  it("which bun resolves now that bun is registered", () => {
+    expect(run("which bun")).toMatch(/bin\/bun/)
+  })
+
+  it("help advertises the package runner", () => {
+    expect(run("help")).toMatch(/bun/)
+  })
+})

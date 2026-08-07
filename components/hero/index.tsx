@@ -67,15 +67,18 @@ export function Hero() {
   return (
     <section
       id="hero"
-      className="relative flex min-h-[90svh] flex-col items-center justify-center overflow-hidden pb-16 max-sm:pt-[8.75rem] sm:pt-16 md:min-h-screen md:pb-24 md:pt-24"
+      /* Top padding clears the fixed nav shell — the name block must never sit
+         tight against it. */
+      className="relative flex min-h-[90svh] flex-col items-center justify-center overflow-hidden pb-16 max-sm:pt-[9.5rem] sm:pt-28 md:min-h-screen md:pb-24 md:pt-36"
     >
       {/* Spectrum lives only in this section (not fixed to viewport) — avoids mobile scroll seam / mask repaint */}
       <BackgroundOrbs />
       {!mobilePerformanceMode && <ParticleCanvas className="z-[1]" />}
 
-      {/* 3D Brain — central hero underlay behind headline and action controls. */}
+      {/* 3D Brain — hero underlay, seated high so it reads as a backdrop behind
+          the name and tagline rather than behind the CTAs and stat row. */}
       <div
-        className="hero-brain-underlay pointer-events-none absolute inset-x-0 bottom-[12%] top-[8%] z-[3] flex items-center justify-center sm:bottom-[6%] sm:top-[6%]"
+        className="hero-brain-underlay pointer-events-none absolute inset-x-0 bottom-[24%] top-[-4%] z-[3] flex items-center justify-center sm:bottom-[22%] sm:top-[-6%]"
         aria-hidden="true"
       >
         {/* Responsive viewport for 3D canvas */}
