@@ -41,11 +41,11 @@ export function OssDemoCard({ demo, active = true, onExplore }: OssDemoCardProps
   if (!project) return null
 
   return (
-    <article className="group/demo relative overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03] transition-colors duration-500 hover:border-primary/30 hover:bg-white/[0.055]">
-      <div className={`h-1 w-full bg-gradient-to-r ${project.gradient} opacity-60 transition-opacity duration-500 group-hover/demo:opacity-100`} />
+    <article className="group/demo relative overflow-hidden rounded-2xl border border-white/20 bg-card/60 backdrop-blur-2xl transition-all duration-500 hover:border-primary/40 hover:bg-card/85 hover:shadow-2xl hover:shadow-primary/20">
+      <div className={`h-1 w-full bg-gradient-to-r ${project.gradient} opacity-80 transition-opacity duration-500 group-hover/demo:opacity-100`} />
 
       <div
-        className="pointer-events-none absolute -right-16 -top-16 z-0 h-48 w-48 rounded-full opacity-0 blur-3xl transition-opacity duration-700 group-hover/demo:opacity-[0.14]"
+        className="pointer-events-none absolute -right-16 -top-16 z-0 h-48 w-48 rounded-full opacity-0 blur-3xl transition-opacity duration-700 group-hover/demo:opacity-[0.20]"
         style={{ background: project.accent }}
         aria-hidden
       />

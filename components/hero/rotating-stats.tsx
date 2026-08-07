@@ -105,24 +105,24 @@ export function RotatingStats() {
         {currentStats.map((stat, i) => (
           <div
             key={`card-${i}`}
-            className={`group relative p-0 sm:overflow-hidden sm:rounded-xl sm:border sm:border-white/[0.08] sm:p-4 sm:glass-card-3d sm:hover:border-primary/20 sm:hover:shadow-lg sm:hover:shadow-primary/10 sm:hover-lift sm:spotlight${i >= 2 ? " max-sm:hidden" : ""}`}
+            className={`group relative p-0 sm:overflow-hidden sm:rounded-2xl sm:border sm:border-white/20 sm:p-5 sm:glass-card-3d sm:hover:border-primary/40 sm:hover:shadow-2xl sm:hover:shadow-primary/20 sm:hover-lift sm:spotlight${i >= 2 ? " max-sm:hidden" : ""}`}
             style={{
               ...getCardStyle(cardPhases[i]),
               perspective: "600px",
               ...(isMobile
                 ? {}
                 : {
-                    background: "hsla(220, 20%, 16%, 0.35)",
-                    backdropFilter: "blur(24px) saturate(1.6)",
-                    WebkitBackdropFilter: "blur(24px) saturate(1.6)",
+                    background: "linear-gradient(135deg, hsla(220, 25%, 15%, 0.65) 0%, hsla(220, 25%, 10%, 0.45) 100%)",
+                    backdropFilter: "blur(28px) saturate(2.2) brightness(1.1)",
+                    WebkitBackdropFilter: "blur(28px) saturate(2.2) brightness(1.1)",
                     boxShadow:
-                      "0 2px 16px -4px hsla(0,0%,0%,0.25), inset 0 1px 0 0 hsla(0,0%,100%,0.06)",
+                      "0 12px 32px -8px hsla(0,0%,0%,0.5), inset 0 1px 0 0 hsla(0,0%,100%,0.22), inset 0 -1px 0 0 hsla(0,0%,0%,0.3)",
                   }),
             }}
           >
-            <div className="absolute inset-0 rounded-xl bg-primary/[0.04] opacity-0 transition-opacity duration-500 group-hover:opacity-100 max-sm:hidden" />
+            <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/10 via-transparent to-accent/10 opacity-0 transition-opacity duration-500 group-hover:opacity-100 max-sm:hidden" />
             <div
-              className="pointer-events-none absolute inset-0 -translate-x-full bg-white/[0.04] max-sm:hidden"
+              className="pointer-events-none absolute inset-0 -translate-x-full bg-white/[0.08] max-sm:hidden"
               style={{
                 animation: cardPhases[i] === "enter"
                   ? `shimmer-sweep 0.8s ${i * 0.1}s ease-out forwards`
@@ -134,14 +134,14 @@ export function RotatingStats() {
                 key={`counter-${i}-${counterKeys[i]}`}
                 value={stat.value}
                 duration={1800}
-                className="text-3xl font-display font-light gradient-text sm:text-3xl lg:text-4xl"
+                className="text-3xl font-display font-semibold gradient-text sm:text-3xl lg:text-4xl"
               />
-              <div className="mt-1 text-[11px] font-medium text-muted-foreground sm:text-xs">
+              <div className="mt-1 text-[11px] font-medium text-foreground/80 sm:text-xs">
                 {stat.label}
               </div>
             </div>
-            <div className="absolute -bottom-4 -right-4 h-16 w-16 rounded-full bg-primary/5 blur-2xl transition-all duration-700 group-hover:scale-150 group-hover:bg-primary/10 max-sm:hidden" />
-            <div className="absolute -top-8 -left-8 h-14 w-14 rounded-full bg-accent/5 blur-2xl opacity-0 transition-all duration-700 group-hover:opacity-100 group-hover:scale-150 max-sm:hidden" />
+            <div className="absolute -bottom-4 -right-4 h-16 w-16 rounded-full bg-primary/10 blur-2xl transition-all duration-700 group-hover:scale-150 group-hover:bg-primary/20 max-sm:hidden" />
+            <div className="absolute -top-8 -left-8 h-14 w-14 rounded-full bg-accent/10 blur-2xl opacity-0 transition-all duration-700 group-hover:opacity-100 group-hover:scale-150 max-sm:hidden" />
           </div>
         ))}
       </div>

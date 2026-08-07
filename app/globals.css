@@ -2506,6 +2506,7 @@ article .blog-prose b a[href],
 .glass-btn {
   position: relative;
   isolation: isolate;
+  overflow: hidden;
   border: 1px solid hsla(0, 0%, 100%, 0.14);
   background: linear-gradient(
     160deg,
