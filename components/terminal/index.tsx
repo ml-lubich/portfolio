@@ -241,14 +241,15 @@ export function LiveTerminal() {
           </p>
         </AnimatedSection>
 
-        {/* Session tabs */}
-        <div className="flex flex-wrap items-center gap-1.5 mb-4">
+        {/* Session tabs — one row always; overflow scrolls horizontally rather
+            than wrapping onto a second line */}
+        <div className="mb-4 flex items-center gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {S.map((s, i) => (
             <button
               key={i}
               onClick={() => jumpTo(i)}
               className={`
-                flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium
+                flex shrink-0 items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium
                 transition-all duration-150 whitespace-nowrap cursor-pointer
                 hover:bg-primary/10 hover:text-primary active:scale-95
                 ${i === activeSession
@@ -265,7 +266,7 @@ export function LiveTerminal() {
             type="button"
             onClick={() => setTerminalMode("snake")}
             className={`
-              flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium
+              flex shrink-0 items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium
               transition-all duration-150 whitespace-nowrap cursor-pointer
               hover:bg-primary/10 hover:text-primary active:scale-95
               ${isSnakeMode
@@ -281,7 +282,7 @@ export function LiveTerminal() {
             type="button"
             onClick={() => setTerminalMode("shell")}
             className={`
-              flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium
+              flex shrink-0 items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium
               transition-all duration-150 whitespace-nowrap cursor-pointer
               hover:bg-primary/10 hover:text-primary active:scale-95
               ${isShellMode

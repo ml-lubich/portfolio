@@ -35,6 +35,9 @@ interface SectionHeaderProps {
   afterLabel?: ReactNode
   /** Additional / override Tailwind classes on the wrapper div */
   className?: string
+  /** Dials the heading and subtitle down a step, for sections whose content
+   *  (not their intro copy) should carry the visual weight. */
+  compact?: boolean
 }
 
 export function SectionHeader({
@@ -44,6 +47,7 @@ export function SectionHeader({
   icon,
   afterLabel,
   className,
+  compact = false,
 }: SectionHeaderProps) {
   return (
     <div className={cn("mb-5 text-center md:mb-12", className)}>
@@ -61,13 +65,27 @@ export function SectionHeader({
         <div className="mt-2 flex justify-center md:mt-2.5">{afterLabel}</div>
       )}
 
-      <h2 className="section-title mt-2 font-display text-3xl font-light text-foreground sm:text-4xl lg:text-5xl text-balance md:mt-4">
+      <h2
+        className={cn(
+          "section-title mt-2 font-display font-light text-foreground text-balance md:mt-4",
+          compact
+            ? "text-xl sm:text-2xl lg:text-3xl"
+            : "text-3xl sm:text-4xl lg:text-5xl",
+        )}
+      >
         <AnimatedText variant="blur-slide" delay={150} stagger={55} duration={750}>
           {title}
         </AnimatedText>
       </h2>
 
-      <p className="mx-auto mt-2 max-w-2xl text-sm text-muted-foreground sm:text-base md:mt-4">
+      <p
+        className={cn(
+          "mx-auto mt-2 text-muted-foreground md:mt-4",
+          compact
+            ? "max-w-xl text-xs sm:text-[13px]"
+            : "max-w-2xl text-sm sm:text-base",
+        )}
+      >
         <AnimatedText text={subtitle} variant="fade-up" delay={400} stagger={20} duration={600} />
       </p>
     </div>

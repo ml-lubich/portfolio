@@ -31,9 +31,8 @@ function SeasideMark({ className }: { className?: string }) {
 interface Logo {
     name: string
     icon: React.ReactNode
-    /** True when the asset is a wordmark that already spells the brand out —
-     *  the text label is then redundant and is dropped (name still read by SRs). */
-    wordmark?: boolean
+    /** Brand site the mark links to. Omitted when there is no public URL. */
+    href?: string
 }
 
 /** Brand-colored client logos are muted to match the grey strip; the row's
@@ -41,12 +40,16 @@ interface Logo {
 const CLIENT_LOGO_IMG =
     "w-auto opacity-60 grayscale transition-[filter,opacity] duration-300 group-hover:opacity-95 group-hover:grayscale-0"
 
+/** The strip is marks only — no wordmark text beside them — so the glyphs run
+ *  larger than they did when a text label carried the identification. */
+const ICON_MARK = "h-9 w-9 sm:h-11 sm:w-11"
+
 const LOGOS: Logo[] = [
-    { name: "Apple", icon: <SiApple className="h-7 w-7 sm:h-8 sm:w-8" /> },
-    { name: "Walmart", icon: <SiWalmart className="h-7 w-7 sm:h-8 sm:w-8" /> },
+    { name: "Apple", href: "https://www.apple.com", icon: <SiApple className={ICON_MARK} /> },
+    { name: "Walmart", href: "https://www.walmart.com", icon: <SiWalmart className={ICON_MARK} /> },
     {
         name: "Lawrence Berkeley Lab",
-        wordmark: true,
+        href: "https://www.lbl.gov",
         icon: (
             <Image
                 src="/logos/berkeley-lab.svg"
@@ -54,14 +57,18 @@ const LOGOS: Logo[] = [
                 width={366}
                 height={79}
                 unoptimized
-                className={`h-6 sm:h-7 ${CLIENT_LOGO_IMG}`}
+                className={`h-8 sm:h-10 ${CLIENT_LOGO_IMG}`}
             />
         ),
     },
-    { name: "Honda Innovations", icon: <SiHonda className="h-7 w-7 sm:h-8 sm:w-8" /> },
+    {
+        name: "Honda Innovations",
+        href: "https://www.hondainnovations.com",
+        icon: <SiHonda className={ICON_MARK} />,
+    },
     {
         name: "UC Berkeley",
-        wordmark: true,
+        href: "https://www.berkeley.edu",
         icon: (
             <Image
                 src="/logos/uc-berkeley.svg"
@@ -69,32 +76,34 @@ const LOGOS: Logo[] = [
                 width={215}
                 height={68}
                 unoptimized
-                className={`h-6 sm:h-7 ${CLIENT_LOGO_IMG}`}
+                className={`h-8 sm:h-10 ${CLIENT_LOGO_IMG}`}
             />
         ),
     },
     {
         name: "LUPFR",
+        href: "https://lupfr.com",
         icon: (
             <Image
                 src="/logos/lupfr-mark.png"
                 alt="LUPFR Entertainment logo"
                 width={256}
                 height={256}
-                className={`h-7 sm:h-8 ${CLIENT_LOGO_IMG}`}
+                className={`h-9 sm:h-11 ${CLIENT_LOGO_IMG}`}
             />
         ),
     },
-    { name: "Seaside", icon: <SeasideMark className={`h-7 sm:h-8 ${CLIENT_LOGO_IMG}`} /> },
+    { name: "Seaside", icon: <SeasideMark className={`h-9 sm:h-11 ${CLIENT_LOGO_IMG}`} /> },
     {
         name: "eria.co",
+        href: "https://www.eria.co",
         icon: (
             <Image
                 src="/logos/eria-wordmark.png"
                 alt="ERIA Events logo"
                 width={256}
                 height={157}
-                className={`h-6 sm:h-7 ${CLIENT_LOGO_IMG}`}
+                className={`h-8 sm:h-10 ${CLIENT_LOGO_IMG}`}
             />
         ),
     },
@@ -103,16 +112,39 @@ const LOGOS: Logo[] = [
 /** Pixels per second for auto-scroll */
 const AUTO_SPEED = 40
 
-function LogoItem({ logo }: { logo: Logo }) {
+/** Pointer travel (px) past which a gesture counts as a drag, not a click */
+const DRAG_SLOP = 6
+
+/** Marks only — the brand name stays in the tree for screen readers and as the
+ *  link's accessible name, but is never painted beside the glyph. */
+function LogoItem({ logo, duplicate }: { logo: Logo; duplicate: boolean }) {
+    const shell =
+        "group flex flex-shrink-0 items-center px-7 sm:px-10 text-muted-foreground/50 transition-colors duration-300 hover:text-muted-foreground/90 select-none"
+
+    if (!logo.href) {
+        return (
+            <div className={shell} aria-hidden={duplicate || undefined}>
+                {logo.icon}
+                <span className="sr-only">{logo.name}</span>
+            </div>
+        )
+    }
+
     return (
-        <div className="group flex flex-shrink-0 items-center gap-2.5 px-6 sm:px-8 text-muted-foreground/50 transition-colors duration-300 hover:text-muted-foreground/90 select-none">
+        <a
+            href={logo.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`${logo.name} (opens in a new tab)`}
+            /* Copies past the first set are decorative filler for the loop —
+               keep them out of the a11y tree and the tab order. */
+            aria-hidden={duplicate || undefined}
+            tabIndex={duplicate ? -1 : undefined}
+            className={`${shell} rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary`}
+        >
             {logo.icon}
-            <span
-                className={`whitespace-nowrap text-xs font-medium tracking-wide uppercase sm:text-sm${logo.wordmark ? " sr-only" : ""}`}
-            >
-                {logo.name}
-            </span>
-        </div>
+            <span className="sr-only">{logo.name}</span>
+        </a>
     )
 }
 
@@ -130,6 +162,9 @@ export function LogoScroll() {
     const lastPointerTimeRef = useRef(0)
     const [dragging, setDragging] = useState(false)
     const marqueePausedRef = useRef(false)
+    /** Total pointer travel for the current gesture — a drag past DRAG_SLOP must
+     *  not also activate the logo link it happened to start on. */
+    const dragDistRef = useRef(0)
 
     // We render 6 copies so there's always enough to wrap seamlessly
     const repeated = [...LOGOS, ...LOGOS, ...LOGOS, ...LOGOS, ...LOGOS, ...LOGOS]
@@ -218,6 +253,7 @@ export function LogoScroll() {
     const onPointerDown = useCallback((e: React.PointerEvent) => {
         isDraggingRef.current = true
         setDragging(true)
+        dragDistRef.current = 0
         velocityRef.current = 0
         dragStartXRef.current = e.clientX
         dragOffsetRef.current = offsetRef.current
@@ -230,6 +266,7 @@ export function LogoScroll() {
         if (!isDraggingRef.current) return
         const dx = e.clientX - dragStartXRef.current
         offsetRef.current = dragOffsetRef.current + dx
+        dragDistRef.current = Math.max(dragDistRef.current, Math.abs(dx))
 
         // Track velocity for momentum
         const now = performance.now()
@@ -244,6 +281,14 @@ export function LogoScroll() {
     const onPointerUp = useCallback(() => {
         isDraggingRef.current = false
         setDragging(false)
+    }, [])
+
+    /** Swallow the click that ends a drag so dragging the strip never navigates. */
+    const onClickCapture = useCallback((e: React.MouseEvent) => {
+        if (dragDistRef.current > DRAG_SLOP) {
+            e.preventDefault()
+            e.stopPropagation()
+        }
     }, [])
 
     return (
@@ -269,11 +314,12 @@ export function LogoScroll() {
                 onPointerMove={onPointerMove}
                 onPointerUp={onPointerUp}
                 onPointerCancel={onPointerUp}
+                onClickCapture={onClickCapture}
                 className={`flex will-change-transform touch-pan-y ${dragging ? "cursor-grabbing" : "cursor-grab"}`}
                 style={{ touchAction: "pan-y" }}
             >
                 {repeated.map((logo, i) => (
-                    <LogoItem key={`${logo.name}-${i}`} logo={logo} />
+                    <LogoItem key={`${logo.name}-${i}`} logo={logo} duplicate={i >= LOGOS.length} />
                 ))}
             </div>
         </section>

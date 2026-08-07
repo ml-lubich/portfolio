@@ -19,11 +19,13 @@ const ParticleField = dynamic(
   { ssr: false }
 )
 
-/* ── Tilt + horizontal glass-shine card wrapper ── */
-function TiltCard({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+/* ── HoloCell — card-less instrument-panel cell.
+ *  The whole cell tips in 3D toward the pointer and the glyph plinth lifts off
+ *  the panel on the Z axis, so depth comes from the transform rather than from
+ *  a bordered card sitting on the page. ── */
+function HoloCell({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   const ref = useRef<HTMLDivElement>(null)
-  const [tilt, setTilt] = useState({ x: 0, y: 0 })
-  const [shine, setShine] = useState({ x: 50, opacity: 0 })
+  const [tilt, setTilt] = useState({ x: 0, y: 0, active: false })
   const lastTouchRef = useRef(0)
 
   const handleMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
@@ -32,43 +34,81 @@ function TiltCard({ children, className = "" }: { children: React.ReactNode; cla
     const r = ref.current.getBoundingClientRect()
     const x = (e.clientX - r.left) / r.width
     const y = (e.clientY - r.top) / r.height
-    setTilt({ x: (y - 0.5) * -10, y: (x - 0.5) * 10 })
-    setShine({ x: x * 100, opacity: 1 })
+    setTilt({ x: (y - 0.5) * -9, y: (x - 0.5) * 12, active: true })
   }, [])
 
-  const handleLeave = useCallback(() => {
-    setTilt({ x: 0, y: 0 })
-    setShine({ x: 50, opacity: 0 })
-  }, [])
+  const reset = useCallback(() => setTilt({ x: 0, y: 0, active: false }), [])
 
   const handleTouchEnd = useCallback(() => {
     lastTouchRef.current = Date.now()
-    setTilt({ x: 0, y: 0 })
-    setShine({ x: 50, opacity: 0 })
-  }, [])
+    reset()
+  }, [reset])
 
   return (
     <div
       ref={ref}
       onMouseMove={handleMove}
-      onMouseLeave={handleLeave}
+      onMouseLeave={reset}
       onTouchEnd={handleTouchEnd}
       className={className}
-      style={{
-        transform: `perspective(800px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale(${tilt.x || tilt.y ? 1.04 : 1})`,
-        transition: "transform 0.15s ease-out",
-        willChange: "transform",
-      }}
+      style={{ perspective: "900px", transformStyle: "preserve-3d" }}
     >
-      {children}
-      {/* Horizontal glass shine band — tracks mouse X */}
       <div
-        className="pointer-events-none absolute inset-0 z-20 rounded-2xl"
+        className="flex h-full flex-col items-center justify-start gap-5 text-center"
         style={{
-          background: `linear-gradient(105deg, transparent ${shine.x - 18}%, hsla(0,0%,100%,0.02) ${shine.x - 8}%, hsla(0,0%,100%,0.12) ${shine.x - 1}%, hsla(0,0%,100%,0.12) ${shine.x + 1}%, hsla(0,0%,100%,0.02) ${shine.x + 8}%, transparent ${shine.x + 18}%)`,
-          opacity: shine.opacity,
-          transition: "opacity 0.25s ease-out",
+          transform: `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) translateZ(${tilt.active ? 24 : 0}px)`,
+          transformStyle: "preserve-3d",
+          transition: "transform 0.2s ease-out",
+          willChange: "transform",
         }}
+      >
+        {children}
+      </div>
+    </div>
+  )
+}
+
+/* ── Glyph plinth — rotating hairline ring around a floating glass core ── */
+function GlyphPlinth({ icon: Icon }: { icon: typeof GraduationCap }) {
+  return (
+    <div className="relative h-[4.5rem] w-[4.5rem]" style={{ transformStyle: "preserve-3d" }}>
+      {/* Rotating conic ring — masked down to a hairline circle */}
+      <div
+        className="absolute inset-0 rounded-full opacity-60 transition-opacity duration-500 group-hover:opacity-100"
+        style={{
+          background:
+            "conic-gradient(from 0deg, transparent 0deg, rgba(255,255,255,0.85) 60deg, transparent 150deg, rgba(169,207,214,0.7) 250deg, transparent 340deg)",
+          WebkitMask:
+            "radial-gradient(farthest-side, transparent calc(100% - 1.5px), #000 calc(100% - 1.5px))",
+          mask: "radial-gradient(farthest-side, transparent calc(100% - 1.5px), #000 calc(100% - 1.5px))",
+          animation: "holo-spin 11s linear infinite",
+        }}
+        aria-hidden
+      />
+      {/* Counter-rotating outer tick ring */}
+      <div
+        className="absolute -inset-2 rounded-full opacity-25 transition-opacity duration-500 group-hover:opacity-50"
+        style={{
+          background:
+            "repeating-conic-gradient(from 0deg, rgba(255,255,255,0.6) 0deg 2deg, transparent 2deg 18deg)",
+          WebkitMask:
+            "radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 4px))",
+          mask: "radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 4px))",
+          animation: "holo-spin 26s linear infinite reverse",
+        }}
+        aria-hidden
+      />
+      {/* Glass core, lifted toward the viewer */}
+      <div
+        className="absolute inset-[9px] flex items-center justify-center rounded-[34%] bg-gradient-to-br from-white/[0.16] via-white/[0.06] to-white/[0.02] shadow-[0_10px_30px_-10px_rgba(0,0,0,0.9)] ring-1 ring-inset ring-white/20 backdrop-blur-md transition-transform duration-500 group-hover:scale-105"
+        style={{ transform: "translateZ(30px)" }}
+      >
+        <Icon className="h-6 w-6 text-foreground/90" aria-hidden />
+      </div>
+      {/* Floor light pooling under the plinth */}
+      <div
+        className="pointer-events-none absolute -bottom-3 left-1/2 h-3 w-16 -translate-x-1/2 rounded-[50%] bg-white/25 blur-md opacity-40 transition-opacity duration-500 group-hover:opacity-80"
+        aria-hidden
       />
     </div>
   )
@@ -173,40 +213,38 @@ export function About() {
           />
         </div>
 
-        {/* Highlight cards */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {highlights.map((item, i) => (
-            <AnimatedSection key={item.title} delay={i * 80}>
-              <TiltCard className="relative h-full">
-                <div className="group relative h-full overflow-hidden rounded-2xl border border-white/[0.06] bg-card/25 backdrop-blur-xl transition-all duration-300 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/15">
-                  {/* Top edge reflection */}
-                  <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
-                  {/* Animated corner glow */}
-                  <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-primary/10 blur-2xl opacity-0 transition-all duration-500 group-hover:opacity-100 group-hover:scale-150" />
+        {/* Highlights — one instrument panel, hairline-divided, no cards.
+            The `gap-px` over a faint panel background is what draws the
+            dividing hairlines; each cell is transparent glass, not a card. */}
+        <div className="relative overflow-hidden rounded-3xl border border-white/[0.06] bg-white/[0.05]">
+          <ul className="grid gap-px sm:grid-cols-2 lg:grid-cols-3">
+            {highlights.map((item, i) => (
+              <li key={item.title} className="bg-background/70 backdrop-blur-xl">
+                <AnimatedSection delay={i * 80} className="h-full">
+                  <HoloCell className="group h-full px-6 py-10">
+                    <GlyphPlinth icon={item.icon} />
 
-                  <div className="relative p-6">
-                    <div className="mb-4 inline-flex rounded-xl bg-primary p-3 ring-1 ring-white/[0.06] transition-all duration-300 group-hover:scale-110">
-                      <item.icon className="h-5 w-5 text-primary-foreground transition-transform duration-300 group-hover:rotate-12" />
+                    <div style={{ transform: "translateZ(12px)" }}>
+                      <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground/60">
+                        {item.title}
+                      </p>
+                      <p className="mt-2 font-display text-xl font-light text-foreground sm:text-2xl">
+                        {item.subtitleNum ? (
+                          <><AnimatedCounter value={item.subtitleNum} duration={1800} />{item.subtitleText}</>
+                        ) : (
+                          item.subtitleText
+                        )}
+                      </p>
+                      <p className="mt-1.5 text-xs text-muted-foreground/70">{item.detail}</p>
                     </div>
-                    <h3 className="text-base font-semibold text-foreground transition-colors duration-300 group-hover:text-primary">
-                      {item.title}
-                    </h3>
-                    <p className="mt-1.5 text-sm font-medium text-primary">
-                      {item.subtitleNum ? (
-                        <><AnimatedCounter value={item.subtitleNum} duration={1800} />{item.subtitleText}</>
-                      ) : (
-                        item.subtitleText
-                      )}
-                    </p>
-                    <p className="mt-1 text-xs text-muted-foreground">{item.detail}</p>
-                  </div>
+                  </HoloCell>
+                </AnimatedSection>
+              </li>
+            ))}
+          </ul>
 
-                  {/* Shimmer effect — always sweeping, independent of hover */}
-                  <ShimmerOverlay />
-                </div>
-              </TiltCard>
-            </AnimatedSection>
-          ))}
+          {/* Shimmer sweeps the whole panel — always on, independent of hover */}
+          <ShimmerOverlay className="rounded-3xl" />
         </div>
       </div>
     </AnimatedSection>

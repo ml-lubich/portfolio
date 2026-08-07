@@ -967,22 +967,18 @@ nav[data-nav-scrolled="true"] .nav-shell {
   animation: shimmer 4.5s infinite;
 }
 
-/* ── Clients carousel — continuous marquee ── */
-@keyframes client-carousel-scroll {
+/* ── About holo plinths — rotating hairline rings ── */
+@keyframes holo-spin {
   to {
-    transform: translateX(-50%);
+    transform: rotate(360deg);
   }
 }
 
+/* ── Clients carousel — drag rail.
+   The drift is driven by rAF in consulting-clients.tsx (so a drag can take
+   over mid-motion); CSS only owns the compositing hint. ── */
 .client-carousel-track {
-  animation: client-carousel-scroll var(--carousel-duration, 48s) linear infinite;
   will-change: transform;
-}
-
-/* Pause via the toggle, or while keyboard focus is inside (no moving targets) */
-.client-carousel[data-paused="true"] .client-carousel-track,
-.client-carousel:focus-within .client-carousel-track {
-  animation-play-state: paused;
 }
 
 /* Hover lift effect */
