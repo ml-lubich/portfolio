@@ -60,16 +60,16 @@ export const hex = {
     cyanLight: "#22d3ee",
     background: "#0a0c14",
     /** brain wireframe base — cool grey for 3D depth */
-    wireBase: "#b0b2be",
+    wireBase: "#dfe2ec",
     /** brain wireframe glow — subtle teal tint */
-    wireGlow: "#90b0b4",
+    wireGlow: "#a9cfd6",
 } as const
 
 /* ── Three.js numeric hex colors ────────────────────────────────── */
 
 export const hexNum = {
-    wireBase: 0xb0b2be,
-    wireGlow: 0x90b0b4,
+    wireBase: 0xdfe2ec,
+    wireGlow: 0xa9cfd6,
     neuralBlue: 0x88dddd,
     background: 0x080810,
 } as const
@@ -228,7 +228,7 @@ export const heroOverlay =
  *  legible without hiding the brain — it stays visible at the edges, where
  *  nothing is written on top of it. */
 export const heroContentScrim =
-    "radial-gradient(ellipse 46% 34% at 50% 42%, rgba(6,8,14,0.30) 0%, rgba(6,8,14,0.16) 55%, transparent 82%)"
+    "radial-gradient(ellipse 42% 26% at 50% 34%, rgba(6,8,14,0.22) 0%, rgba(6,8,14,0.10) 58%, transparent 84%)"
 
 /* ── Architecture diagram colors ─────────────────────────────────── */
 

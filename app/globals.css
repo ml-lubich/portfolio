@@ -580,10 +580,8 @@ body {
 .hero-brain-underlay {
   -webkit-mask-image: linear-gradient(to bottom, transparent 0%, transparent 8%, black 30%, black 100%);
   mask-image: linear-gradient(to bottom, transparent 0%, transparent 8%, black 30%, black 100%);
-  /* A backdrop, not a subject. At full strength the wireframe and its bright
-     neural orbs punched through the CTA labels and the Tokscale card sitting
-     on top of it - no scrim can rescue text from a light source behind it. */
-  opacity: 0.55;
+  /* Bright white & vivid brain visualization - visible behind glass controls */
+  opacity: 0.85;
 }
 
 @media (max-width: 639px) {

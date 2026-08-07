@@ -159,11 +159,11 @@ export function makeWireGradientMaterial(pull: PullUniforms, opacity: number) {
       varying vec3 vMvPos;
       varying vec3 vPos;
       void main() {
-        // Enhanced 3D grey/white gradient: dark grey bottom → bright white top
-        vec3 deepGrey  = vec3(0.07, 0.08, 0.10);
-        vec3 midGrey   = vec3(0.30, 0.32, 0.36);
-        vec3 lightGrey = vec3(0.58, 0.60, 0.65);
-        vec3 brightWhite = vec3(0.80, 0.82, 0.85);
+        // Enhanced 3D bright white gradient for clear visibility
+        vec3 deepGrey    = vec3(0.20, 0.22, 0.28);
+        vec3 midGrey     = vec3(0.50, 0.53, 0.58);
+        vec3 lightGrey   = vec3(0.78, 0.80, 0.85);
+        vec3 brightWhite = vec3(0.95, 0.97, 1.00);
 
         // Multi-stop gradient for realistic 3D shading
         vec3 color;
