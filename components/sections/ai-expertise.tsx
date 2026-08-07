@@ -176,50 +176,50 @@ export function AIExpertise() {
           {/* Vertical connector line (visible on lg) */}
           <div className="absolute left-1/2 top-0 bottom-0 hidden w-px -translate-x-1/2 bg-primary/20 lg:block" aria-hidden="true" />
 
-          <div className="grid gap-5 md:gap-8 lg:grid-cols-2">
+          <div className="grid gap-6 md:gap-8 lg:grid-cols-2">
             {aiDomains.map((domain, i) => (
               <AnimatedSection key={domain.title} delay={i * 150}>
-                <div className="group relative h-full overflow-hidden rounded-2xl border border-white/[0.04] bg-card/30 backdrop-blur-xl transition-all duration-500 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/15 glass-card-3d spotlight">
+                <div className="group relative h-full overflow-hidden rounded-2xl border border-primary/20 bg-card/60 backdrop-blur-2xl transition-all duration-500 hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/20 glass-card-3d spotlight">
                   {/* Top edge light */}
-                  <div className="absolute inset-x-0 top-0 h-px bg-white/[0.06]" />
+                  <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
                   {/* Hover overlay */}
-                  <div className="absolute inset-0 rounded-2xl bg-primary/[0.03] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                  <div className="absolute inset-0 rounded-2xl bg-primary/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
                   <ShimmerOverlay className="rounded-2xl" />
 
-                  {/* Top accent */}
-                  <div className={`h-1 w-full bg-primary`} />
+                  {/* Top glowing accent bar */}
+                  <div className="h-1 w-full bg-gradient-to-r from-primary via-accent to-primary" />
 
-                  <div className="relative p-5 md:p-8">
+                  <div className="relative p-6 md:p-8">
                     {/* Step number + icon header */}
                     <div className="flex items-start gap-4">
-                      <div className="relative">
-                        <div className={`rounded-xl bg-primary p-3 transition-all duration-500 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-primary/20`}>
-                          <domain.icon className="h-6 w-6 text-primary-foreground transition-all duration-500 group-hover:drop-shadow-[0_0_8px_rgba(0,0,0,0.3)]" />
+                      <div className="relative shrink-0">
+                        <div className="rounded-xl bg-primary/10 border border-primary/30 p-3.5 text-primary transition-all duration-500 group-hover:scale-105 group-hover:bg-primary group-hover:text-primary-foreground group-hover:shadow-lg group-hover:shadow-primary/30">
+                          <domain.icon className="h-6 w-6 transition-all duration-500" />
                         </div>
                         {/* Step number badge */}
-                        <div className={`absolute -top-2 -right-2 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground ring-2 ring-background transition-transform duration-500 group-hover:scale-110`}>
+                        <div className="absolute -top-2.5 -right-2.5 flex h-7 w-7 items-center justify-center rounded-full border border-primary/40 bg-background font-mono text-xs font-bold text-primary shadow-md transition-transform duration-500 group-hover:scale-110 group-hover:border-primary group-hover:bg-primary group-hover:text-primary-foreground">
                           {i + 1}
                         </div>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-xl font-display font-medium text-foreground transition-colors duration-300 group-hover:text-primary">{domain.title}</h3>
-                        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                        <h3 className="text-xl font-display font-semibold text-foreground transition-colors duration-300 group-hover:text-primary">{domain.title}</h3>
+                        <p className="mt-2 text-sm leading-relaxed text-muted-foreground/90">
                           {domain.description}
                         </p>
                       </div>
                     </div>
 
-                    {/* Details — always visible */}
+                    {/* Details — elevated contrast containers */}
                     <div className="mt-6 space-y-3">
-                      <div className="h-px bg-white/[0.06]" />
+                      <div className="h-px bg-border/60" />
                       {domain.details.map((detail, idx) => (
                         <div
                           key={idx}
-                          className="flex items-start gap-3 rounded-lg border border-white/[0.04] bg-white/[0.02] p-3 transition-all duration-300 hover:border-primary/20 hover:bg-white/[0.04] hover:translate-x-1"
+                          className="flex items-start gap-3 rounded-xl border border-primary/15 bg-secondary/40 p-3.5 transition-all duration-300 hover:border-primary/40 hover:bg-secondary/70 hover:translate-x-1"
                           style={{ transitionDelay: `${idx * 50}ms` }}
                         >
-                          <div className={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary transition-shadow duration-300 group-hover:shadow-[0_0_6px_1px_hsl(var(--primary)/0.4)]`} />
-                          <p className="text-sm text-muted-foreground transition-colors duration-300 hover:text-foreground">{detail}</p>
+                          <div className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary shadow-[0_0_8px_1px_hsl(var(--primary)/0.6)]" />
+                          <p className="text-sm font-medium leading-normal text-foreground/90 transition-colors duration-300 group-hover:text-foreground">{detail}</p>
                         </div>
                       ))}
                     </div>
