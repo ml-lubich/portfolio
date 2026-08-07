@@ -578,10 +578,10 @@ body {
 /* Keep the hero brain below the headline and reveal it behind the lower glass
    controls. The mask is static, so the WebGL canvas remains compositor-friendly. */
 .hero-brain-underlay {
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, transparent 8%, black 30%, black 100%);
-  mask-image: linear-gradient(to bottom, transparent 0%, transparent 8%, black 30%, black 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, transparent 2%, black 20%, black 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, transparent 2%, black 20%, black 100%);
   /* Bright white & vivid brain visualization - visible behind glass controls */
-  opacity: 0.85;
+  opacity: 0.90;
 }
 
 @media (max-width: 639px) {

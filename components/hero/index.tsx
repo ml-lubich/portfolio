@@ -73,13 +73,12 @@ export function Hero() {
       <BackgroundOrbs />
       {!mobilePerformanceMode && <ParticleCanvas className="z-[1]" />}
 
-      {/* 3D Brain — lower hero underlay. It sits behind the glass actions/stats,
-          while the top fade keeps it out of the name and rotating role. */}
+      {/* 3D Brain — central hero underlay behind headline and action controls. */}
       <div
-        className="hero-brain-underlay pointer-events-none absolute inset-x-0 bottom-[10%] top-[18%] z-[3] flex items-center justify-center sm:bottom-[8%] sm:top-[16%]"
+        className="hero-brain-underlay pointer-events-none absolute inset-x-0 bottom-[12%] top-[8%] z-[3] flex items-center justify-center sm:bottom-[6%] sm:top-[6%]"
         aria-hidden="true"
       >
-        {/* Mobile keeps a large square viewport; larger screens fill the lower underlay. */}
+        {/* Responsive viewport for 3D canvas */}
         <div className="aspect-square shrink-0 max-sm:size-[min(108vw,38rem)] sm:h-full sm:w-full">
           {showBrain && (
             <div className="h-full w-full">
@@ -102,11 +101,7 @@ export function Hero() {
         }}
       />
 
-      {/* Content scrim — sits ABOVE the brain (z-3), below the copy (z-10).
-          The vignette below can only darken the orbs: the brain paints over
-          it, which is why the wireframe used to run straight through the CTA
-          row and the Tokscale card. This darkens the centre column the copy
-          occupies while leaving the brain's silhouette readable at the edges. */}
+      {/* Content scrim — subtle center gradient */}
       <div
         className="pointer-events-none absolute inset-0 z-[4]"
         aria-hidden="true"
@@ -119,8 +114,8 @@ export function Hero() {
         <HeroTagline />
         <HeroSubtitle />
         <HeroCTAs />
-        <SocialLinks />
         <TokscaleHeroBadge />
+        <SocialLinks />
         <RotatingStats />
       </div>
 
