@@ -19,7 +19,7 @@ export function ProfileIntro() {
         const rect = cardRef.current.getBoundingClientRect()
         const x = (e.clientX - rect.left) / rect.width - 0.5
         const y = (e.clientY - rect.top) / rect.height - 0.5
-        setTilt({ x: y * -12, y: x * 12 })
+        setTilt({ x: y * -10, y: x * 10 })
     }, [])
 
     const handleMouseEnter = useCallback(() => {
@@ -38,109 +38,118 @@ export function ProfileIntro() {
     }, [])
 
     return (
-        <section id="profile" className="relative py-10 sm:py-24 overflow-hidden">
-            <div className="mx-auto max-w-3xl px-3 md:px-6">
+        <section id="profile" className="relative py-12 sm:py-24 overflow-hidden">
+            <div className="mx-auto max-w-5xl px-3 md:px-6">
                 <AnimatedSection>
-                    {/* Floating liquid-glass card with 3D tilt */}
+                    {/* Sleek liquid glass card container with subtle 3D tilt */}
                     <div
                         ref={cardRef}
                         onMouseMove={handleMouseMove}
                         onMouseEnter={handleMouseEnter}
                         onMouseLeave={handleMouseLeave}
                         onTouchEnd={handleTouchEnd}
-                        className="group relative overflow-hidden rounded-3xl p-6 sm:p-10 md:p-12 will-change-transform"
+                        className="group relative overflow-hidden rounded-3xl border border-white/20 bg-card/60 p-6 backdrop-blur-2xl transition-all duration-500 sm:p-10 md:p-12 will-change-transform shadow-2xl shadow-black/40"
                         style={{
-                            transform: `perspective(800px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) translateY(${isHovered ? -8 : 0}px) scale(${isHovered ? 1.015 : 1})`,
-                            transition: "transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1)",
-                            background: "linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 50%, rgba(255,255,255,0.04) 100%)",
-                            backdropFilter: "blur(24px) saturate(1.4)",
-                            WebkitBackdropFilter: "blur(24px) saturate(1.4)",
-                            border: "1px solid rgba(255,255,255,0.08)",
-                            boxShadow: isHovered
-                                ? "0 24px 80px -12px rgba(0,0,0,0.45), 0 8px 24px -8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.08)"
-                                : "0 8px 32px -8px rgba(0,0,0,0.3), 0 4px 12px -4px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.06)",
+                            transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) translateY(${isHovered ? -6 : 0}px)`,
+                            background: "linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 50%, rgba(255,255,255,0.05) 100%)",
                         }}
                     >
-                        {/* Animated glass shimmer on hover */}
+                        {/* Specular edge sheen */}
                         <div
-                            className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-700 group-hover:opacity-100"
-                            style={{
-                                background: "linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.04) 45%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.04) 55%, transparent 60%)",
-                                backgroundSize: "200% 100%",
-                                animation: isHovered ? "glassShimmer 2s ease-in-out infinite" : "none",
-                            }}
+                            className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent"
                             aria-hidden="true"
                         />
 
-                        {/* Corner glow accents */}
+                        {/* Corner ambient glow */}
                         <div
-                            className="pointer-events-none absolute -right-20 -top-20 h-48 w-48 rounded-full opacity-15 blur-3xl transition-opacity duration-500 group-hover:opacity-25"
+                            className="pointer-events-none absolute -right-20 -top-20 h-56 w-56 rounded-full opacity-20 blur-3xl transition-opacity duration-500 group-hover:opacity-30"
                             style={{ background: profileOrbs.topRight }}
                             aria-hidden="true"
                         />
-                        <div
-                            className="pointer-events-none absolute -bottom-16 -left-16 h-40 w-40 rounded-full opacity-10 blur-3xl transition-opacity duration-500 group-hover:opacity-20"
-                            style={{ background: profileOrbs.bottomLeft }}
-                            aria-hidden="true"
-                        />
 
-                        <div className="relative flex flex-col items-center gap-8 sm:flex-row sm:items-start sm:gap-10">
-                            {/* Profile photo — larger, darker, with hover lift */}
-                            <div className="relative shrink-0 transition-transform duration-500 ease-out group-hover:-translate-y-1">
-                                {/* Glow ring behind photo */}
-                                <div
-                                    className="absolute inset-0 scale-110 rounded-full opacity-0 blur-xl transition-opacity duration-500 group-hover:opacity-20"
-                                    style={{ background: profileOrbs.photoRing }}
-                                    aria-hidden="true"
-                                />
-                                <div
-                                    className="relative h-72 w-52 overflow-hidden border border-white/[0.1] shadow-xl shadow-black/30 transition-shadow duration-500 group-hover:shadow-2xl group-hover:shadow-black/40 sm:h-96 sm:w-64"
-                                    style={{ borderRadius: "50% / 46%" }}
-                                >
+                        <div className="relative flex flex-col gap-10 lg:flex-row lg:items-center">
+                            {/* Main photo & Work Gallery Grid */}
+                            <div className="flex flex-col gap-4 shrink-0 lg:w-[22rem]">
+                                {/* Primary Feature Photo: Crisp rectangular glass frame with natural rounded corners */}
+                                <div className="relative h-80 w-full overflow-hidden rounded-2xl border border-white/20 shadow-2xl shadow-black/50 group/photo">
                                     <Image
-                                        src="/profile.jpg"
-                                        alt="Misha Lubich"
-                                        width={412}
-                                        height={628}
-                                        sizes="(max-width: 640px) 208px, 412px"
-                                        className="h-full w-full object-cover object-top brightness-[0.52] contrast-[1.08] saturate-[0.9] transition-all duration-500 group-hover:brightness-[0.62] group-hover:saturate-[1]"
-                                        priority={false}
+                                        src="/misha-desk-laptop.png"
+                                        alt="Misha Lubich working on laptop with clients"
+                                        width={600}
+                                        height={750}
+                                        className="h-full w-full object-cover object-center transition-transform duration-700 group-hover/photo:scale-105"
+                                        priority
                                     />
-                                    {/* The source frame blows out around the stairwell lighting, so the
-                                        highlights get pulled down twice: once by the filter above, and
-                                        again by this vignette that darkens the rim toward the card. */}
-                                    <div
-                                        className="pointer-events-none absolute inset-0 transition-opacity duration-500 group-hover:opacity-80"
-                                        style={{
-                                            background:
-                                                "radial-gradient(ellipse at 50% 38%, transparent 28%, rgba(6,8,14,0.45) 68%, rgba(6,8,14,0.88) 100%)",
-                                        }}
-                                        aria-hidden="true"
-                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80" />
+                                    <div className="absolute bottom-3 left-3 text-xs font-medium tracking-wide text-white/90">
+                                        Engineering &amp; Client Solutions
+                                    </div>
+                                </div>
+
+                                {/* Secondary Action Photography Strip */}
+                                <div className="grid grid-cols-3 gap-2.5">
+                                    <div className="relative h-24 overflow-hidden rounded-xl border border-white/15 shadow-md group/thumb">
+                                        <Image
+                                            src="/misha-headshot.png"
+                                            alt="Misha Lubich Executive Portrait"
+                                            width={300}
+                                            height={375}
+                                            className="h-full w-full object-cover object-top transition-transform duration-500 group-hover/thumb:scale-110"
+                                        />
+                                    </div>
+                                    <div className="relative h-24 overflow-hidden rounded-xl border border-white/15 shadow-md group/thumb">
+                                        <Image
+                                            src="/misha-office-window.png"
+                                            alt="Misha Lubich Architecture & Systems"
+                                            width={300}
+                                            height={375}
+                                            className="h-full w-full object-cover object-center transition-transform duration-500 group-hover/thumb:scale-110"
+                                        />
+                                    </div>
+                                    <div className="relative h-24 overflow-hidden rounded-xl border border-white/15 shadow-md group/thumb">
+                                        <Image
+                                            src="/misha-cafe-notebook.png"
+                                            alt="Misha Lubich Research & Strategy"
+                                            width={300}
+                                            height={375}
+                                            className="h-full w-full object-cover object-center transition-transform duration-500 group-hover/thumb:scale-110"
+                                        />
+                                    </div>
                                 </div>
                             </div>
 
-                            {/* Open letter intro */}
-                            <div className="text-center sm:text-left">
-                                <h2 className="section-title font-display text-2xl font-light tracking-tight text-foreground sm:text-3xl">
+                            {/* Professional intro copy & stats */}
+                            <div className="flex-1 text-center lg:text-left">
+                                <h2 className="section-title font-display text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
                                     <AnimatedText text="Hello, I'm Misha" variant="blur-slide" stagger={70} duration={800} />
                                 </h2>
 
-                                <div className="mx-auto mt-3 h-px w-12 bg-gradient-to-r from-transparent via-primary/40 to-transparent sm:mx-0 sm:w-16" />
+                                <div className="mx-auto mt-3.5 h-1 w-16 rounded-full bg-gradient-to-r from-primary via-accent to-primary lg:mx-0" />
 
-                                <p className="mt-5 text-base font-light leading-relaxed tracking-normal text-muted-foreground sm:text-lg">
+                                <p className="mt-6 text-base font-normal leading-relaxed text-foreground/90 sm:text-lg">
                                     <AnimatedText variant="fade-up" delay={300} stagger={20} duration={600}>
-                                        I architect AI-driven, cloud-native applications that scale to millions of users&mdash;from
-                                        multi-agent orchestration and RAG pipelines to production systems shipping at{" "}
-                                        <span className="font-normal text-foreground/90">Apple</span> and{" "}
-                                        <span className="font-normal text-foreground/90">Walmart</span>.{" "}
-                                        {"If you're exploring the frontier of intelligent software, I'd love to connect."}
+                                        I architect production AI-driven, cloud-native applications that scale to millions of users&mdash;from
+                                        multi-agent orchestration and RAG pipelines to systems shipping at{" "}
+                                        <span className="font-semibold text-foreground">Apple</span> and{" "}
+                                        <span className="font-semibold text-foreground">Walmart</span>.{" "}
+                                        {"Whether you're scaling intelligent software or building custom AI infrastructure, I'd love to connect."}
                                     </AnimatedText>
                                 </p>
 
-                                <p className="mt-5 font-mono text-xs tracking-widest uppercase text-muted-foreground/50">
-                                    <AnimatedText text="Berkeley CS · 6 published papers · 100 M+ users impacted" variant="fade-up" delay={600} stagger={30} duration={600} />
-                                </p>
+                                <div className="mt-8 grid grid-cols-3 gap-3 border-t border-white/10 pt-6">
+                                    <div className="text-center lg:text-left">
+                                        <div className="font-mono text-lg font-bold text-primary sm:text-xl">Berkeley CS</div>
+                                        <div className="mt-0.5 text-xs text-muted-foreground">Degree</div>
+                                    </div>
+                                    <div className="text-center lg:text-left">
+                                        <div className="font-mono text-lg font-bold text-primary sm:text-xl">6 Papers</div>
+                                        <div className="mt-0.5 text-xs text-muted-foreground">Published</div>
+                                    </div>
+                                    <div className="text-center lg:text-left">
+                                        <div className="font-mono text-lg font-bold text-primary sm:text-xl">100M+</div>
+                                        <div className="mt-0.5 text-xs text-muted-foreground">Users Impacted</div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
