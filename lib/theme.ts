@@ -228,7 +228,7 @@ export const heroOverlay =
  *  legible without hiding the brain — it stays visible at the edges, where
  *  nothing is written on top of it. */
 export const heroContentScrim =
-    "radial-gradient(ellipse 42% 26% at 50% 34%, rgba(6,8,14,0.22) 0%, rgba(6,8,14,0.10) 58%, transparent 84%)"
+    "linear-gradient(to bottom, rgba(6,8,14,0.74) 0%, rgba(6,8,14,0.70) 30%, rgba(6,8,14,0.52) 46%, rgba(6,8,14,0.20) 60%, transparent 74%)"
 
 /* ── Architecture diagram colors ─────────────────────────────────── */
 
