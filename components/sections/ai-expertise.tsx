@@ -222,14 +222,35 @@ function DomainRing() {
    *  spinning the same direction instead of unwinding on wrap. */
   const activeSlot = ((index % count) + count) % count
 
+  const dragStartXRef = useRef(0)
+  const isDraggingRef = useRef(false)
+
+  const onPointerDown = useCallback((e: React.PointerEvent) => {
+    isDraggingRef.current = true
+    dragStartXRef.current = e.clientX
+    ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
+  }, [])
+
+  const onPointerUp = useCallback((e: React.PointerEvent) => {
+    if (!isDraggingRef.current) return
+    isDraggingRef.current = false
+    const dx = e.clientX - dragStartXRef.current
+    if (Math.abs(dx) > 40) {
+      go(dx < 0 ? 1 : -1)
+    }
+  }, [go])
+
   return (
     <div className="relative">
       <RingMesh />
 
       <div
         ref={stageRef}
-        className="relative h-[600px] sm:h-[520px]"
-        style={{ perspective: "1800px" }}
+        onPointerDown={onPointerDown}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerUp}
+        className="relative h-[600px] sm:h-[520px] cursor-grab active:cursor-grabbing touch-pan-y select-none"
+        style={{ perspective: "1800px", touchAction: "pan-y" }}
       >
         <div
           className="absolute inset-0"
