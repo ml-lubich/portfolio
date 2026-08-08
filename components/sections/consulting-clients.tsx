@@ -561,20 +561,17 @@ export function ConsultingClients() {
           </div>
         </div>
 
-        {/* Rail controls */}
-        <div className="mb-4 flex items-center justify-between gap-3">
-          <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground/45">
-            Drag to explore · tap a card for details
-          </p>
+        {/* Rail controls — centered */}
+        <div className="mb-6 flex items-center justify-center">
           <button
             type="button"
             onClick={() => setCarouselPaused((p) => !p)}
             aria-pressed={carouselPaused}
             aria-label={carouselPaused ? "Resume client carousel" : "Pause client carousel"}
-            className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.04] px-3 py-1.5 font-mono text-[10px] font-semibold uppercase tracking-wider text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
+            className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/[0.08] px-4 py-2 font-mono text-xs font-semibold uppercase tracking-wider text-foreground/90 transition-all hover:border-primary/50 hover:bg-primary/10 shadow-lg backdrop-blur-md"
           >
-            {carouselPaused ? <Play className="h-3 w-3" aria-hidden /> : <Pause className="h-3 w-3" aria-hidden />}
-            {carouselPaused ? "Play" : "Pause"}
+            {carouselPaused ? <Play className="h-3.5 w-3.5" aria-hidden /> : <Pause className="h-3.5 w-3.5" aria-hidden />}
+            {carouselPaused ? "Play Carousel" : "Pause Carousel"}
           </button>
         </div>
       </div>

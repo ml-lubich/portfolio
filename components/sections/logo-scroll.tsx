@@ -295,17 +295,24 @@ export function LogoScroll() {
         <section
             ref={sectionRef}
             id="partners"
-            className="relative w-full overflow-hidden border-b border-border/40 bg-background/40 py-3 md:py-6 lg:py-8 md:backdrop-blur-sm"
+            className="relative w-full overflow-hidden border-y border-white/20 bg-gradient-to-r from-background/90 via-card/80 to-background/90 py-5 sm:py-7 md:py-8 shadow-2xl backdrop-blur-xl"
             aria-label="Companies and institutions"
+            style={{
+                boxShadow: "0 20px 50px -10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.15)",
+                clipPath: "ellipse(140% 100% at 50% 0%)",
+            }}
         >
+            {/* Top specular arch highlight line */}
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent z-10" />
+
             {/* Heading */}
-            <p className="mb-3 text-center text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground/50 sm:mb-5 sm:text-sm">
+            <p className="mb-3 text-center text-xs font-semibold uppercase tracking-[0.22em] text-foreground/80 sm:mb-4 sm:text-sm">
                 <AnimatedText text="Trusted & partnered with:" variant="blur-slide" stagger={40} duration={600} />
             </p>
 
-            {/* Fade edges */}
-            <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-background/60 to-transparent sm:w-32" />
-            <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-background/60 to-transparent sm:w-32" />
+            {/* Deep gradient fade edges */}
+            <div className="pointer-events-none absolute inset-y-0 left-0 z-20 w-24 bg-gradient-to-r from-background via-background/80 to-transparent sm:w-40" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 z-20 w-24 bg-gradient-to-l from-background via-background/80 to-transparent sm:w-40" />
 
             {/* Draggable scrolling track */}
             <div
@@ -315,7 +322,7 @@ export function LogoScroll() {
                 onPointerUp={onPointerUp}
                 onPointerCancel={onPointerUp}
                 onClickCapture={onClickCapture}
-                className={`flex will-change-transform touch-pan-y ${dragging ? "cursor-grabbing" : "cursor-grab"}`}
+                className={`flex items-center will-change-transform touch-pan-y ${dragging ? "cursor-grabbing" : "cursor-grab"}`}
                 style={{ touchAction: "pan-y" }}
             >
                 {repeated.map((logo, i) => (

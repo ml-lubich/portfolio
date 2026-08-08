@@ -159,37 +159,32 @@ export function makeWireGradientMaterial(pull: PullUniforms, opacity: number) {
       varying vec3 vMvPos;
       varying vec3 vPos;
       void main() {
-        // Enhanced 3D bright white gradient for clear visibility
-        vec3 deepGrey    = vec3(0.20, 0.22, 0.28);
-        vec3 midGrey     = vec3(0.50, 0.53, 0.58);
-        vec3 lightGrey   = vec3(0.78, 0.80, 0.85);
-        vec3 brightWhite = vec3(0.95, 0.97, 1.00);
+        // Balanced 3D wireframe shading — subtle contrast, non-harsh white
+        vec3 deepGrey    = vec3(0.12, 0.14, 0.18);
+        vec3 midGrey     = vec3(0.35, 0.38, 0.42);
+        vec3 lightGrey   = vec3(0.60, 0.64, 0.70);
+        vec3 softWhite   = vec3(0.82, 0.85, 0.90);
 
-        // Multi-stop gradient for realistic 3D shading
+        // Multi-stop gradient for realistic 3D depth
         vec3 color;
         if (vGrad < 0.3) {
           color = mix(deepGrey, midGrey, vGrad / 0.3);
         } else if (vGrad < 0.65) {
           color = mix(midGrey, lightGrey, (vGrad - 0.3) / 0.35);
         } else {
-          color = mix(lightGrey, brightWhite, (vGrad - 0.65) / 0.35);
+          color = mix(lightGrey, softWhite, (vGrad - 0.65) / 0.35);
         }
 
-        // Depth-based brightness (closer to camera = brighter)
+        // Depth-based brightness (closer to camera = clearer)
         float depth = -vMvPos.z;
         float df = smoothstep(4.5, 1.2, depth);
-        color *= 0.4 + 0.6 * df;
+        color *= 0.35 + 0.65 * df;
 
-        // Strong rim glow — silhouette edge highlight for 3D pop
+        // Silhouette rim highlight
         vec3 viewDir = normalize(-vMvPos);
         vec3 posDir  = normalize(vPos);
         float rim = pow(1.0 - abs(dot(viewDir, posDir)), 2.5);
-        // Subtle teal tint on rim for cursor.com feel
-        color += vec3(0.04, 0.10, 0.12) * rim;
-
-        // Specular-like highlight on top-facing surfaces
-        float topLight = max(0.0, dot(normalize(vPos), vec3(0.0, 1.0, 0.3)));
-        color += brightWhite * pow(topLight, 4.0) * 0.05;
+        color += vec3(0.02, 0.06, 0.08) * rim;
 
         gl_FragColor = vec4(color, uOpacity);
       }

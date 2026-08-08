@@ -37,7 +37,7 @@ export function BrainWireframe() {
     const m = new THREE.LineBasicMaterial({
       color: hexNum.wireBase,
       transparent: true,
-      opacity: 0.78,
+      opacity: 0.55,
       depthWrite: false,
     })
     injectPull(m, pull)
