@@ -3,6 +3,7 @@
 import { useState, useCallback, useRef } from "react"
 import { GraduationCap, BookOpen, Users, Code2, Award, Briefcase } from "lucide-react"
 import dynamic from "next/dynamic"
+import Image from "next/image"
 import { AnimatedSection } from "../animations/animated-section"
 import { AnimatedCounter } from "../animations/animated-counter"
 import { SectionHeader } from "../layout/section-header"
@@ -195,9 +196,27 @@ export function About() {
           subtitle="Senior Software Engineer specializing in AI-driven, cloud-native applications. Led the design and deployment of a production AI platform with multi-agent orchestration and RAG pipelines, achieving sub-second latency for millions of users."
         />
 
-        {/* Bio — terminal (OpenClaw + claw live under #consulting) */}
-        <div className="relative mx-auto mb-10 max-w-4xl">
-          <TerminalReveal
+        {/* Bio — portrait alongside the terminal (OpenClaw + claw live under #consulting) */}
+        <div className="relative mx-auto mb-10 flex max-w-5xl flex-col items-stretch gap-5 md:flex-row">
+          {/* min-h floors the row: the terminal beside it starts two lines tall
+              and types its way down, and without a floor the photo squashed to
+              a letterbox that cut the face off for the first few seconds. */}
+          <div className="group/photo relative h-64 shrink-0 overflow-hidden rounded-2xl border border-white/15 shadow-2xl shadow-black/50 md:h-auto md:min-h-[20rem] md:w-56 lg:w-64">
+            <Image
+              src="/misha-desk-laptop.png"
+              alt="Misha Lubich at his desk"
+              width={560}
+              height={700}
+              /* Absolute so the photo never drives the row height — it fills
+                 whatever height the terminal beside it sets. */
+              className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover/photo:scale-105"
+              style={{ objectPosition: "center 12%" }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" aria-hidden />
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <TerminalReveal
             title="~/about — misha.bio"
             prompt=">"
             charSpeed={18}
@@ -210,7 +229,8 @@ export function About() {
               "Published 6 peer-reviewed papers in ML for hydrology & environmental science.",
               "Co-founded Equiverse.ml — AI-driven solutions for 5,000+ underrepresented students.",
             ]}
-          />
+            />
+          </div>
         </div>
 
         {/* Highlights — one instrument panel, hairline-divided, no cards.

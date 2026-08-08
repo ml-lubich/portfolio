@@ -42,10 +42,6 @@ const ClientTestimonials = dynamic(
 const Projects = dynamic(() => import("@/components/sections/projects").then(m => m.Projects), {
   loading: () => <SectionSkeleton />,
 })
-const ValueMaxxing = dynamic(
-  () => import("@/components/sections/value-maxxing").then(m => m.ValueMaxxing),
-  { loading: () => <SectionSkeleton height="24vh" /> },
-)
 const OpenSourceShowcase = dynamic(
   () => import("@/components/sections/open-source-showcase").then(m => m.OpenSourceShowcase),
   { loading: () => <SectionSkeleton /> },
@@ -107,9 +103,6 @@ export default function Home() {
           className={`border-t border-white/[0.06] ${LAZY_SECTION_TOP}`}
         >
           <Projects />
-        </LazySection>
-        <LazySection sectionId="value-maxxing" className={LAZY_SECTION_TOP}>
-          <ValueMaxxing />
         </LazySection>
         <LazySection sectionId="open-source" className={LAZY_SECTION_TOP}>
           <OpenSourceShowcase />

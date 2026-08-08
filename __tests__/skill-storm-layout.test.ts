@@ -76,8 +76,9 @@ describe("Skill Storm", () => {
     // never let labels bleed through.
     expect(storm).not.toMatch(/opacity:\s*ring\.opacity/)
     expect(css).toMatch(/\.skill-orbit-item\b[\s\S]{0,900}brightness/)
-    // The pill itself is opaque glass: blurred backdrop + solid card background.
-    expect(css).toMatch(/\.skill-pill\b[\s\S]{0,240}backdrop-filter/)
-    expect(css).toMatch(/\.skill-pill\b[\s\S]{0,240}(--card|--background)/)
+    // The pill is opaque glass: a solid card background under a sheen. It
+    // carries no backdrop-filter — the opaque base hid it anyway, so it only
+    // cost a backdrop pass per pill (see skill-storm-performance.test.ts).
+    expect(css).toMatch(/\.skill-pill\b[\s\S]{0,320}(--card|--background)/)
   })
 })

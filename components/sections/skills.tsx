@@ -9,7 +9,15 @@ import { ShimmerOverlay } from "../ui/shimmer-overlay"
 import { skillCategories } from "@/data/skills"
 import { hex } from "@/lib/theme"
 import { SkillDetailModal } from "./skill-detail-modal"
-import { SkillStorm } from "./skill-storm"
+
+/* Desktop-only and ~114 pill nodes deep. Statically imported it landed in the
+   server HTML and the initial bundle on every device, including the phones
+   that never show it (`hidden lg:block`). Code-split + ssr:false so it costs
+   nothing until the section is actually on screen. */
+const SkillStorm = dynamic(
+  () => import("./skill-storm").then((mod) => mod.SkillStorm),
+  { ssr: false }
+)
 
 const ParticleField = dynamic(
   () => import("../three/scene-backgrounds").then((mod) => mod.ParticleField),

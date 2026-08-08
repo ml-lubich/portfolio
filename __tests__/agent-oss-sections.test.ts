@@ -48,10 +48,8 @@ describe("agent OSS portfolio surface", () => {
     )
   })
 
-  it("wires value-maxxing and the open-source showcase into the homepage", () => {
+  it("wires the open-source showcase into the homepage", () => {
     const page = fs.readFileSync(path.join(ROOT, "app/page.tsx"), "utf8")
-    expect(page).toMatch(/ValueMaxxing/)
-    expect(page).toMatch(/value-maxxing/)
     // The CLI/MCP comparison table was removed; OSS is now its own top-level
     // section so the "OSS" nav anchor resolves without waiting on projects.
     expect(page).toMatch(/OpenSourceShowcase/)
@@ -59,8 +57,20 @@ describe("agent OSS portfolio surface", () => {
     expect(page).not.toMatch(/ToolMatrix/)
   })
 
+  it("dropped the Value-maxxing section but kept its slogan", () => {
+    // Six paragraphs of manifesto became one line above the tools it describes.
+    expect(fs.existsSync(path.join(ROOT, "components/sections/value-maxxing.tsx"))).toBe(false)
+    const page = fs.readFileSync(path.join(ROOT, "app/page.tsx"), "utf8")
+    expect(page).not.toMatch(/ValueMaxxing/)
+    const nav = fs.readFileSync(path.join(ROOT, "components/nav/nav-links.ts"), "utf8")
+    expect(nav).not.toMatch(/value-maxxing/)
+
+    const oss = fs.readFileSync(path.join(ROOT, "components/sections/open-source-showcase.tsx"), "utf8")
+    expect(oss).toMatch(/Value-maxxing/)
+    expect(oss).toMatch(/tokenmaxxing/)
+  })
+
   it("ships section components", () => {
-    expect(fs.existsSync(path.join(ROOT, "components/sections/value-maxxing.tsx"))).toBe(true)
     expect(fs.existsSync(path.join(ROOT, "components/sections/tool-matrix.tsx"))).toBe(true)
   })
 })

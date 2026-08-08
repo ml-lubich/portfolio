@@ -2343,14 +2343,15 @@ article .blog-prose b a[href],
 }
 
 /* Opaque liquid-glass pill: a solid card-tinted base (so overlapping pills
-   occlude each other cleanly — no text bleed-through) with a blurred backdrop
-   and a faint top sheen for the glass read. */
+   occlude each other cleanly — no text bleed-through) and a faint top sheen
+   for the glass read.
+   No backdrop-filter: `hsl(var(--card))` is fully opaque, so a blurred
+   backdrop was painted and then covered 100% by the base — invisible, but
+   costing a backdrop pass on all ~114 pills every frame. */
 .skill-pill {
   background:
     linear-gradient(180deg, hsl(0 0% 100% / 0.06), hsl(0 0% 100% / 0) 60%),
     hsl(var(--card));
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
   box-shadow: 0 1px 0 hsl(0 0% 100% / 0.05) inset, 0 8px 24px -12px hsl(0 0% 0% / 0.7);
 }
 .skill-pill:hover {

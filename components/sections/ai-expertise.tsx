@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { useCallback, useMemo, useRef, useState } from "react"
 import dynamic from "next/dynamic"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { AnimatedSection } from "../animations/animated-section"
@@ -13,7 +13,7 @@ const TerminalReveal = dynamic(
   { ssr: false }
 )
 import { NeuralConstellation } from "../three/neural-constellation"
-import { Brain, Sparkles, Target, TrendingUp } from "lucide-react"
+import { Brain, Sparkles, Target, TrendingUp, Eye, Database, ShieldCheck } from "lucide-react"
 
 const aiDomains = [
   {
@@ -59,6 +59,39 @@ const aiDomains = [
       "Built real-time monitoring dashboards with Prometheus, Grafana, and OpenTelemetry",
     ],
     gradient: g.primaryViaSkyToAccent,
+  },
+  {
+    icon: Eye,
+    title: "Computer Vision & Multimodal",
+    description: "Vision and multimodal pipelines — detection, segmentation, OCR, and document understanding wired into LLM workflows so images, PDFs, and screenshots become first-class inputs.",
+    details: [
+      "Built OCR + layout-aware document extraction feeding downstream RAG retrieval",
+      "Deployed vision inference on GPU-backed containers with batching and autoscaling",
+      "Combined image, text, and structured signals in a single multimodal prompt path",
+    ],
+    gradient: g.primaryToCyan,
+  },
+  {
+    icon: Database,
+    title: "Data & Feature Engineering",
+    description: "The unglamorous half of every AI system: ingestion, dedup, chunking strategy, embeddings, and feature stores that stay correct as volume and schema drift.",
+    details: [
+      "Designed idempotent ingestion with Airflow DAGs over Postgres, S3, and pgvector",
+      "Tuned chunking and embedding strategy against retrieval evals, not intuition",
+      "Built backfill + reindex paths so model swaps never mean downtime",
+    ],
+    gradient: g.magentaToAccent,
+  },
+  {
+    icon: ShieldCheck,
+    title: "Evaluation, Guardrails & Safety",
+    description: "Shipping AI you can defend: offline and online evals, regression gates in CI, drift detection, and circuit breakers that fail closed instead of quietly degrading.",
+    details: [
+      "Automated LLM evaluation with RAGAS and DeepEval as a CI quality gate",
+      "Instrumented end-to-end tracing across chains, retrieval, and agent execution",
+      "Circuit-breaker alerting on guardrail violations, hallucination rate, and drift",
+    ],
+    gradient: g.primaryToRose,
   },
 ]
 
@@ -132,17 +165,43 @@ const techBars: BarItem[] = [
   },
 ]
 
-/* ── DomainRing — the four AI domains suspended on a rotating 3D carousel.
+/* ── DomainArch — the AI domains laid out as a banner-wide arch, seen from
+ *  above.
  *
- *  Stacked cards ate most of a screen each and read as a flat list. Here the
- *  panels sit on a ring in real 3D space (preserve-3d, one rotateY step per
- *  panel), floating over a vertex mesh that echoes the hero brain's wireframe.
- *  One panel faces the viewer at a time; the rest angle away, so the section
- *  costs one viewport instead of four.
+ *  A closed 360° ring put the neighbouring panels at ±90°, edge-on to the
+ *  camera, so the section read as one card folding into itself. This is the
+ *  bird's-eye reading instead: the centre panel is nearest and largest, and
+ *  each slot outward recedes into the page — further back in Z, smaller,
+ *  dimmer, softer, and riding higher in frame the way distance does under
+ *  perspective. Yaw stays small on purpose: every card keeps facing the
+ *  viewer, so the curve is read from the recession rather than from panels
+ *  turning away.
  * ── */
 
-/** Gap between a panel's edge and the ring radius, in px */
-const RING_PADDING = 60
+/** Per-slot arch geometry, measured out from the centre panel. */
+const ARCH = {
+  /** Sideways travel per slot, as a share of the panel's own width. */
+  spread: 0.7,
+  /** Inward yaw per slot, in degrees — small, so cards still face the viewer. */
+  tilt: 13,
+  /** Z pushback per slot, in px. */
+  depth: 300,
+  /** Upward drift per slot, in px — distance reads as height under perspective. */
+  rise: 24,
+  /** Scale shed per slot. */
+  shrink: 0.1,
+  /** Defocus per slot, in px. */
+  blur: 1.4,
+  /** Slots still painted on each side of centre. */
+  visible: 3,
+} as const
+
+/** Shortest signed distance from the active slot to `i`, wrapping both ways. */
+function archOffset(i: number, active: number, count: number) {
+  let off = ((i - active) % count + count) % count
+  if (off > count / 2) off -= count
+  return off
+}
 
 function RingMesh() {
   /* Static wireframe — deterministic so SSR and client agree. */
@@ -194,27 +253,9 @@ function RingMesh() {
   )
 }
 
-function DomainRing() {
+function DomainArch() {
   const [index, setIndex] = useState(0)
-  const [radius, setRadius] = useState(360)
-  const stageRef = useRef<HTMLDivElement>(null)
-  const panelRef = useRef<HTMLDivElement>(null)
   const count = aiDomains.length
-  const step = 360 / count
-
-  /* The ring only reads correctly when its radius matches the panel width —
-     too small and neighbours punch through the front panel. */
-  useEffect(() => {
-    const measure = () => {
-      const w = panelRef.current?.offsetWidth
-      if (w) setRadius(Math.round(w / 2 / Math.tan(Math.PI / count)) + RING_PADDING)
-    }
-    measure()
-    if (typeof ResizeObserver === "undefined") return
-    const ro = new ResizeObserver(measure)
-    if (stageRef.current) ro.observe(stageRef.current)
-    return () => ro.disconnect()
-  }, [count])
 
   const go = useCallback((delta: number) => setIndex((i) => i + delta), [])
 
@@ -245,36 +286,36 @@ function DomainRing() {
       <RingMesh />
 
       <div
-        ref={stageRef}
         onPointerDown={onPointerDown}
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
-        className="relative h-[600px] sm:h-[520px] cursor-grab active:cursor-grabbing touch-pan-y select-none"
+        className="relative h-[620px] cursor-grab touch-pan-y select-none active:cursor-grabbing sm:h-[500px]"
         style={{ perspective: "1800px", touchAction: "pan-y" }}
       >
-        <div
-          className="absolute inset-0"
-          style={{
-            transformStyle: "preserve-3d",
-            transform: `translateZ(-${radius}px) rotateY(${-index * step}deg)`,
-            transition: "transform 900ms cubic-bezier(0.16, 1, 0.3, 1)",
-          }}
-        >
+        <div className="absolute inset-0" style={{ transformStyle: "preserve-3d" }}>
           {aiDomains.map((domain, i) => {
             const isActive = i === activeSlot
+            const off = archOffset(i, activeSlot, count)
+            const dist = Math.abs(off)
+            const offstage = dist > ARCH.visible
             return (
               <article
                 key={domain.title}
-                ref={i === 0 ? panelRef : undefined}
                 aria-hidden={!isActive || undefined}
                 inert={!isActive}
-                className={`absolute left-1/2 top-0 w-[min(88vw,560px)] overflow-hidden rounded-3xl border bg-[#0a0c14]/85 backdrop-blur-2xl transition-[opacity,border-color,box-shadow] duration-700 ${
+                className={`absolute left-1/2 top-0 w-[min(86vw,560px)] overflow-hidden rounded-3xl border bg-[#0a0c14]/85 backdrop-blur-2xl ${
                   isActive
-                    ? "border-white/25 opacity-100 shadow-[0_40px_120px_-40px_rgba(0,0,0,0.95)]"
-                    : "pointer-events-none border-white/[0.08] opacity-35"
+                    ? "border-white/25 shadow-[0_40px_120px_-40px_rgba(0,0,0,0.95)]"
+                    : "pointer-events-none border-white/[0.08]"
                 }`}
                 style={{
-                  transform: `translateX(-50%) rotateY(${i * step}deg) translateZ(${radius}px)`,
+                  transform: `translateX(calc(-50% + ${off * ARCH.spread * 100}%)) translateY(${-dist * ARCH.rise}px) translateZ(${-dist * ARCH.depth}px) rotateY(${-off * ARCH.tilt}deg) scale(${1 - dist * ARCH.shrink})`,
+                  transition:
+                    "transform 700ms cubic-bezier(0.16,1,0.3,1), opacity 700ms cubic-bezier(0.16,1,0.3,1), filter 700ms, border-color 700ms, box-shadow 700ms",
+                  opacity: offstage ? 0 : isActive ? 1 : dist === 1 ? 0.5 : 0.26,
+                  filter: dist ? `blur(${dist * ARCH.blur}px)` : undefined,
+                  zIndex: count - dist,
+                  visibility: offstage ? "hidden" : "visible",
                 }}
               >
                 <div className={`h-[2px] w-full bg-gradient-to-r ${domain.gradient}`} />
@@ -405,9 +446,12 @@ export function AIExpertise() {
           <NeuralConstellation bars={techBars} metrics={metrics} />
         </AnimatedSection>
 
-        {/* AI Domains — suspended 3D ring */}
+        {/* AI Domains — full-bleed 3D arch. Breaks the max-w-7xl column so the
+            outer panels run off both edges instead of stacking in the middle. */}
         <AnimatedSection delay={100}>
-          <DomainRing />
+          <div className="relative left-1/2 w-screen -translate-x-1/2 overflow-hidden">
+            <DomainArch />
+          </div>
         </AnimatedSection>
 
         {/* Bottom CTA */}

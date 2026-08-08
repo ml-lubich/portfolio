@@ -68,52 +68,24 @@ export function ProfileIntro() {
                         />
 
                         <div className="relative flex flex-col gap-10 lg:flex-row lg:items-center">
-                            {/* Main photo & Work Gallery Grid */}
-                            <div className="flex flex-col gap-4 shrink-0 lg:w-[22rem]">
-                                {/* Primary Feature Photo: Crisp rectangular glass frame with natural rounded corners */}
-                                <div className="relative h-80 w-full overflow-hidden rounded-2xl border border-white/20 shadow-2xl shadow-black/50 group/photo">
+                            {/* Portrait — one photo only. The rest of the set is
+                                spread down the page (About, Research, Contact)
+                                rather than piled into a thumbnail strip here.
+                                The frame's aspect tracks the source image so
+                                object-cover never crops the top of the head. */}
+                            <div className="shrink-0 lg:w-[22rem]">
+                                <div className="group/photo relative h-[26rem] w-full overflow-hidden rounded-2xl border border-white/20 shadow-2xl shadow-black/50 sm:h-[28rem]">
                                     <Image
-                                        src="/misha-desk-laptop.png"
-                                        alt="Misha Lubich working on laptop with clients"
+                                        src="/misha-headshot.png"
+                                        alt="Misha Lubich"
                                         width={600}
                                         height={750}
-                                        className="h-full w-full object-cover object-center transition-transform duration-700 group-hover/photo:scale-105"
+                                        className="h-full w-full object-cover object-top transition-transform duration-700 group-hover/photo:scale-105"
                                         priority
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80" />
                                     <div className="absolute bottom-3 left-3 text-xs font-medium tracking-wide text-white/90">
                                         Engineering &amp; Client Solutions
-                                    </div>
-                                </div>
-
-                                {/* Secondary Action Photography Strip */}
-                                <div className="grid grid-cols-3 gap-2.5">
-                                    <div className="relative h-24 overflow-hidden rounded-xl border border-white/15 shadow-md group/thumb">
-                                        <Image
-                                            src="/misha-headshot.png"
-                                            alt="Misha Lubich Executive Portrait"
-                                            width={300}
-                                            height={375}
-                                            className="h-full w-full object-cover object-top transition-transform duration-500 group-hover/thumb:scale-110"
-                                        />
-                                    </div>
-                                    <div className="relative h-24 overflow-hidden rounded-xl border border-white/15 shadow-md group/thumb">
-                                        <Image
-                                            src="/misha-office-window.png"
-                                            alt="Misha Lubich Architecture & Systems"
-                                            width={300}
-                                            height={375}
-                                            className="h-full w-full object-cover object-center transition-transform duration-500 group-hover/thumb:scale-110"
-                                        />
-                                    </div>
-                                    <div className="relative h-24 overflow-hidden rounded-xl border border-white/15 shadow-md group/thumb">
-                                        <Image
-                                            src="/misha-cafe-notebook.png"
-                                            alt="Misha Lubich Research & Strategy"
-                                            width={300}
-                                            height={375}
-                                            className="h-full w-full object-cover object-center transition-transform duration-500 group-hover/thumb:scale-110"
-                                        />
                                     </div>
                                 </div>
                             </div>

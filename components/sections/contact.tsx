@@ -1,6 +1,7 @@
 "use client"
 
 import dynamic from "next/dynamic"
+import Image from "next/image"
 import { Mail, Phone, MapPin, Calendar, Linkedin, Github, GraduationCap } from "lucide-react"
 import { AnimatedSection } from "../animations/animated-section"
 import { SectionHeader } from "../layout/section-header"
@@ -53,7 +54,24 @@ export function Contact() {
           subtitle="Ready to collaborate on innovative projects and drive technical excellence"
         />
 
-        <div className="grid gap-4 sm:grid-cols-2 md:gap-6">
+        <div className="grid gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-3">
+          {/* Portrait — puts a face on the section people actually act from.
+              A portrait column, not a wide band: the source is 4:5, so a
+              letterbox crop would take the top of the head off. */}
+          <AnimatedSection delay={50} className="sm:col-span-2 lg:col-span-1">
+            <div className="group/photo relative h-72 overflow-hidden rounded-2xl border border-white/10 shadow-2xl shadow-black/50 lg:h-full">
+              <Image
+                src="/misha-loft-window.png"
+                alt="Misha Lubich in the studio"
+                width={1120}
+                height={1400}
+                className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover/photo:scale-105"
+                style={{ objectPosition: "center 18%" }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" aria-hidden />
+            </div>
+          </AnimatedSection>
+
           {/* Contact info */}
           <AnimatedSection delay={100}>
             <div className="flex h-full flex-col gap-4 rounded-2xl border border-border bg-card p-6">
@@ -62,12 +80,12 @@ export function Contact() {
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary">
                     <item.icon className="h-4 w-4 text-primary-foreground" />
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-xs text-muted-foreground">{item.label}</p>
                     {item.href ? (
                       <a
                         href={item.href}
-                        className="text-sm font-medium text-foreground transition-colors hover:text-primary"
+                        className="block break-all text-sm font-medium text-foreground transition-colors hover:text-primary"
                       >
                         {item.value}
                       </a>

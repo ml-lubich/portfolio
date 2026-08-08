@@ -222,13 +222,13 @@ export const terminalChrome = {
 /* ── Hero overlay ────────────────────────────────────────────────── */
 
 export const heroOverlay =
-    "radial-gradient(ellipse 60% 50% at 50% 45%, rgba(10,12,20,0.35) 0%, transparent 100%)"
+    "radial-gradient(ellipse 60% 50% at 50% 45%, rgba(10,12,20,0.22) 0%, transparent 100%)"
 
 /** Painted above the 3D brain, below the hero copy. Keeps the centre column
  *  legible without hiding the brain — it stays visible at the edges, where
  *  nothing is written on top of it. */
 export const heroContentScrim =
-    "linear-gradient(to bottom, rgba(6,8,14,0.74) 0%, rgba(6,8,14,0.70) 30%, rgba(6,8,14,0.52) 46%, rgba(6,8,14,0.20) 60%, transparent 74%)"
+    "linear-gradient(to bottom, rgba(6,8,14,0.60) 0%, rgba(6,8,14,0.56) 30%, rgba(6,8,14,0.40) 46%, rgba(6,8,14,0.15) 60%, transparent 74%)"
 
 /* ── Architecture diagram colors ─────────────────────────────────── */
 

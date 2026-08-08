@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useRef } from "react"
+import { memo, useCallback, useEffect, useMemo, useRef } from "react"
 import { getSkillIcon } from "./skill-icons"
 import { skillCategories } from "@/data/skills"
 
@@ -141,23 +141,39 @@ export function SkillStorm({ onSelect }: { onSelect: (skill: string) => void }) 
 
   // Single rAF loop: apply velocity, decay it toward idle, write one CSS var.
   useEffect(() => {
-    const reduce =
-      typeof window !== "undefined" &&
-      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+    const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+    /* The storm is `hidden lg:block`, so below lg it is display:none — every
+       CSS-var write there still invalidates ~114 pill subtrees for pixels
+       nobody sees. Gate on the same breakpoint (matchMedia, not offsetParent:
+       reading layout every frame would be its own reflow). */
+    const wide = window.matchMedia("(min-width: 1024px)")
+    let live = wide.matches
+    const syncLive = () => (live = wide.matches)
+    wide.addEventListener("change", syncLive)
 
     let raf = 0
+    let written = Number.NaN
     const tick = () => {
+      raf = requestAnimationFrame(tick)
+      if (!live) return
+
       if (!draggingRef.current) {
         const idle = reduce ? 0 : IDLE_DRIFT * dirRef.current
         // Fling velocity bleeds off toward the idle drift baseline.
         velocityRef.current = idle + (velocityRef.current - idle) * FLING_FRICTION
         if (!pausedRef.current) angleRef.current += velocityRef.current
       }
-      rotatorRef.current?.style.setProperty("--storm-angle", `${angleRef.current}deg`)
-      raf = requestAnimationFrame(tick)
+      // Hovering or reduced-motion parks the angle; re-writing the same value
+      // would still dirty every pill, so only write when it actually moved.
+      if (angleRef.current === written) return
+      written = angleRef.current
+      rotatorRef.current?.style.setProperty("--storm-angle", `${written}deg`)
     }
     raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
+    return () => {
+      cancelAnimationFrame(raf)
+      wide.removeEventListener("change", syncLive)
+    }
   }, [])
 
   const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -194,10 +210,17 @@ export function SkillStorm({ onSelect }: { onSelect: (skill: string) => void }) 
   }
 
   // A press that moved past the threshold is a spin, not a selection.
-  const handleSelect = (name: string) => {
-    if (movedRef.current > DRAG_CLICK_THRESHOLD) return
-    onSelect(name)
-  }
+  // Stable identities so the memoised pills never re-render.
+  const handleSelect = useCallback(
+    (name: string) => {
+      if (movedRef.current > DRAG_CLICK_THRESHOLD) return
+      onSelect(name)
+    },
+    [onSelect],
+  )
+  const handleHoverChange = useCallback((hovering: boolean) => {
+    pausedRef.current = hovering
+  }, [])
 
   return (
     <div
@@ -250,7 +273,7 @@ export function SkillStorm({ onSelect }: { onSelect: (skill: string) => void }) 
               } as React.CSSProperties
             }
           >
-            <SkillPill name={p.name} onSelect={handleSelect} onHoverChange={(h) => (pausedRef.current = h)} />
+            <SkillPill name={p.name} onSelect={handleSelect} onHoverChange={handleHoverChange} />
           </div>
         ))}
       </div>
@@ -258,7 +281,8 @@ export function SkillStorm({ onSelect }: { onSelect: (skill: string) => void }) 
   )
 }
 
-function SkillPill({
+/** Memoised: 114 pills, and none of their props change after mount. */
+const SkillPill = memo(function SkillPill({
   name,
   onSelect,
   onHoverChange,
@@ -282,4 +306,4 @@ function SkillPill({
       {name}
     </button>
   )
-}
+})

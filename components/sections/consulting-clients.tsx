@@ -492,8 +492,22 @@ export function ConsultingClients() {
           subtitle="Web apps, integrations, IT execution, workflows, and automations for SMBs, organizations, and solo operators — plus AI/ML when it genuinely fits."
         />
 
-        {/* OpenClaw — compact inline pitch */}
-        <div className="mx-auto mb-4 flex max-w-2xl flex-col items-center gap-3 text-center sm:flex-row sm:text-left">
+        {/* Portrait + OpenClaw pitch. Portrait column, not a letterbox band —
+            the source is 4:5 and a wide crop takes the head off. */}
+        <div className="mx-auto mb-6 flex max-w-3xl flex-col items-stretch gap-5 md:flex-row">
+          <div className="group/photo relative h-64 shrink-0 overflow-hidden rounded-2xl border border-white/15 shadow-2xl shadow-black/50 md:h-auto md:w-52 lg:w-60">
+            <Image
+              src="/misha-office-window.png"
+              alt="Misha Lubich working with a client"
+              width={560}
+              height={700}
+              className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover/photo:scale-105"
+              style={{ objectPosition: "center 22%" }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" aria-hidden />
+          </div>
+
+          <div className="flex min-w-0 flex-1 flex-col items-center gap-3 text-center sm:flex-row sm:text-left">
           <div className="shrink-0 scale-[0.55] sm:scale-[0.6]" aria-hidden>
             <AnimatedLobsterClaw />
           </div>
@@ -514,6 +528,7 @@ export function ConsultingClients() {
               Schedule a call about OpenClaw
               <ExternalLink className="h-3 w-3 shrink-0 opacity-70" aria-hidden />
             </a>
+          </div>
           </div>
         </div>
 

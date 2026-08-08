@@ -18,7 +18,6 @@ export const navLinks: NavLink[] = [
   { label: "Consulting", href: "#consulting" },
   { label: "Clients", href: "#testimonials" },
   { label: "Projects", href: "#projects" },
-  { label: "Value", href: "#value-maxxing" },
   { label: "OSS", href: "#open-source" },
   { label: "Skills", href: "#skills" },
   { label: "Stats", href: "#github" },

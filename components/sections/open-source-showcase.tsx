@@ -115,6 +115,13 @@ export function OpenSourceShowcase() {
           subtitle="Public CLIs and MCP servers. Pick one to run its demo."
         />
 
+        {/* The old Value-maxxing section said this in six paragraphs. One line
+            carries it just as well, right above the tools it describes. */}
+        <p className="mb-6 text-center font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground/70 md:mb-8">
+          Value-maxxing<span className="text-muted-foreground/40">,</span> not{" "}
+          <span className="gradient-text">tokenmaxxing</span>
+        </p>
+
         {/* Tool rail — glyph tiles, one active */}
         <ul
           className="mb-5 flex flex-wrap justify-center gap-2"
