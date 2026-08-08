@@ -132,7 +132,7 @@ export function Brain3D({
             <OrbitControls
               makeDefault
               autoRotate
-              autoRotateSpeed={1.8}
+              autoRotateSpeed={0.45}
               enableZoom={false}
               enablePan={false}
               enableDamping

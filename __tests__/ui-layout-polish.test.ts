@@ -19,6 +19,6 @@ describe("UI Layout Polish TDD", () => {
   it("brain wireframe uses refined 3D line shading", () => {
     const file = path.resolve(__dirname, "../components/brain/materials.ts")
     const content = fs.readFileSync(file, "utf-8")
-    expect(content).toContain("Balanced 3D wireframe shading")
+    expect(content).toContain("Crisp 3D wireframe shading")
   })
 })

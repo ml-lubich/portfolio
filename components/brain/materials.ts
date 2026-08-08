@@ -159,11 +159,11 @@ export function makeWireGradientMaterial(pull: PullUniforms, opacity: number) {
       varying vec3 vMvPos;
       varying vec3 vPos;
       void main() {
-        // Balanced 3D wireframe shading — subtle contrast, non-harsh white
-        vec3 deepGrey    = vec3(0.12, 0.14, 0.18);
-        vec3 midGrey     = vec3(0.35, 0.38, 0.42);
-        vec3 lightGrey   = vec3(0.60, 0.64, 0.70);
-        vec3 softWhite   = vec3(0.82, 0.85, 0.90);
+        // Crisp 3D wireframe shading — bright white front lines with subtle depth
+        vec3 deepGrey    = vec3(0.25, 0.28, 0.35);
+        vec3 midGrey     = vec3(0.55, 0.58, 0.65);
+        vec3 lightGrey   = vec3(0.82, 0.85, 0.90);
+        vec3 brightWhite = vec3(0.98, 0.99, 1.00);
 
         // Multi-stop gradient for realistic 3D depth
         vec3 color;
@@ -172,19 +172,19 @@ export function makeWireGradientMaterial(pull: PullUniforms, opacity: number) {
         } else if (vGrad < 0.65) {
           color = mix(midGrey, lightGrey, (vGrad - 0.3) / 0.35);
         } else {
-          color = mix(lightGrey, softWhite, (vGrad - 0.65) / 0.35);
+          color = mix(lightGrey, brightWhite, (vGrad - 0.65) / 0.35);
         }
 
-        // Depth-based brightness (closer to camera = clearer)
+        // Depth-based brightness (closer to camera = bright white)
         float depth = -vMvPos.z;
         float df = smoothstep(4.5, 1.2, depth);
-        color *= 0.35 + 0.65 * df;
+        color *= 0.50 + 0.50 * df;
 
-        // Silhouette rim highlight
+        // Clean white rim specular
         vec3 viewDir = normalize(-vMvPos);
         vec3 posDir  = normalize(vPos);
         float rim = pow(1.0 - abs(dot(viewDir, posDir)), 2.5);
-        color += vec3(0.02, 0.06, 0.08) * rim;
+        color += vec3(0.08, 0.12, 0.15) * rim;
 
         gl_FragColor = vec4(color, uOpacity);
       }

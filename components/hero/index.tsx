@@ -78,7 +78,7 @@ export function Hero() {
       {/* 3D Brain — hero underlay, seated high so it reads as a backdrop behind
           the name and tagline rather than behind the CTAs and stat row. */}
       <div
-        className="hero-brain-underlay pointer-events-none absolute inset-x-0 bottom-[24%] top-[-4%] z-[3] flex items-center justify-center sm:bottom-[22%] sm:top-[-6%]"
+        className="hero-brain-underlay pointer-events-none absolute inset-x-0 bottom-[20%] top-[2%] z-[3] flex items-center justify-center sm:bottom-[18%] sm:top-[1%]"
         aria-hidden="true"
       >
         {/* Responsive viewport for 3D canvas */}
