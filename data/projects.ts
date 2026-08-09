@@ -1142,4 +1142,43 @@ export const projects: Project[] = [
             link: { label: "GitHub", url: "https://github.com/ml-lubich/jenkins-mcp" },
         },
     },
+    {
+        id: "ical-cli",
+        name: "ical-cli",
+        metric: "macOS Calendar.app agent tool",
+        coverImage: "/images/projects/imessage-exporter-hero.png",
+        summary:
+            "Local Apple Calendar CLI (ical) \u2014 list calendars, schedule events, and invite attendees directly on Calendar.app; registered under tool registry as ical-cli.",
+        tags: ["CLI", "AppleScript", "Python", "macOS", "Calendar"],
+        gradient: g.primaryToAccent,
+        accent: accentCycle[0],
+        number: "30",
+        detail: {
+            title: "ical-cli",
+            subtitle: "macOS Calendar.app CLI tool",
+            description:
+                "ical is a CLI agent tool over Calendar.app \u2014 list calendars, list events, create events, and invite attendees with zero cloud middleman. It follows the same scaffold as imsg, imail, and inotes, exposing clean commands and full Calendar.app synchronization.",
+            highlights: [
+                "CLI-first design (ical) to inspect calendars, list events, and add events with attendees",
+                "Direct AppleScript automation over Calendar.app \u2014 syncs natively with iCloud/Google calendars",
+                "Registered in the global tool-registry (mcpServers.ical)",
+                "Open-source repo on GitHub at ml-lubich/ical",
+            ],
+            architecture: [
+                { label: "CLI", icon: "layers", description: "ical \u2014 calendars, list, add, version" },
+                { label: "Calendar.app bridge", icon: "cpu", description: "AppleScript automation over Calendar.app" },
+                { label: "Tool registry", icon: "server", description: "Integrated into global ~/.config/tool-registry/registry.json" },
+                { label: "Distribution", icon: "git", description: "Installed locally via uv tool install -e ~/dev/ical" },
+            ],
+            techStack: ["Python", "AppleScript", "Typer", "Rich", "Calendar.app"],
+            metrics: [
+                { label: "Install", value: "uv tool install -e ~/dev/ical" },
+                { label: "Type", value: "CLI Tool" },
+            ],
+            diagramType: "cicd",
+            gradient: g.primaryToAccent,
+            accent: accentCycle[0],
+            link: { label: "GitHub", url: "https://github.com/ml-lubich/ical" },
+        },
+    },
 ]
