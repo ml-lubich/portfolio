@@ -59,7 +59,7 @@ export function Contact() {
               A portrait column, not a wide band: the source is 4:5, so a
               letterbox crop would take the top of the head off. */}
           <AnimatedSection delay={50} className="sm:col-span-2 lg:col-span-1">
-            <div className="group/photo relative h-72 overflow-hidden rounded-2xl border border-white/10 shadow-2xl shadow-black/50 lg:h-full">
+            <div className="group/photo relative aspect-[4/5] overflow-hidden rounded-2xl border border-white/10 shadow-2xl shadow-black/50 sm:aspect-[16/10] lg:aspect-auto lg:h-full">
               <Image
                 src="/misha-loft-window.png"
                 alt="Misha Lubich in the studio"

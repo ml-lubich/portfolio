@@ -201,7 +201,10 @@ export function About() {
           {/* min-h floors the row: the terminal beside it starts two lines tall
               and types its way down, and without a floor the photo squashed to
               a letterbox that cut the face off for the first few seconds. */}
-          <div className="group/photo relative h-64 shrink-0 overflow-hidden rounded-2xl border border-white/15 shadow-2xl shadow-black/50 md:h-auto md:min-h-[20rem] md:w-56 lg:w-64">
+          {/* Stacked (mobile): the source's own 4:5 ratio, so nothing crops.
+              Side-by-side (md+): fills the terminal's height, with min-h so the
+              row never collapses while the terminal is still typing itself out. */}
+          <div className="group/photo relative aspect-[3/4] shrink-0 overflow-hidden rounded-2xl border border-white/15 shadow-2xl shadow-black/50 md:aspect-auto md:h-auto md:min-h-[20rem] md:w-56 lg:w-64">
             <Image
               src="/misha-desk-laptop.png"
               alt="Misha Lubich at his desk"

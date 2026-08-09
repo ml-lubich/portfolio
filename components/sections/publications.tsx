@@ -181,7 +181,9 @@ export function Publications() {
       <div className="relative mx-auto max-w-5xl px-3 md:px-4 lg:px-6">
         {/* Wide reading band — the research half of the day, away from the desk */}
         <AnimatedSection delay={400} className="mt-8 md:mt-12">
-          <figure className="group/photo relative h-56 overflow-hidden rounded-2xl border border-white/10 shadow-2xl shadow-black/50 sm:h-72 md:h-80">
+          {/* 3:2 ≈ the source's own 1.45, so the narrow view crops nothing;
+              the fixed band only kicks in once there's width to spare. */}
+          <figure className="group/photo relative aspect-[3/2] overflow-hidden rounded-2xl border border-white/10 shadow-2xl shadow-black/50 sm:aspect-auto sm:h-72 md:h-80">
             <Image
               src="/misha-cafe-notebook.png"
               alt="Misha Lubich reading and taking notes"

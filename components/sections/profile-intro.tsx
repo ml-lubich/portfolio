@@ -74,7 +74,12 @@ export function ProfileIntro() {
                                 The frame's aspect tracks the source image so
                                 object-cover never crops the top of the head. */}
                             <div className="shrink-0 lg:w-[22rem]">
-                                <div className="group/photo relative h-[26rem] w-full overflow-hidden rounded-2xl border border-white/20 shadow-2xl shadow-black/50 sm:h-[28rem]">
+                                {/* aspect-[4/5] matches the source exactly, so
+                                    object-cover has nothing to crop at ANY
+                                    width. A fixed height cannot do this: the
+                                    frame's ratio drifts as the column narrows
+                                    and the crop eats the top of the head. */}
+                                <div className="group/photo relative aspect-[4/5] w-full overflow-hidden rounded-2xl border border-white/20 shadow-2xl shadow-black/50">
                                     <Image
                                         src="/misha-headshot.png"
                                         alt="Misha Lubich"

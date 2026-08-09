@@ -495,7 +495,7 @@ export function ConsultingClients() {
         {/* Portrait + OpenClaw pitch. Portrait column, not a letterbox band —
             the source is 4:5 and a wide crop takes the head off. */}
         <div className="mx-auto mb-6 flex max-w-3xl flex-col items-stretch gap-5 md:flex-row">
-          <div className="group/photo relative h-64 shrink-0 overflow-hidden rounded-2xl border border-white/15 shadow-2xl shadow-black/50 md:h-auto md:w-52 lg:w-60">
+          <div className="group/photo relative aspect-[4/5] shrink-0 overflow-hidden rounded-2xl border border-white/15 shadow-2xl shadow-black/50 md:aspect-auto md:h-auto md:w-52 lg:w-60">
             <Image
               src="/misha-office-window.png"
               alt="Misha Lubich working with a client"
