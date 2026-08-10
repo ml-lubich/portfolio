@@ -95,21 +95,16 @@
     background-image: 
       radial-gradient(ellipse 80% 50% at 50% -20%, rgba(30, 41, 89, 0.25), transparent 70%),
       radial-gradient(ellipse 60% 40% at 20% 40%, rgba(49, 28, 77, 0.18), transparent 70%),
-      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(20, 45, 70, 0.2), transparent 70%),
-      linear-gradient(to bottom, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
-      linear-gradient(to right, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
-    background-size: 100% 100%, 100% 100%, 100% 100%, 48px 48px, 48px 48px;
+      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(20, 45, 70, 0.2), transparent 70%);
+    background-size: 100% 100%, 100% 100%, 100% 100%;
     background-attachment: fixed;
   }
 }
 
-/* ── Page texture ──────────────────────────────────────────────────
- *  The sections below the hero sit on a flat opaque `bg-background`, which
- *  reads as paper rather than as a lit surface. This paints one fixed layer
- *  over that fill — a broad top light, two cool bounce pools, and fine film
- *  grain — so panels above it look like they are sitting *in* a space with
- *  depth. Fixed (not scrolling) so it costs one composited layer, and it sits
- *  under every section: content is positioned and paints after it.
+/* ── Page backdrop ─────────────────────────────────────────────────
+ *  One fixed layer under every section below the hero: a broad top light and
+ *  two cool bounce pools in dark blue, plus a faint dot grid for structure.
+ *  No film grain — it read as dirt on the screen, not as depth.
  * ─────────────────────────────────────────────────────────────────── */
 .page-texture::before {
   content: "";
@@ -121,17 +116,9 @@
     radial-gradient(ellipse 95% 55% at 50% -12%, rgba(96, 124, 200, 0.16), transparent 66%),
     radial-gradient(ellipse 60% 45% at 8% 26%, rgba(84, 52, 126, 0.13), transparent 72%),
     radial-gradient(ellipse 60% 45% at 92% 74%, rgba(28, 78, 120, 0.14), transparent 72%),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23g)' opacity='0.42'/%3E%3C/svg%3E");
-  background-size: 100% 100%, 100% 100%, 100% 100%, 160px 160px;
+    radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.05) 1px, transparent 0);
+  background-size: 100% 100%, 100% 100%, 100% 100%, 32px 32px;
   background-repeat: no-repeat, no-repeat, no-repeat, repeat;
-}
-
-/* Grain is a texture, not a light source — keep it off the motion-sensitive
-   path and out of the way when the user has asked for less. */
-@media (prefers-reduced-motion: reduce) {
-  .page-texture::before {
-    opacity: 0.6;
-  }
 }
 
 /* ── Terminal cursor blink ──────────────────────────────────── */
