@@ -37,16 +37,16 @@ interface Logo {
 
 /** Brand-colored client logos are muted to match the grey strip; the row's
  *  existing hover (via `group`) restores full color and contrast. */
+/** Monochromatic white-tinted client logos with crisp contrast against dark background. */
 const CLIENT_LOGO_IMG =
-    "w-auto opacity-60 grayscale transition-[filter,opacity] duration-300 group-hover:opacity-95 group-hover:grayscale-0"
+    "w-auto brightness-0 invert opacity-85 transition-[filter,opacity] duration-300 group-hover:opacity-100"
 
-/** The strip is marks only — no wordmark text beside them — so the glyphs run
- *  larger than they did when a text label carried the identification. */
-const ICON_MARK = "h-9 w-9 sm:h-11 sm:w-11"
+/** Scaled up icon sizes for uniform visual weight */
+const ICON_MARK = "h-11 w-11 sm:h-14 sm:w-14 text-white/85 transition-opacity duration-300 group-hover:text-white"
 
 const LOGOS: Logo[] = [
-    { name: "Apple", href: "https://www.apple.com", icon: <SiApple className={ICON_MARK} /> },
-    { name: "Walmart", href: "https://www.walmart.com", icon: <SiWalmart className={ICON_MARK} /> },
+    { name: "Apple", href: "https://www.apple.com", icon: <SiApple className="h-10 w-10 sm:h-13 sm:w-13 text-white/85 transition-opacity duration-300 group-hover:text-white" /> },
+    { name: "Walmart", href: "https://www.walmart.com", icon: <SiWalmart className="h-12 w-12 sm:h-16 sm:w-16 text-white/85 transition-opacity duration-300 group-hover:text-white" /> },
     {
         name: "Lawrence Berkeley Lab",
         href: "https://www.lbl.gov",
@@ -57,14 +57,14 @@ const LOGOS: Logo[] = [
                 width={366}
                 height={79}
                 unoptimized
-                className={`h-8 sm:h-10 ${CLIENT_LOGO_IMG}`}
+                className={`h-9 sm:h-12 ${CLIENT_LOGO_IMG}`}
             />
         ),
     },
     {
         name: "Honda Innovations",
         href: "https://www.hondainnovations.com",
-        icon: <SiHonda className={ICON_MARK} />,
+        icon: <SiHonda className="h-11 w-11 sm:h-14 sm:w-14 text-white/85 transition-opacity duration-300 group-hover:text-white" />,
     },
     {
         name: "UC Berkeley",
@@ -76,7 +76,7 @@ const LOGOS: Logo[] = [
                 width={215}
                 height={68}
                 unoptimized
-                className={`h-8 sm:h-10 ${CLIENT_LOGO_IMG}`}
+                className={`h-9 sm:h-12 ${CLIENT_LOGO_IMG}`}
             />
         ),
     },
@@ -89,11 +89,11 @@ const LOGOS: Logo[] = [
                 alt="LUPFR Entertainment logo"
                 width={256}
                 height={256}
-                className={`h-9 sm:h-11 ${CLIENT_LOGO_IMG}`}
+                className="h-10 w-auto sm:h-13 opacity-90 transition-opacity duration-300 group-hover:opacity-100"
             />
         ),
     },
-    { name: "Seaside", icon: <SeasideMark className={`h-9 sm:h-11 ${CLIENT_LOGO_IMG}`} /> },
+    { name: "Seaside", icon: <SeasideMark className="h-10 w-10 sm:h-13 sm:w-13 opacity-85 transition-opacity duration-300 group-hover:opacity-100" /> },
     {
         name: "eria.co",
         href: "https://www.eria.co",
@@ -103,7 +103,7 @@ const LOGOS: Logo[] = [
                 alt="ERIA Events logo"
                 width={256}
                 height={157}
-                className={`h-8 sm:h-10 ${CLIENT_LOGO_IMG}`}
+                className={`h-9 sm:h-12 ${CLIENT_LOGO_IMG}`}
             />
         ),
     },
