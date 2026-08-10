@@ -14,16 +14,24 @@ export function ProfileIntro() {
     const lastTouchRef = useRef(0)
 
     const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-        if (Date.now() - lastTouchRef.current < 500) return
         if (!cardRef.current) return
         const rect = cardRef.current.getBoundingClientRect()
         const x = (e.clientX - rect.left) / rect.width - 0.5
         const y = (e.clientY - rect.top) / rect.height - 0.5
+        setTilt({ x: y * -14, y: x * 14 })
+    }, [])
+
+    const handleTouchMove = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+        if (!cardRef.current || !e.touches[0]) return
+        const rect = cardRef.current.getBoundingClientRect()
+        const touch = e.touches[0]
+        const x = (touch.clientX - rect.left) / rect.width - 0.5
+        const y = (touch.clientY - rect.top) / rect.height - 0.5
         setTilt({ x: y * -10, y: x * 10 })
+        setIsHovered(true)
     }, [])
 
     const handleMouseEnter = useCallback(() => {
-        if (Date.now() - lastTouchRef.current < 500) return
         setIsHovered(true)
     }, [])
     const handleMouseLeave = useCallback(() => {
@@ -32,7 +40,6 @@ export function ProfileIntro() {
     }, [])
 
     const handleTouchEnd = useCallback(() => {
-        lastTouchRef.current = Date.now()
         setIsHovered(false)
         setTilt({ x: 0, y: 0 })
     }, [])
@@ -41,19 +48,28 @@ export function ProfileIntro() {
         <section id="profile" className="relative py-12 sm:py-24 overflow-hidden">
             <div className="mx-auto max-w-5xl px-3 md:px-6">
                 <AnimatedSection>
-                    {/* Sleek liquid glass card container with subtle 3D tilt */}
+                    {/* Sleek 3D pannable holographic glass card container */}
                     <div
                         ref={cardRef}
                         onMouseMove={handleMouseMove}
                         onMouseEnter={handleMouseEnter}
                         onMouseLeave={handleMouseLeave}
+                        onTouchMove={handleTouchMove}
                         onTouchEnd={handleTouchEnd}
-                        className="group relative overflow-hidden rounded-3xl border border-white/20 bg-card/60 p-6 backdrop-blur-2xl transition-all duration-500 sm:p-10 md:p-12 will-change-transform shadow-2xl shadow-black/40"
+                        className="group relative overflow-hidden rounded-3xl border border-white/30 bg-card/70 p-6 backdrop-blur-2xl transition-transform duration-200 ease-out sm:p-10 md:p-12 will-change-transform shadow-2xl shadow-black/50"
                         style={{
-                            transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) translateY(${isHovered ? -6 : 0}px)`,
-                            background: "linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 50%, rgba(255,255,255,0.05) 100%)",
+                            transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) translateY(${isHovered ? -8 : 0}px) scale3d(${isHovered ? 1.01 : 1}, ${isHovered ? 1.01 : 1}, 1)`,
+                            background: "linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.03) 50%, rgba(255,255,255,0.08) 100%)",
                         }}
                     >
+                        {/* Dynamic holographic glare sheen */}
+                        <div
+                            className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                            style={{
+                                background: `radial-gradient(600px circle at ${((tilt.y / 14) + 0.5) * 100}% ${((tilt.x / -14) + 0.5) * 100}%, rgba(255,255,255,0.18), transparent 60%)`,
+                            }}
+                            aria-hidden="true"
+                        />
                         {/* Specular edge sheen */}
                         <div
                             className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent"
