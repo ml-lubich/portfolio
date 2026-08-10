@@ -83,7 +83,10 @@ export function Hero() {
            well past the fold once the copy, CTAs and stat card stack up, so
            centring in it seats the brain low and half of it never gets seen.
            `svh` keeps that anchor still while mobile browser chrome slides. */
-        className="hero-brain-underlay pointer-events-none absolute inset-x-0 top-0 z-[3] flex h-[100svh] items-center justify-center"
+        /* Nudged down off the nav: centring on the raw first screenful seated
+           the crown right under the nav shell and pushed the stem past the
+           fold. The offset drops the whole mesh into the body of the hero. */
+        className="hero-brain-underlay pointer-events-none absolute inset-x-0 top-0 z-[3] flex h-[100svh] translate-y-[6svh] items-center justify-center"
         aria-hidden="true"
       >
         {/* Square canvas viewport — the brain fills it, so this is the size knob.
@@ -95,7 +98,7 @@ export function Hero() {
             128vw the box was wider than the viewport itself, which is what put
             the temples off-screen. Desktop is sized against josephheupler.com,
             whose canvas measures 684px at 1440×900. */}
-        <div className="aspect-square shrink-0 max-sm:size-[min(94vw,60svh)] sm:size-[min(62vw,86svh)]">
+        <div className="aspect-square shrink-0 max-sm:size-[min(88vw,54svh)] sm:size-[min(56vw,78svh)]">
           {showBrain && (
             <div className="h-full w-full">
               <Brain3D
