@@ -108,13 +108,21 @@ export function TerminalReveal({
                 </div>
 
                 {/* Terminal body */}
-                <div className="px-5 py-4 font-mono text-sm leading-relaxed min-h-[80px]">
+                <div className="px-5 py-4 font-mono text-sm leading-relaxed min-h-[220px]">
                     {lines.map((line, i) => {
                         const isTypingThis = i === revealedLines && started
                         const isRevealed = i < revealedLines
                         const isHidden = i > revealedLines
 
-                        if (isHidden && !done) return null
+                        // Show faint placeholder before line is typed to prevent layout shift/flicker
+                        if (isHidden && !done) {
+                          return (
+                            <div key={i} className="flex gap-2 opacity-0 aria-hidden">
+                              <span className="shrink-0 select-none">{prompt}</span>
+                              <span>{typeof line === "string" ? line : plainLines[i]}</span>
+                            </div>
+                          )
+                        }
 
                         const lineText = typeof line === "string" ? line : plainLines[i]
 

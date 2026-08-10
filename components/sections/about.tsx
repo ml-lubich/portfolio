@@ -204,16 +204,16 @@ export function About() {
           {/* Stacked (mobile): the source's own 4:5 ratio, so nothing crops.
               Side-by-side (md+): fills the terminal's height, with min-h so the
               row never collapses while the terminal is still typing itself out. */}
-          <div className="group/photo relative aspect-[3/4] shrink-0 overflow-hidden rounded-2xl border border-white/15 shadow-2xl shadow-black/50 md:aspect-auto md:h-auto md:min-h-[20rem] md:w-56 lg:w-64">
+          <div className="group/photo relative aspect-[4/5] shrink-0 overflow-hidden rounded-2xl border border-white/15 shadow-2xl shadow-black/50 md:aspect-auto md:h-auto md:min-h-[22rem] md:w-72 lg:w-80">
             <Image
               src="/misha-desk-laptop.png"
               alt="Misha Lubich at his desk"
-              width={560}
-              height={700}
+              width={640}
+              height={800}
               /* Absolute so the photo never drives the row height — it fills
                  whatever height the terminal beside it sets. */
               className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover/photo:scale-105"
-              style={{ objectPosition: "center 12%" }}
+              style={{ objectPosition: "center 20%" }}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" aria-hidden />
           </div>

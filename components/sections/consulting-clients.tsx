@@ -494,15 +494,15 @@ export function ConsultingClients() {
 
         {/* Portrait + OpenClaw pitch. Portrait column, not a letterbox band —
             the source is 4:5 and a wide crop takes the head off. */}
-        <div className="mx-auto mb-6 flex max-w-3xl flex-col items-stretch gap-5 md:flex-row">
-          <div className="group/photo relative aspect-[4/5] shrink-0 overflow-hidden rounded-2xl border border-white/15 shadow-2xl shadow-black/50 md:aspect-auto md:h-auto md:w-52 lg:w-60">
+        <div className="mx-auto mb-6 flex max-w-4xl flex-col items-stretch gap-5 md:flex-row">
+          <div className="group/photo relative aspect-[4/5] shrink-0 overflow-hidden rounded-2xl border border-white/15 shadow-2xl shadow-black/50 md:aspect-auto md:h-auto md:w-64 lg:w-72">
             <Image
               src="/misha-office-window.png"
               alt="Misha Lubich working with a client"
-              width={560}
-              height={700}
+              width={640}
+              height={800}
               className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover/photo:scale-105"
-              style={{ objectPosition: "center 22%" }}
+              style={{ objectPosition: "center 15%" }}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" aria-hidden />
           </div>

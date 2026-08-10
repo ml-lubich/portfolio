@@ -47,7 +47,7 @@ export function Contact() {
         <ParticleField color="#a855f7" speed={0.08} />
       </div>
 
-      <div className="relative mx-auto max-w-4xl px-3 md:px-6">
+      <div className="relative mx-auto max-w-5xl px-3 md:px-6">
         <SectionHeader
           label="Let's Connect"
           title={<>Ready to collaborate on{" "}<span className="gradient-text">innovative projects</span></>}
@@ -66,7 +66,7 @@ export function Contact() {
                 width={1120}
                 height={1400}
                 className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover/photo:scale-105"
-                style={{ objectPosition: "center 18%" }}
+                style={{ objectPosition: "center 12%" }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" aria-hidden />
             </div>
@@ -74,7 +74,7 @@ export function Contact() {
 
           {/* Contact info */}
           <AnimatedSection delay={100}>
-            <div className="flex h-full flex-col gap-4 rounded-2xl border border-border bg-card p-6">
+            <div className="flex h-full flex-col justify-between gap-4 rounded-2xl border border-border bg-card p-6">
               {contactInfo.map((item) => (
                 <div key={item.label} className="flex items-center gap-4">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary">
@@ -95,8 +95,6 @@ export function Contact() {
                   </div>
                 </div>
               ))}
-
-
             </div>
           </AnimatedSection>
 
@@ -110,17 +108,17 @@ export function Contact() {
 
               <div className="flex flex-1 flex-col justify-end gap-3">
                 <p className="text-xs text-muted-foreground">Or find me on these platforms</p>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-2.5">
                   {socialLinks.map((link) => (
                     <a
                       key={link.label}
                       href={link.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 rounded-xl border border-white/[0.1] bg-white/[0.04] px-4 py-3 text-sm text-white/80 transition-colors hover:border-white/20 hover:text-white"
+                      className="flex items-center gap-2 rounded-xl border border-white/[0.1] bg-white/[0.04] px-3 py-2.5 text-xs text-white/80 transition-colors hover:border-white/20 hover:text-white"
                     >
-                      <link.icon className="h-4 w-4" />
-                      <span className="text-xs">{link.label}</span>
+                      <link.icon className="h-3.5 w-3.5 shrink-0" />
+                      <span className="truncate whitespace-nowrap">{link.label}</span>
                     </a>
                   ))}
                 </div>
