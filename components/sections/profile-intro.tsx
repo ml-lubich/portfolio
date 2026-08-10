@@ -96,12 +96,12 @@ export function ProfileIntro() {
                             </div>
 
                             {/* Professional intro copy & stats */}
-                            <div className="flex-1 text-center lg:text-left">
+                            <div className="flex-1 text-center">
                                 <h2 className="section-title font-display text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
                                     <AnimatedText text="Hello, I'm Misha" variant="blur-slide" stagger={70} duration={800} />
                                 </h2>
 
-                                <div className="mx-auto mt-3.5 h-1 w-16 rounded-full bg-gradient-to-r from-primary via-accent to-primary lg:mx-0" />
+                                <div className="mx-auto mt-3.5 h-1 w-16 rounded-full bg-gradient-to-r from-primary via-accent to-primary" />
 
                                 <p className="mt-6 text-base font-normal leading-relaxed text-foreground/90 sm:text-lg">
                                     <AnimatedText variant="fade-up" delay={300} stagger={20} duration={600}>
@@ -114,15 +114,15 @@ export function ProfileIntro() {
                                 </p>
 
                                 <div className="mt-8 grid grid-cols-3 gap-3 border-t border-white/10 pt-6">
-                                    <div className="text-center lg:text-left">
+                                    <div className="text-center">
                                         <div className="font-mono text-lg font-bold text-primary sm:text-xl">Berkeley CS</div>
                                         <div className="mt-0.5 text-xs text-muted-foreground">Degree</div>
                                     </div>
-                                    <div className="text-center lg:text-left">
+                                    <div className="text-center">
                                         <div className="font-mono text-lg font-bold text-primary sm:text-xl">6 Papers</div>
                                         <div className="mt-0.5 text-xs text-muted-foreground">Published</div>
                                     </div>
-                                    <div className="text-center lg:text-left">
+                                    <div className="text-center">
                                         <div className="font-mono text-lg font-bold text-primary sm:text-xl">100M+</div>
                                         <div className="mt-0.5 text-xs text-muted-foreground">Users Impacted</div>
                                     </div>

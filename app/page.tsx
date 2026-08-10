@@ -76,12 +76,10 @@ export default function Home() {
       <div className="relative bg-background">
         <LogoScroll />
 
-        {/* Each LazySection defers rendering until near viewport,
-            preventing 6+ WebGL canvases from booting at once */}
+        <ProfileIntro />
         <LazySection>
           <LiveTerminal />
         </LazySection>
-        <ProfileIntro />
         <LazySection sectionId="ai-expertise" className={LAZY_SECTION_TOP}>
           <AIExpertise />
         </LazySection>
