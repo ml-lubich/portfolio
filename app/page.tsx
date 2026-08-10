@@ -5,17 +5,14 @@ import { Hero } from "@/components/hero"
 import { ProfileIntro, LogoScroll, WorkMarquee } from "@/components/sections"
 import { LazySection } from "@/components/layout"
 
-/* ── Skeleton placeholder while chunks load ─────────────────────────── */
+/* ── Skeleton placeholder while chunks load ─────────────────────────────
+ *  Deliberately empty. A spinner here fires for a chunk that is loading
+ *  400px+ below the fold — the reader never sees it resolve, only the flash
+ *  as it is replaced. The div exists purely to hold the height its
+ *  `LazySection` already reserved, so the swap moves nothing.
+ * ─────────────────────────────────────────────────────────────────────── */
 function SectionSkeleton({ height = "30vh" }: { height?: string }) {
-  return (
-    <div
-      className="flex items-center justify-center"
-      style={{ minHeight: height }}
-      aria-hidden="true"
-    >
-      <div className="h-6 w-6 animate-spin rounded-full border-2 border-muted-foreground/20 border-t-muted-foreground/60" />
-    </div>
-  )
+  return <div style={{ minHeight: height }} aria-hidden="true" />
 }
 
 /* ── Below-fold sections: code-split & deferred ─────────────────────── */
@@ -73,7 +70,7 @@ export default function Home() {
       <Hero />
 
       {/* Below hero: solid page bg. Rainbow orbs render only inside <Hero> (not fixed), so fast scroll doesn’t drag a full-viewport effect. */}
-      <div className="relative bg-background">
+      <div className="page-texture relative bg-background">
         <LogoScroll />
 
         <ProfileIntro />

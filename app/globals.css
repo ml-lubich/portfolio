@@ -82,6 +82,37 @@
   }
 }
 
+/* ── Page texture ──────────────────────────────────────────────────
+ *  The sections below the hero sit on a flat opaque `bg-background`, which
+ *  reads as paper rather than as a lit surface. This paints one fixed layer
+ *  over that fill — a broad top light, two cool bounce pools, and fine film
+ *  grain — so panels above it look like they are sitting *in* a space with
+ *  depth. Fixed (not scrolling) so it costs one composited layer, and it sits
+ *  under every section: content is positioned and paints after it.
+ * ─────────────────────────────────────────────────────────────────── */
+.page-texture::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    radial-gradient(ellipse 95% 55% at 50% -12%, rgba(96, 124, 200, 0.16), transparent 66%),
+    radial-gradient(ellipse 60% 45% at 8% 26%, rgba(84, 52, 126, 0.13), transparent 72%),
+    radial-gradient(ellipse 60% 45% at 92% 74%, rgba(28, 78, 120, 0.14), transparent 72%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23g)' opacity='0.42'/%3E%3C/svg%3E");
+  background-size: 100% 100%, 100% 100%, 100% 100%, 160px 160px;
+  background-repeat: no-repeat, no-repeat, no-repeat, repeat;
+}
+
+/* Grain is a texture, not a light source — keep it off the motion-sensitive
+   path and out of the way when the user has asked for less. */
+@media (prefers-reduced-motion: reduce) {
+  .page-texture::before {
+    opacity: 0.6;
+  }
+}
+
 /* ── Terminal cursor blink ──────────────────────────────────── */
 @keyframes terminal-blink {
 
@@ -586,16 +617,41 @@ body {
 /* Keep the hero brain below the headline and reveal it behind the lower glass
    controls. The mask is static, so the WebGL canvas remains compositor-friendly. */
 .hero-brain-underlay {
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, transparent 2%, black 20%, black 100%);
-  mask-image: linear-gradient(to bottom, transparent 0%, transparent 2%, black 20%, black 100%);
+  /* Short top fade only — the mesh is sized to fill the hero, so a long ramp
+     would eat the crown of the brain rather than just soften the nav seam. */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 9%, black 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, black 9%, black 100%);
   /* Bright white & vivid brain visualization - visible behind glass controls */
-  opacity: 0.90;
+  opacity: 1;
 }
 
 @media (max-width: 639px) {
   .hero-brain-underlay {
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, transparent 14%, black 38%, black 100%);
-    mask-image: linear-gradient(to bottom, transparent 0%, transparent 14%, black 38%, black 100%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, transparent 6%, black 22%, black 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, transparent 6%, black 22%, black 100%);
+  }
+}
+
+/* Section rule that draws itself in from its left edge. */
+@keyframes rule-wipe {
+  from {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+
+  to {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
+.animate-rule-wipe {
+  animation: rule-wipe 900ms cubic-bezier(0.16, 1, 0.3, 1) 250ms both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-rule-wipe {
+    animation: none;
   }
 }
 

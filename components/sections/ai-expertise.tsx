@@ -191,9 +191,9 @@ const ARCH = {
   /** Scale shed per slot. */
   shrink: 0.1,
   /** Defocus per slot, in px. */
-  blur: 1.4,
+  blur: 3.2,
   /** Slots still painted on each side of centre. */
-  visible: 3,
+  visible: 2,
 } as const
 
 /** Shortest signed distance from the active slot to `i`, wrapping both ways. */
@@ -312,7 +312,11 @@ function DomainArch() {
                   transform: `translateX(calc(-50% + ${off * ARCH.spread * 100}%)) translateY(${-dist * ARCH.rise}px) translateZ(${-dist * ARCH.depth}px) rotateY(${-off * ARCH.tilt}deg) scale(${1 - dist * ARCH.shrink})`,
                   transition:
                     "transform 700ms cubic-bezier(0.16,1,0.3,1), opacity 700ms cubic-bezier(0.16,1,0.3,1), filter 700ms, border-color 700ms, box-shadow 700ms",
-                  opacity: offstage ? 0 : isActive ? 1 : dist === 1 ? 0.5 : 0.26,
+                  /* Neighbours are depth, not content. At 0.5 their body copy
+                     stayed legible through the active panel and the section
+                     read as three overlapping cards flickering against each
+                     other; this drops them to a suggestion of a card edge. */
+                  opacity: offstage ? 0 : isActive ? 1 : dist === 1 ? 0.2 : 0.09,
                   filter: dist ? `blur(${dist * ARCH.blur}px)` : undefined,
                   zIndex: count - dist,
                   visibility: offstage ? "hidden" : "visible",

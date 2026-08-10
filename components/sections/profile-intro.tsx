@@ -117,7 +117,10 @@ export function ProfileIntro() {
                                     <AnimatedText text="Hello, I'm Misha" variant="blur-slide" stagger={70} duration={800} />
                                 </h2>
 
-                                <div className="mt-3.5 h-1 w-16 rounded-full bg-gradient-to-r from-primary via-accent to-primary mx-auto lg:mx-0" />
+                                {/* Wipes out from the heading's own left edge rather than
+                                    appearing at full width, and `origin-left` keeps that edge
+                                    pinned so the rule and the "H" share a start point. */}
+                                <div className="animate-rule-wipe mt-3.5 h-1 w-16 origin-left rounded-full bg-gradient-to-r from-primary via-accent to-primary mx-auto lg:mx-0 lg:origin-left" />
 
                                 <p className="mt-6 text-base font-normal leading-relaxed text-foreground/90 sm:text-lg">
                                     <AnimatedText variant="fade-up" delay={300} stagger={20} duration={600}>

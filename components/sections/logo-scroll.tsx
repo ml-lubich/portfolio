@@ -41,7 +41,7 @@ const CLIENT_LOGO_IMG =
 
 const LOGOS: Logo[] = [
     { name: "Apple", href: "https://www.apple.com", icon: <SiApple className="h-10 w-10 sm:h-13 sm:w-13 text-white/90 transition-opacity duration-300 group-hover:text-white" /> },
-    { name: "Walmart", href: "https://www.walmart.com", icon: <SiWalmart className="h-[3.25rem] w-[3.25rem] sm:h-[4.25rem] sm:w-[4.25rem] text-white/90 transition-opacity duration-300 group-hover:text-white" /> },
+    { name: "Walmart", href: "https://www.walmart.com", icon: <SiWalmart className="h-[4.5rem] w-[4.5rem] sm:h-[6rem] sm:w-[6rem] text-white/90 transition-opacity duration-300 group-hover:text-white" /> },
     {
         name: "Lawrence Berkeley Lab",
         href: "https://www.lbl.gov",
@@ -52,7 +52,12 @@ const LOGOS: Logo[] = [
                 width={366}
                 height={79}
                 unoptimized
-                className="h-8 sm:h-11 w-auto opacity-90 transition-opacity duration-300 group-hover:opacity-100"
+                /* The source mark is a black block + black wordmark: on this
+                   strip it disappears entirely. Flattened to white so it
+                   reads — then held back to ~70% because unlike the other
+                   marks here this one is a *filled* square, and at full
+                   strength it blares next to Apple's and Honda's glyphs. */
+                className="h-8 sm:h-11 w-auto opacity-[0.72] brightness-0 invert transition-opacity duration-300 group-hover:opacity-95"
             />
         ),
     },
@@ -71,7 +76,7 @@ const LOGOS: Logo[] = [
                 width={215}
                 height={68}
                 unoptimized
-                className="h-8 sm:h-11 w-auto opacity-90 transition-opacity duration-300 group-hover:opacity-100"
+                className="h-8 sm:h-11 w-auto opacity-90 brightness-0 invert transition-opacity duration-300 group-hover:opacity-100"
             />
         ),
     },

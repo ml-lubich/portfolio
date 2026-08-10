@@ -28,7 +28,7 @@ interface LazySectionProps {
  */
 export function LazySection({
   children,
-  rootMargin = "400px",
+  rootMargin = "1600px",
   minHeight = "min(38dvh, 320px)",
   className = "",
   sectionId,
@@ -48,9 +48,14 @@ export function LazySection({
         }
       },
       {
+        /* Mount well before the section is reachable. A section swapping from
+           a ~320px placeholder to its real height is a page-height change; if
+           that lands near the viewport the reader sees everything below it
+           slide, which reads as the page scrolling on its own. Doing it a
+           screenful-and-a-half early keeps the growth off-screen. */
         rootMargin:
-          rootMargin === "400px" && window.matchMedia("(max-width: 767px)").matches
-            ? "120px"
+          rootMargin === "1600px" && window.matchMedia("(max-width: 767px)").matches
+            ? "700px"
             : rootMargin,
       }
     )
@@ -72,7 +77,10 @@ export function LazySection({
       className={["lazy-section-wrap", className].filter(Boolean).join(" ") || undefined}
       data-section={sectionId || undefined}
       data-lazy-loaded={visible ? "true" : "false"}
-      style={visible ? undefined : { minHeight }}
+      /* Floor stays applied after mount too: dropping it the instant the IO
+         fires collapses the wrapper to 0 for the frame or two before the
+         dynamic chunk paints, which is itself a jump. */
+      style={{ minHeight }}
     >
       {visible ? children : null}
     </div>

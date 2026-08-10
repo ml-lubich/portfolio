@@ -78,8 +78,20 @@ describe("mobile performance guardrails", () => {
     expect(source("app/globals.css")).not.toContain("hue-rotate(")
   })
 
-  it("keeps lazy sections close to the mobile viewport", () => {
-    expect(source("components/layout/lazy-section.tsx")).toContain("120px")
+  /* Mobile must still prefetch a shorter distance than desktop, or a phone
+     boots every section at once. It cannot be *too* short either: a section
+     that swaps from its placeholder to full height within a screen of the
+     viewport shoves everything below it, which reads as the page scrolling
+     by itself. Bound it on both sides instead of pinning one literal. */
+  it("keeps lazy section prefetch shorter on mobile than desktop", () => {
+    const src = source("components/layout/lazy-section.tsx")
+    const desktop = Number(/rootMargin = "(\d+)px"/.exec(src)?.[1])
+    const mobile = Number(/\?\s*"(\d+)px"/.exec(src)?.[1])
+
+    expect(desktop).toBeGreaterThan(0)
+    expect(mobile).toBeGreaterThan(0)
+    expect(mobile).toBeLessThan(desktop)
+    expect(mobile).toBeLessThanOrEqual(900)
   })
 
   it("keeps hero sizing stable during mobile browser chrome changes", () => {

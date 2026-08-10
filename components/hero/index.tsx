@@ -75,14 +75,21 @@ export function Hero() {
       <BackgroundOrbs />
       {!mobilePerformanceMode && <ParticleCanvas className="z-[1]" />}
 
-      {/* 3D Brain — hero underlay, seated high so it reads as a backdrop behind
-          the name and tagline rather than behind the CTAs and stat row. */}
+      {/* 3D Brain — hero underlay. Sized off the viewport (not the content box)
+          so the mesh reads as a full-bleed backdrop behind the whole hero
+          column, and centred on the section rather than cropped by it. */}
       <div
-        className="hero-brain-underlay pointer-events-none absolute inset-x-0 bottom-[20%] top-[2%] z-[3] flex items-center justify-center sm:bottom-[18%] sm:top-[1%] opacity-45 scale-95"
+        /* Centred on the first screenful, not on the section. The hero box runs
+           well past the fold once the copy, CTAs and stat card stack up, so
+           centring in it seats the brain low and half of it never gets seen.
+           `svh` keeps that anchor still while mobile browser chrome slides. */
+        className="hero-brain-underlay pointer-events-none absolute inset-x-0 top-0 z-[3] flex h-[100svh] items-center justify-center"
         aria-hidden="true"
       >
-        {/* Responsive viewport for 3D canvas */}
-        <div className="aspect-square shrink-0 max-sm:size-[min(108vw,38rem)] sm:h-full sm:w-full">
+        {/* Square canvas viewport — the brain fills it, so this is the size knob.
+            Capped against viewport *height*: the mesh is as tall as it is wide,
+            and sizing it off width alone runs the crown and stem off the fold. */}
+        <div className="aspect-square shrink-0 max-sm:size-[min(155vw,72svh)] sm:size-[min(96vw,94svh)]">
           {showBrain && (
             <div className="h-full w-full">
               <Brain3D

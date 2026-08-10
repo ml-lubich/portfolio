@@ -494,15 +494,18 @@ export function ConsultingClients() {
 
         {/* Portrait + OpenClaw pitch. Portrait column, not a letterbox band —
             the source is 4:5 and a wide crop takes the head off. */}
-        <div className="mx-auto mb-6 flex max-w-4xl flex-col items-stretch gap-5 md:flex-row">
-          <div className="group/photo relative aspect-[4/5] shrink-0 overflow-hidden rounded-2xl border border-white/15 shadow-2xl shadow-black/50 md:aspect-auto md:h-auto md:w-64 lg:w-72">
+        <div className="mx-auto mb-6 flex max-w-4xl flex-col items-center gap-5 md:flex-row md:items-start">
+          {/* The source is 4:5. Letting this column stretch to the row height
+              made the frame landscape, which crops the shot to a head-and-
+              shoulders band. The portrait ratio is fixed at every width so the
+              whole figure stays in frame. */}
+          <div className="group/photo relative aspect-[4/5] w-full max-w-[15rem] shrink-0 overflow-hidden rounded-2xl border border-white/15 shadow-2xl shadow-black/50 md:w-64 md:max-w-none lg:w-72">
             <Image
               src="/misha-office-window.png"
               alt="Misha Lubich working with a client"
               width={640}
               height={800}
-              className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover/photo:scale-105"
-              style={{ objectPosition: "center 15%" }}
+              className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-700 group-hover/photo:scale-105"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" aria-hidden />
           </div>
