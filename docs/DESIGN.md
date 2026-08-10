@@ -1,5 +1,29 @@
 # Design
 
+## Type system & tokens — cua.ai landing-redesign (2026-08-10)
+
+Visual reference: `cua.ai` (its `<html class="landing-redesign">` build). Adopted its
+design *language* over the existing page structure; sections, hero brain, skill storm and
+terminal are unchanged.
+
+- **Fonts** (`app/layout.tsx` + `tailwind.config.ts`): `font-sans` → **Urbanist**, `font-display` →
+  **Instrument Serif**, mono unchanged (**JetBrains Mono**). Geist remains as the sans fallback.
+- **Instrument Serif is 400-only.** Existing headings carry `font-light`…`font-bold`, so
+  `.font-display { font-synthesis-weight: none }` in `globals.css` blocks faux-bold — the serif
+  always renders as a true 400, matching cua. Do not remove this without also normalising the
+  weight utilities on all `font-display` call sites.
+- **Ink:** `--muted-foreground` moved `215 15% 55%` → `217 15% 69%` (cua `--color-ink-muted`
+  `#a4adbb`); secondary copy no longer sinks into the background.
+- **Accents:** `--brand` `205 100% 69%` (cua `#61bcff`), plus `--brand-soft`, `--brand-glow`,
+  `--hairline`. Hue 205 is deliberately *not* the banned 217 tech blue, and brand is reserved for
+  rules/glows/hairlines — headline text keeps the metallic silver sheen
+  (`__tests__/no-tech-blue.test.ts`).
+- **Radii:** `--radius` `0.75rem` → `0.625rem` (cua `--radius-card` 10px); `--radius-card-lg` 1.5rem.
+- Surfaces were already within ~1% of cua's `#07080a` / `#0a0c10` ramp and were left alone.
+
+Not adopted: cua's page *structure* (numbered 01–03 feature cards, 4-column OS grid, product
+showcase). That would replace the portfolio's own sections rather than restyle them.
+
 ## 3D hero
 
 - **Hero placement (CSS):** The WebGL brain sits in `components/hero/index.tsx` inside a square sized from `vw` (desktop uses full hero; below `sm` the square is ~`68vw` with extra top padding on the brain layer and on the hero section so the H1/role block clears the fixed nav). On viewports below `sm`, avoid flex vertical centering plus negative `translateY` (crown clips under `overflow-hidden`); use `items-start`, top padding, and a positive `translateY` so the mesh sits lower in the hero.

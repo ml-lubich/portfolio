@@ -20,7 +20,9 @@
     --secondary: 220 15% 7%;
     --secondary-foreground: 210 20% 85%;
     --muted: 220 15% 6%;
-    --muted-foreground: 215 15% 55%;
+    /* cua.ai --color-ink-muted (#a4adbb) reads noticeably lighter than the
+       old 55% — secondary copy stops sinking into the background. */
+    --muted-foreground: 217 15% 69%;
 
     /* brand */
     --primary: 0 0% 100%;
@@ -56,7 +58,18 @@
     --chart-5: 45 90% 55%;
     /* amber     */
 
-    --radius: 0.75rem;
+    /* ── cua.ai landing-redesign accents ──────────────────────────────
+     * Brand hue is 205 (#61bcff), deliberately NOT the banned 217 tech
+     * blue. Reserved for rules, glows and hairlines — headline text keeps
+     * the metallic silver sheen (see __tests__/no-tech-blue.test.ts).
+     * ─────────────────────────────────────────────────────────────── */
+    --brand: 205 100% 69%;
+    --brand-soft: 205 100% 81%;
+    --brand-glow: 205 100% 69% / 0.34;
+    --hairline: 0 0% 100% / 0.1;
+
+    --radius: 0.625rem;
+    --radius-card-lg: 1.5rem;
   }
 }
 
@@ -67,6 +80,14 @@
 
   * {
     @apply border-border;
+  }
+
+  /* Instrument Serif ships a single 400 weight. Existing headings carry
+     font-light..font-bold utilities; without this the browser fakes the
+     heavy end and the serif renders smeared. Synthesis off = true 400,
+     which is how cua.ai sets it. */
+  .font-display {
+    font-synthesis-weight: none;
   }
 
   body {

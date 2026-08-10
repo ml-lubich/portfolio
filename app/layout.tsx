@@ -1,6 +1,12 @@
 import React from "react"
 import type { Metadata, Viewport } from 'next'
-import { JetBrains_Mono, Cormorant_Garamond, Italiana } from 'next/font/google'
+import {
+  JetBrains_Mono,
+  Cormorant_Garamond,
+  Italiana,
+  Urbanist,
+  Instrument_Serif,
+} from 'next/font/google'
 import { GeistSans } from 'geist/font/sans'
 import { GeistMono } from 'geist/font/mono'
 
@@ -18,6 +24,21 @@ const italiana = Italiana({
   weight: '400',
   subsets: ['latin'],
   variable: '--font-italiana',
+  display: 'swap',
+})
+
+// Body + display faces mirroring the cua.ai landing redesign:
+// Urbanist for running text, Instrument Serif for headings.
+const urbanist = Urbanist({
+  subsets: ['latin'],
+  variable: '--font-urbanist',
+  display: 'swap',
+})
+
+const instrumentSerif = Instrument_Serif({
+  weight: '400',
+  subsets: ['latin'],
+  variable: '--font-instrument-serif',
   display: 'swap',
 })
 
@@ -158,7 +179,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" dir="ltr" className={`${GeistSans.variable} ${GeistMono.variable} ${jetbrains.variable} ${italiana.variable} ${cormorant.variable}`}>
+    <html lang="en" dir="ltr" className={`${GeistSans.variable} ${GeistMono.variable} ${jetbrains.variable} ${italiana.variable} ${cormorant.variable} ${urbanist.variable} ${instrumentSerif.variable}`}>
       <head>
         {/* Preconnect only to origins used on initial load. Google Fonts are bundled by next/font; Unsplash is used only on blog. */}
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />

@@ -71,8 +71,8 @@ const config: Config = {
         sm: 'calc(var(--radius) - 4px)',
       },
       fontFamily: {
-        sans: ['var(--font-geist-sans)', 'system-ui', 'sans-serif'],
-        display: ['var(--font-geist-sans)', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-urbanist)', 'var(--font-geist-sans)', 'system-ui', 'sans-serif'],
+        display: ['var(--font-instrument-serif)', 'Georgia', 'Times New Roman', 'serif'],
         mono: ['var(--font-geist-mono)', 'var(--font-jetbrains)', 'monospace'],
         italiana: ['var(--font-italiana)', 'serif'],
         cormorant: ['var(--font-cormorant)', 'Georgia', 'serif'],
