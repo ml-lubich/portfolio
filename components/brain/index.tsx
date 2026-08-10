@@ -38,7 +38,12 @@ function getInitialCam() {
   if (w < 480) return { z: 1.34, fov: 46 }
   if (w < 640) return { z: 1.42, fov: 45 }
   if (w < 1024) return { z: 1.58, fov: 44 }
-  return { z: 1.46, fov: 42 }
+  /* Desktop carries the largest mesh (0.54), so it needs the *most* camera
+     distance, not the least. At z 1.46 the frustum half-height was 0.56 against
+     a 0.54 mesh — under 4% margin, so the auto-rotating brain swept its long
+     axis straight through the canvas edge and got sliced. Matches the ~1.3x
+     headroom the other tiers already run. */
+  return { z: 1.83, fov: 42 }
 }
 
 function InitialCamera() {
