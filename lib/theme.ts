@@ -221,8 +221,12 @@ export const terminalChrome = {
 
 /* ── Hero overlay ────────────────────────────────────────────────── */
 
+/** Painted *below* the 3D brain (z-2, brain is z-3), so this darkens the
+ *  ambient orbs and body gradient back to near-black without touching the
+ *  mesh. Keeping the hero black is what makes the white wireframe read —
+ *  dimming the brain itself is not the lever. */
 export const heroOverlay =
-    "radial-gradient(ellipse 60% 50% at 50% 45%, rgba(10,12,20,0.22) 0%, transparent 100%)"
+    "linear-gradient(rgba(4,5,10,0.80), rgba(4,5,10,0.80)), radial-gradient(ellipse 60% 50% at 50% 45%, rgba(8,10,18,0.35) 0%, transparent 100%)"
 
 /** Painted above the 3D brain, below the hero copy. Keeps the centre column
  *  legible without hiding the brain — it stays visible at the edges, where

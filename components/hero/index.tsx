@@ -89,7 +89,7 @@ export function Hero() {
         {/* Square canvas viewport — the brain fills it, so this is the size knob.
             Capped against viewport *height*: the mesh is as tall as it is wide,
             and sizing it off width alone runs the crown and stem off the fold. */}
-        <div className="aspect-square shrink-0 max-sm:size-[min(155vw,72svh)] sm:size-[min(96vw,94svh)]">
+        <div className="aspect-square shrink-0 max-sm:size-[min(128vw,58svh)] sm:size-[min(78vw,76svh)]">
           {showBrain && (
             <div className="h-full w-full">
               <Brain3D
