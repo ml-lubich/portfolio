@@ -32,6 +32,16 @@ export function HeroCTAs() {
         <span className="relative z-10">View AI Expertise</span>
       </button>
       <a
+        href="/resume_mlubich.pdf"
+        target="_blank"
+        rel="noopener noreferrer"
+        download="Misha_Lubich_Resume.pdf"
+        className="glass-btn group relative inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-foreground sm:px-8 sm:py-3.5"
+      >
+        <Sparkles className="relative z-10 h-4 w-4 shrink-0 text-primary" aria-hidden />
+        <span className="relative z-10">Download Resume</span>
+      </a>
+      <a
         href="https://calendar.app.google/T2VGkBsBAUzGABRB7"
         target="_blank"
         rel="noopener noreferrer"

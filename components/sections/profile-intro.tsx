@@ -112,35 +112,36 @@ export function ProfileIntro() {
                             </div>
 
                             {/* Professional intro copy & stats */}
-                            <div className="flex-1 text-center">
+                            <div className="flex-1 text-center lg:text-left">
                                 <h2 className="section-title font-display text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
                                     <AnimatedText text="Hello, I'm Misha" variant="blur-slide" stagger={70} duration={800} />
                                 </h2>
 
-                                <div className="mx-auto mt-3.5 h-1 w-16 rounded-full bg-gradient-to-r from-primary via-accent to-primary" />
+                                <div className="mt-3.5 h-1 w-16 rounded-full bg-gradient-to-r from-primary via-accent to-primary mx-auto lg:mx-0" />
 
                                 <p className="mt-6 text-base font-normal leading-relaxed text-foreground/90 sm:text-lg">
                                     <AnimatedText variant="fade-up" delay={300} stagger={20} duration={600}>
                                         I architect production AI-driven, cloud-native applications that scale to millions of users&mdash;from
                                         multi-agent orchestration and RAG pipelines to systems shipping at{" "}
-                                        <span className="font-semibold text-foreground">Apple</span> and{" "}
-                                        <span className="font-semibold text-foreground">Walmart</span>.{" "}
+                                        <span className="font-bold text-foreground underline decoration-primary/40 underline-offset-4">Apple</span>,{" "}
+                                        <span className="font-bold text-foreground underline decoration-primary/40 underline-offset-4">Walmart</span>, and{" "}
+                                        <span className="font-bold text-foreground underline decoration-primary/40 underline-offset-4">LBNL</span>.{" "}
                                         {"Whether you're scaling intelligent software or building custom AI infrastructure, I'd love to connect."}
                                     </AnimatedText>
                                 </p>
 
                                 <div className="mt-8 grid grid-cols-3 gap-3 border-t border-white/10 pt-6">
-                                    <div className="text-center">
+                                    <div className="text-center lg:text-left">
                                         <div className="font-mono text-lg font-bold text-primary sm:text-xl">Berkeley CS</div>
-                                        <div className="mt-0.5 text-xs text-muted-foreground">Degree</div>
+                                        <div className="mt-0.5 text-xs text-muted-foreground/80 font-medium">B.A. Computer Science</div>
                                     </div>
-                                    <div className="text-center">
+                                    <div className="text-center lg:text-left">
                                         <div className="font-mono text-lg font-bold text-primary sm:text-xl">6 Papers</div>
-                                        <div className="mt-0.5 text-xs text-muted-foreground">Published</div>
+                                        <div className="mt-0.5 text-xs text-muted-foreground/80 font-medium">Peer-Reviewed</div>
                                     </div>
-                                    <div className="text-center">
+                                    <div className="text-center lg:text-left">
                                         <div className="font-mono text-lg font-bold text-primary sm:text-xl">100M+</div>
-                                        <div className="mt-0.5 text-xs text-muted-foreground">Users Impacted</div>
+                                        <div className="mt-0.5 text-xs text-muted-foreground/80 font-medium">Production Users</div>
                                     </div>
                                 </div>
                             </div>

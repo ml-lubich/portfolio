@@ -126,6 +126,12 @@ function internalPageExists(urlPath: string): boolean {
   const pathOnly = urlPath.split("#")[0].split("?")[0]
   const stripped = pathOnly === "/" ? "" : pathOnly.replace(/^\//, "")
 
+  // Check static files in public/ directory (e.g. /resume_mlubich.pdf)
+  const publicFile = path.join(ROOT, "public", stripped)
+  if (fs.existsSync(publicFile) && fs.statSync(publicFile).isFile()) {
+    return true
+  }
+
   // /blog/:slug → app/blog/[slug]/page.tsx + content/blog/:slug.mdx
   const blogPost = /^blog\/([a-zA-Z0-9_-]+)$/.exec(stripped)
   if (blogPost) {
