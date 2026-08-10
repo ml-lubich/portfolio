@@ -220,6 +220,9 @@ export function About() {
 
           <div className="min-w-0 flex-1">
             <TerminalReveal
+            /* Fills the stretched row so the card ends level with the portrait
+               instead of stopping short and leaving a gap beside it. */
+            className="h-full"
             title="~/about — misha.bio"
             prompt=">"
             charSpeed={18}

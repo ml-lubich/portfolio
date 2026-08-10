@@ -89,10 +89,13 @@ export function Hero() {
         {/* Square canvas viewport — the brain fills it, so this is the size knob.
             Capped against viewport *height*: the mesh is as tall as it is wide,
             and sizing it off width alone runs the crown and stem off the fold. */}
-        {/* The mesh only fills ~77% of this box now that the camera sits back far
-            enough to keep the whole brain in frame, so the box runs larger to
-            hold the same on-screen brain size. */}
-        <div className="aspect-square shrink-0 max-sm:size-[min(128vw,58svh)] sm:size-[min(90vw,88svh)]">
+        {/* The mesh fills ~77% of this box now that the camera sits back far
+            enough to keep the whole brain in frame, so the box runs larger than
+            the brain you actually see. Width caps still stay under 100vw: at
+            128vw the box was wider than the viewport itself, which is what put
+            the temples off-screen. Desktop is sized against josephheupler.com,
+            whose canvas measures 684px at 1440×900. */}
+        <div className="aspect-square shrink-0 max-sm:size-[min(94vw,60svh)] sm:size-[min(62vw,86svh)]">
           {showBrain && (
             <div className="h-full w-full">
               <Brain3D

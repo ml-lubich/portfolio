@@ -494,7 +494,10 @@ export function ConsultingClients() {
 
         {/* Portrait + OpenClaw pitch. Portrait column, not a letterbox band —
             the source is 4:5 and a wide crop takes the head off. */}
-        <div className="mx-auto mb-6 flex max-w-4xl flex-col items-center gap-5 md:flex-row md:items-start">
+        {/* Centred, not top-aligned: the blurb beside the portrait is much
+            shorter than the 4:5 photo, and pinning it to the top dumped all of
+            that height difference into one dead gap under the text. */}
+        <div className="mx-auto mb-6 flex max-w-4xl flex-col items-center gap-5 md:flex-row md:items-center">
           {/* The source is 4:5. Letting this column stretch to the row height
               made the frame landscape, which crops the shot to a head-and-
               shoulders band. The portrait ratio is fixed at every width so the

@@ -90,7 +90,11 @@ export function TerminalReveal({
             transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
             className={`perspective-[1200px] ${className}`}
         >
-            <div className={`relative overflow-hidden rounded-xl border border-white/[0.08] bg-[${terminalChrome.revealBg}] shadow-2xl shadow-black/40 backdrop-blur-xl`}>
+            {/* `h-full` + column flex so the card fills a definite-height parent
+                (see About, where it sits beside the portrait and has to match
+                its height). With an auto-height parent this resolves to auto,
+                so every other usage is unaffected. */}
+            <div className={`relative flex h-full flex-col overflow-hidden rounded-xl border border-white/[0.08] bg-[${terminalChrome.revealBg}] shadow-2xl shadow-black/40 backdrop-blur-xl`}>
                 {/* Subtle top-edge glow */}
                 <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
 
@@ -108,7 +112,7 @@ export function TerminalReveal({
                 </div>
 
                 {/* Terminal body */}
-                <div className="px-5 py-4 font-mono text-sm leading-relaxed min-h-[220px]">
+                <div className="flex-1 px-5 py-4 font-mono text-sm leading-relaxed min-h-[220px]">
                     {lines.map((line, i) => {
                         const isTypingThis = i === revealedLines && started
                         const isRevealed = i < revealedLines

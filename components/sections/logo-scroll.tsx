@@ -40,8 +40,28 @@ const CLIENT_LOGO_IMG =
     "w-auto opacity-85 transition-opacity duration-300 group-hover:opacity-100"
 
 const LOGOS: Logo[] = [
-    { name: "Apple", href: "https://www.apple.com", icon: <SiApple className="h-10 w-10 sm:h-13 sm:w-13 text-white/90 transition-opacity duration-300 group-hover:text-white" /> },
-    { name: "Walmart", href: "https://www.walmart.com", icon: <SiWalmart className="h-[4.5rem] w-[4.5rem] sm:h-[6rem] sm:w-[6rem] text-white/90 transition-opacity duration-300 group-hover:text-white" /> },
+    { name: "Apple", href: "https://www.apple.com", icon: <SiApple className="h-10 w-10 sm:h-12 sm:w-12 text-white/90 transition-opacity duration-300 group-hover:text-white" /> },
+    {
+        name: "Walmart",
+        href: "https://www.walmart.com",
+        icon: (
+            <SiWalmart
+                /* Simple-Icons ships this wordmark in a square 24×24 viewBox, but
+                   the ink only spans y≈9.1→14.9 — 24% of the box. Forced into a
+                   square it rendered ~23px of visible mark inside a 96px slot,
+                   the *optically smallest* logo on the strip. Cropping the
+                   viewBox to the ink lets `w-auto` size it like the other
+                   wordmarks. */
+                viewBox="0 9.1 24 5.8"
+                /* Explicit width, not `w-auto`: react-icons stamps `width="1em"`
+                   on the svg, and against that Chrome resolves `width:auto` to
+                   the height instead of deriving it from the viewBox — which
+                   squashed the wordmark back into a square. These widths are
+                   the cropped 24 ÷ 5.8 ratio applied to each height. */
+                className="h-8 w-[8.28rem] sm:h-10 sm:w-[10.35rem] text-white/90 transition-opacity duration-300 group-hover:text-white"
+            />
+        ),
+    },
     {
         name: "Lawrence Berkeley Lab",
         href: "https://www.lbl.gov",
@@ -89,11 +109,16 @@ const LOGOS: Logo[] = [
                 alt="LUPFR Entertainment logo"
                 width={256}
                 height={256}
-                className="h-10 w-auto sm:h-13 opacity-90 transition-opacity duration-300 group-hover:opacity-100"
+                /* The mark sits in ~48% transparent padding inside a 256² PNG,
+                   so the box has to run bigger than the neighbouring wordmarks
+                   to land the same optical weight. `sm:h-13` used to be here and
+                   silently did nothing — there is no 13 on the Tailwind v3
+                   spacing scale, so this was pinned at 40px on every breakpoint. */
+                className="h-14 w-auto sm:h-[4.75rem] opacity-90 transition-opacity duration-300 group-hover:opacity-100"
             />
         ),
     },
-    { name: "Seaside", icon: <SeasideMark className="h-10 w-10 sm:h-13 sm:w-13 opacity-90 transition-opacity duration-300 group-hover:opacity-100" /> },
+    { name: "Seaside", icon: <SeasideMark className="h-10 w-10 sm:h-12 sm:w-12 opacity-90 transition-opacity duration-300 group-hover:opacity-100" /> },
     {
         name: "eria.co",
         href: "https://www.eria.co",
@@ -111,6 +136,11 @@ const LOGOS: Logo[] = [
 
 /** Pixels per second for auto-scroll */
 const AUTO_SPEED = 40
+
+/** Copies of the logo set rendered back-to-back to make the loop seamless.
+ *  Only enough to cover the widest realistic viewport plus one set of slack:
+ *  a set is ~1.4k px, so 4 copies (~5.6k) still wraps cleanly on ultrawide. */
+const COPIES = 4
 
 /** Pointer travel (px) past which a gesture counts as a drag, not a click */
 const DRAG_SLOP = 6
@@ -165,27 +195,54 @@ export function LogoScroll() {
     /** Total pointer travel for the current gesture — a drag past DRAG_SLOP must
      *  not also activate the logo link it happened to start on. */
     const dragDistRef = useRef(0)
+    /** Width of one logo set, measured off the layout instead of re-read per
+     *  frame. Reading `scrollWidth` inside the rAF loop forced a synchronous
+     *  reflow on every tick — the single most expensive thing this strip did. */
+    const setWidthRef = useRef(0)
+    const reducedMotionRef = useRef(false)
 
-    // We render 6 copies so there's always enough to wrap seamlessly
-    const repeated = [...LOGOS, ...LOGOS, ...LOGOS, ...LOGOS, ...LOGOS, ...LOGOS]
+    const repeated = Array.from({ length: COPIES }, () => LOGOS).flat()
 
     /** Apply the current offset to the DOM */
     const applyTransform = useCallback(() => {
         if (trackRef.current) {
-            trackRef.current.style.transform = `translateX(${offsetRef.current}px)`
+            // translate3d keeps the track on its own compositor layer.
+            trackRef.current.style.transform = `translate3d(${offsetRef.current}px, 0, 0)`
         }
     }, [])
 
     /** Wrap offset so it stays within one "set" width */
     const wrapOffset = useCallback(() => {
-        if (!trackRef.current) return
-        // Width of one set of logos (total / 6)
-        const totalWidth = trackRef.current.scrollWidth
-        const setWidth = totalWidth / 6
-        if (setWidth === 0) return
+        const setWidth = setWidthRef.current
+        if (setWidth <= 0) return
         // Keep offset within [-setWidth, 0] range
         while (offsetRef.current < -setWidth) offsetRef.current += setWidth
         while (offsetRef.current > 0) offsetRef.current -= setWidth
+    }, [])
+
+    /** Re-measure one set's width — on mount and whenever layout actually changes. */
+    const measure = useCallback(() => {
+        const el = trackRef.current
+        if (el) setWidthRef.current = el.scrollWidth / COPIES
+    }, [])
+
+    useEffect(() => {
+        measure()
+        if (typeof ResizeObserver === "undefined") return
+        const ro = new ResizeObserver(measure)
+        if (trackRef.current) ro.observe(trackRef.current)
+        return () => ro.disconnect()
+    }, [measure])
+
+    useEffect(() => {
+        if (typeof matchMedia !== "function") return
+        const mq = matchMedia("(prefers-reduced-motion: reduce)")
+        const sync = () => {
+            reducedMotionRef.current = mq.matches
+        }
+        sync()
+        mq.addEventListener("change", sync)
+        return () => mq.removeEventListener("change", sync)
     }, [])
 
     /** Main animation loop */
@@ -207,8 +264,11 @@ export function LogoScroll() {
                 } else {
                     velocityRef.current = 0
                 }
-                // Always auto-scroll
-                offsetRef.current -= AUTO_SPEED * dt
+                // Auto-scroll, unless the visitor asked for reduced motion —
+                // dragging still works, it just never drifts on its own.
+                if (!reducedMotionRef.current) {
+                    offsetRef.current -= AUTO_SPEED * dt
+                }
             }
 
             wrapOffset()
