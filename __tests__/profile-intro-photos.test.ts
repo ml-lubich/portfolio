@@ -35,7 +35,6 @@ describe("Photos spread through the page", () => {
   const placements: [string, string][] = [
     ["../components/sections/about.tsx", "misha-desk-laptop.png"],
     ["../components/sections/consulting-clients.tsx", "misha-office-window.png"],
-    ["../components/sections/publications.tsx", "misha-cafe-notebook.png"],
     ["../components/sections/contact.tsx", "misha-loft-window.png"],
   ]
 
@@ -45,5 +44,10 @@ describe("Photos spread through the page", () => {
 
   it.each(placements)("%s ships the asset it references", (_file, asset) => {
     expect(fs.existsSync(path.resolve(__dirname, "../public", asset))).toBe(true)
+  })
+
+  // The research section is the papers, not another portrait.
+  it("publications stays photo-free", () => {
+    expect(read("../components/sections/publications.tsx")).not.toContain("<Image")
   })
 })

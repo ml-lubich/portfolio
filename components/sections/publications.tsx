@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useCallback, useMemo } from "react"
-import Image from "next/image"
 import { BookOpen, ExternalLink, ChevronRight, ArrowRight } from "lucide-react"
 import { AnimatedSection } from "../animations/animated-section"
 import { ScrollStackSection } from "../layout/scroll-stack-section"
@@ -179,30 +178,7 @@ export function Publications() {
     >
       {/* Google Scholar link */}
       <div className="relative mx-auto max-w-5xl px-3 md:px-4 lg:px-6">
-        {/* Wide reading band — the research half of the day, away from the desk */}
-        <AnimatedSection delay={400} className="mt-8 md:mt-12">
-          {/* 3:2 ≈ the source's own 1.45, so the narrow view crops nothing;
-              the fixed band only kicks in once there's width to spare. */}
-          <figure className="group/photo relative aspect-[3/2] overflow-hidden rounded-2xl border border-white/10 shadow-2xl shadow-black/50 sm:aspect-auto sm:h-96 md:h-[26rem]">
-            <Image
-              src="/misha-cafe-notebook.png"
-              alt="Misha Lubich reading and taking notes"
-              width={1600}
-              height={1100}
-              className="h-full w-full object-cover transition-transform duration-700 group-hover/photo:scale-105"
-              /* Crop window sits high in the frame — a centred crop of this
-                 wide band clips the top of the head. Inline, because
-                 `object-[center_15%]` is ambiguous to Tailwind and drops. */
-              style={{ objectPosition: "center 10%" }}
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" aria-hidden />
-            <figcaption className="absolute bottom-4 left-5 text-sm font-medium tracking-wide text-white/90">
-              Reading, notes, and the papers behind the systems
-            </figcaption>
-          </figure>
-        </AnimatedSection>
-
-        <AnimatedSection delay={600} className="mt-6 text-center md:mt-10">
+        <AnimatedSection delay={200} className="mt-8 text-center md:mt-12">
           <a
             href="https://scholar.google.com/citations?hl=en&user=Be6ZA78AAAAJ"
             target="_blank"

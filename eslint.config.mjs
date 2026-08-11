@@ -6,6 +6,8 @@ const config = [
     ignores: [
       ".next/**",
       ".next.stale*/**",
+      /* Agent scratch: nested worktrees carry their own node_modules/.next. */
+      ".claude/**",
       "coverage/**",
       "node_modules/**",
       "tsconfig.tsbuildinfo",

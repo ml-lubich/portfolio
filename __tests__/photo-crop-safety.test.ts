@@ -20,7 +20,6 @@ const FRAMES: { file: string; asset: string; anchor: string }[] = [
   { file: "components/sections/about.tsx", asset: "misha-desk-laptop.png", anchor: "aspect-[4/5]" },
   { file: "components/sections/consulting-clients.tsx", asset: "misha-office-window.png", anchor: "aspect-[4/5]" },
   { file: "components/sections/contact.tsx", asset: "misha-loft-window.png", anchor: "aspect-[4/5]" },
-  { file: "components/sections/publications.tsx", asset: "misha-cafe-notebook.png", anchor: "aspect-[3/2]" },
 ]
 
 describe("Photo crop safety", () => {
