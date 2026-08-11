@@ -98,7 +98,7 @@ export function Hero() {
             128vw the box was wider than the viewport itself, which is what put
             the temples off-screen. Desktop is sized against josephheupler.com,
             whose canvas measures 684px at 1440×900. */}
-        <div className="aspect-square shrink-0 max-sm:size-[min(88vw,54svh)] sm:size-[min(56vw,78svh)]">
+        <div className="aspect-square shrink-0 max-sm:size-[min(94vw,60svh)] sm:size-[min(64vw,88svh)]">
           {showBrain && (
             <div className="h-full w-full">
               <Brain3D

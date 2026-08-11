@@ -115,10 +115,33 @@
   background-image:
     radial-gradient(ellipse 95% 55% at 50% -12%, rgba(96, 124, 200, 0.16), transparent 66%),
     radial-gradient(ellipse 60% 45% at 8% 26%, rgba(84, 52, 126, 0.13), transparent 72%),
-    radial-gradient(ellipse 60% 45% at 92% 74%, rgba(28, 78, 120, 0.14), transparent 72%),
-    radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.05) 1px, transparent 0);
-  background-size: 100% 100%, 100% 100%, 100% 100%, 32px 32px;
-  background-repeat: no-repeat, no-repeat, no-repeat, repeat;
+    radial-gradient(ellipse 60% 45% at 92% 74%, rgba(28, 78, 120, 0.14), transparent 72%);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+
+/* ── Coordinate grid ───────────────────────────────────────────────
+ *  A second fixed layer: fine ruled lines on a 64px module, with a heavier
+ *  line every 4th module, so the page reads as a lit space with a floor
+ *  rather than a flat fill. Radially masked so the grid is only legible
+ *  toward the centre and dissolves at the edges — that falloff is what
+ *  sells the depth; an evenly-drawn grid just looks like graph paper.
+ * ─────────────────────────────────────────────────────────────────── */
+.page-texture::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(150, 180, 255, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(150, 180, 255, 0.055) 1px, transparent 1px),
+    linear-gradient(rgba(150, 180, 255, 0.028) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(150, 180, 255, 0.028) 1px, transparent 1px);
+  background-size: 256px 256px, 256px 256px, 64px 64px, 64px 64px;
+  background-repeat: repeat;
+  -webkit-mask-image: radial-gradient(ellipse 78% 62% at 50% 42%, #000 12%, transparent 78%);
+  mask-image: radial-gradient(ellipse 78% 62% at 50% 42%, #000 12%, transparent 78%);
 }
 
 /* ── Terminal cursor blink ──────────────────────────────────── */
@@ -1589,6 +1612,25 @@ strong:not(.no-metallic) {
   -webkit-background-clip: border-box !important;
   background-clip: border-box !important;
   -webkit-text-fill-color: inherit !important;
+}
+
+/* ─ Guard: never nest two text clips ───────────────────────────────
+ *  Several headings carry their own Tailwind `bg-clip-text` gradient AND
+ *  wrap an <AnimatedText>, whose word spans clip a second metallic gradient
+ *  (rule 2 above) while each sits on its own layer via `will-change`. Chrome
+ *  paints the outer clip against those promoted layers and leaves stray
+ *  fragments of the gradient floating beside the heading — two small grey
+ *  bars turned up left of "A Day in My Life".
+ *
+ *  The word spans already own the metallic ramp, so the parent's clip is
+ *  redundant; drop it. Scoped to exactly the parents rule 2 matches, so a
+ *  heading whose words are NOT painting their own gradient keeps its clip
+ *  and never turns invisible.
+ * ─────────────────────────────────────────────────────────────────── */
+:is(.font-bold, .font-semibold, .font-extrabold, .font-black, .gradient-text):not(.no-metallic):has(> .animated-text-root) {
+  background-image: none;
+  -webkit-background-clip: border-box;
+  background-clip: border-box;
 }
 
 /* ── AnimatedText — Anthropic-style word/letter reveals ─────── */
