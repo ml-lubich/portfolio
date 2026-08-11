@@ -55,7 +55,10 @@ export function RoleRotator({
           onReveal={onNameRevealStart}
         />
       </span>
-      <span className="relative mt-2 block min-h-[2rem] w-full overflow-hidden sm:min-h-[2.4rem] md:min-h-[3rem] lg:min-h-[3.6rem]">
+      {/* min-h is sized to fit the role's line box *plus* the pb-[0.18em] the
+          gradient span needs for its descenders (see below) — otherwise this
+          overflow-hidden slot re-clips exactly what that padding buys back. */}
+      <span className="relative mt-2 block min-h-[2.15rem] w-full overflow-hidden sm:min-h-[2.6rem] md:min-h-[3.15rem] lg:min-h-[3.6rem]">
         {roles.map((role, i) => {
           const isActive = i === roleIndex
           const isLeaving = i === prevRoleIndex && isTransitioning
@@ -91,7 +94,15 @@ export function RoleRotator({
                   defeating whitespace-nowrap and clipping long roles in the
                   fixed-height slot. lg size caps at 2.6rem so the longest role
                   ("AI & Machine Learning Engineer") stays on one line. */}
-              <span className="gradient-text mx-auto px-2 text-center font-light whitespace-nowrap text-[clamp(0.95rem,4.2vw,1.5rem)] sm:text-3xl md:text-4xl lg:text-[2.6rem]">
+              {/* pb-[0.18em]: the metallic sheen class below paints its glyphs
+                  with `background-clip: text`, so the letters only exist where
+                  the element's own box gets painted. The h1's line-height of
+                  1.15 leaves Instrument Serif's descenders sitting within a
+                  hair of that box's bottom edge, so the closed loop of every
+                  `g` ("Learning", "Engineer", "Engineering Lead") rendered
+                  sliced flat. The padding grows the paint box only — with
+                  items-start/top-0 the text itself does not move. */}
+              <span className="gradient-text mx-auto px-2 pb-[0.18em] text-center font-light whitespace-nowrap text-[clamp(0.95rem,4.2vw,1.5rem)] sm:text-3xl md:text-4xl lg:text-[2.6rem]">
                 {role}
               </span>
             </span>
