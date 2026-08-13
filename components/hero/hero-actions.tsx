@@ -1,6 +1,6 @@
 "use client"
 
-import { Mail, Phone, Sparkles } from "lucide-react"
+import { Mail, Phone, Sparkles, MessageSquare } from "lucide-react"
 import { navigateTo } from "@/components/nav/woosh-scroll"
 import { SocialIcons } from "@/components/social-icons"
 
@@ -22,6 +22,14 @@ export function HeroCTAs() {
           Get In Touch
         </span>
         <div className="absolute inset-0 bg-white/80 opacity-0 transition-opacity group-hover:opacity-100" />
+      </button>
+      <button
+        type="button"
+        onClick={() => window.dispatchEvent(new Event("mlbot:open"))}
+        className="glass-btn group relative inline-flex cursor-pointer items-center gap-2 px-6 py-3 text-sm font-semibold text-foreground sm:px-8 sm:py-3.5"
+      >
+        <MessageSquare className="relative z-10 h-4 w-4 shrink-0 text-primary" aria-hidden />
+        <span className="relative z-10">Ask MLBot</span>
       </button>
       <button
         type="button"

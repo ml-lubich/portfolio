@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo } from "react"
 import { SiteLogoMark } from "@/components/site-logo-mark"
-import { Menu, X, ChevronUp, ArrowRight, Zap, ChevronDown, ExternalLink, Gamepad2 } from "lucide-react"
+import { Menu, X, ArrowRight, Zap, ChevronDown, ExternalLink, Gamepad2 } from "lucide-react"
 import { navLinks, liveTools, liveGames } from "./nav-links"
 import { wooshScrollTo, navigateTo } from "./woosh-scroll"
 import { useActiveSection } from "./use-nav-hooks"
@@ -16,51 +16,6 @@ import { computeNavPastHero } from "@/lib/nav-hero-surface"
    ──────────────────────────────────────────────────────────────────── */
 
 /** Back-to-top FAB — only re-renders when visibility toggles (not every scroll frame). */
-function BackToTopButton() {
-  const [visible, setVisible] = useState(false)
-  const wasVisible = useRef(false)
-
-  useEffect(() => {
-    let rafId: number
-    function update() {
-      const docH = document.documentElement.scrollHeight - window.innerHeight
-      const progress = docH > 0 ? Math.min(window.scrollY / docH, 1) : 0
-      const show = progress > 0.1
-      if (show !== wasVisible.current) {
-        wasVisible.current = show
-        setVisible(show)
-      }
-    }
-    function onScroll() {
-      cancelAnimationFrame(rafId)
-      rafId = requestAnimationFrame(update)
-    }
-    window.addEventListener("scroll", onScroll, { passive: true })
-    update()
-    return () => {
-      window.removeEventListener("scroll", onScroll)
-      cancelAnimationFrame(rafId)
-    }
-  }, [])
-
-  return (
-    <button
-      type="button"
-      onClick={() => wooshScrollTo(0)}
-      aria-label="Back to top"
-      className={[
-        "fixed bottom-6 right-6 z-50 flex h-12 w-12 min-h-[48px] min-w-[48px] items-center justify-center rounded-full",
-        "nav-glass border border-white/[0.04] text-muted-foreground hover:text-foreground",
-        "transition-all duration-300 ease-fluid",
-        visible
-          ? "translate-y-0 opacity-100 scale-100"
-          : "translate-y-4 opacity-0 scale-90 pointer-events-none",
-      ].join(" ")}
-    >
-      <ChevronUp className="h-4 w-4" />
-    </button>
-  )
-}
 
 /* ── Tools dropdown (desktop) ────────────────────────────────────── */
 
@@ -662,7 +617,6 @@ export function Navigation() {
         </div>
       ) : null}
 
-      <BackToTopButton />
     </>
   )
 }

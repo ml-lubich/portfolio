@@ -13,6 +13,7 @@ import { GeistMono } from 'geist/font/mono'
 import './globals.css'
 import { JsonLd } from '@/components/seo/json-ld'
 import { LiquidGooFilter } from '@/components/glass-blob-field'
+import { MLBot } from "@/components/ai-chat/mlbot"
 
 const jetbrains = JetBrains_Mono({
   subsets: ['latin'],
@@ -195,6 +196,7 @@ export default function RootLayout({
         </a>
         <LiquidGooFilter />
         {children}
+        <MLBot />
       </body>
     </html>
   )

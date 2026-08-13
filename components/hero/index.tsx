@@ -86,7 +86,7 @@ export function Hero() {
         /* Nudged down off the nav: centring on the raw first screenful seated
            the crown right under the nav shell and pushed the stem past the
            fold. The offset drops the whole mesh into the body of the hero. */
-        className="hero-brain-underlay pointer-events-none absolute inset-x-0 top-0 z-[3] flex h-[100svh] translate-y-[6svh] items-center justify-center"
+        className="hero-brain-underlay pointer-events-none absolute inset-x-0 top-0 z-[3] flex h-[100svh] translate-y-[1svh] items-center justify-center"
         aria-hidden="true"
       >
         {/* Square canvas viewport — the brain fills it, so this is the size knob.

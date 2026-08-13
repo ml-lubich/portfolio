@@ -59,13 +59,13 @@ export function Contact() {
               A portrait column, not a wide band: the source is 4:5, so a
               letterbox crop would take the top of the head off. */}
           <AnimatedSection delay={50} className="sm:col-span-2 lg:col-span-1">
-            <div className="group/photo relative aspect-[4/5] overflow-hidden rounded-2xl border border-white/10 shadow-2xl shadow-black/50 sm:aspect-[16/10] lg:aspect-auto lg:h-full">
+            <div className="group/photo relative mx-auto aspect-[4/5] w-full max-w-[20rem] overflow-hidden rounded-2xl border border-white/20 shadow-2xl shadow-black/50 ring-1 ring-inset ring-white/10 sm:max-w-[22rem] lg:max-w-none">
               <Image
                 src="/misha-loft-window.png"
                 alt="Misha Lubich in the studio"
                 width={1120}
                 height={1400}
-                className="absolute inset-0 h-full w-full object-contain transition-transform duration-700 group-hover/photo:scale-105"
+                className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover/photo:scale-105"
                 style={{ objectPosition: "center center" }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" aria-hidden />
