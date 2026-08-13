@@ -39,6 +39,10 @@ const ClientTestimonials = dynamic(
 const Projects = dynamic(() => import("@/components/sections/projects").then(m => m.Projects), {
   loading: () => <SectionSkeleton />,
 })
+const MacAppDemos = dynamic(
+  () => import("@/components/sections/mac-app-demos").then(m => m.MacAppDemos),
+  { loading: () => <SectionSkeleton /> },
+)
 const OpenSourceShowcase = dynamic(
   () => import("@/components/sections/open-source-showcase").then(m => m.OpenSourceShowcase),
   { loading: () => <SectionSkeleton /> },
@@ -101,6 +105,9 @@ export default function Home() {
         </LazySection>
         <LazySection sectionId="open-source" className={LAZY_SECTION_TOP}>
           <OpenSourceShowcase />
+        </LazySection>
+        <LazySection sectionId="mac-demos" className={LAZY_SECTION_TOP}>
+          <MacAppDemos />
         </LazySection>
         <LazySection sectionId="skills" className={LAZY_SECTION_TOP}>
           <Skills />

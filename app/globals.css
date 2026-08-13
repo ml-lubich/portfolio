@@ -2984,3 +2984,60 @@ article .blog-prose b a[href],
     transform: none;
   }
 }
+
+/* ── macOS window chrome ───────────────────────────────────────────────
+   Reads from the shared surface stack so it themes with everything else. */
+
+.mac-window {
+  border: 1px solid var(--line-soft);
+  background: var(--surface-1);
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / 0.05),
+    0 24px 60px -28px hsl(0 0% 0% / 0.85);
+}
+
+.mac-titlebar {
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.mac-sidebar {
+  background: var(--surface-0);
+  border-right: 1px solid var(--line-soft);
+}
+
+.mac-detail {
+  background: var(--surface-1);
+}
+
+.mac-row-active {
+  background: hsl(0 0% 100% / 0.07);
+}
+
+.mac-bubble-them {
+  background: hsl(0 0% 100% / 0.09);
+  color: hsl(var(--foreground) / 0.9);
+}
+
+.mac-bubble-me {
+  background: var(--accent-glow);
+  color: #06131f;
+}
+
+.light .mac-window {
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / 0.9),
+    0 24px 60px -30px hsl(220 20% 10% / 0.3);
+}
+
+.light .mac-row-active {
+  background: hsl(220 20% 10% / 0.07);
+}
+
+.light .mac-bubble-them {
+  background: hsl(220 20% 10% / 0.07);
+}
+
+.light .mac-bubble-me {
+  color: #ffffff;
+}
