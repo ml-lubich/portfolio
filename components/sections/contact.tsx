@@ -65,8 +65,8 @@ export function Contact() {
                 alt="Misha Lubich in the studio"
                 width={1120}
                 height={1400}
-                className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover/photo:scale-105"
-                style={{ objectPosition: "center 12%" }}
+                className="absolute inset-0 h-full w-full object-contain transition-transform duration-700 group-hover/photo:scale-105"
+                style={{ objectPosition: "center center" }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" aria-hidden />
             </div>
