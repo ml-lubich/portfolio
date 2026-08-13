@@ -15,6 +15,7 @@
 import { useCallback, useMemo, useState } from "react"
 import { ArrowRight, Check, Copy, Github } from "lucide-react"
 import { DemoTerminal } from "@/components/terminal/demo-terminal"
+import { OssDemoSim } from "./oss-demo-sim"
 import { AnimatedCounter } from "@/components/animations"
 import { terminalChrome } from "@/lib/theme"
 import { projects } from "@/data/projects"
@@ -241,6 +242,14 @@ export function OssDemoCard({ demo, active = true, onExplore }: OssDemoCardProps
               <DemoTerminal lines={demo.demo} active={active} />
             </div>
           </div>
+
+          {/* The app the command actually drove — only tools that touch a
+              visible app carry a sim; the rest stay terminal-only. */}
+          {demo.sim && (
+            <div className="mt-3">
+              <OssDemoSim sim={demo.sim} active={active} />
+            </div>
+          )}
 
           {onExplore && (
             <button

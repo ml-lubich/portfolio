@@ -2965,3 +2965,22 @@ article .blog-prose b a[href],
   background-clip: text;
   color: transparent;
 }
+
+/* ── OSS demo simulation rows ────────────────────────────────────
+ *  Rows and flow stages fade up in sequence; the inline animationDelay the
+ *  component sets is what staggers them. `forwards` holds the end state, so a
+ *  finished panel stays put when the tool is no longer featured.
+ * ─────────────────────────────────────────────────────────────────── */
+.oss-sim-row {
+  opacity: 0;
+  animation: mobile-nav-item-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .oss-sim-row {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
