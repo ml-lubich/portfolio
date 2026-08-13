@@ -115,3 +115,30 @@ describe("MLBot system prompt", () => {
         }
     })
 })
+
+describe("MLBot spend governor", () => {
+    // Worst-case request against z-ai/glm-4.7-flash ($0.06/M in, $0.40/M out):
+    // 4 tool rounds ≈ 15k cumulative input + 4k output.
+    const WORST_CASE_USD = (15_000 / 1e6) * 0.06 + (4_000 / 1e6) * 0.4
+    const MONTHLY_BUDGET_USD = 5
+
+    it("keeps the daily ceiling inside a $5/month budget", async () => {
+        const { CHAT_LIMITS } = await import("@/lib/ai/rate-limit")
+
+        expect(CHAT_LIMITS.global.windowMs).toBe(24 * 60 * 60 * 1000)
+        expect(CHAT_LIMITS.global.max * WORST_CASE_USD * 31).toBeLessThanOrEqual(MONTHLY_BUDGET_USD)
+    })
+
+    it("still allows a normal visitor's whole conversation in one day", async () => {
+        const { CHAT_LIMITS } = await import("@/lib/ai/rate-limit")
+
+        expect(CHAT_LIMITS.global.max).toBeGreaterThanOrEqual(CHAT_LIMITS.cookie.max)
+    })
+
+    it("falls back to $0 models so a tripped spend cap does not take the bot down", () => {
+        const route = read("app/api/chat/route.ts")
+        const models = route.slice(route.indexOf("const MODELS"), route.indexOf("] as const"))
+
+        expect(models.match(/:free/g)?.length).toBeGreaterThanOrEqual(1)
+    })
+})
