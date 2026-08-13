@@ -132,14 +132,14 @@ const MarqueeCard = memo(function MarqueeCard({ project, onExplore }: MarqueeCar
           handleCardClick()
         }
       }}
-      className="marquee-card group/card relative mr-4 w-[270px] shrink-0 cursor-pointer overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03] transition-colors duration-500 hover:border-primary/30 hover:bg-white/[0.055] focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary/60 sm:mr-5 sm:w-[320px]"
+      className="marquee-card group/card relative mr-4 flex h-[370px] w-[270px] shrink-0 flex-col cursor-pointer overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03] transition-colors duration-500 hover:border-primary/30 hover:bg-white/[0.055] focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary/60 sm:mr-5 sm:h-[410px] sm:w-[320px]"
     >
       {/* Top gradient accent strip */}
       <div className={`h-1 w-full bg-gradient-to-r ${project.gradient} opacity-60 transition-opacity duration-500 group-hover/card:opacity-100`} />
 
       {/* Cover image, or a gradient header carrying the big ghost number */}
       {project.coverImage != null && project.coverImage !== "" ? (
-        <div className="relative h-32 w-full overflow-hidden border-b border-white/[0.08] bg-black/20 sm:h-36">
+        <div className="relative h-32 w-full shrink-0 overflow-hidden border-b border-white/[0.08] bg-black/20 sm:h-36">
           <Image
             src={project.coverImage}
             alt={`${project.name} — product preview`}
@@ -160,7 +160,7 @@ const MarqueeCard = memo(function MarqueeCard({ project, onExplore }: MarqueeCar
         style={{ background: project.accent }}
       />
 
-      <div className="relative z-[1] p-4 sm:p-5">
+      <div className="relative z-[1] flex flex-1 flex-col p-4 sm:p-5">
         <div className="flex flex-wrap items-center gap-2">
           <h3 className="text-base font-semibold text-foreground transition-colors group-hover/card:text-primary sm:text-lg">
             {project.name}
@@ -194,21 +194,22 @@ const MarqueeCard = memo(function MarqueeCard({ project, onExplore }: MarqueeCar
           ))}
         </div>
 
-        {/* Explore CTA — same action as the card itself, kept as a visual
-            affordance; stopPropagation avoids double-firing via the card */}
-        <button
-          type="button"
-          tabIndex={-1}
-          onClick={(e) => {
-            e.stopPropagation()
-            onExplore(project.id)
-          }}
-          className="mt-4 inline-flex items-center gap-1.5 rounded-lg border border-border/50 bg-secondary px-3 py-1.5 text-xs font-medium text-muted-foreground/80 transition-all duration-300 hover:border-primary/40 hover:text-primary"
-          aria-label={`Explore ${project.name} — architecture and details`}
-        >
-          Explore
-          <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover/card:translate-x-0.5" />
-        </button>
+        {/* Explore CTA — pushed to bottom of card */}
+        <div className="mt-auto pt-4">
+          <button
+            type="button"
+            tabIndex={-1}
+            onClick={(e) => {
+              e.stopPropagation()
+              onExplore(project.id)
+            }}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-border/50 bg-secondary px-3 py-1.5 text-xs font-medium text-muted-foreground/80 transition-all duration-300 hover:border-primary/40 hover:text-primary"
+            aria-label={`Explore ${project.name} — architecture and details`}
+          >
+            Explore
+            <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover/card:translate-x-0.5" />
+          </button>
+        </div>
       </div>
     </article>
   )

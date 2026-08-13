@@ -28,3 +28,6 @@ coverage/
 *.tsbuildinfo
 .omc/
 .env*
+
+# Claude Code local state / worktrees
+.claude/

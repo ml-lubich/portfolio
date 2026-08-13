@@ -103,14 +103,21 @@
 
 /* ── Page backdrop ─────────────────────────────────────────────────
  *  One fixed layer under every section below the hero: a broad top light and
- *  two cool bounce pools in dark blue, plus a faint dot grid for structure.
+ *  two cool bounce pools in dark blue. No ruled grid — it read as graph paper
+ *  over the content, not as depth.
  *  No film grain — it read as dirt on the screen, not as depth.
  * ─────────────────────────────────────────────────────────────────── */
+/* Own stacking context so the -1 layers below sit above .page-texture's own
+ * background but behind every section in it. */
+.page-texture {
+  isolation: isolate;
+}
+
 .page-texture::before {
   content: "";
   position: fixed;
   inset: 0;
-  z-index: 0;
+  z-index: -1;
   pointer-events: none;
   background-image:
     radial-gradient(ellipse 95% 55% at 50% -12%, rgba(96, 124, 200, 0.16), transparent 66%),
@@ -118,30 +125,6 @@
     radial-gradient(ellipse 60% 45% at 92% 74%, rgba(28, 78, 120, 0.14), transparent 72%);
   background-size: 100% 100%;
   background-repeat: no-repeat;
-}
-
-/* ── Coordinate grid ───────────────────────────────────────────────
- *  A second fixed layer: fine ruled lines on a 64px module, with a heavier
- *  line every 4th module, so the page reads as a lit space with a floor
- *  rather than a flat fill. Radially masked so the grid is only legible
- *  toward the centre and dissolves at the edges — that falloff is what
- *  sells the depth; an evenly-drawn grid just looks like graph paper.
- * ─────────────────────────────────────────────────────────────────── */
-.page-texture::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background-image:
-    linear-gradient(rgba(150, 180, 255, 0.055) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(150, 180, 255, 0.055) 1px, transparent 1px),
-    linear-gradient(rgba(150, 180, 255, 0.028) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(150, 180, 255, 0.028) 1px, transparent 1px);
-  background-size: 256px 256px, 256px 256px, 64px 64px, 64px 64px;
-  background-repeat: repeat;
-  -webkit-mask-image: radial-gradient(ellipse 78% 62% at 50% 42%, #000 12%, transparent 78%);
-  mask-image: radial-gradient(ellipse 78% 62% at 50% 42%, #000 12%, transparent 78%);
 }
 
 /* ── Terminal cursor blink ──────────────────────────────────── */

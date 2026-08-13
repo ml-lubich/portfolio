@@ -21,6 +21,17 @@ export interface ClientTestimonial {
 
 export const clientTestimonials: ClientTestimonial[] = [
     {
+        id: "nikita-tech",
+        quote:
+            "Working with Misha on systems & automation is a breath of fresh air — zero fluff, bulletproof architecture, and pragmatic AI integration that actually delivers real business ROI.",
+        name: "Nikita Khanderia",
+        title: "Technical Partner & Lead Engineer",
+        organization: "ERIA",
+        rating: 5,
+        avatarSrc: "/images/testimonials/nikita.webp",
+        avatarAlt: "Nikita Khanderia",
+    },
+    {
         id: "will-lupfer",
         quote:
             "Misha got our public site somewhere we’re actually excited to send artists and venues — like, it finally feels like *us*. Lead routing + little follow-up nudges mean ops isn’t drowning in the inbox anymore. AI bits were grounded (drafting + structure for event copy), not some black-box thing. We’d gotten a couple of wild ‘AI transformation’ quotes; his rate was so much saner we’re saving real money this year vs going that route. Huge relief!!",
@@ -30,6 +41,15 @@ export const clientTestimonials: ClientTestimonial[] = [
         rating: 5,
         avatarSrc: "/images/testimonials/will-lupfer.png",
         avatarAlt: "Will Lupfer",
+    },
+    {
+        id: "joseph-heupler",
+        quote:
+            "Misha streamlined our service operations and customer tech workflows with fast, robust tooling. Technical execution was sharp, reliable, and delivered right on budget.",
+        name: "Joseph Heupler",
+        title: "Lead Customer Service Tech",
+        organization: "Biro",
+        rating: 5,
     },
     {
         id: "enrichdata-team",
