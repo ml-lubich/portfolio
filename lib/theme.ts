@@ -70,6 +70,10 @@ export const hex = {
 export const hexNum = {
     wireBase: 0xf4f7ff,
     wireGlow: 0xc6e4ea,
+    /** Light-mode brain: the mesh inverts to near-black so it reads against a
+     *  pale page exactly as the near-white mesh reads against the dark one. */
+    wireBaseLight: 0x0b1018,
+    wireGlowLight: 0x2f4a63,
     neuralBlue: 0x88dddd,
     background: 0x080810,
 } as const
@@ -225,14 +229,15 @@ export const terminalChrome = {
  *  ambient orbs and body gradient back to near-black without touching the
  *  mesh. Keeping the hero black is what makes the white wireframe read —
  *  dimming the brain itself is not the lever. */
-export const heroOverlay =
-    "linear-gradient(rgba(4,5,10,0.80), rgba(4,5,10,0.80)), radial-gradient(ellipse 60% 50% at 50% 45%, rgba(8,10,18,0.35) 0%, transparent 100%)"
+/* Both hero washes resolve from CSS custom properties rather than literals:
+   they are applied as inline styles, and an inline style cannot respond to the
+   .light class. The values live in globals.css under :root and .light. */
+export const heroOverlay = "var(--hero-overlay)"
 
 /** Painted above the 3D brain, below the hero copy. Keeps the centre column
  *  legible without hiding the brain — it stays visible at the edges, where
  *  nothing is written on top of it. */
-export const heroContentScrim =
-    "linear-gradient(to bottom, rgba(6,8,14,0.44) 0%, rgba(6,8,14,0.42) 30%, rgba(6,8,14,0.28) 46%, rgba(6,8,14,0.10) 60%, transparent 76%)"
+export const heroContentScrim = "var(--hero-scrim)"
 
 /* ── Architecture diagram colors ─────────────────────────────────── */
 

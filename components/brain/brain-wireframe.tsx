@@ -9,6 +9,7 @@ import {
   getBrainMeshViewportScale,
   getBrainOrbViewportTier,
 } from "./constants"
+import { useTheme } from "next-themes"
 import { createPullUniforms, injectPull, makeOrbMaterial } from "./materials"
 import { NeuralOrbs } from "./neural-orbs"
 import { hexNum } from "@/lib/theme"
@@ -33,27 +34,32 @@ export function BrainWireframe() {
   const pull = useMemo(() => createPullUniforms(), [])
   const pullTarget = useRef(0)
 
+  // In light mode the mesh inverts to near-black; the wireframe has to read
+  // against a pale page the same way the near-white mesh reads against a dark one.
+  const { resolvedTheme } = useTheme()
+  const isLight = resolvedTheme === "light"
+
   const material = React.useMemo(() => {
     const m = new THREE.LineBasicMaterial({
-      color: hexNum.wireBase,
+      color: isLight ? hexNum.wireBaseLight : hexNum.wireBase,
       transparent: true,
       opacity: 1,
       depthWrite: false,
     })
     injectPull(m, pull)
     return m
-  }, [pull])
+  }, [pull, isLight])
 
   const glowMaterial = React.useMemo(() => {
     const m = new THREE.LineBasicMaterial({
-      color: hexNum.wireGlow,
+      color: isLight ? hexNum.wireGlowLight : hexNum.wireGlow,
       transparent: true,
       opacity: 0.8,
       depthWrite: false,
     })
     injectPull(m, pull)
     return m
-  }, [pull])
+  }, [pull, isLight])
 
   const signalMaterial = React.useMemo(() => {
     const m = new THREE.LineBasicMaterial({

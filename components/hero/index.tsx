@@ -14,6 +14,8 @@ import { TokscaleHeroBadge } from "@/components/sections/tokscale-stats"
 
 const MOBILE_PERFORMANCE_QUERY = "(max-width: 767px), (pointer: coarse), (hover: none)"
 
+import { CircuitField } from "@/components/circuit-field"
+
 const Brain3D = dynamic(
   () => import("../brain").then((mod) => mod.Brain3D),
   { ssr: false }
@@ -75,6 +77,11 @@ export function Hero() {
       <BackgroundOrbs />
       {!mobilePerformanceMode && <ParticleCanvas className="z-[1]" />}
 
+      {/* Circuit backdrop — behind the brain and every content layer. */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[100svh]" aria-hidden>
+        <CircuitField />
+      </div>
+
       {/* 3D Brain — hero underlay. Sized off the viewport (not the content box)
           so the mesh reads as a full-bleed backdrop behind the whole hero
           column, and centred on the section rather than cropped by it. */}
@@ -86,7 +93,7 @@ export function Hero() {
         /* Nudged down off the nav: centring on the raw first screenful seated
            the crown right under the nav shell and pushed the stem past the
            fold. The offset drops the whole mesh into the body of the hero. */
-        className="hero-brain-underlay pointer-events-none absolute inset-x-0 top-0 z-[3] flex h-[100svh] translate-y-[1svh] items-center justify-center"
+        className="hero-brain-underlay pointer-events-none absolute inset-x-0 top-0 z-[3] flex h-[100svh] -translate-y-[3svh] items-center justify-center"
         aria-hidden="true"
       >
         {/* Square canvas viewport — the brain fills it, so this is the size knob.
@@ -98,7 +105,7 @@ export function Hero() {
             128vw the box was wider than the viewport itself, which is what put
             the temples off-screen. Desktop is sized against josephheupler.com,
             whose canvas measures 684px at 1440×900. */}
-        <div className="aspect-square shrink-0 max-sm:size-[min(94vw,60svh)] sm:size-[min(64vw,88svh)]">
+        <div className="aspect-square shrink-0 max-sm:size-[min(94vw,60svh)] sm:size-[min(72vw,96svh)]">
           {showBrain && (
             <div className="h-full w-full">
               <Brain3D

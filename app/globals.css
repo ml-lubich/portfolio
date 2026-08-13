@@ -10,6 +10,23 @@
 
 @layer base {
   :root {
+    /* ── Unified surface stack (cua.ai-derived) ──────────────────────
+       Every elevated surface on the site picks from these three, so cards,
+       nav, panels and popovers stop each inventing their own dark. */
+    --surface-0: #07080a;
+    --surface-1: #0a0c10;
+    --surface-2: #12161b;
+    --line-soft: hsl(0 0% 100% / 0.12);
+    --line-strong: hsl(0 0% 100% / 0.2);
+    /* Accent is for glow, borders and gradients only — never headline text,
+       which stays the metallic silver treatment (see no-tech-blue.test.ts). */
+    --accent-glow: #61bcff;
+    --accent-glow-soft: #61bcff57;
+
+    /* Hero washes — applied as inline styles, so they must be vars to theme. */
+    --hero-overlay: linear-gradient(rgba(4,5,10,0.80), rgba(4,5,10,0.80)), radial-gradient(ellipse 60% 50% at 50% 45%, rgba(8,10,18,0.35) 0%, transparent 100%);
+    --hero-scrim: radial-gradient(ellipse 48% 32% at 50% 40%, rgba(6,8,14,0.78) 0%, rgba(6,8,14,0.5) 52%, transparent 82%), linear-gradient(to bottom, rgba(6,8,14,0.44) 0%, rgba(6,8,14,0.42) 30%, rgba(6,8,14,0.28) 46%, rgba(6,8,14,0.10) 60%, transparent 76%);
+
     /* surfaces */
     --background: 220 20% 4%;
     --foreground: 210 20% 95%;
@@ -71,6 +88,49 @@
     --radius: 0.625rem;
     --radius-card-lg: 1.5rem;
   }
+
+  /* ── Light theme ──────────────────────────────────────────────────────
+     Mirrors every token :root defines, so any surface that reads from the
+     stack flips automatically. next-themes stamps .light on <html>.
+     The metallic text treatment is preserved by darkening its stops rather
+     than switching to a flat colour — the sheen is the brand, not the hue. */
+  .light {
+    --surface-0: #ffffff;
+    --surface-1: #f7f8fa;
+    --surface-2: #eef1f5;
+    --line-soft: hsl(220 20% 10% / 0.12);
+    --line-strong: hsl(220 20% 10% / 0.22);
+    --accent-glow: #2d84c6;
+    --accent-glow-soft: #2d84c657;
+
+    --background: 220 20% 98%;
+    --foreground: 220 25% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 25% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 25% 12%;
+    --secondary: 220 16% 94%;
+    --secondary-foreground: 220 20% 25%;
+    --muted: 220 16% 94%;
+    --muted-foreground: 220 12% 42%;
+
+    --primary: 220 25% 12%;
+    --primary-foreground: 0 0% 100%;
+    --accent: 220 20% 25%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 48%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 16% 87%;
+    --input: 220 16% 87%;
+    --ring: 220 25% 12%;
+
+    /* Light hero: the same two washes inverted to pale, so the dark brain
+       reads against them exactly as the white brain reads against the dark. */
+    --hero-overlay: linear-gradient(rgba(250,251,253,0.86), rgba(250,251,253,0.86)), radial-gradient(ellipse 60% 50% at 50% 45%, rgba(235,240,247,0.5) 0%, transparent 100%);
+    --hero-scrim: radial-gradient(ellipse 48% 32% at 50% 40%, rgba(250,251,253,0.82) 0%, rgba(250,251,253,0.55) 52%, transparent 82%), linear-gradient(to bottom, rgba(250,251,253,0.5) 0%, rgba(250,251,253,0.46) 30%, rgba(250,251,253,0.3) 46%, rgba(250,251,253,0.12) 60%, transparent 76%);
+  }
+
 }
 
 @layer base {
@@ -703,10 +763,10 @@ body {
     hsl(0 0% 100% / 0.07);
   background-size: 260% 260%;
   background-position: 0% 0%;
-  -webkit-backdrop-filter: blur(20px) saturate(1.6);
-  backdrop-filter: blur(20px) saturate(1.6);
-  border: 1px solid hsl(0 0% 100% / 0.1);
-  box-shadow: 0 1px 2px hsl(0 0% 0% / 0.12), 0 10px 28px hsl(0 0% 0% / 0.14);
+  -webkit-backdrop-filter: blur(14px) saturate(1.25);
+  backdrop-filter: blur(14px) saturate(1.25);
+  border: 1px solid var(--line-soft);
+  box-shadow: 0 1px 2px hsl(0 0% 0% / 0.3), 0 12px 32px -14px hsl(0 0% 0% / 0.7);
 }
 
 /* Specular drift — light creeping through hot glass. Background-position
@@ -747,16 +807,13 @@ body {
      them, page content scrolled straight through the bar and stayed fully
      legible behind the links. The flat colour below is that base: static
      paint, no filter, no per-frame cost. */
-  background:
-    linear-gradient(135deg, hsl(220 22% 12% / 0.4), hsl(220 22% 8% / 0.3)),
-    radial-gradient(circle at 18% 0%, hsl(0 0% 100% / 0.06), transparent 44%),
-    radial-gradient(circle at 82% 0%, hsl(0 0% 100% / 0.05), transparent 42%),
-    hsl(220 20% 6% / 0.88);
+  /* Solid elevation + hairline, the cua.ai treatment. Translucent washes read
+     as cheap plastic over a dark page; an opaque surface reads as machined. */
+  background: linear-gradient(180deg, var(--surface-2) 0%, var(--surface-1) 100%);
   box-shadow:
-    inset 0 1px 0 hsl(0 0% 100% / 0.14),
-    inset 0 0 0 1px hsl(0 0% 100% / 0.05),
-    inset 0 -1px 0 hsl(0 0% 0% / 0.22),
-    0 12px 36px hsl(0 0% 0% / 0.24);
+    inset 0 1px 0 hsl(0 0% 100% / 0.07),
+    0 1px 0 0 hsl(0 0% 0% / 0.5),
+    0 18px 48px -24px hsl(0 0% 0% / 0.9);
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   will-change: auto;
@@ -773,10 +830,8 @@ body {
   inset: 0;
   z-index: -1;
   border-radius: inherit;
-  background:
-    linear-gradient(180deg, hsl(0 0% 100% / 0.1) 0%, transparent 38%),
-    radial-gradient(120% 80% at 50% -20%, hsl(0 0% 100% / 0.08), transparent 60%);
-  opacity: 0.9;
+  background: linear-gradient(180deg, hsl(0 0% 100% / 0.035) 0%, transparent 42%);
+  opacity: 1;
   pointer-events: none;
 }
 
@@ -786,16 +841,12 @@ nav[data-nav-scrolled="true"] .nav-shell {
      without one the scrolled bar was three translucent white washes and the
      page ran visibly through the links. The white sheen stays; it now sits on
      something. */
-  background:
-    linear-gradient(135deg, hsl(0 0% 100% / 0.11), hsl(0 0% 100% / 0.04)),
-    radial-gradient(circle at 18% 0%, hsl(0 0% 100% / 0.08), transparent 36%),
-    radial-gradient(circle at 82% 0%, hsl(0 0% 100% / 0.07), transparent 34%),
-    hsl(220 20% 7% / 0.92);
+  background: linear-gradient(180deg, var(--surface-2) 0%, var(--surface-0) 100%);
+  border-color: var(--line-soft);
   box-shadow:
-    inset 0 1px 0 hsl(0 0% 100% / 0.18),
-    inset 0 0 0 1px hsl(0 0% 100% / 0.06),
-    inset 0 -1px 0 hsl(0 0% 0% / 0.24),
-    0 18px 60px hsl(0 0% 0% / 0.28);
+    inset 0 1px 0 hsl(0 0% 100% / 0.09),
+    0 1px 0 0 hsl(0 0% 0% / 0.6),
+    0 24px 64px -28px hsl(0 0% 0% / 0.95);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -2750,4 +2801,167 @@ article .blog-prose b a[href],
   background: #61bcff;
   box-shadow: 0 0 6px #61bcff57;
   flex-shrink: 0;
+}
+
+
+/* ── Circuit backdrop ─────────────────────────────────────────────────
+   A faint grid with two light pulses travelling along it, sitting behind
+   the brain and behind every content layer.
+
+   Performance: the grid itself is a static repeating-linear-gradient (one
+   paint, never animated). Only the two pulse layers move, and they animate
+   `transform` alone — no filter, no background-position, no layout — so the
+   whole thing composites on the GPU and costs nothing per frame. */
+
+.circuit-field {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  /* Fades out toward the edges so the grid never meets a hard border. */
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 45%, #000 30%, transparent 78%);
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 45%, #000 30%, transparent 78%);
+}
+
+.circuit-field::before {
+  content: "";
+  position: absolute;
+  inset: -10%;
+  background:
+    repeating-linear-gradient(90deg, hsl(0 0% 100% / 0.045) 0 1px, transparent 1px 68px),
+    repeating-linear-gradient(0deg, hsl(0 0% 100% / 0.045) 0 1px, transparent 1px 68px);
+}
+
+/* Two travelling pulses — thin accent bands that sweep the grid. */
+.circuit-pulse {
+  position: absolute;
+  will-change: transform;
+}
+
+.circuit-pulse--h {
+  left: -30%;
+  right: -30%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent-glow-soft) 42%, var(--accent-glow) 50%, var(--accent-glow-soft) 58%, transparent);
+}
+
+.circuit-pulse--v {
+  top: -30%;
+  bottom: -30%;
+  width: 1px;
+  background: linear-gradient(180deg, transparent, var(--accent-glow-soft) 42%, var(--accent-glow) 50%, var(--accent-glow-soft) 58%, transparent);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .circuit-pulse--h { animation: circuit-travel-y 13s linear infinite; }
+  .circuit-pulse--v { animation: circuit-travel-x 17s linear infinite; animation-delay: -6s; }
+
+  @keyframes circuit-travel-y {
+    0%   { transform: translate3d(0, 8vh, 0); opacity: 0; }
+    12%  { opacity: 0.5; }
+    88%  { opacity: 0.5; }
+    100% { transform: translate3d(0, 88vh, 0); opacity: 0; }
+  }
+
+  @keyframes circuit-travel-x {
+    0%   { transform: translate3d(6vw, 0, 0); opacity: 0; }
+    12%  { opacity: 0.4; }
+    88%  { opacity: 0.4; }
+    100% { transform: translate3d(94vw, 0, 0); opacity: 0; }
+  }
+}
+
+/* ── Desktop-only 3D suspension ───────────────────────────────────────
+   Cards and CTAs tilt toward the pointer, driven by --px/--py set on the
+   container by usePointerTilt. Gated to fine pointers so touch devices keep
+   their current flat, cheap rendering — mobile perf rules unchanged. */
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .tilt-scene {
+    perspective: 900px;
+    perspective-origin: 50% 50%;
+  }
+
+  .tilt-layer {
+    /* --px/--py are -1..1, centred at 0. */
+    transform:
+      rotateX(calc(var(--py, 0) * -6deg))
+      rotateY(calc(var(--px, 0) * 6deg))
+      translate3d(calc(var(--px, 0) * 6px), calc(var(--py, 0) * 4px), 0);
+    transition: transform 380ms cubic-bezier(0.16, 1, 0.3, 1);
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+
+  /* Nearer layers travel further, which is what sells the depth. */
+  .tilt-layer--near {
+    transform:
+      rotateX(calc(var(--py, 0) * -9deg))
+      rotateY(calc(var(--px, 0) * 9deg))
+      translate3d(calc(var(--px, 0) * 12px), calc(var(--py, 0) * 8px), 40px);
+    transition: transform 380ms cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: transform;
+  }
+}
+
+
+/* ── Light-mode surface corrections ───────────────────────────────────
+   These components paint explicit dark gradients; in light mode they take
+   the same shape from the light end of the surface stack. */
+
+.light .mlbot-launcher,
+.light .mlbot-surface {
+  background: linear-gradient(160deg, var(--surface-0) 0%, var(--surface-2) 100%);
+  border: 1px solid var(--line-strong);
+  box-shadow: 0 10px 30px -14px hsl(220 20% 10% / 0.35);
+}
+
+.light .mlbot-panel {
+  background: linear-gradient(180deg, var(--surface-0) 0%, var(--surface-1) 100%);
+  border: 1px solid var(--line-strong);
+  box-shadow: 0 30px 70px -28px hsl(220 20% 10% / 0.4);
+}
+
+.light .nav-shell,
+.light nav[data-nav-scrolled="true"] .nav-shell {
+  background: linear-gradient(180deg, var(--surface-0) 0%, var(--surface-1) 100%);
+  border-color: var(--line-soft);
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / 0.8),
+    0 1px 0 0 hsl(220 20% 10% / 0.08),
+    0 18px 48px -28px hsl(220 20% 10% / 0.28);
+}
+
+.light .nav-shell::before {
+  background: linear-gradient(180deg, hsl(0 0% 100% / 0.6) 0%, transparent 42%);
+}
+
+/* The circuit grid is drawn in white for dark mode; invert it for light. */
+.light .circuit-field::before {
+  background:
+    repeating-linear-gradient(90deg, hsl(220 20% 10% / 0.06) 0 1px, transparent 1px 68px),
+    repeating-linear-gradient(0deg, hsl(220 20% 10% / 0.06) 0 1px, transparent 1px 68px);
+}
+
+
+/* Light-mode button + text corrections. */
+.light .glass-btn {
+  border: 1px solid hsl(220 20% 10% / 0.14);
+  background: linear-gradient(160deg, hsl(220 20% 10% / 0.05) 0%, hsl(220 20% 10% / 0.02) 45%, hsl(220 20% 10% / 0.04) 100%);
+  color: hsl(var(--foreground));
+}
+
+.light .glass-btn:hover {
+  border-color: hsl(220 20% 10% / 0.24);
+  background: linear-gradient(160deg, hsl(220 20% 10% / 0.08) 0%, hsl(220 20% 10% / 0.04) 45%, hsl(220 20% 10% / 0.06) 100%);
+}
+
+/* The metallic sheen is the brand, so it is retained rather than replaced —
+   the gradient stops just move from silver-on-black to graphite-on-white. */
+.light .metallic-text,
+.light .gradient-text {
+  background-image: linear-gradient(180deg, #2b3442 0%, #55627a 42%, #1b2230 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }

@@ -13,6 +13,8 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { X, ArrowUp, ArrowUpToLine } from "lucide-react"
 import { SiteLogoMark } from "@/components/site-logo-mark"
+import { BlogChart } from "@/components/blog/charts/blog-chart"
+import { splitChatSegments } from "@/lib/ai/chat-segments"
 import { wooshScrollTo } from "@/components/nav/woosh-scroll"
 import { ChatChart, type ChartSpec } from "./chat-chart"
 
@@ -200,7 +202,10 @@ export function MLBot() {
                 <div
                     role="dialog"
                     aria-label="Chat with MLBot"
-                    className="mlbot-panel fixed bottom-24 right-4 z-[60] flex h-[min(34rem,calc(100dvh-12rem))] w-[min(24rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-2xl sm:right-6"
+                    /* Full-screen on a phone — a 24rem card floating over the
+                       page is unusable with a keyboard open. From sm up it goes
+                       back to the bottom-right panel. */
+                    className="mlbot-panel fixed inset-0 z-[60] flex h-dvh w-full flex-col overflow-hidden rounded-none sm:inset-auto sm:bottom-24 sm:right-6 sm:h-[min(34rem,calc(100dvh-12rem))] sm:w-[min(24rem,calc(100vw-2rem))] sm:rounded-2xl"
                 >
                     <header className="flex items-center gap-3 border-b border-white/[0.08] px-4 py-3">
                         <SiteLogoMark width={28} height={28} sizes="28px" alt="" className="h-7 w-7 object-contain" />
@@ -248,10 +253,17 @@ export function MLBot() {
 
                                         {turn.charts?.map((spec, j) => <ChatChart key={j} spec={spec} />)}
 
-                                        {turn.content && (
-                                            <p className="whitespace-pre-wrap text-[13px] leading-relaxed text-foreground/90">
-                                                {turn.content}
-                                            </p>
+                                        {splitChatSegments(turn.content).map((seg, j) =>
+                                            seg.kind === "diagram" ? (
+                                                <BlogChart key={j} json={seg.json} className="my-2" />
+                                            ) : (
+                                                <p
+                                                    key={j}
+                                                    className="whitespace-pre-wrap text-[13px] leading-relaxed text-foreground/90"
+                                                >
+                                                    {seg.value}
+                                                </p>
+                                            ),
                                         )}
 
                                         {busy && i === turns.length - 1 && !turn.content && !turn.tools?.length && (

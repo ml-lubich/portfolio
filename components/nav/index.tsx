@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo } from "react"
 import { SiteLogoMark } from "@/components/site-logo-mark"
+import { ThemeToggle } from "@/components/theme-toggle"
 import { Menu, X, ArrowRight, Zap, ChevronDown, ExternalLink, Gamepad2 } from "lucide-react"
 import { navLinks, liveTools, liveGames } from "./nav-links"
 import { wooshScrollTo, navigateTo } from "./woosh-scroll"
@@ -398,6 +399,7 @@ export function Navigation() {
                 height={56}
                 sizes="56px"
                 alt="Misha Lubich — home"
+                className="h-full w-full scale-[1.3] object-contain"
                 suppressHydrationWarning
               />
             </div>
@@ -436,11 +438,13 @@ export function Navigation() {
               onClick={(e) => handleLinkClick(e, "#contact")}
               aria-label="Get In Touch"
               title="Get In Touch"
-              className="group/link relative isolate ml-2 overflow-hidden whitespace-nowrap rounded-full border border-white/[0.16] bg-foreground px-4 py-2 text-[13px] font-semibold text-background shadow-[0_14px_34px_-18px_rgba(255,255,255,0.8)] transition-[transform,box-shadow,background-color] duration-150 ease-out before:absolute before:inset-0 before:-z-10 before:bg-[linear-gradient(120deg,rgba(255,255,255,0.95),rgba(255,255,255,0.72))] hover:scale-[1.03] hover:shadow-[0_18px_46px_-18px_rgba(255,255,255,0.9)] active:scale-[0.98] 2xl:ml-3 2xl:px-4 2xl:text-[14px]"
+              className="group/link relative isolate ml-2 overflow-hidden whitespace-nowrap rounded-full border border-white/[0.16] bg-foreground px-4 py-2 text-[13px] font-semibold text-background shadow-[0_14px_34px_-18px_hsl(var(--foreground)/0.5)] transition-[transform,box-shadow,background-color] duration-150 ease-out before:absolute before:inset-0 before:-z-10 before:bg-[linear-gradient(120deg,hsl(var(--foreground)/0.97),hsl(var(--foreground)/0.78))] hover:scale-[1.03] hover:shadow-[0_18px_46px_-18px_hsl(var(--foreground)/0.6)] active:scale-[0.98] 2xl:ml-3 2xl:px-4 2xl:text-[14px]"
             >
               <ExpandingText text="Get In Touch" />
             </a>
           </div>
+
+          <ThemeToggle className="ml-2 hidden xl:flex" />
 
           {/* Mobile toggle — min 48px touch target for accessibility */}
           <button

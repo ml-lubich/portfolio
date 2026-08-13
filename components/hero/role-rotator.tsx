@@ -118,7 +118,7 @@ export function RoleRotator({
 
 export function HeroTagline() {
   return (
-    <p className="animate-fade-in-up-subtle mx-auto mt-4 max-w-2xl text-balance text-center font-medium uppercase tracking-[0.18em] text-white/70 text-[clamp(0.62rem,2.6vw,0.8rem)] sm:mt-5 sm:tracking-[0.22em] sm:text-sm">
+    <p className="animate-fade-in-up-subtle mx-auto mt-4 max-w-2xl text-balance text-center font-medium uppercase tracking-[0.18em] text-foreground/70 text-[clamp(0.62rem,2.6vw,0.8rem)] sm:mt-5 sm:tracking-[0.22em] sm:text-sm">
       AI Software Engineering, Consulting &amp; Solutions
     </p>
   )
@@ -128,7 +128,7 @@ export function HeroTagline() {
 
 export function HeroSubtitle() {
   return (
-    <p className="hero-subtitle mx-auto mt-5 max-w-3xl text-pretty text-sm leading-relaxed text-white/95 sm:mt-6 sm:text-base md:mt-7 md:text-lg">
+    <p className="hero-subtitle mx-auto mt-5 max-w-3xl text-pretty text-sm leading-relaxed text-foreground/95 sm:mt-6 sm:text-base md:mt-7 md:text-lg">
       <AnimatedText variant="blur-slide" delay={1200} stagger={30} duration={650}>
         {"Senior Software Engineer specializing in "}
         <span className="font-semibold text-foreground">AI-driven, cloud-native applications</span>

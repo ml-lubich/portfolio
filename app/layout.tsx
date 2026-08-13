@@ -14,6 +14,7 @@ import './globals.css'
 import { JsonLd } from '@/components/seo/json-ld'
 import { LiquidGooFilter } from '@/components/glass-blob-field'
 import { MLBot } from "@/components/ai-chat/mlbot"
+import { ThemeProvider } from "@/components/theme-provider"
 
 const jetbrains = JetBrains_Mono({
   subsets: ['latin'],
@@ -180,7 +181,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" dir="ltr" className={`${GeistSans.variable} ${GeistMono.variable} ${jetbrains.variable} ${italiana.variable} ${cormorant.variable} ${urbanist.variable} ${instrumentSerif.variable}`}>
+    <html lang="en" dir="ltr" suppressHydrationWarning className={`${GeistSans.variable} ${GeistMono.variable} ${jetbrains.variable} ${italiana.variable} ${cormorant.variable} ${urbanist.variable} ${instrumentSerif.variable}`}>
       <head>
         {/* Preconnect only to origins used on initial load. Google Fonts are bundled by next/font; Unsplash is used only on blog. */}
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
@@ -194,9 +195,11 @@ export default function RootLayout({
         >
           Skip to main content
         </a>
-        <LiquidGooFilter />
-        {children}
-        <MLBot />
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} disableTransitionOnChange>
+          <LiquidGooFilter />
+          {children}
+          <MLBot />
+        </ThemeProvider>
       </body>
     </html>
   )
