@@ -31,18 +31,19 @@ export const CHAT_LIMITS = {
     ip: { max: 40, windowMs: 60 * 60 * 1000 },
     /** Short burst guard — stops a scripted hammer regardless of the hourly budget. */
     burst: { max: 5, windowMs: 20 * 1000 },
-    /** Whole-site daily ceiling, sized to a ~$5/month OpenRouter budget.
+    /** Whole-site daily ceiling, sized to a ~$10/month OpenRouter budget.
      *
-     *  glm-4.7-flash costs $0.06/M input and $0.40/M output. A worst-case
-     *  request is 4 tool rounds — roughly 15k cumulative input and 4k output,
-     *  about $0.0025. $5 / $0.0025 ≈ 2000 requests a month ≈ 64 a day
-     *  (checked against a 31-day month, not an average one).
+     *  Priced off the dearest model in the roster, deepseek-v4-flash at
+     *  $0.14/M input and $0.28/M output. A worst-case request is 4 tool
+     *  rounds — roughly 15k cumulative input and 4k output, about $0.0032.
+     *  $10 / $0.0032 ≈ 3100 requests a month ≈ 100 a day (checked against a
+     *  31-day month, not an average one).
      *
      *  This is the governor, not the guarantee: it lives in per-instance
      *  memory, so a recycled instance forgets the count. The hard cap is the
      *  spend limit set on the OpenRouter key itself — when that trips, the
      *  route falls through to the :free models and the bot keeps answering. */
-    global: { max: 64, windowMs: 24 * 60 * 60 * 1000 },
+    global: { max: 100, windowMs: 24 * 60 * 60 * 1000 },
     /** Simultaneous in-flight streams per IP. Each stream holds a socket and a
      *  model call open for seconds, so request-count limits alone do not bound
      *  resource use — 50 parallel streams cost 50x even at 1 request each. */

@@ -77,7 +77,7 @@ const LOGOS: Logo[] = [
                    reads — then held back to ~70% because unlike the other
                    marks here this one is a *filled* square, and at full
                    strength it blares next to Apple's and Honda's glyphs. */
-                className="h-8 sm:h-11 w-auto opacity-[0.72] brightness-0 invert transition-opacity duration-300 group-hover:opacity-95"
+                className="h-8 sm:h-11 w-auto opacity-[0.72] brightness-0 dark:invert transition-opacity duration-300 group-hover:opacity-95"
             />
         ),
     },
@@ -96,7 +96,7 @@ const LOGOS: Logo[] = [
                 width={215}
                 height={68}
                 unoptimized
-                className="h-8 sm:h-11 w-auto opacity-90 brightness-0 invert transition-opacity duration-300 group-hover:opacity-100"
+                className="h-8 sm:h-11 w-auto opacity-90 brightness-0 dark:invert transition-opacity duration-300 group-hover:opacity-100"
             />
         ),
     },
@@ -128,7 +128,7 @@ const LOGOS: Logo[] = [
                 alt="ERIA Events logo"
                 width={256}
                 height={157}
-                className="h-8 sm:h-11 w-auto opacity-90 transition-opacity duration-300 group-hover:opacity-100 brightness-0 invert"
+                className="h-8 sm:h-11 w-auto opacity-90 transition-opacity duration-300 group-hover:opacity-100 brightness-0 dark:invert"
             />
         ),
     },

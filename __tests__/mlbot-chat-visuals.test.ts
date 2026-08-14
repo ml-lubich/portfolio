@@ -117,10 +117,11 @@ describe("MLBot system prompt", () => {
 })
 
 describe("MLBot spend governor", () => {
-    // Worst-case request against z-ai/glm-4.7-flash ($0.06/M in, $0.40/M out):
-    // 4 tool rounds ≈ 15k cumulative input + 4k output.
-    const WORST_CASE_USD = (15_000 / 1e6) * 0.06 + (4_000 / 1e6) * 0.4
-    const MONTHLY_BUDGET_USD = 5
+    // Worst-case request against the dearest model in the roster,
+    // deepseek-v4-flash ($0.14/M in, $0.28/M out): 4 tool rounds ≈ 15k
+    // cumulative input + 4k output.
+    const WORST_CASE_USD = (15_000 / 1e6) * 0.14 + (4_000 / 1e6) * 0.28
+    const MONTHLY_BUDGET_USD = 10
 
     it("keeps the daily ceiling inside a $5/month budget", async () => {
         const { CHAT_LIMITS } = await import("@/lib/ai/rate-limit")
@@ -135,10 +136,64 @@ describe("MLBot spend governor", () => {
         expect(CHAT_LIMITS.global.max).toBeGreaterThanOrEqual(CHAT_LIMITS.cookie.max)
     })
 
-    it("falls back to $0 models so a tripped spend cap does not take the bot down", () => {
+    it("keeps more than one lab in the roster so an outage is not an outage", () => {
         const route = read("app/api/chat/route.ts")
         const models = route.slice(route.indexOf("const MODELS"), route.indexOf("] as const"))
+        const labs = new Set([...models.matchAll(/"([^"]+)\//g)].map((m) => m[1]))
 
-        expect(models.match(/:free/g)?.length).toBeGreaterThanOrEqual(1)
+        expect(labs.size).toBeGreaterThanOrEqual(2)
+    })
+})
+
+describe("MLBot transcript", () => {
+    const source = read("components/ai-chat/mlbot.tsx")
+
+    it("renders replies as markdown, not raw asterisks", () => {
+        expect(source).toMatch(/react-markdown/)
+        expect(source).toMatch(/remark-gfm/)
+    })
+
+    it("reuses the markdown stack the blog already depends on", async () => {
+        const pkg = JSON.parse(read("package.json"))
+        expect(pkg.dependencies["react-markdown"]).toBeDefined()
+        expect(pkg.dependencies["remark-gfm"]).toBeDefined()
+    })
+
+    it("follows the stream to the bottom as tokens arrive", () => {
+        expect(source).toContain("isPinnedToBottom")
+    })
+})
+
+describe("isPinnedToBottom", () => {
+    it("is true at the bottom", async () => {
+        const { isPinnedToBottom } = await import("@/lib/ai/chat-scroll")
+        expect(isPinnedToBottom({ scrollTop: 900, scrollHeight: 1000, clientHeight: 100 })).toBe(true)
+    })
+
+    it("is true just above the bottom, inside the slack", async () => {
+        const { isPinnedToBottom } = await import("@/lib/ai/chat-scroll")
+        expect(isPinnedToBottom({ scrollTop: 860, scrollHeight: 1000, clientHeight: 100 })).toBe(true)
+    })
+
+    it("is false once the reader has scrolled up to re-read", async () => {
+        const { isPinnedToBottom } = await import("@/lib/ai/chat-scroll")
+        expect(isPinnedToBottom({ scrollTop: 200, scrollHeight: 1000, clientHeight: 100 })).toBe(false)
+    })
+})
+
+describe("MLBot model roster", () => {
+    const route = read("app/api/chat/route.ts")
+    const models = route.slice(route.indexOf("const MODELS"), route.indexOf("] as const"))
+
+    it("runs on Chinese open-weight models only", () => {
+        const ids = [...models.matchAll(/"([^"]+\/[^"]+)"/g)].map((m) => m[1])
+        expect(ids.length).toBeGreaterThanOrEqual(2)
+        for (const id of ids) {
+            expect(id).toMatch(/^(z-ai|qwen|deepseek|moonshotai|minimax|inclusionai)\//)
+        }
+    })
+
+    it("streams rather than waiting for the whole reply", () => {
+        expect(route).toContain("stream: true")
     })
 })

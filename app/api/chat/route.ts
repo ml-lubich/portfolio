@@ -16,11 +16,13 @@ import { FollowupStream } from "@/lib/ai/followups"
 export const runtime = "nodejs"
 export const maxDuration = 60
 
-/** Primary is the cheapest GLM with tool support. Free models catch overflow. */
+/** Chinese open-weight models only, cheapest-with-tool-support first. Each
+ *  fallback is a different lab, so one provider being down or rate-limited
+ *  does not take the bot with it. */
 const MODELS = [
+    "qwen/qwen3-30b-a3b-instruct-2507",
     "z-ai/glm-4.7-flash",
-    "openai/gpt-oss-20b:free",
-    "nvidia/nemotron-3.5-lightning:free",
+    "deepseek/deepseek-v4-flash",
 ] as const
 
 const LIMITS = {

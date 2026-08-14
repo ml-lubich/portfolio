@@ -15,6 +15,9 @@ import { X, ArrowUp, ArrowUpToLine } from "lucide-react"
 import { SiteLogoMark } from "@/components/site-logo-mark"
 import { BlogChart } from "@/components/blog/charts/blog-chart"
 import { splitChatSegments } from "@/lib/ai/chat-segments"
+import { isPinnedToBottom } from "@/lib/ai/chat-scroll"
+import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
 import { wooshScrollTo } from "@/components/nav/woosh-scroll"
 import { ChatChart, type ChartSpec } from "./chat-chart"
 
@@ -77,9 +80,14 @@ export function MLBot() {
         if (open) inputRef.current?.focus()
     }, [open])
 
+    // Follow the stream. `turns` changes on every token, so this runs as the
+    // reply grows — but only while the reader is still at the bottom, so
+    // scrolling up to re-read an earlier answer is not yanked back down.
     useEffect(() => {
-        scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" })
-    }, [turns])
+        const el = scrollRef.current
+        if (!el || !isPinnedToBottom(el)) return
+        el.scrollTo({ top: el.scrollHeight, behavior: busy ? "auto" : "smooth" })
+    }, [turns, busy])
 
     useEffect(() => {
         if (!open) return
@@ -257,12 +265,9 @@ export function MLBot() {
                                             seg.kind === "diagram" ? (
                                                 <BlogChart key={j} json={seg.json} className="my-2" />
                                             ) : (
-                                                <p
-                                                    key={j}
-                                                    className="whitespace-pre-wrap text-[13px] leading-relaxed text-foreground/90"
-                                                >
-                                                    {seg.value}
-                                                </p>
+                                                <div key={j} className="mlbot-md text-[13px] leading-relaxed text-foreground/90">
+                                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{seg.value}</ReactMarkdown>
+                                                </div>
                                             ),
                                         )}
 
