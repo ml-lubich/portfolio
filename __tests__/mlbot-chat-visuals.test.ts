@@ -185,10 +185,25 @@ describe("MLBot model roster", () => {
     const route = read("app/api/chat/route.ts")
     const models = route.slice(route.indexOf("const MODELS"), route.indexOf("] as const"))
 
-    it("runs on Chinese open-weight models only", () => {
+    /* Free tiers carry normal traffic, so spend stays near zero; the paid
+     * fallback tier is where the Chinese open-weight preference still applies.
+     * Both cannot hold at once — OpenRouter currently ships no free Chinese
+     * model with tool calling, so the free entries are necessarily other
+     * vendors, chosen for clean (non-chain-of-thought) output. */
+    it("puts free tiers ahead of any paid model", () => {
         const ids = [...models.matchAll(/"([^"]+\/[^"]+)"/g)].map((m) => m[1])
         expect(ids.length).toBeGreaterThanOrEqual(2)
-        for (const id of ids) {
+        const lastFree = ids.map((i) => i.endsWith(":free")).lastIndexOf(true)
+        const firstPaid = ids.findIndex((i) => !i.endsWith(":free"))
+        expect(lastFree).toBeGreaterThanOrEqual(0)
+        expect(firstPaid).toBeGreaterThan(lastFree)
+    })
+
+    it("keeps every paid fallback on Chinese open-weight models", () => {
+        const ids = [...models.matchAll(/"([^"]+\/[^"]+)"/g)].map((m) => m[1])
+        const paid = ids.filter((i) => !i.endsWith(":free"))
+        expect(paid.length).toBeGreaterThan(0)
+        for (const id of paid) {
             expect(id).toMatch(/^(z-ai|qwen|deepseek|moonshotai|minimax|inclusionai)\//)
         }
     })

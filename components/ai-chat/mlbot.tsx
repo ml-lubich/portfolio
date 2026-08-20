@@ -20,6 +20,8 @@ import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import { wooshScrollTo } from "@/components/nav/woosh-scroll"
 import { ChatChart, type ChartSpec } from "./chat-chart"
+import { BookingCard } from "./booking-card"
+import { BOOKING_URL, type BookingSpec } from "@/lib/ai/profile-tools"
 
 interface Turn {
     role: "user" | "assistant"
@@ -28,6 +30,8 @@ interface Turn {
     tools?: string[]
     /** Model-suggested next questions, extracted from the same reply. */
     followups?: string[]
+    /** Calendar hand-off, when the visitor asked about working together. */
+    booking?: BookingSpec
 }
 
 const SUGGESTIONS = [
@@ -38,6 +42,19 @@ const SUGGESTIONS = [
 ]
 
 /** Human-readable labels for the tool names the model calls. */
+/** The booking card already carries the link. Models paste it anyway, which
+ *  renders as raw markdown and duplicates the card — so strip it on display
+ *  rather than trusting the prompt to hold. */
+function stripBookingLink(text: string): string {
+    const escaped = BOOKING_URL.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+    return text
+        .replace(new RegExp(`\\[([^\\]]*)\\]\\(\\s*${escaped}[^)]*\\)`, "gi"), "$1")
+        .replace(new RegExp(escaped, "gi"), "")
+        .replace(/[ \t]{2,}/g, " ")
+        .replace(/\n{3,}/g, "\n\n")
+        .trim()
+}
+
 const TOOL_LABELS: Record<string, string> = {
     search_profile: "Searching the profile",
     get_experience: "Reading work history",
@@ -48,6 +65,7 @@ const TOOL_LABELS: Record<string, string> = {
     chart_skills: "Charting skills",
     chart_tech_usage: "Charting tech usage",
     chart_publications_by_year: "Charting publications",
+    request_consultation: "Opening the calendar",
 }
 
 export function MLBot() {
@@ -158,6 +176,8 @@ export function MLBot() {
                         } else if (event === "tool") {
                             const name = (data as { name: string }).name
                             patch((t) => ({ ...t, tools: [...(t.tools ?? []), name] }))
+                        } else if (event === "booking") {
+                            patch((t) => ({ ...t, booking: data as BookingSpec }))
                         } else if (event === "followups") {
                             patch((t) => ({ ...t, followups: data as string[] }))
                         } else if (event === "error") {
@@ -202,6 +222,13 @@ export function MLBot() {
                         <SiteLogoMark width={40} height={40} sizes="40px" alt="" className="h-9 w-9 object-contain" />
                     )}
                     {!open && <span className="mlbot-pulse" aria-hidden />}
+                    {/* Names the button. A bare logo does not tell a first-time
+                        visitor that this is a chat they can talk to. */}
+                    {!open && (
+                        <span className="mlbot-tag" aria-hidden>
+                            AI Chat
+                        </span>
+                    )}
                 </button>
             </div>
 
@@ -260,6 +287,8 @@ export function MLBot() {
                                         ))}
 
                                         {turn.charts?.map((spec, j) => <ChatChart key={j} spec={spec} />)}
+
+                                        {turn.booking && <BookingCard booking={turn.booking} />}
 
                                         {splitChatSegments(turn.content).map((seg, j) =>
                                             seg.kind === "diagram" ? (

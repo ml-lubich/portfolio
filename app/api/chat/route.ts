@@ -19,9 +19,21 @@ export const maxDuration = 60
 /** Chinese open-weight models only, cheapest-with-tool-support first. Each
  *  fallback is a different lab, so one provider being down or rate-limited
  *  does not take the bot with it. */
+/* Free tiers carry normal traffic; paid models only catch what they drop, so
+ * spend stays near zero in normal operation.
+ *
+ * Both free entries were checked against the live API for two things, not one:
+ * tool calling AND clean output. Several otherwise-capable free models
+ * (nemotron-3.5-lightning, nemotron-3-super-120b) stream their chain-of-thought
+ * as ordinary content — "I need to follow the rules..." lands straight in the
+ * user's panel — and they do it even with reasoning.exclude set, so they are
+ * deliberately excluded. Verify both properties before adding a model here. */
 const MODELS = [
-    "qwen/qwen3-30b-a3b-instruct-2507",
+    "openai/gpt-oss-20b:free",
+    "cohere/north-mini-code:free",
+    // Paid fallbacks, cheapest first.
     "z-ai/glm-4.7-flash",
+    "qwen/qwen3-30b-a3b-instruct-2507",
     "deepseek/deepseek-v4-flash",
 ] as const
 
@@ -120,6 +132,9 @@ function runAgent(history: ChatMessage[], apiKey: string, release: () => void): 
                         // Charts render client-side; the model still sees the spec so it
                         // knows what the user is looking at and does not narrate the bars.
                         if ("chart" in result) send("chart", result.chart)
+                        // Booking card renders client-side; the model still sees the
+                        // spec so it knows the card is on screen and does not paste a URL.
+                        if ("booking" in result) send("booking", result.booking)
 
                         messages.push({
                             role: "tool",
@@ -243,6 +258,9 @@ async function fetchWithFallback(messages: ChatMessage[], apiKey: string): Promi
                 tools: TOOL_SCHEMAS,
                 tool_choice: "auto",
                 stream: true,
+                // Honoured by providers that separate reasoning tokens; models
+                // that ignore it are kept out of MODELS entirely.
+                reasoning: { exclude: true },
                 max_tokens: LIMITS.maxTokens,
                 temperature: 0.3,
             }),

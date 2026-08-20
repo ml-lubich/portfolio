@@ -28,7 +28,21 @@ export interface ChartSpec {
     data: { label: string; value: number }[]
 }
 
-export type ToolResult = Record<string, unknown> | { chart: ChartSpec }
+/** A consultation hand-off. Not a confirmed booking: the visitor still picks a
+ *  slot on the real calendar. Claiming otherwise would be a fabricated record. */
+export interface BookingSpec {
+    topic: string
+    durationMin: number
+    /** Misha's real Google Calendar booking page. */
+    url: string
+    /** What the visitor said they wanted, echoed back for confirmation. */
+    summary: string
+}
+
+export type ToolResult = Record<string, unknown> | { chart: ChartSpec } | { booking: BookingSpec }
+
+/** Single source of truth — same link as the hero "Schedule Call" CTA. */
+export const BOOKING_URL = "https://calendar.app.google/T2VGkBsBAUzGABRB7"
 
 /* ── Tool schemas (OpenAI/OpenRouter function-calling format) ─────────── */
 
@@ -115,6 +129,32 @@ export const TOOL_SCHEMAS = [
             parameters: {
                 type: "object",
                 properties: { top: { type: "number", description: "How many technologies to show (default 10)" } },
+            },
+        },
+    },
+    {
+        type: "function",
+        function: {
+            name: "request_consultation",
+            description:
+                "Open Misha's booking calendar for the visitor. Call this the moment someone wants to book a call, hire him, discuss consulting, ask about availability, rates, or working together. Do not ask for their email — the calendar collects it.",
+            parameters: {
+                type: "object",
+                properties: {
+                    topic: {
+                        type: "string",
+                        description: "Short subject line, e.g. 'RAG pipeline for internal docs'",
+                    },
+                    durationMin: {
+                        type: "number",
+                        description: "15 for a quick intro, 30 for a scoping call. Default 30.",
+                    },
+                    summary: {
+                        type: "string",
+                        description: "One sentence restating what the visitor is looking for.",
+                    },
+                },
+                required: ["topic"],
             },
         },
     },
@@ -232,6 +272,18 @@ function chartTechUsage(top = 10): ToolResult {
     return { chart: { kind: "bar", title: "Most-used technologies", unit: "mentions", data } }
 }
 
+function requestConsultation(args: Record<string, unknown>): ToolResult {
+    const topic = typeof args.topic === "string" && args.topic.trim() ? args.topic.trim() : "Consulting enquiry"
+    const raw = typeof args.durationMin === "number" ? args.durationMin : 30
+    // Only the two slot lengths the calendar actually offers.
+    const durationMin = raw <= 20 ? 15 : 30
+    const summary =
+        typeof args.summary === "string" && args.summary.trim()
+            ? args.summary.trim().slice(0, 200)
+            : "Wants to talk through a project with Misha."
+    return { booking: { topic: topic.slice(0, 90), durationMin, url: BOOKING_URL, summary } }
+}
+
 function chartPublicationsByYear(): ToolResult {
     const counts = new Map<string, number>()
     for (const p of papers) counts.set(p.year, (counts.get(p.year) ?? 0) + 1)
@@ -262,6 +314,8 @@ export function runTool(name: string, args: Record<string, unknown>): ToolResult
             return chartTechUsage(typeof args.top === "number" ? args.top : undefined)
         case "chart_publications_by_year":
             return chartPublicationsByYear()
+        case "request_consultation":
+            return requestConsultation(args)
         default:
             return { error: `Unknown tool: ${name}` }
     }
@@ -283,6 +337,7 @@ Rules:
   Keep it to 6 steps or fewer — it renders in a phone-width panel.
 - Be concise. Two short paragraphs maximum unless asked for depth.
 - If something genuinely is not in the profile, say so plainly and suggest contacting him directly.
+- If the visitor wants to book a call, hire him, discuss consulting, rates or availability — call request_consultation immediately. Then write ONE sentence, and nothing else, saying Misha would be glad to talk it through. A booking card with his real calendar is already on screen, so: never write a URL or a markdown link, and never say a slot has been opened, held, reserved or booked. Nothing is reserved until the visitor picks a time themselves.
 - Stay on topic: you are here to talk about Misha's work, not to be a general-purpose assistant.
 
 End every final answer with one line in exactly this format, and nothing after it:
