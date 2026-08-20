@@ -58,7 +58,7 @@ export function MLBot() {
     const [showTop, setShowTop] = useState(false)
 
     const scrollRef = useRef<HTMLDivElement>(null)
-    const inputRef = useRef<HTMLInputElement>(null)
+    const inputRef = useRef<HTMLTextAreaElement>(null)
 
     // The launcher replaces the old back-to-top button, so it takes over that job
     // as a secondary control that appears once you've scrolled away from the hero.
@@ -300,22 +300,29 @@ export function MLBot() {
                             e.preventDefault()
                             send(input)
                         }}
-                        className="flex items-center gap-2 border-t border-white/[0.08] px-3 py-3"
+                        className="flex items-end gap-2 border-t border-white/[0.08] px-3 py-2.5"
                     >
-                        <input
+                        <textarea
                             ref={inputRef}
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
-                            maxLength={1200}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter" && !e.shiftKey) {
+                                    e.preventDefault()
+                                    if (!busy && input.trim()) send(input)
+                                }
+                            }}
+                            rows={1}
+                            maxLength={1000}
                             placeholder="Ask about Misha…"
                             aria-label="Message MLBot"
-                            className="min-w-0 flex-1 bg-transparent text-[13px] text-foreground outline-none placeholder:text-muted-foreground/60"
+                            className="max-h-28 min-h-[38px] min-w-0 flex-1 resize-none overflow-y-auto bg-transparent py-2 text-[13px] text-foreground border-0 outline-none focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 placeholder:text-muted-foreground/60"
                         />
                         <button
                             type="submit"
                             disabled={busy || !input.trim()}
                             aria-label="Send"
-                            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-foreground text-background transition-opacity disabled:opacity-30"
+                            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-foreground text-background transition-opacity disabled:opacity-30 mb-0.5"
                         >
                             <ArrowUp className="h-4 w-4" />
                         </button>

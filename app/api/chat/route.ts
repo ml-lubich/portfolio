@@ -26,7 +26,7 @@ const MODELS = [
 ] as const
 
 const LIMITS = {
-    maxMessageChars: 1200,
+    maxMessageChars: 1000,
     maxHistory: 12,
     maxToolRounds: 4,
     maxTokens: 800,
