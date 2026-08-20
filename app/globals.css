@@ -17,6 +17,9 @@
     --white-rgb: 255 255 255;
     --card-fill: rgb(10 12 20 / 0.72);
     --card-fill-hover: rgb(14 17 26 / 0.86);
+    /* Metallic text shine: bright stops read as sheen on a dark page. */
+    --metal-mid: hsl(220 15% 78%);
+    --metal-hi: hsl(0 0% 100%);
     --surface-0: #07080a;
     --surface-1: #0a0c10;
     --surface-2: #12161b;
@@ -103,6 +106,10 @@
     --white-rgb: 15 23 42;
     --card-fill: #ffffff;
     --card-fill-hover: #ffffff;
+    /* On a light page the shine must go DARKER than the base, or bold text
+       dissolves into the card. */
+    --metal-mid: hsl(220 12% 46%);
+    --metal-hi: hsl(220 14% 58%);
     --surface-0: #ffffff;
     --surface-1: #f7f8fa;
     --surface-2: #eef1f5;
@@ -685,7 +692,7 @@ body {
       hsl(220 15% 75%) 40%,
       hsl(0 0% 100%) 52%,
       hsl(220 20% 82%) 66%,
-      hsl(0 0% 100%) 78%,
+      var(--metal-hi) 78%,
       hsl(220 15% 75%) 90%,
       hsl(0 0% 100%) 100%);
   background-size: 250% 100%;
@@ -1514,7 +1521,7 @@ nav[data-nav-scrolled="true"] .nav-shell {
   background: linear-gradient(120deg,
       hsl(var(--foreground)) 0%,
       hsl(220 15% 75%) 20%,
-      hsl(0 0% 100%) 30%,
+      var(--metal-hi) 30%,
       hsl(220 15% 75%) 40%,
       hsl(var(--foreground)) 55%,
       hsl(220 15% 75%) 70%,
@@ -1556,13 +1563,13 @@ nav[data-nav-scrolled="true"] .nav-shell {
   .metallic-text {
     background-image: linear-gradient(120deg,
         hsl(var(--foreground)) 0%,
-        hsl(220 15% 78%) 18%,
-        hsl(0 0% 100%) 30%,
-        hsl(220 15% 78%) 40%,
+        var(--metal-mid) 18%,
+        var(--metal-hi) 30%,
+        var(--metal-mid) 40%,
         hsl(var(--foreground)) 54%,
-        hsl(220 15% 78%) 68%,
-        hsl(0 0% 100%) 78%,
-        hsl(220 15% 78%) 88%,
+        var(--metal-mid) 68%,
+        var(--metal-hi) 78%,
+        var(--metal-mid) 88%,
         hsl(var(--foreground)) 100%);
     background-size: 250% 100%;
     -webkit-background-clip: text;
@@ -1585,13 +1592,13 @@ b:not(.no-metallic),
 strong:not(.no-metallic) {
   background-image: linear-gradient(120deg,
       hsl(var(--foreground)) 0%,
-      hsl(220 15% 78%) 18%,
-      hsl(0 0% 100%) 30%,
-      hsl(220 15% 78%) 40%,
+      var(--metal-mid) 18%,
+      var(--metal-hi) 30%,
+      var(--metal-mid) 40%,
       hsl(var(--foreground)) 54%,
-      hsl(220 15% 78%) 68%,
-      hsl(0 0% 100%) 78%,
-      hsl(220 15% 78%) 88%,
+      var(--metal-mid) 68%,
+      var(--metal-hi) 78%,
+      var(--metal-mid) 88%,
       hsl(var(--foreground)) 100%);
   background-size: 250% 100%;
   -webkit-background-clip: text;
@@ -1608,13 +1615,13 @@ strong:not(.no-metallic) {
 .gradient-text:not(.no-metallic) .animated-text-word {
   background-image: linear-gradient(120deg,
       hsl(var(--foreground)) 0%,
-      hsl(220 15% 78%) 18%,
-      hsl(0 0% 100%) 30%,
-      hsl(220 15% 78%) 40%,
+      var(--metal-mid) 18%,
+      var(--metal-hi) 30%,
+      var(--metal-mid) 40%,
       hsl(var(--foreground)) 54%,
-      hsl(220 15% 78%) 68%,
-      hsl(0 0% 100%) 78%,
-      hsl(220 15% 78%) 88%,
+      var(--metal-mid) 68%,
+      var(--metal-hi) 78%,
+      var(--metal-mid) 88%,
       hsl(var(--foreground)) 100%);
   background-size: 250% 100%;
   -webkit-background-clip: text;
@@ -1632,13 +1639,13 @@ strong:not(.no-metallic) {
 .blog-prose h4 {
   background-image: linear-gradient(120deg,
       hsl(var(--foreground)) 0%,
-      hsl(220 15% 78%) 18%,
-      hsl(0 0% 100%) 30%,
-      hsl(220 15% 78%) 40%,
+      var(--metal-mid) 18%,
+      var(--metal-hi) 30%,
+      var(--metal-mid) 40%,
       hsl(var(--foreground)) 54%,
-      hsl(220 15% 78%) 68%,
-      hsl(0 0% 100%) 78%,
-      hsl(220 15% 78%) 88%,
+      var(--metal-mid) 68%,
+      var(--metal-hi) 78%,
+      var(--metal-mid) 88%,
       hsl(var(--foreground)) 100%);
   background-size: 250% 100%;
   -webkit-background-clip: text;
@@ -1811,13 +1818,13 @@ strong:not(.no-metallic) {
   font-weight: 700;
   background-image: linear-gradient(120deg,
       hsl(var(--foreground)) 0%,
-      hsl(220 15% 78%) 18%,
-      hsl(0 0% 100%) 30%,
-      hsl(220 15% 78%) 40%,
+      var(--metal-mid) 18%,
+      var(--metal-hi) 30%,
+      var(--metal-mid) 40%,
       hsl(var(--foreground)) 54%,
-      hsl(220 15% 78%) 68%,
-      hsl(0 0% 100%) 78%,
-      hsl(220 15% 78%) 88%,
+      var(--metal-mid) 68%,
+      var(--metal-hi) 78%,
+      var(--metal-mid) 88%,
       hsl(var(--foreground)) 100%);
   background-size: 250% 100%;
   -webkit-background-clip: text;

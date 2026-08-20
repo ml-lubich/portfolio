@@ -82,3 +82,27 @@ describe("light mode — glass surfaces", () => {
         expect((css.match(/--card-fill-hover:/g) ?? []).length).toBe(2)
     })
 })
+
+describe("light mode — metallic bold text", () => {
+    const css = read("app/globals.css")
+
+    it("has no white shine stop left hard-coded in the metallic gradients", () => {
+        const block = css.slice(css.indexOf("/* 1 ─ Direct bold elements */"))
+        expect(block).not.toMatch(/hsl\(0 0% 100%\) (?:30|78)%/)
+        expect(block).not.toContain("hsl(220 15% 78%)")
+    })
+
+    it("themes both shine stops", () => {
+        expect((css.match(/--metal-mid:/g) ?? []).length).toBe(2)
+        expect((css.match(/--metal-hi:/g) ?? []).length).toBe(2)
+    })
+
+    it("darkens the shine in light mode instead of brightening it", () => {
+        const light = css.slice(css.indexOf(".light"))
+        const mid = light.match(/--metal-mid:\s*hsl\([\d.]+ [\d.]+% ([\d.]+)%\)/)
+        const hi = light.match(/--metal-hi:\s*hsl\([\d.]+ [\d.]+% ([\d.]+)%\)/)
+        // Below 70% lightness stays legible against a white card.
+        expect(Number(mid![1])).toBeLessThan(70)
+        expect(Number(hi![1])).toBeLessThan(70)
+    })
+})
