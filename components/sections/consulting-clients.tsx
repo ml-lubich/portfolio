@@ -72,7 +72,7 @@ function ClientCard({
   const idx = String(index + 1).padStart(2, "0")
 
   const face =
-    "absolute inset-0 flex flex-col overflow-hidden rounded-2xl border border-white/[0.10] bg-[#0a0c14]/80 backdrop-blur-2xl [backface-visibility:hidden]"
+    "absolute inset-0 flex flex-col overflow-hidden rounded-2xl border border-white/[0.10] bg-[var(--card-fill)] backdrop-blur-2xl [backface-visibility:hidden]"
 
   return (
     <div className="h-full w-full" style={{ perspective: "1600px" }}>
@@ -104,7 +104,7 @@ function ClientCard({
                 onError={onCoverError}
               />
               {/* Readout scrim + scanlines */}
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0a0c14] via-[#0a0c14]/25 to-transparent" />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[var(--card-fill)] via-[var(--card-fill)]/25 to-transparent" />
               <div
                 className="pointer-events-none absolute inset-0 opacity-[0.16] mix-blend-overlay"
                 style={{

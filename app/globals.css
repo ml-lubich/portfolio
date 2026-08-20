@@ -13,6 +13,9 @@
     /* ── Unified surface stack (cua.ai-derived) ──────────────────────
        Every elevated surface on the site picks from these three, so cards,
        nav, panels and popovers stop each inventing their own dark. */
+    /* Dark is the default theme: white overlays lift a dark surface. */
+    --white-rgb: 255 255 255;
+    --card-fill: rgb(10 12 20 / 0.72);
     --surface-0: #07080a;
     --surface-1: #0a0c10;
     --surface-2: #12161b;
@@ -95,6 +98,9 @@
      The metallic text treatment is preserved by darkening its stops rather
      than switching to a flat colour — the sheen is the brand, not the hue. */
   .light {
+    /* Light: the same overlays must darken, and cards go solid white. */
+    --white-rgb: 15 23 42;
+    --card-fill: #ffffff;
     --surface-0: #ffffff;
     --surface-1: #f7f8fa;
     --surface-2: #eef1f5;

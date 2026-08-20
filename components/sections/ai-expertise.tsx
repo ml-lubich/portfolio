@@ -303,7 +303,7 @@ function DomainArch() {
                 key={domain.title}
                 aria-hidden={!isActive || undefined}
                 inert={!isActive}
-                className={`absolute left-1/2 top-0 w-[min(86vw,560px)] overflow-hidden rounded-3xl border bg-[#0a0c14]/85 backdrop-blur-2xl ${
+                className={`absolute left-1/2 top-0 w-[min(86vw,560px)] overflow-hidden rounded-3xl border bg-[var(--card-fill)] backdrop-blur-2xl ${
                   isActive
                     ? "border-white/25 shadow-[0_40px_120px_-40px_rgba(0,0,0,0.95)]"
                     : "pointer-events-none border-white/[0.08]"

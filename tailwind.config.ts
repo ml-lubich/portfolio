@@ -14,6 +14,9 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        /* Themed white: every white/<alpha> utility (surfaces, borders, text)
+           flips with the theme instead of being edited at ~450 call sites. */
+        white: 'rgb(var(--white-rgb) / <alpha-value>)',
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         card: {
