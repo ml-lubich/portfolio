@@ -8,6 +8,7 @@
  * pane. Presentational: the parent owns which step is showing.
  */
 
+import type { CSSProperties } from "react"
 import type { MacDemo, MacDemoStep } from "@/data/mac-demos"
 
 const TRAFFIC = ["#ff5f56", "#ffbd2e", "#27c93f"] as const
@@ -33,11 +34,14 @@ export function MacWindow({ demo, step }: { demo: MacDemo; step: MacDemoStep }) 
                     <p className="px-3 pb-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                         {demo.sidebarTitle}
                     </p>
-                    <ul>
+                    {/* Keyed on the command so a step change replays the entrance
+                        rather than mutating rows in place. */}
+                    <ul key={`rows-${step.command}`}>
                         {step.rows.map((row, i) => (
                             <li
                                 key={row.title}
-                                className={`mx-1.5 rounded-md px-2 py-1.5 transition-colors duration-300 ${
+                                style={{ "--i": i } as CSSProperties}
+                                className={`mac-row-in mx-1.5 rounded-md px-2 py-1.5 transition-colors duration-300 ${
                                     i === step.activeRow ? "mac-row-active" : ""
                                 }`}
                             >
@@ -60,7 +64,7 @@ export function MacWindow({ demo, step }: { demo: MacDemo; step: MacDemoStep }) 
                 </div>
 
                 {/* Detail */}
-                <div className="mac-detail min-w-0 flex-1 px-3.5 py-3">
+                <div key={`detail-${step.command}`} className="mac-pane mac-detail min-w-0 flex-1 px-3.5 py-3">
                     <p className="truncate text-[12.5px] font-semibold text-foreground">{step.detail.title}</p>
                     {step.detail.subtitle && (
                         <p className="mb-2.5 truncate text-[10.5px] text-muted-foreground">{step.detail.subtitle}</p>
@@ -71,7 +75,8 @@ export function MacWindow({ demo, step }: { demo: MacDemo; step: MacDemoStep }) 
                             {step.detail.bubbles.map((b, i) => (
                                 <div key={i} className={b.from === "me" ? "flex justify-end" : "flex justify-start"}>
                                     <p
-                                        className={`max-w-[85%] rounded-2xl px-2.5 py-1.5 text-[11px] leading-snug ${
+                                        style={{ "--i": i } as CSSProperties}
+                                        className={`mac-bubble-in max-w-[85%] rounded-2xl px-2.5 py-1.5 text-[11px] leading-snug ${
                                             b.from === "me" ? "mac-bubble-me" : "mac-bubble-them"
                                         }`}
                                     >

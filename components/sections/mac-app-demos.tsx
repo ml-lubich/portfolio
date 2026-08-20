@@ -13,6 +13,7 @@ import { Github } from "lucide-react"
 import { AnimatedSection } from "@/components/animations"
 import { SectionHeader } from "@/components/layout/section-header"
 import { MacWindow } from "@/components/demos/mac-window"
+import { useTypewriter } from "@/components/demos/typewriter"
 import { macDemos } from "@/data/mac-demos"
 
 const STEP_MS = 3800
@@ -21,6 +22,9 @@ export function MacAppDemos() {
     const [activeDemo, setActiveDemo] = useState(0)
     const [step, setStep] = useState(0)
     const [inView, setInView] = useState(false)
+    // Assume reduced until the client says otherwise, so SSR never claims to
+    // be mid-animation.
+    const [still, setStill] = useState(true)
     const sectionRef = useRef<HTMLDivElement>(null)
 
     const demo = macDemos[activeDemo]
@@ -34,11 +38,19 @@ export function MacAppDemos() {
     }, [])
 
     useEffect(() => {
+        const mq = window.matchMedia("(prefers-reduced-motion: reduce)")
+        const sync = () => setStill(mq.matches)
+        sync()
+        mq.addEventListener("change", sync)
+        return () => mq.removeEventListener("change", sync)
+    }, [])
+
+    useEffect(() => {
         if (!inView) return
-        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
+        if (still) return
         const id = setInterval(() => setStep((s) => (s + 1) % demo.steps.length), STEP_MS)
         return () => clearInterval(id)
-    }, [inView, demo.steps.length])
+    }, [inView, still, demo.steps.length])
 
     const pickDemo = useCallback((i: number) => {
         setActiveDemo(i)
@@ -46,6 +58,8 @@ export function MacAppDemos() {
     }, [])
 
     const current = demo.steps[step]
+    const typed = useTypewriter(current.command)
+    const playing = inView && !still
 
     return (
         <AnimatedSection id="mac-demos" className="relative py-12 md:py-20">
@@ -84,15 +98,25 @@ export function MacAppDemos() {
 
                         {/* The command that produced the window state on the left. */}
                         <div className="rounded-lg border border-[var(--line-soft)] bg-[var(--surface-1)] px-3 py-2.5">
-                            <code className="block break-words font-mono text-[11.5px] leading-relaxed text-foreground/90">
-                                <span className="text-[var(--accent-glow)]">$</span> {current.command}
+                            <code className="block min-h-[1.4em] break-words font-mono text-[11.5px] leading-relaxed text-foreground/90">
+                                <span className="text-[var(--accent-glow)]">$</span>{" "}
+                                {/* The typed text is decoration mid-animation; assistive
+                                    tech reads the whole command instead. */}
+                                <span className="sr-only">{current.command}</span>
+                                <span aria-hidden>{typed.shown}</span>
+                                {!typed.done && (
+                                    <span aria-hidden className="mac-caret">
+                                        ▌
+                                    </span>
+                                )}
                             </code>
                         </div>
 
                         <p className="text-[12px] leading-relaxed text-muted-foreground">{current.caption}</p>
 
-                        {/* Step dots double as manual controls. */}
-                        <div className="flex items-center gap-1.5">
+                        {/* Step dots double as manual controls; the active one fills
+                            over exactly one step so the wait is legible. */}
+                        <div data-playing={playing} className="flex items-center gap-1.5">
                             {demo.steps.map((s, i) => (
                                 <button
                                     key={s.command}
@@ -100,10 +124,18 @@ export function MacAppDemos() {
                                     onClick={() => setStep(i)}
                                     aria-label={`Step ${i + 1}: ${s.command}`}
                                     aria-current={i === step}
-                                    className={`h-1.5 rounded-full transition-all duration-300 ${
-                                        i === step ? "w-6 bg-foreground/70" : "w-1.5 bg-foreground/25 hover:bg-foreground/40"
+                                    className={`h-1.5 overflow-hidden rounded-full transition-all duration-300 ${
+                                        i === step ? "w-6 bg-foreground/25" : "w-1.5 bg-foreground/25 hover:bg-foreground/40"
                                     }`}
-                                />
+                                >
+                                    {i === step && (
+                                        <span
+                                            key={`${demo.id}-${step}`}
+                                            style={{ animationDuration: `${STEP_MS}ms` }}
+                                            className="mac-progress block h-full w-full rounded-full bg-foreground/70"
+                                        />
+                                    )}
+                                </button>
                             ))}
                         </div>
 

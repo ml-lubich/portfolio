@@ -3048,6 +3048,117 @@ article .blog-prose b a[href],
   color: #ffffff;
 }
 
+/* ── macOS demo motion ─────────────────────────────────────────────────
+   Each step is a claim that a command just changed the app. A hard cut
+   reads as a slideshow, so the panes re-enter on every step: the detail
+   lifts in, the rows arrive in sequence, bubbles land last. The parent
+   remounts these by key, which is what replays the animation. */
+
+@keyframes mac-pane-in {
+  from {
+    opacity: 0;
+    transform: translateY(7px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes mac-row-in {
+  from {
+    opacity: 0;
+    transform: translateX(-7px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes mac-bubble-in {
+  from {
+    opacity: 0;
+    transform: translateY(9px) scale(0.965);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes mac-caret {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes mac-progress {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.mac-pane {
+  animation: mac-pane-in 420ms cubic-bezier(0.22, 0.7, 0.2, 1) both;
+}
+
+.mac-row-in {
+  animation: mac-row-in 340ms cubic-bezier(0.22, 0.7, 0.2, 1) both;
+  animation-delay: calc(var(--i) * 45ms);
+}
+
+.mac-bubble-in {
+  animation: mac-bubble-in 300ms cubic-bezier(0.22, 0.9, 0.3, 1) both;
+  /* Lands after the pane and the rows, so the reply reads as the result. */
+  animation-delay: calc(180ms + var(--i) * 110ms);
+}
+
+.mac-caret {
+  display: inline-block;
+  width: 0.55ch;
+  animation: mac-caret 1s steps(1, end) infinite;
+  color: var(--accent-glow);
+}
+
+/* Fills over exactly one step, so the bar is the timer rather than a
+   decoration that happens to look like one. */
+.mac-progress {
+  transform-origin: left center;
+  animation: mac-progress linear both;
+  animation-play-state: paused;
+}
+
+[data-playing="true"] .mac-progress {
+  animation-play-state: running;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .mac-pane,
+  .mac-row-in,
+  .mac-bubble-in,
+  .mac-caret,
+  .mac-progress {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /* ── MLBot markdown ──────────────────────────────────────────────
  *  Replies are markdown (react-markdown + remark-gfm, already the blog's
  *  stack). These rules only set rhythm for the panel's narrow column — the
