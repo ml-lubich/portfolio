@@ -62,3 +62,23 @@ describe("light mode — card fills", () => {
         expect(offenders).toEqual([])
     })
 })
+
+describe("light mode — glass surfaces", () => {
+    const css = read("app/globals.css")
+
+    it("paints the stacked publication cards from the themed fill", () => {
+        const block = css.slice(css.indexOf(".glass-stack-card"), css.indexOf(".glass-stack-card") + 260)
+        expect(block).toContain("var(--card-fill)")
+        expect(block).not.toMatch(/background:\s*hsla\(220/)
+    })
+
+    it("paints the footer from the themed fill", () => {
+        const block = css.slice(css.indexOf(".footer-liquid-glass"), css.indexOf(".footer-liquid-glass") + 400)
+        expect(block).toContain("var(--card-fill)")
+        expect(block).not.toMatch(/hsl\(220 20% 6% \/ 0\.82\)/)
+    })
+
+    it("defines the hover fill in both themes", () => {
+        expect((css.match(/--card-fill-hover:/g) ?? []).length).toBe(2)
+    })
+})
