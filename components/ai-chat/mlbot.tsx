@@ -55,6 +55,47 @@ function stripBookingLink(text: string): string {
         .trim()
 }
 
+/* Cycled while waiting. "Thinking…" is what every other chat says; these are
+ * the site's own vocabulary, and the motion tells you it is alive rather than
+ * hung — which is most of what a loading state is for. */
+const THINKING_VERBS = [
+    "Lubiching",
+    "Pythoning",
+    "Agenting",
+    "Retrieving",
+    "Prompting",
+    "Vectorising",
+    "Orchestrating",
+    "Shipping",
+    "Tokenising",
+    "Kubernetting",
+    "Refactoring",
+    "Inferencing",
+] as const
+
+function ThinkingVerb() {
+    const [i, setI] = useState(() => Math.floor(Math.random() * THINKING_VERBS.length))
+
+    useEffect(() => {
+        const id = setInterval(() => setI((n) => (n + 1) % THINKING_VERBS.length), 1100)
+        return () => clearInterval(id)
+    }, [])
+
+    return (
+        <span className="flex items-center gap-1.5 text-[13px] text-muted-foreground">
+            {/* Keyed so each verb replays the fade rather than swapping in place. */}
+            <span key={i} className="mlbot-verb">
+                {THINKING_VERBS[i]}
+            </span>
+            <span className="mlbot-dots" aria-hidden>
+                <i />
+                <i />
+                <i />
+            </span>
+        </span>
+    )
+}
+
 const TOOL_LABELS: Record<string, string> = {
     search_profile: "Searching the profile",
     get_experience: "Reading work history",
@@ -245,15 +286,15 @@ export function MLBot() {
                     <header className="flex items-center gap-3 border-b border-white/[0.08] px-4 py-3">
                         <SiteLogoMark width={28} height={28} sizes="28px" alt="" className="h-7 w-7 object-contain" />
                         <div className="min-w-0">
-                            <p className="text-[13px] font-medium text-foreground">MLBot</p>
-                            <p className="truncate text-[11px] text-muted-foreground">Ask about Misha&apos;s work</p>
+                            <p className="text-[14px] font-medium text-foreground">MLBot</p>
+                            <p className="truncate text-[12px] text-muted-foreground">Ask about Misha&apos;s work</p>
                         </div>
                     </header>
 
                     <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto px-4 py-4">
                         {turns.length === 0 && (
                             <div className="space-y-3">
-                                <p className="text-[13px] leading-relaxed text-muted-foreground">
+                                <p className="text-[14px] leading-relaxed text-muted-foreground">
                                     I can look through Misha&apos;s roles, projects, skills and papers — and chart them.
                                 </p>
                                 <div className="flex flex-wrap gap-2">
@@ -262,7 +303,7 @@ export function MLBot() {
                                             key={s}
                                             type="button"
                                             onClick={() => send(s)}
-                                            className="rounded-full border border-white/[0.1] bg-white/[0.04] px-3 py-1.5 text-[11px] text-muted-foreground transition-colors hover:border-white/20 hover:text-foreground"
+                                            className="rounded-full border border-white/[0.1] bg-white/[0.04] px-3 py-1.5 text-[12.5px] text-muted-foreground transition-colors hover:border-white/20 hover:text-foreground"
                                         >
                                             {s}
                                         </button>
@@ -272,15 +313,15 @@ export function MLBot() {
                         )}
 
                         {turns.map((turn, i) => (
-                            <div key={i} className={turn.role === "user" ? "flex justify-end" : "space-y-2"}>
+                            <div key={i} className={turn.role === "user" ? "mlbot-turn-in flex justify-end" : "mlbot-turn-in space-y-2"}>
                                 {turn.role === "user" ? (
-                                    <p className="max-w-[85%] rounded-2xl rounded-br-sm bg-white/[0.08] px-3 py-2 text-[13px] text-foreground">
+                                    <p className="max-w-[85%] rounded-2xl rounded-br-sm bg-white/[0.08] px-3.5 py-2.5 text-[14.5px] leading-[1.55] text-foreground">
                                         {turn.content}
                                     </p>
                                 ) : (
                                     <>
                                         {turn.tools?.map((name, j) => (
-                                            <p key={j} className="flex items-center gap-2 text-[11px] text-muted-foreground/70">
+                                            <p key={j} className="mlbot-tool-in flex items-center gap-2 text-[12px] text-muted-foreground/70">
                                                 <span className="mlbot-tick" aria-hidden />
                                                 {TOOL_LABELS[name] ?? name}
                                             </p>
@@ -294,14 +335,14 @@ export function MLBot() {
                                             seg.kind === "diagram" ? (
                                                 <BlogChart key={j} json={seg.json} className="my-2" />
                                             ) : (
-                                                <div key={j} className="mlbot-md text-[13px] leading-relaxed text-foreground/90">
+                                                <div key={j} className="mlbot-md text-[14.5px] leading-[1.65] text-foreground/90">
                                                     <ReactMarkdown remarkPlugins={[remarkGfm]}>{seg.value}</ReactMarkdown>
                                                 </div>
                                             ),
                                         )}
 
                                         {busy && i === turns.length - 1 && !turn.content && !turn.tools?.length && (
-                                            <p className="text-[12px] text-muted-foreground">Thinking…</p>
+                                            <ThinkingVerb />
                                         )}
 
                                         {!busy && turn.followups?.length ? (
@@ -311,7 +352,7 @@ export function MLBot() {
                                                         key={q}
                                                         type="button"
                                                         onClick={() => send(q)}
-                                                        className="rounded-full border border-white/[0.1] bg-white/[0.04] px-3 py-1.5 text-[11px] text-muted-foreground transition-colors hover:border-white/20 hover:text-foreground"
+                                                        className="rounded-full border border-white/[0.1] bg-white/[0.04] px-3 py-1.5 text-[12.5px] text-muted-foreground transition-colors hover:border-white/20 hover:text-foreground"
                                                     >
                                                         {q}
                                                     </button>

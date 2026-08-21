@@ -190,16 +190,14 @@ describe("MLBot model roster", () => {
      * Both cannot hold at once — OpenRouter currently ships no free Chinese
      * model with tool calling, so the free entries are necessarily other
      * vendors, chosen for clean (non-chain-of-thought) output. */
-    it("puts free tiers ahead of any paid model", () => {
+    it("is ordered fastest-first, with a free model kept as a net", () => {
         const ids = [...models.matchAll(/"([^"]+\/[^"]+)"/g)].map((m) => m[1])
         expect(ids.length).toBeGreaterThanOrEqual(2)
-        const lastFree = ids.map((i) => i.endsWith(":free")).lastIndexOf(true)
-        const firstPaid = ids.findIndex((i) => !i.endsWith(":free"))
-        expect(lastFree).toBeGreaterThanOrEqual(0)
-        expect(firstPaid).toBeGreaterThan(lastFree)
+        expect(ids[0]).toBe("inclusionai/ling-3.0-flash")
+        expect(ids.some((i) => i.endsWith(":free"))).toBe(true)
     })
 
-    it("keeps every paid fallback on Chinese open-weight models", () => {
+    it("keeps every paid model Chinese open-weight", () => {
         const ids = [...models.matchAll(/"([^"]+\/[^"]+)"/g)].map((m) => m[1])
         const paid = ids.filter((i) => !i.endsWith(":free"))
         expect(paid.length).toBeGreaterThan(0)

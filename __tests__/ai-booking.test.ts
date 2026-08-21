@@ -74,13 +74,21 @@ describe("no fabricated appointments", () => {
 describe("model cascade", () => {
     const route = read("app/api/chat/route.ts")
 
-    it("tries free tiers before any paid model", () => {
+    /* Ordered by measured latency, not price. Free models here are the slow
+     * ones and spend their budget on reasoning tokens before answering, so
+     * free-first made the panel feel broken. The paid leaders cost about
+     * $0.0001 per conversation, which makes "fast" and "cheap" the same pick;
+     * the free tier stays as a last-resort net if they all fail. */
+    it("leads with the fastest verified model", () => {
         const block = route.slice(route.indexOf("const MODELS"), route.indexOf("] as const"))
         const models = [...block.matchAll(/"([^"]+)"/g)].map((m) => m[1])
-        const firstPaid = models.findIndex((m) => !m.endsWith(":free"))
-        const lastFree = models.map((m) => m.endsWith(":free")).lastIndexOf(true)
-        expect(lastFree).toBeGreaterThanOrEqual(0)
-        expect(firstPaid).toBeGreaterThan(lastFree)
+        expect(models[0]).toBe("inclusionai/ling-3.0-flash")
+    })
+
+    it("keeps a free model in the cascade as a cost/outage net", () => {
+        const block = route.slice(route.indexOf("const MODELS"), route.indexOf("] as const"))
+        const models = [...block.matchAll(/"([^"]+)"/g)].map((m) => m[1])
+        expect(models.some((m) => m.endsWith(":free"))).toBe(true)
     })
 
     it("excludes the free models that stream chain-of-thought as content", () => {

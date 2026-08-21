@@ -19,22 +19,28 @@ export const maxDuration = 60
 /** Chinese open-weight models only, cheapest-with-tool-support first. Each
  *  fallback is a different lab, so one provider being down or rate-limited
  *  does not take the bot with it. */
-/* Free tiers carry normal traffic; paid models only catch what they drop, so
- * spend stays near zero in normal operation.
+/* Ordered by measured first-token latency against the live API, because the
+ * panel is a conversation and waiting reads as broken.
  *
- * Both free entries were checked against the live API for two things, not one:
- * tool calling AND clean output. Several otherwise-capable free models
- * (nemotron-3.5-lightning, nemotron-3-super-120b) stream their chain-of-thought
- * as ordinary content — "I need to follow the rules..." lands straight in the
- * user's panel — and they do it even with reasoning.exclude set, so they are
- * deliberately excluded. Verify both properties before adding a model here. */
+ *   ling-3.0-flash   0.77s   $0.021/M   ← primary
+ *   glm-4.7-flash    1.45s   $0.060/M
+ *   qwen3.7-flash    1.69s   $0.030/M
+ *   gpt-oss-20b:free 2.39s   free       ← last-resort net
+ *
+ * The free tier is last, not first: free models here are the slow ones, and
+ * they burn their budget on reasoning tokens before emitting any answer. The
+ * paid models are all Chinese open-weight and cost ~$0.0001 per conversation,
+ * so "cheapest" and "fastest" are effectively the same choice.
+ *
+ * Every entry is verified for BOTH tool calling and clean output. Models that
+ * stream chain-of-thought as ordinary content (nemotron-3.5-lightning,
+ * nemotron-3-super-120b) leak the system prompt into the panel and are
+ * excluded regardless of capability — reasoning.exclude does not stop them. */
 const MODELS = [
-    "openai/gpt-oss-20b:free",
-    "cohere/north-mini-code:free",
-    // Paid fallbacks, cheapest first.
+    "inclusionai/ling-3.0-flash",
     "z-ai/glm-4.7-flash",
-    "qwen/qwen3-30b-a3b-instruct-2507",
-    "deepseek/deepseek-v4-flash",
+    "qwen/qwen3.7-flash",
+    "openai/gpt-oss-20b:free",
 ] as const
 
 const LIMITS = {
