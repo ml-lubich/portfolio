@@ -9,6 +9,11 @@ import { statSets, STAT_ROTATE_INTERVAL, STAT_STAGGER_DELAY } from "./data"
 
 export function RotatingStats() {
   const isMobile = useIsMobile()
+  const rootRef = useRef<HTMLDivElement>(null)
+  /** The rotation fades every card to zero and back. Running that off-screen
+   *  means scrolling back up lands on a half-faded row of cards, which reads as
+   *  broken rather than animated — so the cycle only runs while it is in view. */
+  const [inView, setInView] = useState(false)
   const [setIndex, setSetIndex] = useState(0)
   const [prevSetIndex, setPrevSetIndex] = useState(-1)
   const [cardPhases, setCardPhases] = useState<("idle" | "exit" | "enter")[]>([
@@ -54,6 +59,18 @@ export function RotatingStats() {
   }, [setIndex])
 
   useEffect(() => {
+    const el = rootRef.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => setInView(entry.isIntersecting),
+      { threshold: 0.35 }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
+    if (!inView) return
     const startDelay = initialMount.current ? 8000 : STAT_ROTATE_INTERVAL
     initialMount.current = false
 
@@ -65,7 +82,7 @@ export function RotatingStats() {
     return () => {
       if (cycleRef.current) clearTimeout(cycleRef.current)
     }
-  }, [setIndex, triggerTransition])
+  }, [setIndex, triggerTransition, inView])
 
   const currentStats = statSets[setIndex]
 
@@ -95,6 +112,7 @@ export function RotatingStats() {
 
   return (
     <div
+      ref={rootRef}
       className="mx-auto mt-8 w-full max-w-2xl animate-fade-in-up-subtle pointer-events-auto"
       style={{ animationDelay: "0.45s" }}
     >
@@ -105,18 +123,20 @@ export function RotatingStats() {
         {currentStats.map((stat, i) => (
           <div
             key={`card-${i}`}
-            className={`group relative p-0 sm:overflow-hidden sm:rounded-2xl sm:border sm:border-white/20 sm:p-5 sm:glass-card-3d sm:hover:border-primary/40 sm:hover:shadow-2xl sm:hover:shadow-primary/20 sm:hover-lift sm:spotlight${i >= 2 ? " max-sm:hidden" : ""}`}
+            className={`group relative p-0 sm:overflow-hidden sm:rounded-2xl sm:border sm:border-[var(--line-strong)] sm:p-5 sm:glass-card-3d sm:hover:border-primary/40 sm:hover:shadow-2xl sm:hover:shadow-primary/20 sm:hover-lift sm:spotlight${i >= 2 ? " max-sm:hidden" : ""}`}
             style={{
               ...getCardStyle(cardPhases[i]),
               perspective: "600px",
               ...(isMobile
                 ? {}
                 : {
-                    background: "linear-gradient(135deg, hsla(220, 25%, 15%, 0.65) 0%, hsla(220, 25%, 10%, 0.45) 100%)",
+                    /* Themed: this used to hard-code a dark-glass gradient and a
+                       black shadow, which turned into grey-on-grey cards with
+                       unreadable numbers on the light page. */
+                    background: "var(--glass-fill)",
                     backdropFilter: "blur(28px) saturate(2.2) brightness(1.1)",
                     WebkitBackdropFilter: "blur(28px) saturate(2.2) brightness(1.1)",
-                    boxShadow:
-                      "0 12px 32px -8px hsla(0,0%,0%,0.5), inset 0 1px 0 0 hsla(0,0%,100%,0.22), inset 0 -1px 0 0 hsla(0,0%,0%,0.3)",
+                    boxShadow: "var(--glass-shadow)",
                   }),
             }}
           >

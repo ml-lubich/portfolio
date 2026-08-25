@@ -285,7 +285,7 @@ export function Projects() {
   const handleClose = useCallback(() => setSelectedId(null), [])
 
   return (
-    <section id="projects" className="relative scroll-mt-24 py-5 md:py-14 lg:py-20">
+    <section id="projects" className="relative scroll-mt-24 section-y">
       {/* Tier 2: the marquee — everything else I've shipped, breadth over depth */}
       {/* Background FX */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">

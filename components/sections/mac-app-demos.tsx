@@ -1,7 +1,8 @@
 "use client"
 
 /**
- * Shows the local-first Mac tools driving the apps they target.
+ * Shows the open-source agent tooling driving the surfaces it targets —
+ * Mac apps, a Bitbucket workspace, a Jenkins controller.
  *
  * The step advances on a timer, but only while the section is on screen —
  * an off-screen interval would keep React re-rendering a window nobody is
@@ -62,12 +63,20 @@ export function MacAppDemos() {
     const playing = inView && !still
 
     return (
-        <AnimatedSection id="mac-demos" className="relative py-12 md:py-20">
+        <AnimatedSection id="mac-demos" className="relative section-y">
             <div ref={sectionRef} className="relative mx-auto max-w-5xl px-3 md:px-6">
                 <SectionHeader
-                    label="Local-First Tooling"
-                    title={<>Agents driving <span className="gradient-text">real Mac apps</span></>}
-                    subtitle="Not a terminal transcript — the app state each command actually produced."
+                    label="Open Source"
+                    title={
+                        <>
+                            Building{" "}
+                            <span className="gradient-text underline decoration-[var(--accent-glow)] decoration-2 underline-offset-[0.18em]">
+                                open-source agents
+                            </span>{" "}
+                            that drive real work
+                        </>
+                    }
+                    subtitle="Not a terminal transcript — the app, repo and pipeline state each command actually produced."
                 />
 
                 {/* App switcher */}

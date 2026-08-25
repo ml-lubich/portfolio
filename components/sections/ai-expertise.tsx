@@ -411,7 +411,7 @@ function DomainArch() {
 
 export function AIExpertise() {
   return (
-    <AnimatedSection id="ai-expertise" className="relative py-6 md:py-14 lg:py-20">
+    <AnimatedSection id="ai-expertise" className="relative section-y">
       {/* Background effects */}
       <div className="absolute inset-0 dot-pattern opacity-30" aria-hidden="true" />
 

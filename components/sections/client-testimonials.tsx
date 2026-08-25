@@ -190,7 +190,7 @@ export function ClientTestimonials() {
   return (
     <AnimatedSection
       id="testimonials"
-      className="relative scroll-mt-28 px-3 py-8 pb-10 md:px-6 md:py-20 md:pb-24 lg:py-28 lg:pb-32"
+      className="relative scroll-mt-28 section-y px-3 md:px-6"
     >
       <div className="pointer-events-none absolute left-1/3 top-1/4 h-72 w-72 rounded-full bg-primary/[0.05] blur-[90px]" aria-hidden />
       <div className="pointer-events-none absolute bottom-1/4 right-1/4 h-64 w-64 rounded-full bg-accent/[0.05] blur-[80px]" aria-hidden />

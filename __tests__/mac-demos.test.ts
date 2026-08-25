@@ -10,9 +10,13 @@ const read = (p: string) => readFileSync(join(process.cwd(), p), "utf8")
  * activeRow points nowhere, quietly turns the section into a lie. */
 
 describe("mac demo data", () => {
-    it("covers the three Mac apps the tools target", () => {
-        expect(macDemos.map((d) => d.app)).toEqual(["Messages", "Mail", "Notes"])
-        expect(macDemos.map((d) => d.tool)).toEqual(["imsg", "imail", "inotes"])
+    it("covers every surface the open-source tools drive", () => {
+        expect(macDemos.map((d) => d.app)).toEqual([
+            "Messages", "Mail", "Notes", "WhatsApp", "Bitbucket", "Jenkins",
+        ])
+        expect(macDemos.map((d) => d.tool)).toEqual([
+            "imsg", "imail", "inotes", "wa", "bb", "jenkins-mcp",
+        ])
     })
 
     it("gives every demo steps and a repo link", () => {

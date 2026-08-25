@@ -100,7 +100,7 @@ export function OpenSourceShowcase() {
   }, [])
 
   return (
-    <section ref={sectionRef} id="open-source" className="relative scroll-mt-24 py-5 md:py-14 lg:py-20">
+    <section ref={sectionRef} id="open-source" className="relative scroll-mt-24 section-y">
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
         <div className="absolute left-1/4 top-20 h-[400px] w-[400px] rounded-full bg-primary/5 blur-[100px]" />
         <div className="absolute right-1/4 bottom-20 h-[400px] w-[400px] rounded-full bg-accent/5 blur-[100px]" />

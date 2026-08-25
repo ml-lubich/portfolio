@@ -400,7 +400,7 @@ export function GitHubStats() {
 
     if (loading) {
         return (
-            <AnimatedSection id="github" className="relative py-10 sm:py-14 overflow-hidden">
+            <AnimatedSection id="github" className="relative section-y overflow-hidden">
                 <div className="relative mx-auto max-w-7xl px-3 md:px-4 lg:px-6">
                     <div className="mb-10 text-center">
                         <div className="mx-auto h-4 w-32 animate-pulse rounded bg-muted" />
@@ -417,7 +417,7 @@ export function GitHubStats() {
 
     if (error) {
         return (
-            <AnimatedSection id="github" className="relative py-10 sm:py-14 overflow-hidden">
+            <AnimatedSection id="github" className="relative section-y overflow-hidden">
                 <div className="relative mx-auto max-w-7xl px-3 text-center md:px-4 lg:px-6">
                     <p className="text-muted-foreground text-sm">{error}</p>
                 </div>
@@ -437,7 +437,7 @@ export function GitHubStats() {
     ]
 
     return (
-        <AnimatedSection id="github" className="relative py-10 sm:py-14 overflow-hidden">
+        <AnimatedSection id="github" className="relative section-y overflow-hidden">
             {/* Background orbs */}
             <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
                 <div className="absolute -right-40 top-1/3 h-[500px] w-[500px] rounded-full bg-primary/8 blur-[100px] translucent-glow" />

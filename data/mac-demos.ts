@@ -271,4 +271,146 @@ export const macDemos: MacDemo[] = [
             },
         ],
     },
+    {
+        id: "wa-mcp",
+        app: "WhatsApp",
+        tool: "wa",
+        repoUrl: "https://github.com/ml-lubich/whatsapp-mcp",
+        tagline: "Ops CLI for the open-source WhatsApp MCP bridge — Go/whatsmeow under it.",
+        sidebarTitle: "Chats",
+        steps: [
+            {
+                command: "wa doctor",
+                caption: "Preflight on both daemons before an agent is allowed anywhere near a thread.",
+                activeRow: 0,
+                rows: [
+                    { title: "Priya Raman", preview: "can you send the invoice today?", meta: "09:12", unread: true },
+                    { title: "Site crew", preview: "materials landed", meta: "08:40" },
+                    { title: "Marco Silva", preview: "call at 4?", meta: "Tue" },
+                ],
+                detail: {
+                    title: "Diagnostics",
+                    subtitle: "wa doctor",
+                    body: [
+                        "bridge (Go/whatsmeow) — running",
+                        "WhatsApp session — authenticated",
+                        "MCP server — running",
+                        "local SQLite store — reachable",
+                    ],
+                },
+            },
+            {
+                command: 'wa send "Priya Raman" "invoice is in your inbox"',
+                caption: "The reply goes out over the bridge, so it lands as a real WhatsApp message.",
+                activeRow: 0,
+                rows: [
+                    { title: "Priya Raman", preview: "invoice is in your inbox", meta: "09:15" },
+                    { title: "Site crew", preview: "materials landed", meta: "08:40" },
+                    { title: "Marco Silva", preview: "call at 4?", meta: "Tue" },
+                ],
+                detail: {
+                    title: "Priya Raman",
+                    bubbles: [
+                        { from: "them", text: "can you send the invoice today?" },
+                        { from: "me", text: "invoice is in your inbox" },
+                    ],
+                },
+            },
+        ],
+    },
+    {
+        id: "bitbucket-cli",
+        app: "Bitbucket",
+        tool: "bb",
+        repoUrl: "https://github.com/ml-lubich/bitbucket-cli",
+        tagline: "gh-style Bitbucket CLI with a built-in read-only MCP server for agents.",
+        sidebarTitle: "Pull requests",
+        steps: [
+            {
+                command: "bb pr list --json",
+                caption: "Structured output first — an agent reads JSON, not a scraped web page.",
+                activeRow: 0,
+                rows: [
+                    { title: "#142 retry token refresh", preview: "fix · 2 approvals", meta: "OPEN", unread: true },
+                    { title: "#139 split ingest worker", preview: "feat · 1 approval", meta: "OPEN" },
+                    { title: "#137 bump pinned deps", preview: "chore · merged", meta: "DONE" },
+                ],
+                detail: {
+                    title: "#142 fix: retry token refresh",
+                    subtitle: "bb pr list --json",
+                    body: [
+                        '[{ "id": 142, "title": "fix: retry token refresh", "state": "OPEN" }]',
+                        "2 approvals · pipeline green · no merge conflicts",
+                    ],
+                },
+            },
+            {
+                command: "bb mcp serve",
+                caption: "The same surface, exposed read-only over MCP — agents can look, not touch.",
+                activeRow: 0,
+                rows: [
+                    { title: "#142 retry token refresh", preview: "fix · 2 approvals", meta: "OPEN" },
+                    { title: "#139 split ingest worker", preview: "feat · 1 approval", meta: "OPEN" },
+                    { title: "#137 bump pinned deps", preview: "chore · merged", meta: "DONE" },
+                ],
+                detail: {
+                    title: "MCP server",
+                    subtitle: "read-only, stdio transport",
+                    body: [
+                        "listening on stdio",
+                        "tools: whoami · repo · pr · issue · pipeline",
+                        "no write verbs registered — by design",
+                    ],
+                },
+            },
+        ],
+    },
+    {
+        id: "jenkins-mcp",
+        app: "Jenkins",
+        tool: "jenkins-mcp",
+        repoUrl: "https://github.com/ml-lubich/jenkins-mcp",
+        tagline: "Drive Jenkins from an agent: trigger builds, tail logs, manage nodes.",
+        sidebarTitle: "Jobs",
+        steps: [
+            {
+                command: "jenkins-mcp jenkins_list_jobs",
+                caption: "Job inventory in one call, so the agent picks a target instead of guessing.",
+                activeRow: 1,
+                rows: [
+                    { title: "api-service", preview: "last build #418 · green", meta: "12m" },
+                    { title: "ingest-worker", preview: "last build #96 · red", meta: "4m", unread: true },
+                    { title: "nightly-e2e", preview: "scheduled 02:00", meta: "8h" },
+                ],
+                detail: {
+                    title: "ingest-worker",
+                    subtitle: "3 jobs discovered",
+                    body: [
+                        "api-service — #418 SUCCESS",
+                        "ingest-worker — #96 FAILURE",
+                        "nightly-e2e — idle, next run 02:00",
+                    ],
+                },
+            },
+            {
+                command: "jenkins-mcp jenkins_build_log_tail --job ingest-worker",
+                caption: "Tails the failing build so the failure text lands in context, not a browser tab.",
+                activeRow: 1,
+                rows: [
+                    { title: "api-service", preview: "last build #418 · green", meta: "12m" },
+                    { title: "ingest-worker", preview: "last build #96 · red", meta: "4m" },
+                    { title: "nightly-e2e", preview: "scheduled 02:00", meta: "8h" },
+                ],
+                detail: {
+                    title: "ingest-worker #96",
+                    subtitle: "tail -n 40",
+                    body: [
+                        "pytest tests/test_backfill.py::test_resume — FAILED",
+                        "AssertionError: cursor advanced past the last acked offset",
+                        "Build step 'Execute shell' marked build as failure",
+                    ],
+                },
+            },
+        ],
+    },
 ]

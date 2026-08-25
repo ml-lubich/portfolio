@@ -33,6 +33,23 @@
     /* Hero washes — applied as inline styles, so they must be vars to theme. */
     --hero-overlay: linear-gradient(rgba(4,5,10,0.80), rgba(4,5,10,0.80)), radial-gradient(ellipse 60% 50% at 50% 45%, rgba(8,10,18,0.35) 0%, transparent 100%);
     --hero-scrim: radial-gradient(ellipse 48% 32% at 50% 40%, rgba(6,8,14,0.78) 0%, rgba(6,8,14,0.5) 52%, transparent 82%), linear-gradient(to bottom, rgba(6,8,14,0.44) 0%, rgba(6,8,14,0.42) 30%, rgba(6,8,14,0.28) 46%, rgba(6,8,14,0.10) 60%, transparent 76%);
+    /* Centre wash behind the hero copy — dims the dense mesh so the type on
+       top of it stays readable without shrinking the brain. */
+    --hero-stage-scrim: radial-gradient(ellipse 62% 56% at 50% 48%, rgba(5,6,12,0.92) 0%, rgba(5,6,12,0.66) 44%, rgba(5,6,12,0.18) 68%, transparent 80%), linear-gradient(to bottom, rgba(5,6,12,0.55) 0%, transparent 26%, transparent 62%, rgba(5,6,12,0.72) 100%);
+
+    /* Page-wide washes. These used to be hard-coded dark radials applied to
+       <body> and .page-texture regardless of theme, which is what smeared the
+       light page into flat grey — dark navy over near-white. */
+    --glass-fill: linear-gradient(135deg, hsla(220, 25%, 15%, 0.65) 0%, hsla(220, 25%, 10%, 0.45) 100%);
+    --glass-shadow: 0 12px 32px -8px hsla(0,0%,0%,0.5), inset 0 1px 0 0 hsla(0,0%,100%,0.22), inset 0 -1px 0 0 hsla(0,0%,0%,0.3);
+    --body-wash:
+      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(30, 41, 89, 0.25), transparent 70%),
+      radial-gradient(ellipse 60% 40% at 20% 40%, rgba(49, 28, 77, 0.18), transparent 70%),
+      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(20, 45, 70, 0.2), transparent 70%);
+    --page-wash:
+      radial-gradient(ellipse 95% 55% at 50% -12%, rgba(96, 124, 200, 0.16), transparent 66%),
+      radial-gradient(ellipse 60% 45% at 8% 26%, rgba(84, 52, 126, 0.13), transparent 72%),
+      radial-gradient(ellipse 60% 45% at 92% 74%, rgba(28, 78, 120, 0.14), transparent 72%);
 
     /* surfaces */
     --background: 220 20% 4%;
@@ -108,26 +125,47 @@
     --card-fill-hover: #ffffff;
     /* On a light page the shine must go DARKER than the base, or bold text
        dissolves into the card. */
-    --metal-mid: hsl(220 12% 46%);
-    --metal-hi: hsl(220 14% 58%);
+    --metal-mid: hsl(220 14% 34%);
+    --metal-hi: hsl(220 16% 47%);
     --surface-0: #ffffff;
     --surface-1: #f7f8fa;
     --surface-2: #eef1f5;
-    --line-soft: hsl(220 20% 10% / 0.12);
-    --line-strong: hsl(220 20% 10% / 0.22);
+    --line-soft: hsl(220 20% 10% / 0.16);
+    --line-strong: hsl(220 20% 10% / 0.30);
     --accent-glow: #2d84c6;
     --accent-glow-soft: #2d84c657;
+    /* Dark type on a pale mesh needs far less cover than white type on a
+       dense white one — at the dark theme's strength the brain ghosted out. */
+    --hero-stage-scrim: radial-gradient(ellipse 58% 52% at 50% 48%, rgba(250,251,253,0.74) 0%, rgba(250,251,253,0.46) 44%, rgba(250,251,253,0.14) 68%, transparent 80%), linear-gradient(to bottom, rgba(250,251,253,0.45) 0%, transparent 26%, transparent 62%, rgba(250,251,253,0.6) 100%);
 
-    --background: 220 20% 98%;
-    --foreground: 220 25% 12%;
+    /* Light: the same three pools, pitched pale and cool so the page keeps its
+       depth without going muddy. */
+    --body-wash:
+      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(96, 124, 200, 0.16), transparent 70%),
+      radial-gradient(ellipse 60% 40% at 20% 40%, rgba(126, 104, 178, 0.10), transparent 70%),
+      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(74, 140, 186, 0.12), transparent 70%);
+    --page-wash:
+      radial-gradient(ellipse 95% 55% at 50% -12%, rgba(96, 124, 200, 0.14), transparent 66%),
+      radial-gradient(ellipse 60% 45% at 8% 26%, rgba(126, 104, 178, 0.10), transparent 72%),
+      radial-gradient(ellipse 60% 45% at 92% 74%, rgba(74, 140, 186, 0.12), transparent 72%);
+    /* Glass surfaces on a light page: a translucent white fill with a real
+       border, instead of the dark-glass gradient the cards were hard-coding. */
+    --glass-fill: linear-gradient(135deg, hsla(0, 0%, 100%, 0.92) 0%, hsla(220, 30%, 97%, 0.78) 100%);
+    --glass-shadow: 0 12px 32px -12px hsla(220, 30%, 20%, 0.18), inset 0 1px 0 0 hsla(0, 0%, 100%, 0.9), inset 0 -1px 0 0 hsla(220, 20%, 60%, 0.16);
+
+    /* The page sits a touch below pure white so the white cards, inputs and
+       glass surfaces separate from it without every card needing its own
+       shadow. At 98% the whole page read as one flat sheet. */
+    --background: 220 22% 95.5%;
+    --foreground: 220 28% 11%;
     --card: 0 0% 100%;
     --card-foreground: 220 25% 12%;
     --popover: 0 0% 100%;
     --popover-foreground: 220 25% 12%;
-    --secondary: 220 16% 94%;
-    --secondary-foreground: 220 20% 25%;
-    --muted: 220 16% 94%;
-    --muted-foreground: 220 12% 42%;
+    --secondary: 220 18% 91%;
+    --secondary-foreground: 220 22% 22%;
+    --muted: 220 18% 91%;
+    --muted-foreground: 220 14% 36%;
 
     --primary: 220 25% 12%;
     --primary-foreground: 0 0% 100%;
@@ -136,8 +174,8 @@
 
     --destructive: 0 72% 48%;
     --destructive-foreground: 0 0% 100%;
-    --border: 220 16% 87%;
-    --input: 220 16% 87%;
+    --border: 220 18% 83%;
+    --input: 220 18% 83%;
     --ring: 220 25% 12%;
 
     /* Light hero: the same two washes inverted to pale, so the dark brain
@@ -167,10 +205,7 @@
 
   body {
     @apply bg-background text-foreground;
-    background-image: 
-      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(30, 41, 89, 0.25), transparent 70%),
-      radial-gradient(ellipse 60% 40% at 20% 40%, rgba(49, 28, 77, 0.18), transparent 70%),
-      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(20, 45, 70, 0.2), transparent 70%);
+    background-image: var(--body-wash);
     background-size: 100% 100%, 100% 100%, 100% 100%;
     background-attachment: fixed;
   }
@@ -194,12 +229,35 @@
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background-image:
-    radial-gradient(ellipse 95% 55% at 50% -12%, rgba(96, 124, 200, 0.16), transparent 66%),
-    radial-gradient(ellipse 60% 45% at 8% 26%, rgba(84, 52, 126, 0.13), transparent 72%),
-    radial-gradient(ellipse 60% 45% at 92% 74%, rgba(28, 78, 120, 0.14), transparent 72%);
+  background-image: var(--page-wash);
   background-size: 100% 100%;
   background-repeat: no-repeat;
+}
+
+/* ── Section rhythm ────────────────────────────────────────────
+ *  One vertical scale for every section. They were each carrying their own
+ *  padding recipe (py-5, py-6, py-9, py-10, py-12, py-16, and four different
+ *  responsive ramps), which is what made the page read as stitched together
+ *  rather than designed. Horizontal padding stays per-section — some sections
+ *  are full-bleed by design.
+ * ───────────────────────────────────────────────────────────── */
+.section-y {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}
+
+@media (min-width: 768px) {
+  .section-y {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .section-y {
+    padding-top: 6rem;
+    padding-bottom: 6rem;
+  }
 }
 
 /* ── Terminal cursor blink ──────────────────────────────────── */
@@ -685,16 +743,20 @@ body {
 /* Highlight text — metallic sheen (scroll-driven) */
 .gradient-text {
   font-weight: 700;
+  /* Themed metallic ramp. The bright stops used to be literal white, so every
+     `gradient-text` outside an AnimatedText rendered white-on-white on the
+     light page. They now ride the foreground token, which is the same ramp the
+     .animated-text-word variant below uses — one shimmer, both themes. */
   background-image: linear-gradient(120deg,
-      hsl(0 0% 100%) 0%,
-      hsl(220 20% 90%) 16%,
-      hsl(0 0% 100%) 28%,
-      hsl(220 15% 86%) 40%,
-      hsl(0 0% 100%) 52%,
-      hsl(220 20% 90%) 66%,
+      hsl(var(--foreground)) 0%,
+      var(--metal-mid) 16%,
+      hsl(var(--foreground)) 28%,
+      var(--metal-mid) 40%,
+      hsl(var(--foreground)) 52%,
+      var(--metal-mid) 66%,
       var(--metal-hi) 78%,
-      hsl(220 15% 86%) 90%,
-      hsl(0 0% 100%) 100%);
+      var(--metal-mid) 90%,
+      hsl(var(--foreground)) 100%);
   background-size: 250% 100%;
   -webkit-background-clip: text;
   background-clip: text;

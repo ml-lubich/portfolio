@@ -176,7 +176,7 @@ const highlights = [
 
 export function About() {
   return (
-    <AnimatedSection id="about" className="relative py-9 md:py-14 lg:py-20 overflow-hidden">
+    <AnimatedSection id="about" className="relative section-y overflow-hidden">
       {/* Ambient background orbs — constant, overlapping, smoothly drifting */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
         <div className="absolute right-1/4 top-1/4 h-[32rem] w-[32rem] rounded-full bg-primary/[0.06] blur-[80px] translucent-glow" style={{ animationDelay: "-3s" }} />

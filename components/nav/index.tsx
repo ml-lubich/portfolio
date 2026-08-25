@@ -3,6 +3,7 @@
 import { useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo } from "react"
 import { SiteLogoMark } from "@/components/site-logo-mark"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { LIGHT_MODE_ENABLED } from "@/lib/light-mode"
 import { Menu, X, ArrowRight, Zap, ChevronDown, ExternalLink, Gamepad2 } from "lucide-react"
 import { navLinks, liveTools, liveGames } from "./nav-links"
 import { wooshScrollTo, navigateTo } from "./woosh-scroll"
@@ -444,7 +445,7 @@ export function Navigation() {
             </a>
           </div>
 
-          <ThemeToggle className="ml-2 hidden xl:flex" />
+          {LIGHT_MODE_ENABLED && <ThemeToggle className="ml-2 hidden xl:flex" />}
 
           {/* Mobile toggle — min 48px touch target for accessibility */}
           <button

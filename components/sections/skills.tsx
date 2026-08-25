@@ -91,7 +91,7 @@ export function Skills() {
   return (
     <AnimatedSection
       id="skills"
-      className="relative scroll-mt-28 px-3 py-12 pb-16 md:px-6 md:py-20 md:pb-24 lg:py-28 lg:pb-32"
+      className="relative scroll-mt-28 section-y px-3 md:px-6"
     >
       {/* Ambient background orbs — constant, overlapping, smoothly drifting */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">

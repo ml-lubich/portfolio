@@ -32,7 +32,7 @@ function Cell({ value }: { value: MatrixValue }) {
 
 export function ToolMatrix() {
   return (
-    <section id="tool-matrix" className="relative px-4 py-16 md:px-8 md:py-24" aria-labelledby="tool-matrix-heading">
+    <section id="tool-matrix" className="relative section-y px-4 md:px-8" aria-labelledby="tool-matrix-heading">
       <div className="mx-auto max-w-6xl">
         <AnimatedSection>
           <SectionHeader

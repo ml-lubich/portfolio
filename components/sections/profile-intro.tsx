@@ -45,7 +45,7 @@ export function ProfileIntro() {
     }, [])
 
     return (
-        <section id="profile" className="relative py-12 sm:py-24 overflow-hidden">
+        <section id="profile" className="relative section-y overflow-hidden">
             <div className="mx-auto max-w-5xl px-3 md:px-6">
                 <AnimatedSection>
                     {/* Sleek 3D pannable holographic glass card container */}

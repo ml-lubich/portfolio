@@ -48,7 +48,7 @@ export const clientTestimonials: ClientTestimonial[] = [
             "Misha streamlined our service operations and customer tech workflows with fast, robust tooling. Technical execution was sharp, reliable, and delivered right on budget.",
         name: "Joseph Heupler",
         title: "Lead Customer Service Tech",
-        organization: "Biro",
+        organization: "Brio",
         rating: 5,
     },
     {
