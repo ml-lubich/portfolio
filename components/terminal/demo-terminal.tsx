@@ -54,7 +54,7 @@ function renderLine(line: Line, dl: DemoDisplayLine, blink: boolean) {
         </div>
       )
     case "hdr":
-      return <div key={dl.index} className="text-muted-foreground/35 italic text-xs mt-2 mb-1">{dl.text}</div>
+      return <div key={dl.index} className="text-muted-foreground/60 italic text-xs mt-2 mb-1">{dl.text}</div>
     case "gap":
       return <div key={dl.index} className="h-1" />
   }

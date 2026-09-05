@@ -38,7 +38,7 @@ function Bubble({ row, style }: { row: SimRow; style: React.CSSProperties }) {
                     {row.text}
                 </p>
                 {row.meta && (
-                    <p className={`mt-0.5 px-1 font-mono text-[9px] text-muted-foreground/40 ${outbound ? "text-right" : ""}`}>
+                    <p className={`mt-0.5 px-1 font-mono text-[9px] text-muted-foreground/60 ${outbound ? "text-right" : ""}`}>
                         {row.meta}
                     </p>
                 )}
@@ -78,7 +78,7 @@ export function OssDemoSim({ sim, active }: { sim: OssSim; active?: boolean }) {
             <div className="flex flex-wrap items-center gap-1.5 border-b border-white/[0.06] px-3 py-2">
                 {sim.flow.map((stage, i) => (
                     <span key={stage} className="flex items-center gap-1.5">
-                        {i > 0 && <span className="font-mono text-[9px] text-muted-foreground/30">→</span>}
+                        {i > 0 && <span className="font-mono text-[9px] text-muted-foreground/60">→</span>}
                         <span
                             className="oss-sim-row rounded-md border border-white/[0.08] bg-white/[0.04] px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wider text-muted-foreground/70"
                             style={delay(i, 0)}
@@ -91,7 +91,7 @@ export function OssDemoSim({ sim, active }: { sim: OssSim; active?: boolean }) {
 
             {/* ── The app window ── */}
             <div className="border-b border-white/[0.06] px-3 py-1.5">
-                <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground/45">{sim.app}</p>
+                <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground/60">{sim.app}</p>
             </div>
 
             <div className={`space-y-2 p-3 ${isChat ? "" : "space-y-1.5"}`}>

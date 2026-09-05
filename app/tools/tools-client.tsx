@@ -98,7 +98,7 @@ function TabButton({ label, Icon, active, onClick }: { label: string; Icon: Luci
     <button
       type="button"
       onClick={onClick}
-      className={["flex items-center gap-2 rounded-xl px-4 py-2 text-sm transition-all", active ? "bg-white text-black" : "text-muted-foreground hover:text-foreground"].join(" ")}
+      className={["flex items-center gap-2 rounded-xl px-4 py-2 text-sm transition-all", active ? "bg-white text-background" : "text-muted-foreground hover:text-foreground"].join(" ")}
     >
       <Icon className="h-4 w-4" />
       {label}
@@ -188,11 +188,11 @@ function PromptEditor({ prompt, setPrompt, loading, runCritique }: { prompt: str
       <textarea
         value={prompt}
         onChange={e => setPrompt(e.target.value)}
-        className="min-h-[240px] w-full resize-y rounded-2xl border border-white/[0.10] bg-black/40 p-4 font-mono text-sm leading-6 text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] outline-none transition-all duration-300 placeholder:text-muted-foreground/35 focus:border-primary/50 focus:shadow-[0_0_0_3px_rgba(255,255,255,0.04),inset_0_1px_0_rgba(255,255,255,0.08)]"
+        className="min-h-[240px] w-full resize-y rounded-2xl border border-white/[0.10] bg-black/40 p-4 font-mono text-sm leading-6 text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] outline-none transition-all duration-300 placeholder:text-muted-foreground/60 focus:border-primary/50 focus:shadow-[0_0_0_3px_rgba(255,255,255,0.04),inset_0_1px_0_rgba(255,255,255,0.08)]"
         placeholder="Paste a system prompt or instruction block..."
       />
       <div className="mt-3 grid gap-3 sm:grid-cols-[auto_1fr] sm:items-center">
-      <button type="button" onClick={runCritique} disabled={loading} className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-black transition duration-300 hover:-translate-y-0.5 hover:bg-white/90 disabled:opacity-60">
+      <button type="button" onClick={runCritique} disabled={loading} className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-background transition duration-300 hover:-translate-y-0.5 hover:bg-white/90 disabled:opacity-60">
         {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Bot className="h-4 w-4" />}
         Run optional AI critique
       </button>

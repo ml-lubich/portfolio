@@ -208,7 +208,7 @@ export function OssDemoCard({ demo, active = true, onExplore }: OssDemoCardProps
                 aria-label={`Copy install command: ${demo.install}`}
                 className="inline-flex items-center gap-1.5 rounded-lg border border-white/[0.10] bg-black/25 px-2.5 py-1 font-mono text-[11px] text-muted-foreground/70 transition-colors hover:border-primary/40 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary/60"
               >
-                {copied ? <Check className="h-3 w-3 text-emerald-400" aria-hidden /> : <Copy className="h-3 w-3" aria-hidden />}
+                {copied ? <Check className="h-3 w-3 text-emerald-700 dark:text-emerald-400" aria-hidden /> : <Copy className="h-3 w-3" aria-hidden />}
                 {copied ? "Copied" : demo.install}
               </button>
             )}
@@ -234,7 +234,7 @@ export function OssDemoCard({ demo, active = true, onExplore }: OssDemoCardProps
               <span className="h-2.5 w-2.5 rounded-full" style={{ background: terminalChrome.dotClose }} />
               <span className="h-2.5 w-2.5 rounded-full" style={{ background: terminalChrome.dotMinimize }} />
               <span className="h-2.5 w-2.5 rounded-full" style={{ background: terminalChrome.dotExpand }} />
-              <span className="ml-2 truncate font-mono text-[10px] text-muted-foreground/40">
+              <span className="ml-2 truncate font-mono text-[10px] text-muted-foreground/60">
                 {demo.id}
               </span>
             </div>

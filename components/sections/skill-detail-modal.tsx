@@ -216,7 +216,7 @@ export function SkillDetailModal({ skill, open, onOpenChange }: SkillDetailModal
                             {/* Experiences */}
                             {usage.items.filter((i) => i.kind === "experience").length > 0 && (
                                 <div>
-                                    <p className="mb-2 text-[11px] font-bold uppercase tracking-widest text-muted-foreground/40">
+                                    <p className="mb-2 text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">
                                         Where I&apos;ve used this
                                     </p>
                                     <div className="space-y-2">
@@ -236,7 +236,7 @@ export function SkillDetailModal({ skill, open, onOpenChange }: SkillDetailModal
                             {/* Projects */}
                             {usage.items.filter((i) => i.kind === "project").length > 0 && (
                                 <div>
-                                    <p className="mb-2 mt-4 text-[11px] font-bold uppercase tracking-widest text-muted-foreground/40">
+                                    <p className="mb-2 mt-4 text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">
                                         Projects built with this
                                     </p>
                                     <div className="space-y-2">
@@ -256,7 +256,7 @@ export function SkillDetailModal({ skill, open, onOpenChange }: SkillDetailModal
                             {/* Publications */}
                             {usage.items.filter((i) => i.kind === "publication").length > 0 && (
                                 <div>
-                                    <p className="mb-2 mt-4 text-[11px] font-bold uppercase tracking-widest text-muted-foreground/40">
+                                    <p className="mb-2 mt-4 text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">
                                         Research &amp; publications
                                     </p>
                                     <div className="space-y-2">
@@ -278,7 +278,7 @@ export function SkillDetailModal({ skill, open, onOpenChange }: SkillDetailModal
 
                 {/* ── Footer ──────────────────────────────────────────────── */}
                 <div className="border-t border-white/[0.04] bg-white/[0.01] px-6 py-3">
-                    <p className="text-center text-[10px] text-muted-foreground/40">
+                    <p className="text-center text-[10px] text-muted-foreground/60">
                         Click any card to navigate &middot; {usage.items.length} connection{usage.items.length !== 1 ? "s" : ""} found
                     </p>
                 </div>

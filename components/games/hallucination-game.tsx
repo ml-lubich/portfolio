@@ -73,7 +73,7 @@ function IdleOverlay({ onStart }: { onStart: () => void }) {
       >
         [ START ]
       </button>
-      <p className="text-[10px] text-muted-foreground/40 mt-3">or press Enter</p>
+      <p className="text-[10px] text-muted-foreground/60 mt-3">or press Enter</p>
     </div>
   )
 }
@@ -94,7 +94,7 @@ function EndOverlay({ won, score, onRestart }: { won: boolean; score: number; on
       >
         [ PLAY AGAIN ]
       </button>
-      <p className="text-[10px] text-muted-foreground/40 mt-3">or press Enter</p>
+      <p className="text-[10px] text-muted-foreground/60 mt-3">or press Enter</p>
     </div>
   )
 }
@@ -109,7 +109,7 @@ function PauseOverlay({ onResume }: { onResume: () => void }) {
       >
         [ RESUME ]
       </button>
-      <p className="text-[10px] text-muted-foreground/40 mt-3">or press P</p>
+      <p className="text-[10px] text-muted-foreground/60 mt-3">or press P</p>
     </div>
   )
 }

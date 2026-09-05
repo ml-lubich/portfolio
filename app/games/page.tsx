@@ -64,7 +64,7 @@ export default function GamesPage() {
             <div className="flex items-center gap-2 text-xs text-muted-foreground/60">
               <span className="rounded-full border border-white/[0.08] px-2 py-0.5">Space Invaders</span>
               <span className="rounded-full border border-white/[0.08] px-2 py-0.5">LLM Theme</span>
-              <ArrowRight className="ml-auto h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 text-muted-foreground/40 group-hover:text-violet-400" />
+              <ArrowRight className="ml-auto h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 text-muted-foreground/60 group-hover:text-violet-400" />
             </div>
           </Link>
 
@@ -96,7 +96,7 @@ export default function GamesPage() {
             <div className="flex items-center gap-2 text-xs text-muted-foreground/60">
               <span className="rounded-full border border-white/[0.08] px-2 py-0.5">Classic</span>
               <span className="rounded-full border border-white/[0.08] px-2 py-0.5">Terminal</span>
-              <ArrowRight className="ml-auto h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 text-muted-foreground/40 group-hover:text-emerald-400" />
+              <ArrowRight className="ml-auto h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 text-muted-foreground/60 group-hover:text-emerald-400" />
             </div>
           </Link>
 
@@ -128,7 +128,7 @@ export default function GamesPage() {
             <div className="flex items-center gap-2 text-xs text-muted-foreground/60">
               <span className="rounded-full border border-white/[0.08] px-2 py-0.5">Tetris</span>
               <span className="rounded-full border border-white/[0.08] px-2 py-0.5">LLM Theme</span>
-              <ArrowRight className="ml-auto h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 text-muted-foreground/40 group-hover:text-cyan-400" />
+              <ArrowRight className="ml-auto h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 text-muted-foreground/60 group-hover:text-cyan-400" />
             </div>
           </Link>
 
@@ -160,7 +160,7 @@ export default function GamesPage() {
             <div className="flex items-center gap-2 text-xs text-muted-foreground/60">
               <span className="rounded-full border border-white/[0.08] px-2 py-0.5">Click game</span>
               <span className="rounded-full border border-white/[0.08] px-2 py-0.5">Wave-based</span>
-              <ArrowRight className="ml-auto h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 text-muted-foreground/40 group-hover:text-yellow-400" />
+              <ArrowRight className="ml-auto h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 text-muted-foreground/60 group-hover:text-yellow-400" />
             </div>
           </Link>
 
@@ -192,7 +192,7 @@ export default function GamesPage() {
             <div className="flex items-center gap-2 text-xs text-muted-foreground/60">
               <span className="rounded-full border border-white/[0.08] px-2 py-0.5">Runner</span>
               <span className="rounded-full border border-white/[0.08] px-2 py-0.5">Endless</span>
-              <ArrowRight className="ml-auto h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 text-muted-foreground/40 group-hover:text-orange-400" />
+              <ArrowRight className="ml-auto h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 text-muted-foreground/60 group-hover:text-orange-400" />
             </div>
           </Link>
         </div>

@@ -221,7 +221,7 @@ interface MetricProps {
 function Metric({ label, value }: MetricProps) {
   return (
     <div className="rounded-md border border-white/[0.08] bg-white/[0.035] px-2 py-2 font-mono">
-      <div className="text-[9px] text-muted-foreground/40">{label}</div>
+      <div className="text-[9px] text-muted-foreground/60">{label}</div>
       <div className="text-sm text-foreground/80">{value}</div>
     </div>
   )

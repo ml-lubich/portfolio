@@ -257,10 +257,10 @@ export function TechOrbit() {
           className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-center"
           aria-hidden="true"
         >
-          <div className="font-display text-xs uppercase tracking-[0.3em] text-muted-foreground/40">
+          <div className="font-display text-xs uppercase tracking-[0.3em] text-muted-foreground/60">
             AI / ML
           </div>
-          <div className="font-display text-sm uppercase tracking-[0.3em] text-muted-foreground/30">
+          <div className="font-display text-sm uppercase tracking-[0.3em] text-muted-foreground/60">
             Stack
           </div>
         </div>

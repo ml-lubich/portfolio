@@ -257,7 +257,7 @@ export function BlogCard({
                 </button>
               ))}
               {post.tags.length > 3 && (
-                <span className="px-1 text-[10px] text-muted-foreground/40">+{post.tags.length - 3}</span>
+                <span className="px-1 text-[10px] text-muted-foreground/60">+{post.tags.length - 3}</span>
               )}
             </div>
 

@@ -194,7 +194,7 @@ function CalcField({
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-2 font-mono text-sm text-foreground placeholder:text-muted-foreground/40 focus:border-primary/40 focus:outline-none transition-colors"
+        className="w-full rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-2 font-mono text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-primary/40 focus:outline-none transition-colors"
       />
     </div>
   )
@@ -240,13 +240,13 @@ const ROW_GAP     = "gap-2 sm:gap-3"
 function TableHeader({ showCalcCol }: { showCalcCol: boolean }) {
   return (
     <div className={`flex items-center ${ROW_GAP} border-b border-white/[0.06] px-4 py-2 sm:px-6`}>
-      <span className={`${COL_RANK} text-right font-mono text-[10px] uppercase tracking-widest text-muted-foreground/30`}>#</span>
-      <span className={`${COL_VENDOR} text-[10px] uppercase tracking-widest text-muted-foreground/30`}>Vendor</span>
-      <span className="flex-1 text-[10px] uppercase tracking-widest text-muted-foreground/30">Model</span>
-      <span className={`${COL_INPUT} text-right text-[10px] uppercase tracking-widest text-muted-foreground/30`}>
-        Input <span className="text-muted-foreground/20 hidden sm:inline">(Cached)</span>
+      <span className={`${COL_RANK} text-right font-mono text-[10px] uppercase tracking-widest text-muted-foreground/60`}>#</span>
+      <span className={`${COL_VENDOR} text-[10px] uppercase tracking-widest text-muted-foreground/60`}>Vendor</span>
+      <span className="flex-1 text-[10px] uppercase tracking-widest text-muted-foreground/60">Model</span>
+      <span className={`${COL_INPUT} text-right text-[10px] uppercase tracking-widest text-muted-foreground/60`}>
+        Input <span className="text-muted-foreground/60 hidden sm:inline">(Cached)</span>
       </span>
-      <span className={`${COL_OUTPUT} text-right text-[10px] uppercase tracking-widest text-muted-foreground/30`}>Output</span>
+      <span className={`${COL_OUTPUT} text-right text-[10px] uppercase tracking-widest text-muted-foreground/60`}>Output</span>
       {showCalcCol && (
         <span className={`${COL_CALC} text-right text-[10px] uppercase tracking-widest text-primary/60`}>Est. Cost</span>
       )}
@@ -283,7 +283,7 @@ function ModelRow({ entry, calc, showCalcCol, index }: RowProps) {
       />
 
       {/* Rank */}
-      <span className={`${COL_RANK} text-right font-mono text-[11px] text-muted-foreground/30`}>
+      <span className={`${COL_RANK} text-right font-mono text-[11px] text-muted-foreground/60`}>
         {index + 1}
       </span>
 
@@ -306,7 +306,7 @@ function ModelRow({ entry, calc, showCalcCol, index }: RowProps) {
       <div className={`${COL_INPUT} text-right`}>
         <span className="font-mono text-sm text-foreground/80">{fmtPrice(entry.input)}</span>
         {entry.input_cached !== null && (
-          <span className="hidden font-mono text-[11px] text-muted-foreground/45 sm:block">
+          <span className="hidden font-mono text-[11px] text-muted-foreground/60 sm:block">
             {fmtPrice(entry.input_cached)} cached
           </span>
         )}
@@ -366,7 +366,7 @@ function ControlBar({
               value={search}
               onChange={e => onSearch(e.target.value)}
               placeholder="Search models..."
-              className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] py-2 pl-9 pr-9 text-sm text-foreground placeholder:text-muted-foreground/40 focus:border-primary/30 focus:outline-none transition-colors"
+              className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] py-2 pl-9 pr-9 text-sm text-foreground placeholder:text-muted-foreground/60 focus:border-primary/30 focus:outline-none transition-colors"
             />
             {search && (
               <button
@@ -428,7 +428,7 @@ function ControlBar({
               </button>
             ))}
           </div>
-          <span className="shrink-0 font-mono text-[11px] text-muted-foreground/40">
+          <span className="shrink-0 font-mono text-[11px] text-muted-foreground/60">
             {count === total ? `${total} models` : `${count} / ${total}`}
           </span>
         </div>
@@ -580,7 +580,7 @@ export function LlmPricesClient({ data }: { data: PricesData | null }) {
         <PageNav />
         <div className="flex min-h-screen items-center justify-center">
           <div className="text-center">
-            <RefreshCw className="mx-auto mb-3 h-8 w-8 animate-spin text-muted-foreground/40" />
+            <RefreshCw className="mx-auto mb-3 h-8 w-8 animate-spin text-muted-foreground/60" />
             <p className="text-sm text-muted-foreground">Loading pricing data…</p>
           </div>
         </div>
@@ -628,7 +628,7 @@ export function LlmPricesClient({ data }: { data: PricesData | null }) {
           <TableHeader showCalcCol={showCalcCol} />
           {filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center gap-2 py-16 text-center">
-              <Search className="h-8 w-8 text-muted-foreground/20" />
+              <Search className="h-8 w-8 text-muted-foreground/60" />
               <p className="text-sm text-muted-foreground/50">No models match your search.</p>
               <button
                 type="button"
@@ -644,7 +644,7 @@ export function LlmPricesClient({ data }: { data: PricesData | null }) {
             ))
           )}
           <div className="border-t border-white/[0.04] px-4 py-3 sm:px-6">
-            <p className="text-[11px] text-muted-foreground/35">
+            <p className="text-[11px] text-muted-foreground/60">
               Prices per million tokens (USD). Cached input price shown below where available.
               Token counts differ by model — estimates only.
             </p>

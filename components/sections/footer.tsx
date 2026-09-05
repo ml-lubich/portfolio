@@ -42,18 +42,18 @@ export function Footer() {
                   <span className="block text-sm font-medium tracking-[-0.01em] text-white">
                     Misha Lubich
                   </span>
-                  <span className="mt-0.5 block text-xs text-white/45">
+                  <span className="mt-0.5 block text-xs text-white/70">
                     AI Engineer &amp; Technical Leader
                   </span>
                 </span>
               </Link>
-              <p className="mt-4 max-w-xs text-xs leading-5 text-white/40">
+              <p className="mt-4 max-w-xs text-xs leading-5 text-white/70">
                 Building thoughtful AI systems and the teams that bring them to life.
               </p>
             </div>
 
             <nav aria-label="Footer navigation">
-              <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.2em] text-white/35">
+              <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.2em] text-white/65">
                 Explore
               </p>
               <ul className="grid grid-cols-2 gap-x-7 gap-y-1 sm:grid-cols-4 lg:grid-cols-3">
@@ -61,7 +61,7 @@ export function Footer() {
                   <li key={href}>
                     <Link
                       href={href}
-                      className="group/link inline-flex min-h-9 items-center gap-1.5 text-xs text-white/50 outline-none transition-colors hover:text-white focus-visible:text-white"
+                      className="group/link inline-flex min-h-9 items-center gap-1.5 text-xs text-white/72 outline-none transition-colors hover:text-white focus-visible:text-white"
                     >
                       <span>{label}</span>
                       <span
@@ -75,7 +75,7 @@ export function Footer() {
             </nav>
 
             <nav aria-label="Social links">
-              <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.2em] text-white/35">
+              <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.2em] text-white/65">
                 Elsewhere
               </p>
               <div className="flex flex-wrap gap-2">
@@ -96,7 +96,7 @@ export function Footer() {
             </nav>
           </div>
 
-          <div className="relative z-10 mt-7 flex flex-col gap-3 border-t border-white/[0.07] pt-5 text-[11px] text-white/35 sm:flex-row sm:items-center sm:justify-between">
+          <div className="relative z-10 mt-7 flex flex-col gap-3 border-t border-white/[0.07] pt-5 text-[11px] text-white/65 sm:flex-row sm:items-center sm:justify-between">
             <p>© {new Date().getFullYear()} Misha Lubich. All rights reserved.</p>
 
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
@@ -108,7 +108,7 @@ export function Footer() {
               </Link>
               <a
                 href="mailto:michaelle.lubich@gmail.com"
-                className="group/mail inline-flex items-center gap-1.5 text-white/50 transition-colors hover:text-white focus-visible:text-white"
+                className="group/mail inline-flex items-center gap-1.5 text-white/72 transition-colors hover:text-white focus-visible:text-white"
               >
                 Start a conversation
                 <ArrowUpRight className="h-3 w-3 transition-transform duration-300 group-hover/mail:-translate-y-0.5 group-hover/mail:translate-x-0.5" />

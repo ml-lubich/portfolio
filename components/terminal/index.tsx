@@ -201,7 +201,7 @@ export function LiveTerminal() {
       case "code":
         return (
           <div className="flex items-start min-h-[1.35em]">
-            <span className="text-muted-foreground/25 select-none w-5 text-right mr-2 text-[11px] leading-relaxed shrink-0">{dl.li}</span>
+            <span className="text-muted-foreground/60 select-none w-5 text-right mr-2 text-[11px] leading-relaxed shrink-0">{dl.li}</span>
             <pre className="m-0 flex-1 min-w-0 overflow-visible whitespace-pre-wrap break-words [tab-size:4] font-mono leading-relaxed text-foreground/80">
               <code className="font-mono">
                 {dl.done ? highlight(dl.text) : <>{dl.text}{blink && <span className="animate-[terminal-blink_1s_step-end_infinite] text-emerald-400">▊</span>}</>}
@@ -210,7 +210,7 @@ export function LiveTerminal() {
           </div>
         )
       case "hdr":
-        return <div className="text-muted-foreground/35 italic text-xs mt-2 mb-1">{dl.text}</div>
+        return <div className="text-muted-foreground/60 italic text-xs mt-2 mb-1">{dl.text}</div>
       case "gap":
         return <div className="h-1" />
       default:
@@ -316,8 +316,8 @@ export function LiveTerminal() {
               </div>
               <div className="flex items-center gap-3 text-[11px] shrink-0">
                 <div className="flex items-center gap-1">
-                  <Zap className="w-3 h-3 text-yellow-400/60" />
-                  <span className="font-mono text-yellow-400/60">{wpm} WPM</span>
+                  <Zap className="w-3 h-3 text-yellow-700 dark:text-yellow-400/60" />
+                  <span className="font-mono text-yellow-700 dark:text-yellow-400/60">{wpm} WPM</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Activity className="w-3 h-3 text-primary/40" />
@@ -325,7 +325,7 @@ export function LiveTerminal() {
                 </div>
                 <div className="flex items-center gap-1">
                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="text-emerald-400/60 font-mono">LIVE</span>
+                  <span className="text-emerald-700 dark:text-emerald-400/60 font-mono">LIVE</span>
                 </div>
               </div>
             </div>
@@ -343,8 +343,8 @@ export function LiveTerminal() {
               </div>
               <div className="flex items-center gap-3 mt-1.5 ml-[calc(3*0.625rem+0.375rem+0.5rem)] text-[10px]">
                 <div className="flex items-center gap-1">
-                  <Zap className="w-3 h-3 text-yellow-400/60" />
-                  <span className="font-mono text-yellow-400/60">{wpm} WPM</span>
+                  <Zap className="w-3 h-3 text-yellow-700 dark:text-yellow-400/60" />
+                  <span className="font-mono text-yellow-700 dark:text-yellow-400/60">{wpm} WPM</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Activity className="w-3 h-3 text-primary/40" />
@@ -352,7 +352,7 @@ export function LiveTerminal() {
                 </div>
                 <div className="flex items-center gap-1">
                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="text-emerald-400/60 font-mono">LIVE</span>
+                  <span className="text-emerald-700 dark:text-emerald-400/60 font-mono">LIVE</span>
                 </div>
               </div>
             </div>
@@ -369,7 +369,7 @@ export function LiveTerminal() {
                 {isSnakeMode ? "snake --play" : isShellMode ? "interactive shell" : `${cur?.time} — ${cur?.label}`}
               </span>
             </div>
-            <span className="text-[10px] font-mono text-muted-foreground/25 shrink-0">
+            <span className="text-[10px] font-mono text-muted-foreground/60 shrink-0">
               {isSnakeMode ? "keyboard ready" : isShellMode ? "bash — 80×24" : `${linesCount} lines`}
             </span>
           </div>
@@ -386,7 +386,7 @@ export function LiveTerminal() {
             ) : (
               <>
                 {lines.length === 0 && visible && (
-                  <div className="text-muted-foreground/20 animate-pulse flex items-center gap-2">
+                  <div className="text-muted-foreground/60 animate-pulse flex items-center gap-2">
                     <Play className="w-3 h-3" /> Loading session...
                   </div>
                 )}
@@ -400,7 +400,7 @@ export function LiveTerminal() {
           </div>
 
           {/* Footer */}
-          <div className={`px-2.5 sm:px-4 py-1 bg-[${terminalChrome.footerBg}] border-t border-white/[0.04] flex items-center justify-between text-[10px] font-mono text-muted-foreground/25`}>
+          <div className={`px-2.5 sm:px-4 py-1 bg-[${terminalChrome.footerBg}] border-t border-white/[0.04] flex items-center justify-between text-[10px] font-mono text-muted-foreground/60`}>
             <span>SESSION {activeSession + 1}/{S.length}</span>
             <span>{isSnakeMode ? "snake — local" : isShellMode ? "bash — 80×24" : "zsh — 80×24"}</span>
           </div>
