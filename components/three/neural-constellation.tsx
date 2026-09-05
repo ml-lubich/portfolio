@@ -128,8 +128,6 @@ interface SceneProps {
 
 function ConstellationScene({ values, onHover }: SceneProps) {
   const groupRef = useRef<THREE.Group>(null!)
-  const nodeGeoRef = useRef<THREE.BufferGeometry>(null!)
-  const signalGeoRef = useRef<THREE.BufferGeometry>(null!)
 
   const nodeCount = PLACEMENTS.length
   const coreIndex = nodeCount
@@ -268,23 +266,27 @@ function ConstellationScene({ values, onHover }: SceneProps) {
   const nodeMaterial = useMemo(() => makeGlowMaterial(), [])
   const signalMaterial = useMemo(() => makeGlowMaterial(), [])
 
-  /* ── Attach dynamic attributes once ────────────────────────────────── */
-  useEffect(() => {
-    const g = nodeGeoRef.current
-    if (!g) return
+  /* ── Node/signal geometries ──────────────────────────────────────────
+   * Attributes are attached synchronously here (useMemo), not via a
+   * ref + useEffect: R3F's useFrame loop can tick before a passive effect
+   * flushes, so an effect-attached attribute can still be undefined on an
+   * early frame (see components/brain/neural-orbs.tsx for the same fix). */
+  const nodeGeo = useMemo(() => {
+    const g = new THREE.BufferGeometry()
     g.setAttribute("position", new THREE.BufferAttribute(nodePositions, 3))
     g.setAttribute("size", new THREE.BufferAttribute(nodeSizes, 1))
     g.setAttribute("aColor", new THREE.BufferAttribute(nodeColors, 3))
     g.setAttribute("aGlow", new THREE.BufferAttribute(nodeGlows, 1))
+    return g
   }, [nodePositions, nodeSizes, nodeColors, nodeGlows])
 
-  useEffect(() => {
-    const g = signalGeoRef.current
-    if (!g) return
+  const signalGeo = useMemo(() => {
+    const g = new THREE.BufferGeometry()
     g.setAttribute("position", new THREE.BufferAttribute(signalPositions, 3))
     g.setAttribute("size", new THREE.BufferAttribute(signalSizes, 1))
     g.setAttribute("aColor", new THREE.BufferAttribute(signalColors, 3))
     g.setAttribute("aGlow", new THREE.BufferAttribute(signalGlows, 1))
+    return g
   }, [signalPositions, signalSizes, signalColors, signalGlows])
 
   const { pointer } = useThree()
@@ -332,17 +334,17 @@ function ConstellationScene({ values, onHover }: SceneProps) {
     nodeMaterial.uniforms.uTime.value = t
     signalMaterial.uniforms.uTime.value = t
 
-    const ng = nodeGeoRef.current
-    if (ng) {
-      ;(ng.getAttribute("size") as THREE.BufferAttribute).needsUpdate = true
-      ;(ng.getAttribute("aGlow") as THREE.BufferAttribute).needsUpdate = true
-    }
-    const sg = signalGeoRef.current
-    if (sg) {
-      ;(sg.getAttribute("position") as THREE.BufferAttribute).needsUpdate = true
-      ;(sg.getAttribute("size") as THREE.BufferAttribute).needsUpdate = true
-      ;(sg.getAttribute("aGlow") as THREE.BufferAttribute).needsUpdate = true
-    }
+    const nSize = nodeGeo.getAttribute("size") as THREE.BufferAttribute
+    const nGlow = nodeGeo.getAttribute("aGlow") as THREE.BufferAttribute
+    if (nSize) nSize.needsUpdate = true
+    if (nGlow) nGlow.needsUpdate = true
+
+    const sPos = signalGeo.getAttribute("position") as THREE.BufferAttribute
+    const sSize = signalGeo.getAttribute("size") as THREE.BufferAttribute
+    const sGlow = signalGeo.getAttribute("aGlow") as THREE.BufferAttribute
+    if (sPos) sPos.needsUpdate = true
+    if (sSize) sSize.needsUpdate = true
+    if (sGlow) sGlow.needsUpdate = true
   })
 
   const setHover = (i: number | null) => {
@@ -359,14 +361,10 @@ function ConstellationScene({ values, onHover }: SceneProps) {
       <lineSegments geometry={lineGeo} material={lineMaterial} />
 
       {/* streaming signal orbs */}
-      <points material={signalMaterial}>
-        <bufferGeometry ref={signalGeoRef} />
-      </points>
+      <points material={signalMaterial} geometry={signalGeo} />
 
       {/* skill + core nodes */}
-      <points material={nodeMaterial}>
-        <bufferGeometry ref={nodeGeoRef} />
-      </points>
+      <points material={nodeMaterial} geometry={nodeGeo} />
 
       {/* invisible hover targets + labels */}
       {PLACEMENTS.map((p, i) => {

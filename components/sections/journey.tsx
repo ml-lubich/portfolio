@@ -1,10 +1,22 @@
 "use client"
 
 import { useState, useCallback } from "react"
+import Image from "next/image"
 import { Briefcase, ChevronRight, MapPin, ArrowRight } from "lucide-react"
+import { SiApple, SiHonda, SiWalmart } from "react-icons/si"
 import { DetailPanel } from "../detail-panel"
 import { ScrollStackSection } from "../layout/scroll-stack-section"
 import { experiences } from "@/data/experiences"
+
+/** Employers whose mark is a react-icons glyph rather than an image asset —
+ *  same glyphs already used on the LogoScroll strip. Rendered with
+ *  currentColor so they inherit the badge's existing primary-foreground
+ *  contrast in both themes, no invert filter needed. */
+const ICON_LOGOS: Record<string, React.ComponentType<{ className?: string }>> = {
+  apple: SiApple,
+  walmart: SiWalmart,
+  honda: SiHonda,
+}
 
 export function Journey() {
   const [selectedId, setSelectedId] = useState<string | null>(null)
@@ -51,7 +63,7 @@ export function Journey() {
             onClick={() => handleSelect(exp.id)}
             className={`glass-stack-card group relative w-full overflow-hidden rounded-2xl border text-left transition-all duration-200 ease-fluid md:duration-500 ${selectedId === exp.id
               ? "border-primary/40 shadow-[0_0_40px_-8px] shadow-primary/20"
-              : "border-white/[0.08] hover:border-primary/30"
+              : "border-[var(--line-soft)] hover:border-primary/30"
               }`}
           >
             {/* Top gradient accent strip */}
@@ -81,12 +93,39 @@ export function Journey() {
                   {exp.number}
                 </span>
 
-                {/* Gradient icon badge */}
-                <div
-                  className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary shadow-lg shadow-black/25 ring-1 ring-white/10 transition-transform duration-200 md:duration-500 group-hover:scale-110 group-hover:shadow-xl`}
-                >
-                  <Briefcase className="h-5 w-5 text-primary-foreground" />
-                </div>
+                {/* Logo / icon badge — real employer mark when we have one,
+                    briefcase fallback otherwise (e.g. independent consulting) */}
+                {exp.logo ? (
+                  <div
+                    /* Literal white, not the themed `bg-white` token (that
+                       one flips dark per theme for glass surfaces) — this is
+                       a fixed neutral tile so brand-colored marks read the
+                       same in both themes. */
+                    className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#fff] p-2 shadow-lg shadow-black/25 ring-1 ring-black/10 transition-transform duration-200 md:duration-500 group-hover:scale-110 group-hover:shadow-xl"
+                  >
+                    <Image
+                      src={exp.logo}
+                      alt={`${exp.company} logo`}
+                      width={64}
+                      height={64}
+                      unoptimized
+                      className="h-full w-full object-contain"
+                    />
+                  </div>
+                ) : (
+                  <div
+                    className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary shadow-lg shadow-black/25 ring-1 ring-white/10 transition-transform duration-200 md:duration-500 group-hover:scale-110 group-hover:shadow-xl"
+                  >
+                    {(() => {
+                      const IconLogo = ICON_LOGOS[exp.id]
+                      return IconLogo ? (
+                        <IconLogo className="h-6 w-6 text-primary-foreground" />
+                      ) : (
+                        <Briefcase className="h-5 w-5 text-primary-foreground" />
+                      )
+                    })()}
+                  </div>
+                )}
 
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">

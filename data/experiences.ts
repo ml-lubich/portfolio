@@ -19,6 +19,8 @@ export interface Experience {
     accent: string
     number: string
     detail: DetailPanelData
+    /** Employer logo, e.g. "/logos/echostar.svg". Omitted falls back to the briefcase icon. */
+    logo?: string
 }
 
 export const experiences: Experience[] = [
@@ -34,6 +36,7 @@ export const experiences: Experience[] = [
         gradient: g.primaryViaSkyToAccent,
         accent: accentCycle[1],
         number: "01",
+        logo: "/logos/echostar.svg",
         detail: {
             title: "Staff AI Engineer",
             subtitle: "EchoStar",
@@ -75,6 +78,7 @@ export const experiences: Experience[] = [
         gradient: g.cyanToPrimary,
         accent: accentCycle[0],
         number: "02",
+        logo: "/logos/polaris-wireless.svg",
         detail: {
             title: "Platform & AI Software Engineer",
             subtitle: "Polaris Wireless",
@@ -249,6 +253,7 @@ export const experiences: Experience[] = [
         gradient: g.primaryToMagenta,
         accent: accentCycle[3],
         number: "06",
+        logo: "/logos/berkeley-lab.svg",
         detail: {
             title: "Software Engineer",
             subtitle: "Lawrence Berkeley National Laboratory",
