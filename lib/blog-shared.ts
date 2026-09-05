@@ -41,7 +41,7 @@ export function normalizeBlogCategoryFromParam(
 
 export const AUTHOR = {
   name: "Misha Lubich",
-  role: "AI Engineer & Technical Leader",
+  role: "Staff AI Engineer",
   avatar: "/profile_blog.png",
 }
 

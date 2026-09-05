@@ -23,21 +23,62 @@ export interface Experience {
 
 export const experiences: Experience[] = [
     {
+        id: "echostar",
+        title: "Staff AI Engineer",
+        company: "EchoStar",
+        period: "Sep 2026 – Present",
+        location: "SF Bay Area",
+        summary:
+            "Builds the AI pipelines behind consumer-grade telecom — retrieval, agent orchestration and evaluation running against a network millions of customers depend on every day.",
+        tags: ["Python", "LLM", "RAG", "Agents", "Pipelines", "Telecom", "Evaluation"],
+        gradient: g.primaryViaSkyToAccent,
+        accent: accentCycle[1],
+        number: "01",
+        detail: {
+            title: "Staff AI Engineer",
+            subtitle: "EchoStar",
+            period: "September 2026 – Present",
+            location: "SF Bay Area",
+            description:
+                "Chose EchoStar over offers and final-round outcomes at defense-tech companies including Anduril and Mach Industries. The draw was blast radius: consumer-grade telecom puts AI in front of millions of ordinary customers rather than a narrow mission set, so the same pipeline work reaches far more people.",
+            highlights: [
+                "Builds production AI pipelines — retrieval, agent orchestration, and evaluation — against consumer telecom systems serving millions of subscribers",
+                "Received offers from and passed final rounds at top defense and frontier-tech companies including Anduril and Mach Industries",
+                "Chose consumer-scale impact over defense: the same agent and RAG work reaches millions of everyday customers",
+            ],
+            architecture: [
+                { label: "Retrieval", icon: "database", description: "Grounded retrieval over operational and customer-facing corpora" },
+                { label: "Agent Orchestration", icon: "layers", description: "Tool-calling pipelines with deterministic execution boundaries" },
+                { label: "Evaluation", icon: "shield", description: "Offline and online evals gating what reaches customers" },
+            ],
+            techStack: ["Python", "LLM Serving", "RAG", "Agents", "Vector Search", "Kubernetes", "Postgres"],
+            metrics: [
+                { label: "Scale", value: "Millions of Customers" },
+                { label: "Focus", value: "Consumer Telecom" },
+                { label: "Started", value: "Sept 2026" },
+            ],
+            diagramType: "agents",
+            gradient: g.primaryViaSkyToAccent,
+            accent: accentCycle[1],
+            link: { label: "EchoStar", url: "https://www.echostar.com" },
+        },
+    },
+    {
         id: "polaris",
         title: "Platform & AI Software Engineer",
         company: "Polaris Wireless",
-        period: "Sep 2024 – Present",
+        period: "Sep 2024 – Sep 2026",
         location: "Santa Clara, CA",
         summary:
             "Architected agentic data engine (AigisQuery) using MCP tools, optimized open-weight model inference (vLLM) under 200ms latency over carrier-scale spatial datasets (Kafka, ClickHouse).",
         tags: ["Python", "Rust", "vLLM", "MCP", "ClickHouse", "Kafka", "Postgres"],
         gradient: g.cyanToPrimary,
         accent: accentCycle[0],
-        number: "01",
+        number: "02",
         detail: {
             title: "Platform & AI Software Engineer",
             subtitle: "Polaris Wireless",
-            period: "September 2024 – Present",
+            period: "September 2024 – September 2026",
             location: "Santa Clara, CA",
             description:
                 "Architected distributed multi-agent systems and carrier-scale spatial data platforms processing billions of real-time records. Built autonomous query engines using MCP tool servers and deployed open-weight models (DeepSeek, Qwen) via vLLM with strict execution safety guardrails.",
@@ -77,7 +118,7 @@ export const experiences: Experience[] = [
         tags: ["Knowledge Graphs", "Agents", "On-Prem", "RAG", "LLM"],
         gradient: g.cyanToPrimary,
         accent: accentCycle[2],
-        number: "02",
+        number: "03",
         detail: {
             title: "AI Engineering Consultant",
             subtitle: "Independent / On-Prem Engagements",
@@ -122,7 +163,7 @@ export const experiences: Experience[] = [
         tags: ["Python", "Ansible", "Docker", "APFS", "LLM"],
         gradient: g.accentToCyan,
         accent: accentCycle[1],
-        number: "03",
+        number: "04",
         detail: {
             title: "Software Development Engineer in Test",
             subtitle: "Apple",
@@ -165,7 +206,7 @@ export const experiences: Experience[] = [
         tags: ["Java", "Spring Boot", "AWS Lambda", "Angular", "Kafka"],
         gradient: g.cyanToPrimary,
         accent: accentCycle[2],
-        number: "04",
+        number: "05",
         detail: {
             title: "Software Engineer",
             subtitle: "Walmart",
@@ -207,7 +248,7 @@ export const experiences: Experience[] = [
         tags: ["Python", "scikit-learn", "Docker", "Airflow", "MLflow"],
         gradient: g.primaryToMagenta,
         accent: accentCycle[3],
-        number: "05",
+        number: "06",
         detail: {
             title: "Software Engineer",
             subtitle: "Lawrence Berkeley National Laboratory",
@@ -250,7 +291,7 @@ export const experiences: Experience[] = [
         tags: ["scikit-learn", "Kafka", "GitHub Actions", "Docker", "Terraform"],
         gradient: g.magentaToAccent,
         accent: accentCycle[4],
-        number: "06",
+        number: "07",
         detail: {
             title: "Software Engineer Intern",
             subtitle: "Honda Innovations",

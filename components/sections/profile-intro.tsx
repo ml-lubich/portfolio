@@ -124,12 +124,16 @@ export function ProfileIntro() {
 
                                 <p className="mt-6 text-base font-normal leading-relaxed text-foreground/90 sm:text-lg">
                                     <AnimatedText variant="fade-up" delay={300} stagger={20} duration={600}>
-                                        I architect production AI-driven, cloud-native applications that scale to millions of users&mdash;from
-                                        multi-agent orchestration and RAG pipelines to systems shipping at{" "}
+                                        {"I'm a Staff AI Engineer at "}
+                                        <span className="font-bold text-foreground underline decoration-primary/40 underline-offset-4">EchoStar</span>
+                                        {", building the AI pipelines behind consumer-scale telecom. I picked it over offers and final rounds at "}
+                                        <span className="font-bold text-foreground underline decoration-primary/40 underline-offset-4">Anduril</span>
+                                        {" and "}
+                                        <span className="font-bold text-foreground underline decoration-primary/40 underline-offset-4">Mach Industries</span>
+                                        {" because consumer telecom puts the same agent and RAG work in front of millions of ordinary customers. Before that, multi-agent orchestration and RAG pipelines shipping at "}
                                         <span className="font-bold text-foreground underline decoration-primary/40 underline-offset-4">Apple</span>,{" "}
                                         <span className="font-bold text-foreground underline decoration-primary/40 underline-offset-4">Walmart</span>, and{" "}
-                                        <span className="font-bold text-foreground underline decoration-primary/40 underline-offset-4">LBNL</span>.{" "}
-                                        {"Whether you're scaling intelligent software or building custom AI infrastructure, I'd love to connect."}
+                                        <span className="font-bold text-foreground underline decoration-primary/40 underline-offset-4">LBNL</span>.
                                     </AnimatedText>
                                 </p>
 

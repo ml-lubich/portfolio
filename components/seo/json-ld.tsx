@@ -25,9 +25,9 @@ const personSchema = {
     width: 400,
     height: 400,
   },
-  jobTitle: "Senior AI Engineer & Technical Leader",
+  jobTitle: "Staff AI Engineer",
   description:
-    "Senior AI Engineer and Technical Leader with experience at Apple, GitHub, Walmart, and Lawrence Berkeley National Lab. Specialising in machine learning, MLOps, LLMs, and full-stack development.",
+    "Staff AI Engineer at EchoStar, previously Apple, Walmart, and Lawrence Berkeley National Lab. Specialising in machine learning, MLOps, LLMs, agents, and full-stack development.",
   sameAs: [
     "https://github.com/ml-lubich",
     "https://linkedin.com/in/mishalubich",
@@ -58,6 +58,11 @@ const personSchema = {
     "Kubernetes",
     "Docker",
   ],
+  worksFor: {
+    "@type": "Organization",
+    name: "EchoStar",
+    url: "https://www.echostar.com",
+  },
   alumniOf: [
     {
       "@type": "Organization",
@@ -72,7 +77,7 @@ const personSchema = {
   ],
   hasOccupation: {
     "@type": "Occupation",
-    name: "AI Engineer",
+    name: "Staff AI Engineer",
     occupationLocation: {
       "@type": "Country",
       name: "United States",
@@ -91,9 +96,9 @@ const webSiteSchema = {
   "@type": "WebSite",
   "@id": `${BASE_URL}/#website`,
   url: BASE_URL,
-  name: "Misha Lubich — AI Engineer & Technical Leader",
+  name: "Misha Lubich — Staff AI Engineer",
   description:
-    "Portfolio of Misha Lubich, a Senior AI Engineer building scalable ML systems. Projects, research, and engineering insights.",
+    "Portfolio of Misha Lubich, a Staff AI Engineer building production AI pipelines. Projects, research, and engineering insights.",
   publisher: {
     "@id": `${BASE_URL}/#person`,
   },
@@ -113,7 +118,7 @@ const profilePageSchema = {
   "@type": "ProfilePage",
   "@id": `${BASE_URL}/#profilepage`,
   url: BASE_URL,
-  name: "Misha Lubich | AI Engineer & Technical Leader — Portfolio",
+  name: "Misha Lubich | Staff AI Engineer — Portfolio",
   description:
     "Portfolio showcasing AI/ML projects, professional experience at Apple, GitHub, and top-tier companies, and research publications.",
   mainEntity: {

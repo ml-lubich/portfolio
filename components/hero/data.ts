@@ -28,6 +28,7 @@ export const statSets = [
 ]
 
 export const roles = [
+  "Staff AI Engineer",
   "Senior Software Engineer",
   "AI & Machine Learning Engineer",
   "ML Systems Architect",

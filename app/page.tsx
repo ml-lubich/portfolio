@@ -134,9 +134,9 @@ export default function Home() {
        *  the dynamically-loaded sections still contribute to indexing.
        * ─────────────────────────────────────────────────────────────── */}
       <section className="sr-only" aria-label="Portfolio summary for search engines">
-        <h2>Misha Lubich — Senior AI Engineer & Technical Leader</h2>
+        <h2>Misha Lubich — Staff AI Engineer</h2>
         <p>
-          Misha Lubich is a Senior AI Engineer and Technical Leader with production
+          Misha Lubich is a Staff AI Engineer at EchoStar with production
           experience at Apple, GitHub, Walmart, and Lawrence Berkeley
           National Lab. Specializing in machine learning, MLOps, large language models (LLMs),
           deep learning, natural language processing, computer vision, and full-stack

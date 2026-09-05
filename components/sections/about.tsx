@@ -193,7 +193,7 @@ export function About() {
         <SectionHeader
           label="About Me"
           title={<>Building at the intersection of{" "}<span className="gradient-text">AI and Engineering</span></>}
-          subtitle="Senior Software Engineer specializing in AI-driven, cloud-native applications. Led the design and deployment of a production AI platform with multi-agent orchestration and RAG pipelines, achieving sub-second latency for millions of users."
+          subtitle="Staff AI Engineer at EchoStar, building AI pipelines for consumer-scale telecom. Chose it over offers and final rounds at Anduril and Mach Industries — consumer-grade telecom puts the same agent and RAG work in front of millions of everyday customers. Previously shipped production AI at Apple and Walmart."
         />
 
         {/* Bio — portrait alongside the terminal (OpenClaw + claw live under #consulting) */}

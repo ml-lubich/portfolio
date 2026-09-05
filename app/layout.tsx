@@ -62,11 +62,11 @@ const BASE_URL = SITE_URL
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    default: "Misha Lubich | AI Engineer & Technical Leader — Portfolio",
+    default: "Misha Lubich | Staff AI Engineer — Portfolio",
     template: "%s | Misha Lubich",
   },
   description:
-    "Misha Lubich is a Senior AI Engineer and Technical Leader with experience at Apple, GitHub, and top-tier startups. Explore projects in machine learning, MLOps, LLMs, deep learning, and full-stack development.",
+    "Misha Lubich is a Staff AI Engineer at EchoStar, previously Apple, Walmart and Lawrence Berkeley National Lab. Explore projects in machine learning, MLOps, LLMs, agents, and full-stack development.",
   keywords: [
     "AI Engineer",
     "Machine Learning Engineer",
@@ -115,29 +115,29 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: BASE_URL,
-    siteName: "Misha Lubich — AI Engineer & Technical Leader",
-    title: "Misha Lubich | AI Engineer & Technical Leader",
+    siteName: "Misha Lubich — Staff AI Engineer",
+    title: "Misha Lubich | Staff AI Engineer",
     description:
-      "Senior AI Engineer building scalable ML systems at Apple, GitHub, and beyond. Explore innovative projects, research publications, and engineering insights.",
+      "Staff AI Engineer at EchoStar building production AI pipelines, previously Apple and Walmart. Explore innovative projects, research publications, and engineering insights.",
     images: [
       {
         url: SITE_DEFAULT_OG_IMAGE,
         width: SITE_DEFAULT_OG_IMAGE_SIZE.width,
         height: SITE_DEFAULT_OG_IMAGE_SIZE.height,
-        alt: "Misha Lubich — AI Engineer & Technical Leader Portfolio",
+        alt: "Misha Lubich — Staff AI Engineer Portfolio",
         type: "image/png",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Misha Lubich | AI Engineer & Technical Leader",
+    title: "Misha Lubich | Staff AI Engineer",
     description:
-      "Senior AI Engineer building scalable ML systems at Apple, GitHub, and beyond. Projects, research & insights.",
+      "Staff AI Engineer at EchoStar building production AI pipelines, previously Apple and Walmart. Projects, research & insights.",
     images: [
       {
         url: SITE_DEFAULT_OG_IMAGE,
-        alt: "Misha Lubich — AI Engineer & Technical Leader Portfolio",
+        alt: "Misha Lubich — Staff AI Engineer Portfolio",
       },
     ],
     creator: "@mishalubich",

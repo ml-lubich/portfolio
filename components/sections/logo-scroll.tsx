@@ -134,6 +134,40 @@ const LOGOS: Logo[] = [
     },
 ]
 
+/** Companies that made an offer or ran him to a final round. Deliberately a
+ *  separate list from LOGOS: they were never clients, and the partners strip
+ *  would claim a relationship that does not exist. */
+const OFFER_LOGOS: Logo[] = [
+    {
+        name: "Anduril Industries",
+        href: "https://www.anduril.com",
+        icon: (
+            <Image
+                src="/logos/anduril.svg"
+                alt="Anduril Industries logo"
+                width={546}
+                height={100}
+                unoptimized
+                className="h-4 w-auto opacity-70 transition-opacity duration-300 group-hover:opacity-100 brightness-0 dark:invert sm:h-5"
+            />
+        ),
+    },
+    {
+        name: "Mach Industries",
+        href: "https://www.machindustries.com",
+        icon: (
+            <Image
+                src="/logos/mach-industries.svg"
+                alt="Mach Industries logo"
+                width={84}
+                height={26}
+                unoptimized
+                className="h-4 w-auto opacity-70 transition-opacity duration-300 group-hover:opacity-100 brightness-0 dark:invert sm:h-5"
+            />
+        ),
+    },
+]
+
 /** Pixels per second for auto-scroll */
 const AUTO_SPEED = 40
 
@@ -388,6 +422,28 @@ export function LogoScroll() {
                 {repeated.map((logo, i) => (
                     <LogoItem key={`${logo.name}-${i}`} logo={logo} duplicate={i >= LOGOS.length} />
                 ))}
+            </div>
+
+            {/* Offers & final rounds — a second, quieter row. Two marks do not
+                need a scrolling track, and the heading above is about clients. */}
+            <div className="mt-5 flex flex-col items-center gap-2 border-t border-white/10 pt-4 sm:mt-6 sm:gap-3 sm:pt-5">
+                <p className="text-center text-[10px] font-semibold uppercase tracking-[0.22em] text-foreground/50 sm:text-[11px]">
+                    Offers &amp; final rounds:
+                </p>
+                <div className="flex items-center gap-8 sm:gap-12">
+                    {OFFER_LOGOS.map((logo) => (
+                        <a
+                            key={logo.name}
+                            href={logo.href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="group flex items-center"
+                        >
+                            {logo.icon}
+                            <span className="sr-only">{logo.name}</span>
+                        </a>
+                    ))}
+                </div>
             </div>
         </section>
     )
