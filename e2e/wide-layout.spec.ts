@@ -48,7 +48,7 @@ const CENTERED_SECTION_IDS = [
  */
 async function mountAllSections(page: Page, ids: readonly string[]): Promise<void> {
   await page.waitForFunction(
-    (wantedIds: string[]) => {
+    (wantedIds: readonly string[]) => {
       window.dispatchEvent(new Event("portfolio:mount-all"))
       return wantedIds.every((id) => document.getElementById(id) !== null)
     },

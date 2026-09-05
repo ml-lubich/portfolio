@@ -7,7 +7,7 @@ import { BlogCard } from "@/components/blog/blog-card"
 import { formatBlogDate } from "@/lib/blog-shared"
 import type { BlogPostListItem } from "@/lib/blog-shared"
 
-interface MockLinkProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
+interface MockLinkProps extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href"> {
   href: string | { toString(): string }
   children?: ReactNode
   prefetch?: boolean

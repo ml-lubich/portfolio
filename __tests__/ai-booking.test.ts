@@ -37,7 +37,7 @@ describe("request_consultation", () => {
 
     it("caps a runaway topic and summary so the card cannot be blown open", () => {
         const b = booking({ topic: "x".repeat(500), summary: "y".repeat(2000) })
-        expect(b.topic.length).toBeLessThanOrEqual(90)
+        expect(String(b.topic).length).toBeLessThanOrEqual(90)
         expect(String(b.summary).length).toBeLessThanOrEqual(200)
     })
 })

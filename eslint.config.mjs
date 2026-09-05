@@ -6,6 +6,9 @@ const config = [
     ignores: [
       ".next/**",
       ".next.stale*/**",
+      /* The e2e harness builds here; linting its minified output produced
+         ~26k warnings and 2MB of noise on every pre-commit run. */
+      ".next-e2e/**",
       /* Agent scratch: nested worktrees carry their own node_modules/.next. */
       ".claude/**",
       "coverage/**",
