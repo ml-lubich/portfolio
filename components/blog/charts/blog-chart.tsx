@@ -266,7 +266,7 @@ function TreeRenderer({ chart }: { chart: TreeChart }) {
 /* ── Main renderer ──────────────────────────────────────────────── */
 
 const shellClassName = (extra: string) =>
-  `mb-8 mt-0 rounded-xl border border-white/[0.06] bg-[hsl(220_20%_6%)] px-6 pb-6 pt-0 [&>:first-child]:pt-2 ${extra}`.trim()
+  `mb-8 mt-0 rounded-xl border border-border bg-card px-6 pb-6 pt-0 [&>:first-child]:pt-2 ${extra}`.trim()
 
 const titleClassName =
   "no-metallic mb-4 !mt-0 text-center text-sm font-semibold text-white/60"

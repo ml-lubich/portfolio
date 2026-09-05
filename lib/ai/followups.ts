@@ -16,7 +16,7 @@ export const FOLLOWUP_MARKER = "FOLLOWUPS:"
 /** Hard caps, enforced here rather than trusted to the prompt. */
 export const FOLLOWUP_LIMITS = {
     max: 3,
-    maxChars: 90,
+    maxChars: 52,
 } as const
 
 export class FollowupStream {

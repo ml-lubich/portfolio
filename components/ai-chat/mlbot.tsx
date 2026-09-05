@@ -321,13 +321,13 @@ export function MLBot() {
                                 <p className="text-[14px] leading-relaxed text-muted-foreground">
                                     I can look through Misha&apos;s roles, projects, skills and papers — and chart them.
                                 </p>
-                                <div className="flex flex-wrap gap-2">
+                                <div className="flex flex-col items-start gap-1.5">
                                     {SUGGESTIONS.map((s) => (
                                         <button
                                             key={s}
                                             type="button"
                                             onClick={() => send(s)}
-                                            className="rounded-full border border-white/[0.1] bg-white/[0.04] px-3 py-1.5 text-[12.5px] text-muted-foreground transition-colors hover:border-white/20 hover:text-foreground"
+                                            className="max-w-full truncate rounded-full border border-white/[0.1] bg-white/[0.04] px-3 py-1.5 text-left text-[12.5px] text-muted-foreground transition-colors hover:border-white/20 hover:text-foreground"
                                         >
                                             {s}
                                         </button>
@@ -344,12 +344,14 @@ export function MLBot() {
                                     </p>
                                 ) : (
                                     <>
-                                        {turn.tools?.map((name, j) => (
-                                            <p key={j} className="mlbot-tool-in flex items-center gap-2 text-[12px] text-muted-foreground/70">
-                                                <span className="mlbot-tick" aria-hidden />
-                                                {TOOL_LABELS[name] ?? name}
-                                            </p>
-                                        ))}
+                                        {turn.tools?.map((name, j) =>
+                                            TOOL_LABELS[name] ? (
+                                                <p key={j} className="mlbot-tool-in flex items-center gap-2 text-[12px] text-muted-foreground/70">
+                                                    <span className="mlbot-tick" aria-hidden />
+                                                    {TOOL_LABELS[name]}
+                                                </p>
+                                            ) : null,
+                                        )}
 
                                         {turn.charts?.map((spec, j) => <ChatChart key={j} spec={spec} />)}
 
@@ -372,13 +374,14 @@ export function MLBot() {
                                         )}
 
                                         {!busy && turn.followups?.length ? (
-                                            <div className="flex flex-wrap gap-2 pt-1">
+                                            <div className="flex flex-col items-start gap-1.5 pt-1">
                                                 {turn.followups.map((q) => (
                                                     <button
                                                         key={q}
                                                         type="button"
                                                         onClick={() => send(q)}
-                                                        className="rounded-full border border-white/[0.1] bg-white/[0.04] px-3 py-1.5 text-[12.5px] text-muted-foreground transition-colors hover:border-white/20 hover:text-foreground"
+                                                        title={q}
+                                                        className="max-w-full truncate rounded-full border border-white/[0.1] bg-white/[0.04] px-3 py-1.5 text-left text-[12.5px] text-muted-foreground transition-colors hover:border-white/20 hover:text-foreground"
                                                     >
                                                         {q}
                                                     </button>

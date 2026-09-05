@@ -20,6 +20,45 @@ interface PieDatum {
   fill: string
 }
 
+/* Labels ride INSIDE the ring. Outside them, a long series name runs past the
+   card in any narrow container — a chat panel clipped "Water Quality 33%" down
+   to "r Quality 33%". The legend beneath already names every slice, so only
+   the share needs drawing, and a slice too thin to hold it gets none. */
+function renderSliceLabel({
+  cx,
+  cy,
+  midAngle,
+  innerRadius,
+  outerRadius,
+  percent,
+}: {
+  cx: number
+  cy: number
+  midAngle: number
+  innerRadius: number
+  outerRadius: number
+  percent: number
+}) {
+  if (percent < 0.06) return null
+
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.5
+  const rad = -midAngle * (Math.PI / 180)
+
+  return (
+    <text
+      x={cx + radius * Math.cos(rad)}
+      y={cy + radius * Math.sin(rad)}
+      fill="#fff"
+      textAnchor="middle"
+      dominantBaseline="central"
+      fontSize={12}
+      fontWeight={600}
+    >
+      {`${(percent * 100).toFixed(0)}%`}
+    </text>
+  )
+}
+
 export function PieChartBody({ data }: { data: PieDatum[] }) {
   return (
     <ResponsiveContainer width="100%" height={260}>
@@ -30,12 +69,10 @@ export function PieChartBody({ data }: { data: PieDatum[] }) {
           nameKey="name"
           cx="50%"
           cy="50%"
-          outerRadius={100}
-          innerRadius={45}
+          outerRadius="80%"
+          innerRadius="36%"
           strokeWidth={0}
-          label={({ name, percent }) =>
-            `${name} ${(percent * 100).toFixed(0)}%`
-          }
+          label={renderSliceLabel}
           labelLine={false}
         >
           {data.map((entry, i) => (
@@ -44,10 +81,10 @@ export function PieChartBody({ data }: { data: PieDatum[] }) {
         </Pie>
         <Tooltip
           contentStyle={{
-            background: "hsl(220 20% 8%)",
-            border: "1px solid hsl(220 15% 18%)",
+            background: "hsl(var(--card))",
+            border: "1px solid hsl(var(--border))",
             borderRadius: "8px",
-            color: "#e2e8f0",
+            color: "hsl(var(--foreground))",
             fontSize: "13px",
           }}
         />

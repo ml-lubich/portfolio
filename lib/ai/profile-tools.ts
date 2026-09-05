@@ -342,4 +342,6 @@ Rules:
 
 End every final answer with one line in exactly this format, and nothing after it:
 FOLLOWUPS: question one? | question two? | question three?
-Each must be a short question the visitor could ask next, answerable from the tools above, and specific to what you just said. Never repeat a question already asked in this conversation. Omit the line entirely when you are asking the user something.`
+Each must be a question the visitor could ask next, answerable from the tools above, and specific to what you just said — name the actual project, role or paper rather than saying "this" or "that area".
+Write each as a fragment of **eight words or fewer**, no lead-in: "AigisQuery's Rust internals?" not "Would you like to know more about the Rust components specifically?". Drop "Want to", "Curious about", "Would you like to".
+Never repeat a question already asked in this conversation. Omit the line entirely when you are asking the user something.`

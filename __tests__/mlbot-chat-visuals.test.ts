@@ -294,3 +294,87 @@ describe("ChatChart", () => {
         expect(source).toContain("interval={0}")
     })
 })
+
+/* A pie's slice labels sit OUTSIDE the circle by default, so in a 24rem chat
+ * panel they run past the card and get clipped by its overflow-hidden — the
+ * reader sees "r Quality 33%" and a half-eaten "Hybrid". The legend under the
+ * chart already names every slice, so the name outside it was duplication;
+ * only the percentage needs to survive, and it survives inside the slice
+ * where nothing can bleed. */
+describe("PieChartBody labels", () => {
+    const source = read("components/blog/charts/pie-chart-body.tsx")
+
+    it("does not print the slice name outside the circle", () => {
+        expect(source).not.toMatch(/`\$\{name\}\s*\$\{/)
+    })
+
+    it("anchors labels inside the slice so nothing can overflow the card", () => {
+        expect(source).toMatch(/textAnchor="middle"/)
+        expect(source).toMatch(/midAngle/)
+    })
+
+    it("scales the pie to its container instead of a fixed radius", () => {
+        expect(source).not.toMatch(/outerRadius=\{\d+\}/)
+        expect(source).toMatch(/outerRadius="\d+%"/)
+    })
+})
+
+/* Blog charts render inside the chat panel too, so their card can no longer be
+ * a hard-coded dark slab — on a light page it painted as a black block. The
+ * literal it used, hsl(220 20% 6%), is exactly what --card resolves to in dark,
+ * so the token is a drop-in that also gets light right. */
+describe("BlogChart card is theme-aware", () => {
+    const chart = read("components/blog/charts/blog-chart.tsx")
+    const pie = read("components/blog/charts/pie-chart-body.tsx")
+
+    it("uses theme tokens rather than a hard-coded dark surface", () => {
+        expect(chart).not.toMatch(/bg-\[hsl\(220_20%_6%\)\]/)
+        expect(chart).toMatch(/bg-card/)
+    })
+
+    it("themes the pie tooltip too", () => {
+        expect(pie).not.toContain("hsl(220 20% 8%)")
+        expect(pie).toMatch(/var\(--|hsl\(var\(/)
+    })
+})
+
+/* The model invents tool names (`chart_pie` showed up under a real answer).
+ * TOOL_LABELS is the allowlist of what a visitor is shown; anything else is an
+ * internal detail they cannot act on, so it is not rendered at all. */
+describe("MLBot tool trace", () => {
+    const source = read("components/ai-chat/mlbot.tsx")
+
+    it("never prints a raw tool name it has no label for", () => {
+        expect(source).not.toMatch(/TOOL_LABELS\[name\]\s*\?\?\s*name/)
+        expect(source).toMatch(/TOOL_LABELS\[name\]/)
+    })
+})
+
+/* Follow-up pills sat on one wrapped line each, text centred, so three of them
+ * read as three ragged blobs. They are questions, not buttons — left-aligned
+ * and one line each. */
+describe("MLBot follow-up pills", () => {
+    const source = read("components/ai-chat/mlbot.tsx")
+    const pills = source.slice(source.indexOf("turn.followups?.length"), source.indexOf("turn.followups?.length") + 900)
+
+    it("left-aligns the pill text instead of centring wrapped lines", () => {
+        expect(pills).toContain("text-left")
+    })
+
+    it("stacks them left-packed, one per line, rather than a ragged wrap", () => {
+        expect(pills).toMatch(/flex-col[^"]*items-start|items-start[^"]*flex-col/)
+        expect(pills).toContain("truncate")
+    })
+})
+
+describe("follow-up prompt", () => {
+    it("asks for fragments short enough to fit one line in the panel", async () => {
+        const { FOLLOWUP_LIMITS } = await import("@/lib/ai/followups")
+        expect(FOLLOWUP_LIMITS.maxChars).toBeLessThanOrEqual(56)
+    })
+
+    it("tells the model to write a short fragment, not a full sentence", () => {
+        const prompt = read("lib/ai/profile-tools.ts")
+        expect(prompt).toMatch(/FOLLOWUPS:[\s\S]{0,600}?(words or fewer|word fragment|at most \d+ words)/)
+    })
+})
