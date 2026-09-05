@@ -34,19 +34,32 @@ const CENTERED_SECTION_IDS = [
   "ai-expertise",
 ]
 
-/** Scroll through the page so every LazySection mounts, then return to top. */
-async function mountAllSections(page: Page): Promise<void> {
-  await page.evaluate(async () => {
-    const delay = (ms: number) => new Promise((r) => setTimeout(r, ms))
-    for (let y = 0; y < document.body.scrollHeight; y += window.innerHeight / 2) {
-      window.scrollTo(0, y)
-      await delay(120)
-    }
-    window.scrollTo(0, document.body.scrollHeight)
-    await delay(500)
-    window.scrollTo(0, 0)
-    await delay(300)
-  })
+/**
+ * Mount every LazySection via the app's own `portfolio:mount-all` escape
+ * hatch (same mechanism `tablet-responsive.spec.ts` uses), retrying the
+ * dispatch until every section id this file checks actually exists — rather
+ * than scrolling with fixed delays and hoping mounting kept up. A fixed
+ * delay is a guess at how long hydration + mount takes; under CPU
+ * contention (many concurrent browser contexts, a loaded dev box) that
+ * guess is wrong and the section is measured before it exists, which is
+ * exactly the "#consulting should exist" / "marquee rows should exist"
+ * flake this used to produce. Polling the real condition has no such
+ * ceiling — it only takes as long as mounting actually takes.
+ */
+async function mountAllSections(page: Page, ids: readonly string[]): Promise<void> {
+  await page.waitForFunction(
+    (wantedIds: string[]) => {
+      window.dispatchEvent(new Event("portfolio:mount-all"))
+      return wantedIds.every((id) => document.getElementById(id) !== null)
+    },
+    ids,
+    { timeout: 30_000, polling: 100 },
+  )
+  // Layout needs one settle pass after mount (marquee tracks compute their
+  // width from post-mount DOM); back at the top so hero-relative assertions
+  // aren't affected by whatever scroll position mounting left us at.
+  await page.evaluate(() => window.scrollTo(0, 0))
+  await page.waitForTimeout(300)
 }
 
 for (const viewport of WIDE_VIEWPORTS) {
@@ -55,8 +68,7 @@ for (const viewport of WIDE_VIEWPORTS) {
 
     test.beforeEach(async ({ page }) => {
       await page.goto("/", { waitUntil: "domcontentloaded" })
-      await page.waitForTimeout(1000)
-      await mountAllSections(page)
+      await mountAllSections(page, CENTERED_SECTION_IDS)
     })
 
     test("no horizontal overflow", async ({ page }) => {
@@ -143,14 +155,17 @@ for (const viewport of WIDE_VIEWPORTS) {
         if (!track) return null
         const set = track.children[0] as HTMLElement | undefined
         return {
-          set: set?.scrollWidth ?? 0,
+          // The rail wraps by one set width, so the run of track AFTER the
+          // first set is what has to cover the visible box. Requiring a single
+          // set to cover it is stricter than the loop actually needs.
+          spare: track.scrollWidth - (set?.scrollWidth ?? 0),
           box: track.parentElement?.clientWidth ?? 0,
         }
       })
       expect(carousel, "client carousel should exist").not.toBeNull()
       expect(
-        carousel!.set,
-        "one card set must cover the carousel box or the slide-by-one-set loop shows a gap",
+        carousel!.spare,
+        "track beyond the first card set must cover the carousel box or the slide-by-one-set loop sweeps a blank through it",
       ).toBeGreaterThanOrEqual(carousel!.box)
     })
 

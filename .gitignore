@@ -17,6 +17,7 @@ coverage/
 /test-results/
 /playwright-report/
 /blob-report/
+.next-e2e/
 
 # local-only demo playground pages (never deployed)
 /app/demo/

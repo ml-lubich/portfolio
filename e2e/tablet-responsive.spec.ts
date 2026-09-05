@@ -89,8 +89,10 @@ for (const width of TABLET_WIDTHS) {
 
     test("logo mark stays inside the nav-shell bounds", async ({ page }) => {
       const shellBox = await page.locator(".nav-shell").boundingBox()
-      // Logo mark is an inline <svg> monogram (C1/C2), not a raster <img>.
-      const logoBox = await page.locator('nav a[aria-label="Back to top"] svg').boundingBox()
+      // The mark is the metallic ML monogram PNG rendered by SiteLogoMark — it
+      // stopped being an inline <svg> when that brand mark landed, and this
+      // selector went on waiting 90s for an element that no longer exists.
+      const logoBox = await page.locator('nav a[aria-label="Back to top"] img').boundingBox()
       expect(shellBox, "nav-shell bounding box").not.toBeNull()
       expect(logoBox, "logo image bounding box").not.toBeNull()
 

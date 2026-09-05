@@ -3,6 +3,7 @@
 ## Commands
 
 - `bun run test` — Vitest suite (also enforced by the `pre-push` git hook).
+- `bun run test:e2e` — Playwright suite (also enforced by the `pre-push` git hook). Reuses whatever dev server is already running on `:3000` (`reuseExistingServer`, see `playwright.config.ts`) or boots one itself. Install browsers once with `npx playwright install chromium` if they're missing.
 - `bun run test:add <slug>` — scaffold a new test file in `__tests__/`. Generates a ready-to-run stub with correct imports, naming convention guidance, and fixture path instructions. Accepts `--describe "what you are guarding"`. Example: `bun run test:add nav-scroll --describe "navbar stays transparent over the hero"`.
 - `bun run build` — runs `vitest run` explicitly, then the production Next build using `bunx next build --webpack`; Turbopack currently fails on `pages-manifest.json` generation in this app-only project. Vercel executes this same script, so the test suite (including asset/media reference checks) gates every deployment.
 - `bun run lint` — ESLint.
@@ -11,8 +12,15 @@
 
 `bun install` installs both hooks via `scripts/install-hooks.js`:
 
-- `pre-commit` → `bun run lint` + `bun run build` (tests + production build).
-- `pre-push` → `bun run test` (full suite, including media/resource reference checks). Do not bypass with `--no-verify`.
+- `pre-commit` → `bun run lint` + `bun run build` (tests + production build). Kept to Vitest speed — no browser boot — so committing stays fast.
+- `pre-push` → `bun run test` (full Vitest suite, including media/resource reference checks) **then** `bun run test:e2e` (full Playwright suite: runtime-error gate, API guard rails, cross-viewport visual checks). The browser suite is pre-push only because it's slower than the commit loop should be. Do not bypass either with `--no-verify`.
+
+## Playwright suite (`e2e/`)
+
+- `e2e/runtime-errors.spec.ts` — **the most important gate.** Loads every real route (`/`, `/blog`, `/tools`, `/llm-prices`, `/games`, `/demo`, `/privacy`, `/terms`) and fails on any uncaught `pageerror`, any un-allow-listed `console.error`, or the Next.js dev error overlay rendering. This is the only thing in the repo that catches a page throwing at runtime — e.g. a three.js `useFrame` loop touching a stale/undefined buffer geometry — since that class of bug only exists once real animation frames run in a real browser; no amount of unit or type-checking catches it. Keep `ALLOWED_CONSOLE_ERRORS` empty unless you can name a specific, justified, benign case in a comment next to it — an empty list means every `console.error` seen so far has been a real bug.
+- `e2e/api-routes.spec.ts` — hits the live routes via Playwright's `request` context (no browser). `/api/tokscale`, `/api/github`, `/api/llm-prices` are checked against their real upstreams (consistent with `media-references.test.ts`'s existing pattern of probing real URLs rather than mocking them) for a clean 200 or a typed failure, never a 500. `/api/prompt-lint` and `/api/chat` are checked for validation and rate-limiting behavior only — **no request in this file ever reaches the model**; `/api/chat`'s history validation runs before the OpenRouter call, so probing the burst limiter (`lib/ai/rate-limit.ts`) with empty-history requests exercises the real guard rail for free. The one guard rail this file cannot exercise against a live server is the missing-`OPENROUTER_API_KEY` → 503 path, since the running dev server has the key configured; that path is a one-line `if (!apiKey)` in `app/api/chat/route.ts` and is left to code review.
+- `e2e/visual-integrity.spec.ts` — no horizontal overflow at 390/834/1440px, every `<img>` loads (`naturalWidth > 0`), and no `bg-card`-styled panel resolves to the same computed background color as the page (the "ghosting"/"black cards" bug class) across all eight routes. Only dark mode is checked: light mode ships disabled (`lib/light-mode.ts`, `forcedTheme="dark"`, toggle not even rendered), so testing it here would just run dark mode twice. Once light mode is re-enabled by default, extend this file to cover it too.
+- `e2e/wide-layout.spec.ts`, `e2e/tablet-responsive.spec.ts`, `e2e/scroll-navigation.spec.ts` — pre-existing homepage-specific layout/motion regression specs (see file headers for what each guards).
 
 ## Automated: blog listing metadata
 

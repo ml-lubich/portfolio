@@ -9,6 +9,11 @@ const nextConfig = {
   turbopack: {
     root: __dirname,
   },
+  // Playwright builds+starts a real production server for e2e (see
+  // playwright.config.ts) so it can run alongside a `bun run dev` instance
+  // without fighting over `.next/dev/lock` — this redirects that build to
+  // its own output directory. Unset for every normal dev/build invocation.
+  distDir: process.env.PLAYWRIGHT_DIST_DIR || ".next",
   // Webpack dev / output tracing uses this when multiple lockfiles exist (e.g. ~/package-lock.json + ./bun.lock).
   outputFileTracingRoot: __dirname,
   // Hide X-Powered-By header for security

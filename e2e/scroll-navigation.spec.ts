@@ -53,12 +53,21 @@ async function contactViewportTop(page: Page): Promise<number> {
 }
 
 async function expectLandedOnContact(page: Page) {
-  await settledScrollY(page)
+  // Poll the thing we actually care about — where #contact ended up — rather
+  // than inferring arrival from scrollY going quiet. Under parallel load a
+  // single long frame can hold scrollY still for over a second mid-flight,
+  // which reads as "settled" while the page is still thousands of px away.
+  // Polling the real invariant waits as long as the scroll genuinely needs and
+  // still fails outright if it never lands.
+  await expect
+    .poll(async () => (await contactViewportTop(page)) > -300 && (await contactViewportTop(page)) < 900 * 0.6, {
+      message: "#contact should land near the nav offset after the scroll",
+      timeout: 15_000,
+      intervals: [100, 100, 200, 200, 500],
+    })
+    .toBe(true)
+
   const top = await contactViewportTop(page)
-  // #contact heading should sit near the nav offset — generous band, but a
-  // landing thousands of px above (the bug) blows way past it.
-  expect(top, "#contact top after scroll settles").toBeGreaterThan(-300)
-  expect(top, "#contact top after scroll settles").toBeLessThan(900 * 0.6)
 
   // "Scrolls me back up": position must not drift after settling.
   await page.waitForTimeout(1500)

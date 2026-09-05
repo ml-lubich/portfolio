@@ -31,8 +31,12 @@ const CALENDAR_URL = "https://calendar.app.google/T2VGkBsBAUzGABRB7"
 const AUTO_SPEED = 34
 /** Pointer travel (px) past which a gesture is a drag, not a card tap */
 const DRAG_SLOP = 8
-/** How many copies of the card set fill the rail so the wrap is never visible */
-const RAIL_COPIES = 3
+/** How many copies of the card set fill the rail so the wrap is never visible.
+ *  The rail slides by exactly one set width and then wraps, so at the wrap
+ *  point the viewport spans [setWidth, setWidth + box] — every copy after the
+ *  first has to cover the widest realistic box. A set is ~1.7k px, so 3 copies
+ *  ran out at 3840 and swept a 448px blank through the rail; 4 covers it. */
+const RAIL_COPIES = 4
 
 /** Each tag gets its own glyph so a card reads at a glance, not as a wall of pills. */
 const TAG_ICON: Record<string, typeof Globe> = {
@@ -122,7 +126,7 @@ function ClientCard({
               className="flex h-[200px] w-full shrink-0 items-center justify-center bg-gradient-to-b from-white/[0.05] to-black/40 sm:h-[230px]"
               aria-hidden
             >
-              <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground/45">
+              <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground/60">
                 Preview unavailable
               </span>
             </div>
