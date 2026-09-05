@@ -68,9 +68,9 @@ function ToolsDropdown() {
           open ? "pointer-events-auto translate-y-0 opacity-100" : "pointer-events-none -translate-y-1 opacity-0",
         ].join(" ")}
       >
-        <div className="overflow-hidden rounded-2xl border border-white/[0.10] bg-[hsl(220_20%_5%/0.96)] shadow-[0_20px_60px_-10px_rgba(0,0,0,0.7)] backdrop-blur-2xl">
+        <div className="overflow-hidden rounded-2xl border border-[var(--line-soft)] bg-[var(--surface-1)] shadow-[0_20px_60px_-10px_rgba(0,0,0,0.7)] backdrop-blur-2xl">
           {/* Header */}
-          <div className="border-b border-white/[0.06] px-3.5 py-2">
+          <div className="border-b border-[var(--line-soft)] px-3.5 py-2">
             <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground/50">
               Live on this site
             </p>
@@ -87,7 +87,7 @@ function ToolsDropdown() {
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-foreground/90 group-hover/tool:text-foreground transition-colors">
+                  <span className="text-sm font-medium text-foreground">
                     {tool.label}
                   </span>
                   <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-1.5 py-0.5 text-[9px] font-medium text-emerald-400">
@@ -157,9 +157,9 @@ function GamesDropdown() {
           open ? "pointer-events-auto translate-y-0 opacity-100" : "pointer-events-none -translate-y-1 opacity-0",
         ].join(" ")}
       >
-        <div className="overflow-hidden rounded-2xl border border-white/[0.10] bg-[hsl(220_20%_5%/0.96)] shadow-[0_20px_60px_-10px_rgba(0,0,0,0.7)] backdrop-blur-2xl">
+        <div className="overflow-hidden rounded-2xl border border-[var(--line-soft)] bg-[var(--surface-1)] shadow-[0_20px_60px_-10px_rgba(0,0,0,0.7)] backdrop-blur-2xl">
           {/* Header */}
-          <div className="border-b border-white/[0.06] px-3.5 py-2">
+          <div className="border-b border-[var(--line-soft)] px-3.5 py-2">
             <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground/50">
               Live on this site
             </p>
@@ -176,7 +176,7 @@ function GamesDropdown() {
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-foreground/90 group-hover/game:text-foreground transition-colors">
+                  <span className="text-sm font-medium text-foreground">
                     {game.label}
                   </span>
                   <span className="inline-flex items-center gap-1 rounded-full border border-violet-500/30 bg-violet-500/10 px-1.5 py-0.5 text-[9px] font-medium text-violet-400">

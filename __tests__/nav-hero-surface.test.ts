@@ -164,3 +164,41 @@ describe("Navigation wiring (regression)", () => {
     expect(navSrc).toContain("Get In Touch")
   })
 })
+
+/**
+ * Defect 8: the Tools/Games nav dropdown panels. Two independent bugs:
+ *   1. The panel painted a hard-coded `bg-[hsl(220_20%_5%/0.96)]` regardless
+ *      of theme — a dark slab on the light page (same class of bug as the
+ *      tokscale card and nav scrim).
+ *   2. The item titles ("AI Tools", "Token Invaders", ...) were dimmed to
+ *      `text-foreground/90` for no reason (hover already went to full
+ *      opacity) — composited that's a murky ~rgb(219,220,223), visibly
+ *      duller than the rest of the site's crisp white/foreground text, in
+ *      BOTH themes. Not an animation — no stagger/opacity-0 default exists
+ *      on this markup, confirmed by reading the component: it's a plain
+ *      static span.
+ */
+describe("nav dropdown panels (Tools / Games)", () => {
+  const navSrc = fs.readFileSync(path.join(ROOT, "components/nav/index.tsx"), "utf8")
+
+  it("paints both dropdown panels from a themed surface token, not a literal dark hsl", () => {
+    expect(navSrc).not.toMatch(/bg-\[hsl\(220_20%_5%/)
+    const panelBlocks = navSrc.match(/rounded-2xl border[^"]*backdrop-blur-2xl"/g) ?? []
+    expect(panelBlocks.length).toBeGreaterThanOrEqual(2)
+    for (const block of panelBlocks) {
+      expect(block).toMatch(/var\(--surface-1\)/)
+    }
+  })
+
+  it("borders the panels with the shared hairline token, not a literal white alpha", () => {
+    expect(navSrc).not.toMatch(/border-white\/\[0\.10\]/)
+  })
+
+  it("gives both dropdown item titles full-opacity foreground text, not a dimmed /90", () => {
+    const titleSpans = navSrc.match(/text-sm font-medium text-foreground[^"]*"/g) ?? []
+    expect(titleSpans.length).toBeGreaterThanOrEqual(2)
+    for (const span of titleSpans) {
+      expect(span).not.toMatch(/text-foreground\/90/)
+    }
+  })
+})
