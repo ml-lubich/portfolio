@@ -15,3 +15,19 @@ export function stripTokscaleBackground(svg: string): string {
     .replace(/<rect\b[^>]*\bfill="none"[^>]*\bstroke="[^"]*"[^>]*\/>\s*/g, "")
     .replace(/<rect\b[^>]*\bstroke="[^"]*"[^>]*\bfill="none"[^>]*\/>\s*/g, "")
 }
+
+/** Text/line colours the upstream embed bakes for its own dark card, which
+ *  read as invisible-or-worse once we drop the card onto the site's light
+ *  theme (`stripTokscaleBackground` already removed the dark card itself).
+ *  It's an <img>, so CSS can't recolor its insides — this is the server-side
+ *  swap for the one thing the SVG stays constant on: literal hex/rgba, not
+ *  currentColor. Matched by exact literal, not role, since these are the
+ *  specific values the embed currently ships. */
+export function recolorForLightTheme(svg: string): string {
+  return svg
+    .replaceAll("#F4F7FB", "#1c2333") // primary text: near-white -> dark
+    .replaceAll("#A8B3C5", "#5b6472") // secondary text: light grey -> mid grey
+    .replaceAll("#2F8FFF", "#0b63d6") // blue stat: darkened for AA on white
+    .replaceAll("#3FB950", "#1e8e3e") // green stat: darkened for AA on white
+    .replaceAll("rgba(255,255,255,0.09)", "rgba(0,0,0,0.12)") // divider lines
+}

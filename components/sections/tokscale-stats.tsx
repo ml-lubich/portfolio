@@ -1,7 +1,8 @@
 "use client"
 
-import { useCallback, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { motion, useReducedMotion, useSpring } from "framer-motion"
+import { useTheme } from "next-themes"
 import { ExternalLink, Flame, Trophy } from "lucide-react"
 
 /* ── tokscale — live AI token usage (single source of truth) ──────── */
@@ -11,6 +12,18 @@ export const TOKSCALE_LEADERBOARD_URL = "https://tokscale.ai/leaderboard"
 /** Served by app/api/tokscale — the raw embed's opaque card background is
  *  stripped server-side so the stats sit on the liquid-glass panel. */
 const TOKSCALE_EMBED_URL = "/api/tokscale"
+
+/** The embed's text/lines are baked for a dark card (see lib/tokscale-svg.ts);
+ *  ?theme=light asks the route to recolor them for the light page. Defaults
+ *  to dark pre-mount so SSR and first paint always match (next-themes only
+ *  knows the resolved theme on the client, same pattern as theme-toggle.tsx). */
+function useTokscaleEmbedSrc(): string {
+  const { resolvedTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
+  const isLight = mounted && resolvedTheme === "light"
+  return isLight ? `${TOKSCALE_EMBED_URL}?theme=light` : TOKSCALE_EMBED_URL
+}
 
 /** Idle float loop — gentle bob with a slow 3D sway. Runs only while not hovered. */
 const FLOAT_KEYFRAMES = {
@@ -37,6 +50,7 @@ export function TokscaleHeroBadge() {
   const reduce = useReducedMotion() ?? false
   const tiltX = useSpring(0, TILT_SPRING)
   const tiltY = useSpring(0, TILT_SPRING)
+  const embedSrc = useTokscaleEmbedSrc()
 
   const handlePointerMove = useCallback(
     (e: React.PointerEvent<HTMLAnchorElement>) => {
@@ -100,7 +114,7 @@ export function TokscaleHeroBadge() {
             <div className="tokscale-sheen absolute inset-0 overflow-hidden rounded-2xl" aria-hidden="true" />
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={TOKSCALE_EMBED_URL}
+              src={embedSrc}
               alt="Misha Lubich — live AI token usage tracked by tokscale"
               width={540}
               height={190}
@@ -127,6 +141,7 @@ export function TokscaleHeroBadge() {
 
 /** Full glass card for the GitHub-stats section: live tokscale embed + links. */
 export function TokscaleCard() {
+  const embedSrc = useTokscaleEmbedSrc()
   return (
     <div className="group relative overflow-hidden rounded-2xl border border-white/[0.03] bg-white/[0.01] p-4 backdrop-blur-2xl transition-all duration-500 hover:border-emerald-400/25 hover:bg-white/[0.025] glass-card-3d sm:p-5">
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/5 to-transparent" />
@@ -136,7 +151,7 @@ export function TokscaleCard() {
       <div className="relative flex flex-col gap-5 lg:flex-row lg:items-center lg:gap-8">
         <div className="min-w-0 flex-1">
           <div className="mb-2 flex flex-wrap items-center gap-2">
-            <Flame className="h-4 w-4 text-emerald-400" />
+            <Flame className="h-4 w-4 text-emerald-700 dark:text-emerald-400" />
             <h3 className="text-lg font-bold text-foreground">AI Token Usage</h3>
           </div>
           <p className="mb-4 max-w-md text-sm leading-relaxed text-muted-foreground">
@@ -150,7 +165,7 @@ export function TokscaleCard() {
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.04] px-3 py-1.5 text-xs text-muted-foreground transition-all hover:border-emerald-400/30 hover:bg-white/[0.08] hover:text-foreground"
             >
-              <Trophy className="h-3.5 w-3.5 text-emerald-400/80" />
+              <Trophy className="h-3.5 w-3.5 text-emerald-700 dark:text-emerald-400/80" />
               Global leaderboard
               <ExternalLink className="h-3 w-3 text-muted-foreground/50" />
             </a>
@@ -175,7 +190,7 @@ export function TokscaleCard() {
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={TOKSCALE_EMBED_URL}
+            src={embedSrc}
             alt="Misha Lubich — AI token usage tracked by tokscale"
             width={460}
             height={162}

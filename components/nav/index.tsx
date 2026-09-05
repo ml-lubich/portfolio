@@ -99,7 +99,7 @@ function ToolsDropdown() {
                   {tool.description}
                 </p>
               </div>
-              <ExternalLink className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground/30 transition-colors group-hover/tool:text-muted-foreground/70" />
+              <ExternalLink className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground/60 transition-colors group-hover/tool:text-muted-foreground/70" />
             </a>
           ))}
         </div>
@@ -188,7 +188,7 @@ function GamesDropdown() {
                   {game.description}
                 </p>
               </div>
-              <ExternalLink className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground/30 transition-colors group-hover/game:text-muted-foreground/70" />
+              <ExternalLink className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground/60 transition-colors group-hover/game:text-muted-foreground/70" />
             </a>
           ))}
         </div>
@@ -352,7 +352,8 @@ export function Navigation() {
       <div
         ref={scrimRef}
         aria-hidden="true"
-        className="pointer-events-none fixed inset-x-0 top-0 z-40 h-32 bg-gradient-to-b from-black/95 via-black/55 to-transparent opacity-0 transition-opacity duration-500 ease-fluid md:h-40"
+        className="pointer-events-none fixed inset-x-0 top-0 z-40 h-32 opacity-0 transition-opacity duration-500 ease-fluid md:h-40"
+        style={{ backgroundImage: "var(--nav-scrim)" }}
       />
       {/* Main nav bar */}
       <nav
@@ -514,7 +515,7 @@ export function Navigation() {
                       aria-hidden="true"
                       className={[
                         "font-mono text-[11px] tracking-[0.18em] tabular-nums transition-colors duration-300",
-                        isActive ? "text-foreground/70" : "text-muted-foreground/45 group-hover/link:text-foreground/60",
+                        isActive ? "text-foreground/70" : "text-muted-foreground/60 group-hover/link:text-foreground/60",
                       ].join(" ")}
                     >
                       {num}
@@ -568,7 +569,7 @@ export function Navigation() {
                     </div>
                     <p className="text-[11px] text-muted-foreground/50">{tool.description}</p>
                   </div>
-                  <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground/30 transition-all duration-300 group-hover/tool:translate-x-0.5 group-hover/tool:text-muted-foreground/70" />
+                  <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground/60 transition-all duration-300 group-hover/tool:translate-x-0.5 group-hover/tool:text-muted-foreground/70" />
                 </a>
               ))}
             </div>
@@ -598,7 +599,7 @@ export function Navigation() {
                     </div>
                     <p className="text-[11px] text-muted-foreground/50">{game.description}</p>
                   </div>
-                  <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground/30 transition-all duration-300 group-hover/game:translate-x-0.5 group-hover/game:text-muted-foreground/70" />
+                  <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground/60 transition-all duration-300 group-hover/game:translate-x-0.5 group-hover/game:text-muted-foreground/70" />
                 </a>
               ))}
             </div>

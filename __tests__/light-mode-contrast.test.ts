@@ -106,3 +106,147 @@ describe("light mode — metallic bold text", () => {
         expect(Number(hi![1])).toBeLessThan(70)
     })
 })
+
+/**
+ * Sep 2026 contrast pass — five defects screenshotted on the light page:
+ * ghosted scroll-stack cards, invisible testimonial cards, a hard-coded-dark
+ * tokscale embed, a black nav scrim, and a harsh work-marquee band.
+ */
+describe("light mode — journey scroll-stack cards", () => {
+    const journey = read("components/sections/journey.tsx")
+    const css = read("app/globals.css")
+
+    it("borders the card with a themed hairline, not a literal white alpha", () => {
+        expect(journey).not.toMatch(/border-white\/\[0\.08\]/)
+        expect(journey).toContain("var(--line-soft)")
+    })
+
+    it("keeps the scroll-frozen card fill opaque and themed, not a literal dark navy", () => {
+        const block = css.slice(css.indexOf('[data-stack-scrolling="true"]'))
+        const rule = block.slice(0, block.indexOf("}"))
+        expect(rule).not.toMatch(/hsla\(220, 18%, 10%, 0\.94\)/)
+        expect(rule).toContain("var(--card-fill-opaque)")
+        expect((css.match(/--card-fill-opaque:/g) ?? []).length).toBe(2)
+    })
+})
+
+describe("light mode — testimonial cards", () => {
+    const source = read("components/sections/client-testimonials.tsx")
+    const css = read("app/globals.css")
+
+    it("paints the card via the themed .testimonial-card class, not a bare card/alpha gradient", () => {
+        expect(source).not.toMatch(/bg-gradient-to-b from-card\/40/)
+        expect(source).toContain("testimonial-card")
+        const block = css.slice(css.indexOf(".light .testimonial-card"), css.indexOf(".light .testimonial-card") + 200)
+        expect(block).toContain("var(--glass-fill)")
+        expect(block).toContain("var(--glass-shadow)")
+    })
+
+    it("keeps dark mode's .testimonial-card byte-identical to the original card/40→card/12 wash", () => {
+        const block = css.slice(css.indexOf(".testimonial-card {"), css.indexOf(".testimonial-card {") + 300)
+        expect(block).toContain("hsl(var(--card) / 0.4)")
+        expect(block).toContain("hsl(var(--card) / 0.12)")
+        expect(block).toContain("rgba(0, 0, 0, 0.65)")
+    })
+
+    it("has no hard-coded white borders left on the card, divider or carousel controls", () => {
+        expect(source).not.toMatch(/border-white\/\[0\.1\]/)
+        expect(source).not.toMatch(/border-white\/\[0\.07\]/)
+        expect(source).not.toMatch(/border-white\/15/)
+    })
+})
+
+describe("light mode — projects grid cards", () => {
+    const source = read("components/sections/projects.tsx")
+    const css = read("app/globals.css")
+
+    it("bumps the .marquee-card alpha in light instead of leaving it to ghost into the page", () => {
+        expect(source).toContain("marquee-card")
+        expect(css).toContain(".light .marquee-card")
+        expect(css).toContain(".light .marquee-card:hover")
+    })
+
+    it("does not touch dark mode's card classes", () => {
+        expect(source).toContain("border-white/[0.08]")
+        expect(source).toContain("bg-white/[0.03]")
+    })
+})
+
+describe("light mode — work marquee band (feathered edge)", () => {
+    const marquee = read("components/sections/work-marquee.tsx")
+    const css = read("app/globals.css")
+
+    it("fades the band in/out in light instead of a hard-edged rectangle", () => {
+        expect(marquee).toContain("work-marquee-band")
+        const block = css.slice(css.indexOf(".light .work-marquee-band"))
+        const rule = block.slice(0, block.indexOf("}"))
+        expect(rule).toContain("linear-gradient(to bottom, transparent")
+        expect(rule).toContain("var(--band-fill)")
+    })
+
+    it("keeps dark mode's flat fill + hairline untouched (no .light scoping needed there)", () => {
+        expect(marquee).toContain("border-y border-[var(--line-soft)]")
+        expect(marquee).toContain("bg-[var(--band-fill)]")
+    })
+
+    it("nudges the light band a little darker than the previous washed-out value", () => {
+        const light = css.slice(css.indexOf(".light"))
+        const match = light.match(/--band-fill:\s*hsl\([\d.]+ [\d.]+% [\d.]+% \/ ([\d.]+)\)/)
+        expect(match, "--band-fill missing from .light").toBeTruthy()
+        const alpha = Number(match![1])
+        expect(alpha).toBeGreaterThanOrEqual(0.07)
+        expect(alpha).toBeLessThan(0.15)
+    })
+})
+
+describe("light mode — tokscale embed", () => {
+    const component = read("components/sections/tokscale-stats.tsx")
+    const svgLib = read("lib/tokscale-svg.ts")
+
+    it("requests a theme-aware embed instead of always the dark render", () => {
+        expect(component).toContain("useTheme")
+        expect(component).toMatch(/theme=light/)
+    })
+
+    it("recolors the dark-baked text/line colors for a light background", () => {
+        expect(svgLib).toContain("recolorForLightTheme")
+        expect(svgLib).not.toMatch(/export function recolorForLightTheme\(svg: string\): string \{\s*return svg\s*\}/)
+    })
+})
+
+describe("light mode — nav gradient scrim", () => {
+    const nav = read("components/nav/index.tsx")
+    const css = read("app/globals.css")
+
+    it("scrims from the themed background, not literal black", () => {
+        expect(nav).not.toMatch(/from-black\/95/)
+        expect(nav).toContain("var(--nav-scrim)")
+        expect((css.match(/--nav-scrim:/g) ?? []).length).toBe(2)
+    })
+})
+
+describe("light mode — work marquee band", () => {
+    const marquee = read("components/sections/work-marquee.tsx")
+    const css = read("app/globals.css")
+
+    it("fills from a themed band token, not a literal black wash", () => {
+        expect(marquee).not.toMatch(/bg-black\/\[0\.15\]/)
+        expect(marquee).toContain("var(--band-fill)")
+        expect((css.match(/--band-fill:/g) ?? []).length).toBe(2)
+    })
+
+    it("borders with the shared hairline token instead of an invisible white one", () => {
+        expect(marquee).not.toMatch(/border-white\/\[0\.05\]/)
+        expect(marquee).toContain("var(--line-soft)")
+    })
+
+    it("keeps the light-mode band darker than the page but not as dark as the dark-mode band", () => {
+        const light = css.slice(css.indexOf(".light"))
+        const match = light.match(/--band-fill:\s*hsl\([\d.]+ [\d.]+% [\d.]+% \/ ([\d.]+)\)/)
+        expect(match, "--band-fill missing from .light").toBeTruthy()
+        const alpha = Number(match![1])
+        // Enough to read as a band, not so much it goes harsh/washed-out.
+        expect(alpha).toBeGreaterThan(0)
+        expect(alpha).toBeLessThan(0.15)
+    })
+})

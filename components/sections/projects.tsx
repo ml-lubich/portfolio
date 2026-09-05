@@ -166,7 +166,7 @@ const MarqueeCard = memo(function MarqueeCard({ project, onExplore }: MarqueeCar
             {project.name}
           </h3>
           {project.prototype && (
-            <span className="inline-flex items-center gap-1 rounded-full border border-amber-400/30 bg-amber-400/[0.08] px-2 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-wider text-amber-300/90">
+            <span className="inline-flex items-center gap-1 rounded-full border border-amber-400/30 bg-amber-400/[0.08] px-2 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-wider text-amber-700 dark:text-amber-300/90">
               <FlaskConical className="h-2.5 w-2.5" aria-hidden />
               Prototype
             </span>
@@ -317,16 +317,16 @@ export function Projects() {
 
       <div className="relative mx-auto max-w-6xl px-3 md:px-4 lg:px-6">
         {/* Hint: whole card is clickable */}
-        <p className="mx-auto mt-6 flex items-center justify-center gap-1.5 text-center font-mono text-[11px] uppercase tracking-wider text-muted-foreground/40">
+        <p className="mx-auto mt-6 flex items-center justify-center gap-1.5 text-center font-mono text-[11px] uppercase tracking-wider text-muted-foreground/60">
           <MousePointerClick className="h-3.5 w-3.5" aria-hidden />
           Click any card for the full story
         </p>
 
         {/* Prototype disclaimer — clarifies the live Vercel demos are proof-of-concept */}
         <div className="mx-auto mt-6 flex max-w-2xl items-start gap-2.5 rounded-xl border border-amber-400/20 bg-amber-400/[0.04] px-4 py-3 text-left">
-          <FlaskConical className="mt-0.5 h-4 w-4 shrink-0 text-amber-300/80" aria-hidden />
+          <FlaskConical className="mt-0.5 h-4 w-4 shrink-0 text-amber-700 dark:text-amber-300/80" aria-hidden />
           <p className="text-xs leading-relaxed text-muted-foreground/80 sm:text-[13px]">
-            <span className="font-semibold text-amber-200/90">Prototype</span>{" "}
+            <span className="font-semibold text-amber-800 dark:text-amber-200/90">Prototype</span>{" "}
             projects are live demo deployments on Vercel—working proof-of-concept
             builds to show the idea and flow end to end, not full production
             products. Client sites are live, in-production work.

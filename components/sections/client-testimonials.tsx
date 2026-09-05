@@ -115,7 +115,7 @@ function Avatar({
 }) {
   if (siteImageSrc != null && siteImageSrc !== "") {
     return (
-      <div className="relative h-14 w-[7.5rem] shrink-0 overflow-hidden rounded-lg border border-white/10 bg-black/20 ring-1 ring-primary/15 sm:h-16 sm:w-[9.5rem]">
+      <div className="relative h-14 w-[7.5rem] shrink-0 overflow-hidden rounded-lg border border-[var(--line-soft)] bg-black/20 ring-1 ring-primary/15 sm:h-16 sm:w-[9.5rem]">
         <Image
           src={siteImageSrc}
           alt={siteImageAlt ?? `${name} — website preview`}
@@ -129,7 +129,7 @@ function Avatar({
   }
   if (avatarSrc != null && avatarSrc !== "") {
     return (
-      <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full border border-white/10 bg-black/20 ring-2 ring-primary/20 sm:h-16 sm:w-16">
+      <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full border border-[var(--line-soft)] bg-black/20 ring-2 ring-primary/20 sm:h-16 sm:w-16">
         <Image
           src={avatarSrc}
           alt={avatarAlt ?? name}
@@ -148,7 +148,7 @@ function Avatar({
       : (words[0]?.[0]?.toUpperCase() ?? "?")
   return (
     <div
-      className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-white/10 bg-primary/10 font-mono text-sm font-bold text-primary sm:h-16 sm:w-16 sm:text-base"
+      className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-[var(--line-soft)] bg-primary/10 font-mono text-sm font-bold text-primary sm:h-16 sm:w-16 sm:text-base"
       aria-hidden
     >
       {initials || "?"}
@@ -239,8 +239,15 @@ export function ClientTestimonials() {
                 >
                   <figure
                     className={cn(
-                      "flex h-full min-h-[240px] flex-col rounded-2xl border border-white/[0.1] bg-gradient-to-b from-card/40 to-card/[0.12] p-5 shadow-[0_20px_50px_-24px_rgba(0,0,0,0.65)] backdrop-blur-xl transition-[border-color,box-shadow] duration-300 sm:min-h-[340px] sm:p-8",
-                      "hover:border-primary/25 hover:shadow-[0_24px_60px_-20px_hsl(var(--primary)/0.12)]",
+                      // testimonial-card: dark keeps the original card/40→card/12
+                      // wash + black shadow (see .testimonial-card in globals.css) —
+                      // on the light page that wash was indistinguishable from the
+                      // near-white background, so `.light .testimonial-card`
+                      // swaps to the same glass-fill/glass-shadow treatment already
+                      // proven on the hero stat cards (rotating-stats.tsx), without
+                      // touching a single dark-mode pixel.
+                      "testimonial-card flex h-full min-h-[240px] flex-col rounded-2xl border p-5 backdrop-blur-xl transition-[border-color] duration-300 sm:min-h-[340px] sm:p-8",
+                      "hover:border-primary/25",
                     )}
                   >
                     <div className="mb-5 flex items-start justify-between gap-4">
@@ -258,7 +265,7 @@ export function ClientTestimonials() {
                       {t.quote}
                       <span className="text-primary/45">”</span>
                     </blockquote>
-                    <figcaption className="mt-6 border-t border-white/[0.07] pt-5">
+                    <figcaption className="mt-6 border-t border-[var(--line-soft)] pt-5">
                       <cite className="not-italic">
                         <span className="block font-semibold tracking-tight text-foreground">{t.name}</span>
                         <span className="mt-1 block text-xs text-muted-foreground sm:text-sm">
@@ -272,11 +279,11 @@ export function ClientTestimonials() {
             </CarouselContent>
             <CarouselPrevious
               variant="outline"
-              className="left-0 border-white/15 bg-background/80 text-foreground shadow-md backdrop-blur-md hover:bg-background hover:text-primary disabled:opacity-40"
+              className="left-0 border-[var(--line-strong)] bg-background/80 text-foreground shadow-md backdrop-blur-md hover:bg-background hover:text-primary disabled:opacity-40"
             />
             <CarouselNext
               variant="outline"
-              className="right-0 border-white/15 bg-background/80 text-foreground shadow-md backdrop-blur-md hover:bg-background hover:text-primary disabled:opacity-40"
+              className="right-0 border-[var(--line-strong)] bg-background/80 text-foreground shadow-md backdrop-blur-md hover:bg-background hover:text-primary disabled:opacity-40"
             />
           </Carousel>
 

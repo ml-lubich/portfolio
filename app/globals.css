@@ -42,6 +42,22 @@
        light page into flat grey — dark navy over near-white. */
     --glass-fill: linear-gradient(135deg, hsla(220, 25%, 15%, 0.65) 0%, hsla(220, 25%, 10%, 0.45) 100%);
     --glass-shadow: 0 12px 32px -8px hsla(0,0%,0%,0.5), inset 0 1px 0 0 hsla(0,0%,100%,0.22), inset 0 -1px 0 0 hsla(0,0%,0%,0.3);
+    /* Opaque stand-in for --card-fill while a scroll-stack card drops its
+       backdrop-filter mid-scroll (perf) — needs a solid fill instead of a
+       translucent one, or page content would bleed straight through. */
+    --card-fill-opaque: hsl(220 18% 10%);
+    /* Nav scrim: the wash painted under the fixed nav once the hero scrolls
+       out of view, so nav pills stay legible over whatever content is
+       underneath. Literal black in dark (unchanged); themed below. */
+    --nav-scrim: linear-gradient(to bottom, rgba(0,0,0,0.95), rgba(0,0,0,0.55), transparent);
+    /* Work-marquee band: a hair darker than the page, not an inverted or
+       washed-out slab. Dark value matches the old literal bg-black/[0.15]. */
+    --band-fill: hsl(0 0% 0% / 0.15);
+    /* Tokscale hero-badge chrome — near-opaque so it occludes the WebGL brain
+       behind it; the embed's own text is recolored to match (see
+       lib/tokscale-svg.ts). */
+    --tokscale-card-bg: hsla(222, 25%, 9%, 0.92);
+    --tokscale-card-bg-hover: hsla(222, 25%, 11%, 0.95);
     --body-wash:
       radial-gradient(ellipse 80% 50% at 50% -20%, rgba(30, 41, 89, 0.25), transparent 70%),
       radial-gradient(ellipse 60% 40% at 20% 40%, rgba(49, 28, 77, 0.18), transparent 70%),
@@ -152,6 +168,17 @@
        border, instead of the dark-glass gradient the cards were hard-coding. */
     --glass-fill: linear-gradient(135deg, hsla(0, 0%, 100%, 0.92) 0%, hsla(220, 30%, 97%, 0.78) 100%);
     --glass-shadow: 0 12px 32px -12px hsla(220, 30%, 20%, 0.18), inset 0 1px 0 0 hsla(0, 0%, 100%, 0.9), inset 0 -1px 0 0 hsla(220, 20%, 60%, 0.16);
+    --card-fill-opaque: #ffffff;
+    /* Light: wash from the page background itself instead of black, so the
+       nav doesn't drop a dark bar onto a light page. */
+    --nav-scrim: linear-gradient(to bottom, hsl(var(--background) / 0.95), hsl(var(--background) / 0.55), transparent);
+    /* A hair darker than the page (background is 95.5% L) — enough to read
+       as a band, not so much it goes harsh or inverts the dark-mode look.
+       0.05 read as washed-out/invisible; 0.08 is the "slightly darker, still
+       subtle" the user asked for. */
+    --band-fill: hsl(220 20% 10% / 0.08);
+    --tokscale-card-bg: hsla(220, 30%, 97%, 0.92);
+    --tokscale-card-bg-hover: hsla(220, 30%, 99%, 0.95);
 
     /* The page sits a touch below pure white so the white cards, inputs and
        glass surfaces separate from it without every card needing its own
@@ -1235,13 +1262,55 @@ nav[data-nav-scrolled="true"] .nav-shell {
 [data-stack-scrolling="true"] [data-stack-card] .glass-stack-card {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-  background: hsla(220, 18%, 10%, 0.94);
+  background: var(--card-fill-opaque);
 }
 
 /* Phones / iPad / touch tablets: lighter blur (stack is 2D; less compositing work). */
 [data-stack-reduced="true"] [data-stack-card] .glass-stack-card {
   backdrop-filter: blur(10px) saturate(1.2);
   -webkit-backdrop-filter: blur(10px) saturate(1.2);
+}
+
+/* ── Testimonial cards ────────────────────────────────────────────────
+   Dark keeps the exact original wash + shadow (a translucent --card gradient
+   over an equally-dark page reads as a barely-there card, which is the
+   existing look). Light swaps to the glass-fill/glass-shadow treatment
+   already proven on the hero stat cards — the old wash was indistinguishable
+   from the near-white page. Scoped by class instead of an inline style so
+   dark stays byte-identical to before. */
+.testimonial-card {
+  border-color: hsl(0 0% 100% / 0.1);
+  background: linear-gradient(to bottom, hsl(var(--card) / 0.4), hsl(var(--card) / 0.12));
+  box-shadow: 0 20px 50px -24px rgba(0, 0, 0, 0.65);
+}
+
+.light .testimonial-card {
+  border-color: var(--line-strong);
+  background: var(--glass-fill);
+  box-shadow: var(--glass-shadow);
+}
+
+/* ── Project grid cards (.marquee-card, components/sections/projects.tsx) ──
+   bg-white/[0.03] / border-white/[0.08] already theme correctly — Tailwind's
+   `white` routes through --white-rgb, which flips to a dark tint in light —
+   but 3-8% alpha is too faint against a light page, so the card ghosted into
+   it. Bump the alpha only in light; dark is untouched. */
+.light .marquee-card {
+  background-color: rgb(var(--white-rgb) / 0.06);
+  border-color: rgb(var(--white-rgb) / 0.16);
+}
+
+.light .marquee-card:hover {
+  background-color: rgb(var(--white-rgb) / 0.1);
+}
+
+/* ── Work-marquee band ────────────────────────────────────────────────
+   Dark keeps its flat fill + hairline border exactly as before. In light,
+   a flat rectangle with a hard top/bottom line read as an abrupt wall
+   cutting the page rather than a band — fade it in and out instead. */
+.light .work-marquee-band {
+  border-color: transparent;
+  background: linear-gradient(to bottom, transparent, var(--band-fill) 25%, var(--band-fill) 75%, transparent);
 }
 
 /* ── 3D Glass Card effect ── */
@@ -1342,11 +1411,11 @@ nav[data-nav-scrolled="true"] .nav-shell {
    inside it is a transparent image, so the card is the only thing standing
    between the wireframe and the numbers. */
 .tokscale-hero-card {
-  background-color: hsla(222, 25%, 9%, 0.92);
+  background-color: var(--tokscale-card-bg);
 }
 
 .tokscale-hero-card:hover {
-  background-color: hsla(222, 25%, 11%, 0.95);
+  background-color: var(--tokscale-card-bg-hover);
 }
 
 .tokscale-aura {

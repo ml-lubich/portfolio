@@ -122,17 +122,18 @@ describe("Navigation wiring (regression)", () => {
       path.join(ROOT, "components/nav/index.tsx"),
       "utf8",
     )
-    const scrimMatch = navSrc.match(/ref=\{scrimRef\}[\s\S]*?className="([^"]*)"/)
+    const scrimMatch = navSrc.match(/ref=\{scrimRef\}[\s\S]*?className="([^"]*)"[\s\S]*?\/>/)
     expect(scrimMatch, "scrim div with ref={scrimRef} must be rendered").toBeTruthy()
     const cls = scrimMatch![1]
     // Pinned to the viewport top, full width
     expect(cls).toContain("fixed")
     expect(cls).toContain("inset-x-0")
     expect(cls).toContain("top-0")
-    // Prominent dark gradient fading downward to transparent
-    expect(cls).toMatch(/bg-gradient-to-b/)
-    expect(cls).toContain("from-black/95")
-    expect(cls).toContain("to-transparent")
+    // Gradient fading downward to transparent, from a themed token (not a
+    // literal black — that painted a dark bar on the light page).
+    const scrimBlock = navSrc.slice(navSrc.indexOf("ref={scrimRef}"), navSrc.indexOf("ref={scrimRef}") + 400)
+    expect(scrimBlock).toContain("var(--nav-scrim)")
+    expect(scrimBlock).not.toMatch(/from-black\/95/)
     // Tall enough to read as a deliberate scrim band
     expect(cls).toContain("h-32")
     expect(cls).toContain("md:h-40")

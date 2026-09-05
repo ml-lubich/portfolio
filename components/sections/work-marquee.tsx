@@ -19,7 +19,7 @@ function MarqueeTrack({ ariaHidden = false }: { ariaHidden?: boolean }) {
       {workMarqueeSegments.map((label) => (
         <span
           key={ariaHidden ? `${label}-dup` : label}
-          className="whitespace-nowrap font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground/45 sm:text-xs"
+          className="whitespace-nowrap font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground/60 sm:text-xs"
         >
           {label}
         </span>
@@ -117,11 +117,11 @@ export function WorkMarquee() {
   return (
     <div
       ref={sectionRef}
-      className="relative border-y border-white/[0.05] bg-black/[0.15] py-3 backdrop-blur-[2px] sm:py-3.5"
+      className="work-marquee-band relative border-y border-[var(--line-soft)] bg-[var(--band-fill)] py-3 backdrop-blur-[2px] sm:py-3.5"
       aria-label="Recent consulting collaborators and typical project scope"
     >
       <p className="sr-only">{workMarqueeSegments.join(", ")}</p>
-      <p className="mb-2 text-center text-[10px] font-medium uppercase tracking-[0.22em] text-muted-foreground/35">
+      <p className="mb-2 text-center text-[10px] font-medium uppercase tracking-[0.22em] text-muted-foreground/60">
         Recent scope & collaborators
       </p>
 
