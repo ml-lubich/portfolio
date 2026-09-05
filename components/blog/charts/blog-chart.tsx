@@ -171,28 +171,42 @@ function ComparisonRenderer({ chart }: { chart: ComparisonChart }) {
 
 /* ── Pie ────────────────────────────────────────────────────────── */
 
+/* The legend doubles as the value readout (see `pie-chart-body.tsx` for why
+   there is no floating tooltip). Hovering a slice or a row highlights both. */
 function PieRenderer({ chart }: { chart: PieChartDef }) {
+  const [activeIndex, setActiveIndex] = useState<number | null>(null)
   const data = chart.data.map((d, i) => ({
     name: d.label,
     value: d.value,
     fill: d.color ? PIE_HEX[d.color] : PIE_PALETTE[i % PIE_PALETTE.length],
   }))
+  const total = data.reduce((sum, d) => sum + d.value, 0)
 
   return (
     <div className="flex flex-col items-center gap-4">
-      <LazyPieChartBody data={data} />
-      {/* Legend */}
-      <div className="flex flex-wrap justify-center gap-x-5 gap-y-1.5">
+      <LazyPieChartBody data={data} activeIndex={activeIndex} onActiveChange={setActiveIndex} />
+      <ul className="flex w-full flex-col gap-1 text-xs">
         {data.map((d, i) => (
-          <div key={i} className="flex items-center gap-1.5 text-xs text-white/70">
+          <li
+            key={i}
+            onMouseEnter={() => setActiveIndex(i)}
+            onMouseLeave={() => setActiveIndex(null)}
+            className={`flex items-center gap-2 rounded-md px-2 py-1 transition-colors ${
+              activeIndex === i ? "bg-white/[0.08] text-foreground" : "text-white/70"
+            }`}
+          >
             <span
-              className="inline-block h-2.5 w-2.5 rounded-sm"
+              className="inline-block h-2.5 w-2.5 shrink-0 rounded-sm"
               style={{ background: d.fill }}
             />
-            {d.name}
-          </div>
+            <span className="min-w-0 flex-1 leading-snug">{d.name}</span>
+            <span className="shrink-0 tabular-nums text-white/50">
+              {d.value}
+              {total > 0 ? ` · ${((d.value / total) * 100).toFixed(0)}%` : ""}
+            </span>
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   )
 }

@@ -5,7 +5,6 @@ import {
   PieChart as RechartsPie,
   Pie,
   Cell,
-  Tooltip,
   ResponsiveContainer,
 } from "recharts"
 
@@ -59,7 +58,19 @@ function renderSliceLabel({
   )
 }
 
-export function PieChartBody({ data }: { data: PieDatum[] }) {
+/* No floating hover box: Recharts' one lands on top of the ring in a narrow
+   chat card and its item text defaults to #000. The legend in `blog-chart.tsx`
+   is the readout instead — it carries value + share, and the hovered slice is
+   reported up so the matching row can light up. */
+export function PieChartBody({
+  data,
+  activeIndex = null,
+  onActiveChange,
+}: {
+  data: PieDatum[]
+  activeIndex?: number | null
+  onActiveChange?: (index: number | null) => void
+}) {
   return (
     <ResponsiveContainer width="100%" height={260}>
       <RechartsPie>
@@ -74,20 +85,19 @@ export function PieChartBody({ data }: { data: PieDatum[] }) {
           strokeWidth={0}
           label={renderSliceLabel}
           labelLine={false}
+          isAnimationActive={false}
+          onMouseEnter={(_, i) => onActiveChange?.(i)}
+          onMouseLeave={() => onActiveChange?.(null)}
         >
           {data.map((entry, i) => (
-            <Cell key={i} fill={entry.fill} />
+            <Cell
+              key={i}
+              fill={entry.fill}
+              fillOpacity={activeIndex === null || activeIndex === i ? 1 : 0.45}
+              style={{ transition: "fill-opacity 150ms", cursor: "default" }}
+            />
           ))}
         </Pie>
-        <Tooltip
-          contentStyle={{
-            background: "hsl(var(--card))",
-            border: "1px solid hsl(var(--border))",
-            borderRadius: "8px",
-            color: "hsl(var(--foreground))",
-            fontSize: "13px",
-          }}
-        />
       </RechartsPie>
     </ResponsiveContainer>
   )

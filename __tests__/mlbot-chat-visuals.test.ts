@@ -332,9 +332,8 @@ describe("BlogChart card is theme-aware", () => {
         expect(chart).toMatch(/bg-card/)
     })
 
-    it("themes the pie tooltip too", () => {
+    it("leaves no hard-coded dark surface in the pie either", () => {
         expect(pie).not.toContain("hsl(220 20% 8%)")
-        expect(pie).toMatch(/var\(--|hsl\(var\(/)
     })
 })
 
@@ -409,5 +408,37 @@ describe("follow-up text is never cut mid-word", () => {
         const pills = source.slice(source.indexOf("turn.followups?.length"), source.indexOf("turn.followups?.length") + 900)
         expect(pills).not.toContain("truncate")
         expect(pills).toContain("text-left")
+    })
+})
+
+/* The Recharts hover tooltip is a floating box positioned at the cursor, so on
+ * a 22rem chat card it sat right on top of the ring, hiding the slice it was
+ * describing, and its item text stayed Recharts' default #000 (dark on dark).
+ * The legend already names every slice; it now also carries the value and
+ * share, and hovering a slice highlights its legend row. No box, nothing to
+ * clip, nothing that needs its own colour. */
+describe("Pie readout lives in the legend, not a floating tooltip", () => {
+    const pie = read("components/blog/charts/pie-chart-body.tsx")
+    const chart = read("components/blog/charts/blog-chart.tsx")
+
+    it("does not mount a recharts Tooltip over the ring", () => {
+        expect(pie).not.toMatch(/<Tooltip/)
+        expect(pie).not.toMatch(/\bTooltip\b/)
+    })
+
+    it("reports the hovered slice to its parent", () => {
+        expect(pie).toMatch(/onMouseEnter=/)
+        expect(pie).toMatch(/onMouseLeave=/)
+        expect(pie).toMatch(/activeIndex/)
+    })
+
+    it("prints each slice's value and share in the legend", () => {
+        expect(chart).toMatch(/\{d\.value\}/)
+        expect(chart).toMatch(/toFixed\(0\)\}%/)
+    })
+
+    it("highlights the hovered slice's legend row", () => {
+        expect(chart).toMatch(/useState<number \| null>\(null\)/)
+        expect(chart).toMatch(/activeIndex === i/)
     })
 })
