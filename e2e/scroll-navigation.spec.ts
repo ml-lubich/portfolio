@@ -59,12 +59,28 @@ async function expectLandedOnContact(page: Page) {
   // which reads as "settled" while the page is still thousands of px away.
   // Polling the real invariant waits as long as the scroll genuinely needs and
   // still fails outright if it never lands.
+  //
+  // "In the band" alone is not "landed": the woosh eases out, so its last few
+  // hundred px take the longest, and a read taken the moment #contact enters
+  // the band still has the tail of the scroll ahead of it. The drift check
+  // below then measures that tail (a repeatable ~230px) and calls it a
+  // regression. Landed means in the band AND holding still across two reads.
+  let previous = Number.NaN
   await expect
-    .poll(async () => (await contactViewportTop(page)) > -300 && (await contactViewportTop(page)) < 900 * 0.6, {
-      message: "#contact should land near the nav offset after the scroll",
-      timeout: 15_000,
-      intervals: [100, 100, 200, 200, 500],
-    })
+    .poll(
+      async () => {
+        const top = await contactViewportTop(page)
+        const inBand = top > -300 && top < 900 * 0.6
+        const holding = Math.abs(top - previous) < 2
+        previous = top
+        return inBand && holding
+      },
+      {
+        message: "#contact should land near the nav offset and hold there",
+        timeout: 15_000,
+        intervals: [250],
+      },
+    )
     .toBe(true)
 
   const top = await contactViewportTop(page)
