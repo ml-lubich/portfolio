@@ -53,13 +53,32 @@ export class FollowupStream {
 }
 
 /** Splits, trims and clamps the raw follow-up line. Never trusts the model's count. */
+/** Clamps to `maxChars` without splitting a word. A pill reading
+ *  "…multi-agent pipeli…" looks broken; one that stops on a whole word does
+ *  not. */
+function clamp(s: string): string {
+    if (s.length <= FOLLOWUP_LIMITS.maxChars) return s
+    const cut = s.slice(0, FOLLOWUP_LIMITS.maxChars)
+    const lastSpace = cut.lastIndexOf(" ")
+    return (lastSpace > 0 ? cut.slice(0, lastSpace) : cut).trimEnd() + "…"
+}
+
 export function parseFollowups(raw: string): string[] {
+    const seen = new Set<string>()
+
     return raw
         .split("|")
         .map((s) => s.replace(/\s+/g, " ").trim())
         // Strip any list numbering the model adds despite the format instruction.
         .map((s) => s.replace(/^[-*\d.)\s]+/, "").trim())
         .filter(Boolean)
-        .map((s) => (s.length > FOLLOWUP_LIMITS.maxChars ? s.slice(0, FOLLOWUP_LIMITS.maxChars).trimEnd() + "…" : s))
+        // Models repeat themselves; two identical pills read as a rendering bug.
+        .filter((s) => {
+            const key = s.toLowerCase()
+            if (seen.has(key)) return false
+            seen.add(key)
+            return true
+        })
         .slice(0, FOLLOWUP_LIMITS.max)
+        .map(clamp)
 }

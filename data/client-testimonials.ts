@@ -50,6 +50,8 @@ export const clientTestimonials: ClientTestimonial[] = [
         title: "AI Lead",
         organization: "Brio Water",
         rating: 5,
+        avatarSrc: "/images/testimonials/joseph-heupler.webp",
+        avatarAlt: "Joseph Heupler",
     },
     {
         id: "enrichdata-team",

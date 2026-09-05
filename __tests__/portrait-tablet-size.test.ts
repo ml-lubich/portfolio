@@ -23,3 +23,25 @@ describe("profile intro portrait", () => {
         expect(frame).toContain("aspect-[4/5]")
     })
 })
+
+/* The file that used to sit at joseph-heupler.png was a LinkedIn login-wall
+ * screenshot from a failed scrape, so the card silently fell back to "JH"
+ * initials. Every named person with a headshot on file should show it. */
+describe("testimonial headshots", () => {
+    it("gives Joseph Heupler a real photo, not initials", async () => {
+        const { clientTestimonials } = await import("@/data/client-testimonials")
+        const jh = clientTestimonials.find((t) => t.id === "joseph-heupler")
+        expect(jh?.avatarSrc).toBe("/images/testimonials/joseph-heupler.webp")
+    })
+
+    it("points every avatarSrc at a file that exists", async () => {
+        const { clientTestimonials } = await import("@/data/client-testimonials")
+        for (const t of clientTestimonials) {
+            if (!t.avatarSrc) continue
+            expect(
+                readFileSync(join(process.cwd(), "public", t.avatarSrc)).byteLength,
+                `${t.avatarSrc} is missing or empty`,
+            ).toBeGreaterThan(0)
+        }
+    })
+})

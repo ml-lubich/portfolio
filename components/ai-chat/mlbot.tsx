@@ -381,7 +381,7 @@ export function MLBot() {
                                                         type="button"
                                                         onClick={() => send(q)}
                                                         title={q}
-                                                        className="max-w-full truncate rounded-full border border-white/[0.1] bg-white/[0.04] px-3 py-1.5 text-left text-[12.5px] text-muted-foreground transition-colors hover:border-white/20 hover:text-foreground"
+                                                        className="max-w-full rounded-2xl border border-white/[0.1] bg-white/[0.04] px-3 py-1.5 text-left text-[12.5px] leading-snug text-muted-foreground transition-colors hover:border-white/20 hover:text-foreground"
                                                     >
                                                         {q}
                                                     </button>

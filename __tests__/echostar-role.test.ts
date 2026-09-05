@@ -59,3 +59,23 @@ describe("site metadata reflects the new title", () => {
         expect(jsonLd).toMatch(/EchoStar/)
     })
 })
+
+/* He is Staff now, and the rotation is his own title line — "Senior Software
+ * Engineer" undersells it and "Vibe Coder" was a joke he has outgrown. */
+describe("hero role rotation", () => {
+    it("leads with Staff AI Engineer", async () => {
+        const { roles } = await import("@/components/hero/data")
+        expect(roles[0]).toBe("Staff AI Engineer")
+    })
+
+    it("no longer claims a Senior title", async () => {
+        const { roles } = await import("@/components/hero/data")
+        expect(roles.some((r) => /^Senior/.test(r))).toBe(false)
+    })
+
+    it("says agentic rather than vibe", async () => {
+        const { roles } = await import("@/components/hero/data")
+        expect(roles.some((r) => /vibe/i.test(r))).toBe(false)
+        expect(roles.some((r) => /agentic/i.test(r))).toBe(true)
+    })
+})

@@ -363,7 +363,6 @@ describe("MLBot follow-up pills", () => {
 
     it("stacks them left-packed, one per line, rather than a ragged wrap", () => {
         expect(pills).toMatch(/flex-col[^"]*items-start|items-start[^"]*flex-col/)
-        expect(pills).toContain("truncate")
     })
 })
 
@@ -376,5 +375,39 @@ describe("follow-up prompt", () => {
     it("tells the model to write a short fragment, not a full sentence", () => {
         const prompt = read("lib/ai/profile-tools.ts")
         expect(prompt).toMatch(/FOLLOWUPS:[\s\S]{0,600}?(words or fewer|word fragment|at most \d+ words)/)
+    })
+})
+
+/* Clamping to a character count cut questions mid-word — "What's inside the
+ * SynthData Forge multi-agent pipeli…" — which reads as a broken pill rather
+ * than a short one. Trim at a word boundary, and let the pill wrap instead of
+ * hiding the tail behind an ellipsis. */
+describe("follow-up text is never cut mid-word", () => {
+    it("trims at a word boundary", async () => {
+        const { parseFollowups } = await import("@/lib/ai/followups")
+        const long = "What is inside the SynthData Forge multi agent pipeline exactly and why?"
+        const [only] = parseFollowups(long)
+        expect(only.endsWith("…")).toBe(true)
+        // The character before the ellipsis must end a word, not split one.
+        // Whatever survives must be a whole-word prefix of the original —
+        // no half-word like "pipeli" left in front of the ellipsis.
+        const kept = only.slice(0, -1)
+        expect(long.startsWith(kept)).toBe(true)
+        expect(long[kept.length]).toBe(" ")
+    })
+
+    it("drops repeats so the same question cannot appear twice", async () => {
+        const { parseFollowups } = await import("@/lib/ai/followups")
+        expect(parseFollowups("Same one? | Different? | same one?")).toEqual([
+            "Same one?",
+            "Different?",
+        ])
+    })
+
+    it("shows the whole question in the pill rather than clipping it", () => {
+        const source = read("components/ai-chat/mlbot.tsx")
+        const pills = source.slice(source.indexOf("turn.followups?.length"), source.indexOf("turn.followups?.length") + 900)
+        expect(pills).not.toContain("truncate")
+        expect(pills).toContain("text-left")
     })
 })
