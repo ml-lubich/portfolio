@@ -89,7 +89,7 @@ export function ProfileIntro() {
                                 rather than piled into a thumbnail strip here.
                                 The frame's aspect tracks the source image so
                                 object-cover never crops the top of the head. */}
-                            <div className="shrink-0 lg:w-[22rem]">
+                            <div className="mx-auto w-full max-w-[17rem] shrink-0 sm:max-w-[20rem] lg:mx-0 lg:w-[22rem] lg:max-w-none">
                                 {/* aspect-[4/5] matches the source exactly, so
                                     object-cover has nothing to crop at ANY
                                     width. A fixed height cannot do this: the
