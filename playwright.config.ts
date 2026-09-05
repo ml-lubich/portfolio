@@ -32,7 +32,7 @@ export default defineConfig({
     // Always rebuild: this is a push gate, so it must test the code that is
     // actually about to be pushed, not a stale server left over from a
     // previous run.
-    command: `PLAYWRIGHT_DIST_DIR=.next-e2e bunx next build --webpack && PLAYWRIGHT_DIST_DIR=.next-e2e bunx next start -p ${PORT}`,
+    command: `PLAYWRIGHT_DIST_DIR=.next-e2e bunx next build --webpack && git checkout -- next-env.d.ts && PLAYWRIGHT_DIST_DIR=.next-e2e bunx next start -p ${PORT}`,
     url: `http://localhost:${PORT}`,
     reuseExistingServer: false,
     // Generous: covers a cold build (~2min measured) plus server boot under
