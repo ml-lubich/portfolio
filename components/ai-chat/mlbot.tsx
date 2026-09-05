@@ -11,7 +11,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from "react"
-import { X, ArrowUp, ArrowUpToLine } from "lucide-react"
+import { X, ArrowUp, ArrowUpToLine, Maximize2 } from "lucide-react"
 import { SiteLogoMark } from "@/components/site-logo-mark"
 import { BlogChart } from "@/components/blog/charts/blog-chart"
 import { splitChatSegments } from "@/lib/ai/chat-segments"
@@ -33,6 +33,17 @@ interface Turn {
     /** Calendar hand-off, when the visitor asked about working together. */
     booking?: BookingSpec
 }
+
+/* Panel footprint, cycled from the header. Small suits a quick answer next to
+ * the page; large suits a chart or a table. Mobile ignores this — the panel is
+ * full-screen there. */
+const PANEL_SIZES = [
+    "sm:h-[min(26rem,calc(100dvh-12rem))] sm:w-[min(20rem,calc(100vw-2rem))]",
+    "sm:h-[min(34rem,calc(100dvh-12rem))] sm:w-[min(24rem,calc(100vw-2rem))]",
+    "sm:h-[min(46rem,calc(100dvh-8rem))] sm:w-[min(36rem,calc(100vw-2rem))]",
+] as const
+
+const SIZE_LABELS = ["Small", "Medium", "Large"] as const
 
 const SUGGESTIONS = [
     "What has Misha built with agents?",
@@ -115,6 +126,7 @@ export function MLBot() {
     const [input, setInput] = useState("")
     const [busy, setBusy] = useState(false)
     const [showTop, setShowTop] = useState(false)
+    const [size, setSize] = useState(1)
 
     const scrollRef = useRef<HTMLDivElement>(null)
     const inputRef = useRef<HTMLTextAreaElement>(null)
@@ -281,17 +293,29 @@ export function MLBot() {
                     /* Full-screen on a phone — a 24rem card floating over the
                        page is unusable with a keyboard open. From sm up it goes
                        back to the bottom-right panel. */
-                    className="mlbot-panel fixed inset-0 z-[60] flex h-dvh w-full flex-col overflow-hidden rounded-none sm:inset-auto sm:bottom-24 sm:right-6 sm:h-[min(34rem,calc(100dvh-12rem))] sm:w-[min(24rem,calc(100vw-2rem))] sm:rounded-2xl"
+                    className={`mlbot-panel fixed inset-0 z-[60] flex h-dvh w-full flex-col overflow-hidden rounded-none sm:inset-auto sm:bottom-24 sm:right-6 sm:rounded-2xl ${PANEL_SIZES[size]}`}
                 >
                     <header className="flex items-center gap-3 border-b border-white/[0.08] px-4 py-3">
                         <SiteLogoMark width={28} height={28} sizes="28px" alt="" className="h-7 w-7 object-contain" />
-                        <div className="min-w-0">
+                        <div className="min-w-0 flex-1">
                             <p className="text-[14px] font-medium text-foreground">MLBot</p>
                             <p className="truncate text-[12px] text-muted-foreground">Ask about Misha&apos;s work</p>
                         </div>
+
+                        {/* Cycles S → M → L. One control beats a grow/shrink pair:
+                            three sizes wrap round in two taps either way. */}
+                        <button
+                            type="button"
+                            onClick={() => setSize((n) => (n + 1) % PANEL_SIZES.length)}
+                            aria-label={`Resize MLBot (${SIZE_LABELS[size]})`}
+                            title={`Resize MLBot — ${SIZE_LABELS[size]}`}
+                            className="hidden h-8 w-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-white/[0.06] hover:text-foreground sm:flex"
+                        >
+                            <Maximize2 className="h-4 w-4" />
+                        </button>
                     </header>
 
-                    <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto px-4 py-4">
+                    <div ref={scrollRef} className="min-w-0 flex-1 space-y-4 overflow-x-hidden overflow-y-auto px-4 py-4">
                         {turns.length === 0 && (
                             <div className="space-y-3">
                                 <p className="text-[14px] leading-relaxed text-muted-foreground">
@@ -313,9 +337,9 @@ export function MLBot() {
                         )}
 
                         {turns.map((turn, i) => (
-                            <div key={i} className={turn.role === "user" ? "mlbot-turn-in flex justify-end" : "mlbot-turn-in space-y-2"}>
+                            <div key={i} className={turn.role === "user" ? "mlbot-turn-in flex min-w-0 justify-end" : "mlbot-turn-in min-w-0 space-y-2"}>
                                 {turn.role === "user" ? (
-                                    <p className="max-w-[85%] rounded-2xl rounded-br-sm bg-white/[0.08] px-3.5 py-2.5 text-[14.5px] leading-[1.55] text-foreground">
+                                    <p className="max-w-[85%] overflow-hidden break-words rounded-2xl rounded-br-sm bg-white/[0.08] px-3.5 py-2.5 text-[14.5px] leading-[1.55] text-foreground">
                                         {turn.content}
                                     </p>
                                 ) : (
@@ -333,9 +357,11 @@ export function MLBot() {
 
                                         {splitChatSegments(turn.content).map((seg, j) =>
                                             seg.kind === "diagram" ? (
-                                                <BlogChart key={j} json={seg.json} className="my-2" />
+                                                <div key={j} className="my-2 max-w-full overflow-x-auto">
+                                                    <BlogChart json={seg.json} />
+                                                </div>
                                             ) : (
-                                                <div key={j} className="mlbot-md text-[14.5px] leading-[1.65] text-foreground/90">
+                                                <div key={j} className="mlbot-md min-w-0 text-[14.5px] leading-[1.65] text-foreground/90">
                                                     <ReactMarkdown remarkPlugins={[remarkGfm]}>{seg.value}</ReactMarkdown>
                                                 </div>
                                             ),

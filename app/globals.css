@@ -136,7 +136,7 @@
     --accent-glow-soft: #2d84c657;
     /* Dark type on a pale mesh needs far less cover than white type on a
        dense white one — at the dark theme's strength the brain ghosted out. */
-    --hero-stage-scrim: radial-gradient(ellipse 58% 52% at 50% 48%, rgba(250,251,253,0.74) 0%, rgba(250,251,253,0.46) 44%, rgba(250,251,253,0.14) 68%, transparent 80%), linear-gradient(to bottom, rgba(250,251,253,0.45) 0%, transparent 26%, transparent 62%, rgba(250,251,253,0.6) 100%);
+    --hero-stage-scrim: radial-gradient(ellipse 62% 56% at 50% 48%, rgba(249,250,252,0.93) 0%, rgba(249,250,252,0.7) 44%, rgba(249,250,252,0.2) 70%, transparent 82%), linear-gradient(to bottom, rgba(249,250,252,0.55) 0%, transparent 26%, transparent 60%, rgba(249,250,252,0.75) 100%);
 
     /* Light: the same three pools, pitched pale and cool so the page keeps its
        depth without going muddy. */
@@ -165,7 +165,9 @@
     --secondary: 220 18% 91%;
     --secondary-foreground: 220 22% 22%;
     --muted: 220 18% 91%;
-    --muted-foreground: 220 14% 36%;
+    /* Sits deliberately dark: a lot of micro-copy renders at /50–/70 alpha,
+       and at a mid grey those variants washed out to near-invisible. */
+    --muted-foreground: 220 20% 24%;
 
     --primary: 220 25% 12%;
     --primary-foreground: 0 0% 100%;
@@ -3237,6 +3239,41 @@ article .blog-prose b a[href],
  * ─────────────────────────────────────────────────────────────────── */
 .mlbot-md > * + * {
   margin-top: 0.6em;
+}
+
+/* The panel is 20–34rem wide. A bare URL, a long identifier, a wide table or a
+   code block will otherwise push the whole transcript sideways — nothing in a
+   chat should scroll horizontally except the block that is genuinely wide. */
+.mlbot-md {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.mlbot-md pre,
+.mlbot-md table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-wrap: normal;
+}
+
+.mlbot-md table {
+  width: max-content;
+  border-collapse: collapse;
+  font-size: 0.9em;
+}
+
+.mlbot-md th,
+.mlbot-md td {
+  border: 1px solid hsl(var(--border));
+  padding: 0.3em 0.55em;
+  text-align: left;
+}
+
+.mlbot-md pre code {
+  background: none;
+  padding: 0;
+  white-space: pre;
 }
 
 .mlbot-md strong {

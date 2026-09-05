@@ -84,8 +84,11 @@ describe("MLBot panel", () => {
         expect(panel).toContain("sm:inset-auto")
         expect(panel).toContain("sm:right-6")
         expect(panel).toMatch(/sm:bottom-\d/)
-        expect(panel).toMatch(/sm:h-\[min\(/)
-        expect(panel).toMatch(/sm:w-\[min\(/)
+        // The width/height pair moved into PANEL_SIZES when the panel became
+        // resizable; every rung still has to be a bottom-right sm: footprint.
+        const sizes = source.slice(source.indexOf("const PANEL_SIZES"), source.indexOf("] as const"))
+        expect(sizes).toMatch(/sm:h-\[min\(/)
+        expect(sizes).toMatch(/sm:w-\[min\(/)
     })
 
     it("squares off the corners only while it is full-screen", () => {
@@ -208,5 +211,86 @@ describe("MLBot model roster", () => {
 
     it("streams rather than waiting for the whole reply", () => {
         expect(route).toContain("stream: true")
+    })
+})
+
+/* The model sometimes prints the chart tool's own spec as prose — an unfenced
+ * `{"type":"bar",…}` object tacked onto the end of a reply. The chart itself
+ * already streamed over the `chart` event, so the JSON is a duplicate that
+ * renders as a wall of braces. */
+describe("splitChatSegments — bare JSON leaks", () => {
+    const BAR = '{"type":"bar","title":"Skill Proficiency","data":[{"label":"Python","value":97}]}'
+    const BARE_PIPELINE = '{"type":"pipeline","title":"RAG","steps":[{"label":"Ingest"}]}'
+
+    it("drops an unfenced chart-tool spec instead of printing raw JSON", () => {
+        const segments = splitChatSegments(`Here are his stats.\n\n${BAR}`)
+        expect(segments).toEqual([{ kind: "text", value: "Here are his stats." }])
+    })
+
+    it("drops a fenced chart-tool spec too", () => {
+        expect(splitChatSegments("Stats:\n\n```json\n" + BAR + "\n```")).toEqual([
+            { kind: "text", value: "Stats:" },
+        ])
+    })
+
+    it("renders an unfenced diagram object rather than dropping it", () => {
+        expect(splitChatSegments(`Flow:\n\n${BARE_PIPELINE}`)).toEqual([
+            { kind: "text", value: "Flow:" },
+            { kind: "diagram", json: BARE_PIPELINE },
+        ])
+    })
+
+    it("withholds a bare object that is still streaming", () => {
+        expect(splitChatSegments('Here are his stats.\n\n{"type":"bar","title":"Skill')).toEqual([
+            { kind: "text", value: "Here are his stats." },
+        ])
+    })
+
+    it("leaves ordinary prose braces alone", () => {
+        const text = "Use {curly braces} in the template."
+        expect(splitChatSegments(text)).toEqual([{ kind: "text", value: text }])
+    })
+})
+
+describe("MLBot panel sizing", () => {
+    const source = read("components/ai-chat/mlbot.tsx")
+
+    it("lets the reader resize the panel", () => {
+        expect(source).toMatch(/PANEL_SIZES|setSize/)
+        expect(source).toMatch(/aria-label=\{?`?"?(Shrink|Enlarge|Resize)/i)
+    })
+})
+
+describe("MLBot horizontal overflow", () => {
+    const css = read("app/globals.css")
+    const source = read("components/ai-chat/mlbot.tsx")
+    const md = css.slice(css.indexOf(".mlbot-md"))
+
+    it("breaks long unbroken strings instead of pushing the panel wide", () => {
+        expect(md).toMatch(/overflow-wrap:\s*anywhere/)
+    })
+
+    it("scrolls wide tables and code inside their own box", () => {
+        expect(md).toMatch(/\.mlbot-md (table|pre)[\s\S]*?overflow-x:\s*auto/)
+    })
+
+    it("gives the transcript a min-width floor so flex children can shrink", () => {
+        expect(source).toMatch(/overflow-y-auto[^"]*/)
+        expect(source).toContain("min-w-0")
+    })
+})
+
+describe("ChatChart", () => {
+    const source = read("components/ai-chat/chat-chart.tsx")
+
+    // --primary is white in dark and near-black in light, so bars rendered as
+    // black slabs on a light page. --accent-glow is defined in both themes.
+    it("paints series in an accent that survives both themes", () => {
+        expect(source).not.toMatch(/(fill|stroke)="hsl\(var\(--primary\)\)"/)
+        expect(source).toContain("var(--accent-glow)")
+    })
+
+    it("shows every category label instead of letting recharts drop half", () => {
+        expect(source).toContain("interval={0}")
     })
 })
