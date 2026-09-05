@@ -38,12 +38,18 @@ function getInitialCam() {
   if (w < 480) return { z: 1.34, fov: 46 }
   if (w < 640) return { z: 1.42, fov: 45 }
   if (w < 1024) return { z: 1.58, fov: 44 }
-  /* Desktop carries the largest mesh (0.54), so it needs the *most* camera
-     distance, not the least. At z 1.46 the frustum half-height was 0.56 against
-     a 0.54 mesh — under 4% margin, so the auto-rotating brain swept its long
-     axis straight through the canvas edge and got sliced. Matches the ~1.3x
-     headroom the other tiers already run. */
-  return { z: 1.83, fov: 42 }
+  /* Desktop carries the largest mesh (0.54). At z 1.46 the frustum half-height
+     was 0.56 against a 0.54 long axis — under 4% margin, so the auto-rotating
+     brain swept its long axis through a *square* canvas edge and got sliced.
+     The hero canvas is now a landscape 6:5 box (components/hero/index.tsx),
+     so the long axis sweeps horizontally with 1.2x the room: at z 1.40 the
+     half-height is 0.54 — the long axis spans the full height but only ~84%
+     of the width, and the (shorter) vertical extent fills ~72% of the height.
+     The polar clamp on OrbitControls below keeps a vertical drag from pitching
+     the long axis into the top/bottom edge, and the underlay mask fades both
+     edges anyway. Parity target: josephheupler.com's mesh is ~91% of the
+     viewport height. */
+  return { z: 1.4, fov: 42 }
 }
 
 function InitialCamera() {
@@ -137,7 +143,11 @@ export function Brain3D({
             <OrbitControls
               makeDefault
               autoRotate
-              autoRotateSpeed={0.45}
+              autoRotateSpeed={0.8}
+              /* Pitch stays within ±12.6° of the equator: with the tight
+                 desktop camera the long axis would otherwise clip vertically. */
+              minPolarAngle={Math.PI / 2 - 0.22}
+              maxPolarAngle={Math.PI / 2 + 0.22}
               enableZoom={false}
               enablePan={false}
               enableDamping

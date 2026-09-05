@@ -35,7 +35,7 @@
     --hero-scrim: radial-gradient(ellipse 48% 32% at 50% 40%, rgba(6,8,14,0.78) 0%, rgba(6,8,14,0.5) 52%, transparent 82%), linear-gradient(to bottom, rgba(6,8,14,0.44) 0%, rgba(6,8,14,0.42) 30%, rgba(6,8,14,0.28) 46%, rgba(6,8,14,0.10) 60%, transparent 76%);
     /* Centre wash behind the hero copy — dims the dense mesh so the type on
        top of it stays readable without shrinking the brain. */
-    --hero-stage-scrim: radial-gradient(ellipse 62% 56% at 50% 48%, rgba(5,6,12,0.92) 0%, rgba(5,6,12,0.66) 44%, rgba(5,6,12,0.18) 68%, transparent 80%), linear-gradient(to bottom, rgba(5,6,12,0.55) 0%, transparent 26%, transparent 62%, rgba(5,6,12,0.72) 100%);
+    --hero-stage-scrim: radial-gradient(ellipse 50% 42% at 50% 48%, rgba(5,6,12,0.82) 0%, rgba(5,6,12,0.52) 48%, rgba(5,6,12,0.12) 74%, transparent 86%), linear-gradient(to bottom, rgba(5,6,12,0.45) 0%, transparent 22%, transparent 66%, rgba(5,6,12,0.6) 100%);
 
     /* Page-wide washes. These used to be hard-coded dark radials applied to
        <body> and .page-texture regardless of theme, which is what smeared the
@@ -152,7 +152,7 @@
     --accent-glow-soft: #2d84c657;
     /* Dark type on a pale mesh needs far less cover than white type on a
        dense white one — at the dark theme's strength the brain ghosted out. */
-    --hero-stage-scrim: radial-gradient(ellipse 62% 56% at 50% 48%, rgba(249,250,252,0.93) 0%, rgba(249,250,252,0.7) 44%, rgba(249,250,252,0.2) 70%, transparent 82%), linear-gradient(to bottom, rgba(249,250,252,0.55) 0%, transparent 26%, transparent 60%, rgba(249,250,252,0.75) 100%);
+    --hero-stage-scrim: radial-gradient(ellipse 50% 42% at 50% 48%, rgba(249,250,252,0.86) 0%, rgba(249,250,252,0.56) 48%, rgba(249,250,252,0.14) 74%, transparent 86%), linear-gradient(to bottom, rgba(249,250,252,0.45) 0%, transparent 22%, transparent 64%, rgba(249,250,252,0.65) 100%);
 
     /* Light: the same three pools, pitched pale and cool so the page keeps its
        depth without going muddy. */
@@ -798,9 +798,11 @@ body {
    controls. The mask is static, so the WebGL canvas remains compositor-friendly. */
 .hero-brain-underlay {
   /* Short top fade only — the mesh is sized to fill the hero, so a long ramp
-     would eat the crown of the brain rather than just soften the nav seam. */
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 9%, black 100%);
-  mask-image: linear-gradient(to bottom, transparent 0%, black 9%, black 100%);
+     would eat the crown of the brain rather than just soften the nav seam.
+     The foot fades too: the sm+ box is taller than the stage, so its last
+     ~15% runs under the Tokscale badge and dissolves instead of butting it. */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 13%, black 84%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, black 13%, black 84%, transparent 100%);
   /* Bright white & vivid brain visualization - visible behind glass controls */
   opacity: 1;
 }

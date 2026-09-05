@@ -12,6 +12,7 @@ import { navigateTo } from "@/components/nav/woosh-scroll"
 import { RotatingStats } from "./rotating-stats"
 import { heroBeatDelay } from "./data"
 import { TokscaleHeroBadge } from "@/components/sections/tokscale-stats"
+import { HeroScrollLayer } from "./hero-scroll-release"
 
 const MOBILE_PERFORMANCE_QUERY = "(max-width: 767px), (pointer: coarse), (hover: none)"
 
@@ -107,13 +108,21 @@ export function Hero() {
              the Tokscale card and stat row used to land mid-brain. */}
       <div className="relative z-10 mx-auto w-full max-w-6xl px-3 text-center pointer-events-none md:px-6">
         <div className="relative flex min-h-[calc(100svh-13rem)] w-full flex-col items-center justify-center">
-          {/* Brain stage — sized off the viewport, deliberately larger than the
-              stage box so it reads as a full-bleed backdrop rather than a tile. */}
-          <div
+          {/* Brain stage — anchored to the viewport height (svh), never to the
+              hero's own height. On sm+ it is a landscape 6:5 box a full
+              viewport-plus tall ("Joseph-sized"): the mesh reads as the
+              dominant object with the name across its centre, the landscape
+              aspect gives the auto-rotating long axis horizontal headroom so
+              the tighter desktop camera never slices it, and the section's
+              top padding + the underlay mask keep the crown clear of the nav.
+              Phones keep their own tier (mobile perf decision).
+              HeroScrollLayer adds the scroll-out "release" (desktop only). */}
+          <HeroScrollLayer
+            layer="brain"
             className="hero-brain-underlay pointer-events-none absolute inset-0 z-0 flex items-center justify-center"
-            aria-hidden="true"
+            aria-hidden
           >
-            <div className="aspect-square shrink-0 max-sm:w-[min(112vw,64svh)] sm:w-[min(78vw,94svh)]">
+            <div className="shrink-0 max-sm:aspect-square max-sm:w-[min(112vw,64svh)] sm:aspect-[6/5] sm:h-[min(120svh,80vw)] sm:translate-y-[1.5svh]">
               {showBrain && (
                 <div className="h-full w-full">
                   <Brain3D
@@ -124,7 +133,7 @@ export function Hero() {
                 </div>
               )}
             </div>
-          </div>
+          </HeroScrollLayer>
 
           {/* Centre wash — the mesh is dense enough to swallow body copy, so the
               middle of the stage is dimmed before the type is drawn over it. */}
@@ -142,12 +151,12 @@ export function Hero() {
           </div>
         </div>
 
-        {/* Below the brain */}
-        <div className="relative z-[2]">
+        {/* Below the brain — lags the page slightly on desktop (parallax). */}
+        <HeroScrollLayer layer="stats" className="relative z-[2]">
           <TokscaleHeroBadge />
           <SocialLinks />
           <RotatingStats />
-        </div>
+        </HeroScrollLayer>
       </div>
 
       {/* Scroll indicator — flex centering avoids transform clash with animate-fade-in-up-subtle (which overwrites translate-x) */}
