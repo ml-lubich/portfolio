@@ -2,6 +2,12 @@
 
 import { useEffect, useRef, useState, useCallback } from "react"
 
+/** True when the visitor asked the OS to minimize motion. */
+function wantsReducedMotion(): boolean {
+  if (typeof window === "undefined") return false
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches
+}
+
 interface AnimatedNameProps {
   /** The text to animate */
   name: string
@@ -59,6 +65,15 @@ export function AnimatedName({
       ([entry]) => {
         if (entry.isIntersecting && !hasBeenVisible) {
           setHasBeenVisible(true)
+          // `delay` is a stagger, and a stagger is motion. CSS delays collapse
+          // under reduce (see the global block in globals.css), but this one is
+          // a JS timer — left as-is it holds the headline at opacity 0 for
+          // `delay` ms with no animation to justify the wait.
+          if (wantsReducedMotion()) {
+            onRevealRef.current?.()
+            setExpanded(true)
+            return
+          }
           setTimeout(() => {
             onRevealRef.current?.()
             setExpanded(true)

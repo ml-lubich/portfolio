@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { motion, useReducedMotion, useSpring } from "framer-motion"
 import { useTheme } from "next-themes"
 import { ExternalLink, Flame, Trophy } from "lucide-react"
+import { heroBeatDelay } from "@/components/hero/data"
 
 /* ── tokscale — live AI token usage (single source of truth) ──────── */
 
@@ -82,7 +83,7 @@ export function TokscaleHeroBadge() {
   return (
     <div
       className="mt-12 flex animate-fade-in-up justify-center pointer-events-auto sm:mt-20"
-      style={{ animationDelay: "0.62s", opacity: 0 }}
+      style={{ animationDelay: heroBeatDelay("tokscale"), opacity: 0 }}
     >
       <div ref={sceneRef} className="tokscale-3d-scene relative">
         <div className="tokscale-aura absolute -inset-3 rounded-[1.5rem]" aria-hidden="true" />

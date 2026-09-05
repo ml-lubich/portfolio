@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { AnimatedCounter } from "../animations/animated-counter"
-import { statSets, STAT_ROTATE_INTERVAL, STAT_STAGGER_DELAY } from "./data"
+import { statSets, STAT_ROTATE_INTERVAL, STAT_STAGGER_DELAY, heroBeatDelay } from "./data"
 
 /* ── Rotating Stats with staggered card animations ────────────────── */
 
@@ -114,7 +114,7 @@ export function RotatingStats() {
     <div
       ref={rootRef}
       className="mx-auto mt-8 w-full max-w-2xl animate-fade-in-up-subtle pointer-events-auto"
-      style={{ animationDelay: "0.45s" }}
+      style={{ animationDelay: heroBeatDelay("stats") }}
     >
       {/* Mobile: first 2 stats only, as bare numbers on the background — no card
           chrome. Card treatment returns at sm+. Extra stats are hidden with CSS

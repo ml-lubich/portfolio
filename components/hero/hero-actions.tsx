@@ -4,6 +4,7 @@ import { Mail, Phone, Sparkles, MessageSquare } from "lucide-react"
 import { navigateTo } from "@/components/nav/woosh-scroll"
 import { usePointerTilt } from "@/lib/use-pointer-tilt"
 import { SocialIcons } from "@/components/social-icons"
+import { heroBeatDelay } from "./data"
 
 /* ── CTA buttons ──────────────────────────────────────────────────── */
 
@@ -16,15 +17,15 @@ export function HeroCTAs() {
     <div
       ref={tiltRef}
       className="tilt-scene mt-10 flex animate-fade-in-up flex-wrap items-center justify-center gap-3 sm:gap-4 pointer-events-auto"
-      style={{ animationDelay: "0.35s", opacity: 0 }}
+      style={{ animationDelay: heroBeatDelay("ctas"), opacity: 0 }}
     >
       <button
         type="button"
         onClick={() => navigateTo("#contact")}
-        className="tilt-layer--near group relative overflow-hidden rounded-xl bg-white px-6 py-3 text-sm font-semibold text-black shadow-lg shadow-white/10 transition-all hover:scale-105 hover:shadow-xl hover:shadow-white/20 sm:px-8 sm:py-3.5 cursor-pointer"
+        className="tilt-layer--near group relative overflow-hidden rounded-xl bg-white px-6 py-3 text-sm font-semibold text-background shadow-lg shadow-white/10 transition-all hover:scale-105 hover:shadow-xl hover:shadow-white/20 sm:px-8 sm:py-3.5 cursor-pointer"
       >
-        <span className="relative z-10 flex items-center gap-2 text-black">
-          <Mail className="h-4 w-4 text-black" />
+        <span className="relative z-10 flex items-center gap-2 text-background">
+          <Mail className="h-4 w-4 text-background" />
           Get In Touch
         </span>
         <div className="absolute inset-0 bg-white/80 opacity-0 transition-opacity group-hover:opacity-100" />
@@ -74,7 +75,7 @@ export function SocialLinks() {
   return (
     <div
       className="mt-6 flex animate-fade-in-up items-center justify-center gap-3 pointer-events-auto"
-      style={{ animationDelay: "0.5s", opacity: 0 }}
+      style={{ animationDelay: heroBeatDelay("social"), opacity: 0 }}
     >
       <SocialIcons size="md" />
     </div>

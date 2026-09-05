@@ -10,6 +10,7 @@ import { HeroCTAs, SocialLinks } from "./hero-actions"
 import { heroOverlay, heroContentScrim } from "@/lib/theme"
 import { navigateTo } from "@/components/nav/woosh-scroll"
 import { RotatingStats } from "./rotating-stats"
+import { heroBeatDelay } from "./data"
 import { TokscaleHeroBadge } from "@/components/sections/tokscale-stats"
 
 const MOBILE_PERFORMANCE_QUERY = "(max-width: 767px), (pointer: coarse), (hover: none)"
@@ -153,7 +154,7 @@ export function Hero() {
       <div className="pointer-events-none absolute bottom-5 left-0 right-0 z-10 flex justify-center sm:bottom-10">
         <div
           className="pointer-events-auto animate-fade-in-up-subtle"
-          style={{ animationDelay: "0.55s" }}
+          style={{ animationDelay: heroBeatDelay("scrollCue") }}
         >
           <a
             href="#ai-expertise"

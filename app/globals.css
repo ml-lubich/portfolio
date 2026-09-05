@@ -2548,6 +2548,16 @@ article .blog-prose b a[href],
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
+    /* Delays must collapse too, not just durations. Every staggered reveal on
+       this site (the hero beat ladder, AnimatedText's --at-delay/--al-delay,
+       AnimatedName's --stagger, the .reveal-delay-* classes) expresses its
+       stagger as a *delay* over an element that starts at opacity 0. Zeroing
+       only the duration left that content invisible for up to ~1.5s for a
+       reduced-motion visitor — motion removed, but the waiting kept. The
+       `!important` is load-bearing: the hero blocks set animation-delay as an
+       inline style, and only an important author rule outranks that. */
+    animation-delay: 0ms !important;
+    transition-delay: 0ms !important;
   }
 
   [data-ambient-orb="true"],
@@ -2841,7 +2851,11 @@ article .blog-prose b a[href],
   pointer-events: none;
 }
 
-.glass-btn:hover {
+/* Keyboard focus gets the same molten treatment as hover — a tab visitor was
+   previously the only one who saw a flat button (the generic :focus-visible
+   ring alone), so the hero CTAs read as inert under keyboard navigation. */
+.glass-btn:hover,
+.glass-btn:focus-visible {
   /* Asymmetric radii = the molten/shape-shifting read */
   border-radius: 26px 12px 26px 12px;
   border-color: hsla(0, 0%, 100%, 0.28);
@@ -2858,7 +2872,8 @@ article .blog-prose b a[href],
     0 14px 38px -14px hsla(0, 0%, 0%, 0.55);
 }
 
-.glass-btn:hover::before {
+.glass-btn:hover::before,
+.glass-btn:focus-visible::before {
   transform: translateX(120%);
   opacity: 1;
 }
@@ -2871,8 +2886,12 @@ article .blog-prose b a[href],
 @media (prefers-reduced-motion: reduce) {
   .glass-btn,
   .glass-btn::before { transition: none; }
-  .glass-btn:hover { border-radius: 14px; transform: none; }
-  .glass-btn:hover::before { transform: translateX(-120%); opacity: 0; }
+
+  .glass-btn:hover,
+  .glass-btn:focus-visible { border-radius: 14px; transform: none; }
+
+  .glass-btn:hover::before,
+  .glass-btn:focus-visible::before { transform: translateX(-120%); opacity: 0; }
 }
 
 /* ── MLBot chat ────────────────────────────────────────────────────────

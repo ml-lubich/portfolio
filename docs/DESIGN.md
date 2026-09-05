@@ -58,3 +58,54 @@ showcase). That would replace the portfolio's own sections rather than restyle t
 - **Logo mark:** `components/site-logo-mark.tsx` is an inline-SVG "ML" monogram on a dark backing tile — resolution-independent, no raster, no tech-blue; the nav tile carries a higher-contrast border/bg than the old liquid-glass treatment.
 - **Vertical rhythm:** a single spacing knob (`LAZY_SECTION_TOP` in `app/page.tsx`: `pt-4 md:pt-8 lg:pt-10`) governs every LazySection boundary; no per-section ad-hoc margins (guarded by `__tests__/section-rhythm.test.ts`).
 - **Tablet detail drawer:** at compact widths ≥768px the scroll-stack `DetailPanel` presents as a fixed right-edge drawer (in-viewport by construction, `slide-in-from-right`); phones keep the full-viewport layer, desktop ≥1367px keeps the centered modal.
+
+## Motion: hero entrance ladder & reduced motion (2026-09-05)
+
+**Hero entrance is one ladder, not per-component literals.** `HERO_BEAT` in
+`components/hero/data.ts` holds the entrance delay for every hero block, in DOM
+order: tagline → subtitle → CTAs → tokscale badge → social row → stat row →
+scroll cue. Blocks read it through `heroBeatDelay(beat)`. Previously each
+component carried its own literal and they had drifted out of order — the
+tagline animated in ahead of the name, the CTAs ahead of the subtitle they
+answer, and the stat row ahead of the badge above it — so the hero landed as one
+jumbled pop inside ~0.6s instead of reading as a reveal. The values must stay
+**ascending**; `__tests__/hero-choreography.test.ts` fails if they don't.
+
+The name is deliberately *not* in the table: it stays `HERO_NAME_REVEAL` in
+`role-rotator.tsx` because `hero/index.tsx` derives the 3D brain's fade
+(`BRAIN_FADE_MS`) from it. The ladder starts after the name reveal begins.
+
+**Reduced motion zeroes delays, not just durations.** Every stagger on this site
+— the hero ladder, `AnimatedText`'s `--at-delay` / `--al-delay`, `AnimatedName`'s
+`--stagger`, the `.reveal-delay-*` classes — is expressed as a *delay* on an
+element that starts at `opacity: 0`. The global
+`@media (prefers-reduced-motion: reduce)` block in `app/globals.css` therefore
+sets `animation-delay: 0ms !important` and `transition-delay: 0ms !important`
+alongside the duration collapse. Without it, a reduced-motion visitor gets the
+motion removed but keeps the waiting — content invisible for up to ~1.5s. The
+`!important` is load-bearing: the hero blocks set `animation-delay` as an inline
+style, and only an important author rule outranks that. **Any new staggered
+reveal expressed in CSS is covered by this rule automatically — do not add a
+per-component reduced-motion branch for delay.**
+
+The one exception is a stagger held by a **JS timer**, which no stylesheet can
+reach: `AnimatedName` gates its reveal on `setTimeout(delay)`, so it checks
+`prefers-reduced-motion` itself and expands immediately. Any future component
+that delays a reveal in JavaScript owes the same check.
+
+**Keyboard parity on glass buttons.** `.glass-btn:focus-visible` shares the
+`:hover` molten treatment (asymmetric radii, lift, sheen sweep), and is disabled
+under reduced motion on the same terms. A tab visitor previously saw only the
+generic focus ring, so the hero CTAs read as inert under keyboard navigation.
+
+### Invariant — `AnimatedSection` and fixed-position children
+
+`.animated-section` keeps a non-`none` `transform` (`perspective(1200px) …`)
+even in its settled state, which makes it the containing block for any
+`position: fixed` descendant. Sections that render their own full-viewport
+overlay inline — `projects.tsx` and `open-source-showcase.tsx` render
+`fixed inset-0 z-[120]` detail modals as direct children — therefore **cannot**
+be wrapped in `AnimatedSection`; their modals would be trapped inside the
+section box. Their reveal comes from `SectionHeader`'s scroll-triggered
+`AnimatedText` instead. `skills.tsx` is safe to wrap because its modal is a
+Radix `Dialog`, which portals to `document.body` and escapes the transform.
