@@ -1,18 +1,21 @@
 "use client"
 
-import { useState, useCallback, useRef } from "react"
+import { useState, useCallback, useRef, memo } from "react"
 import { GraduationCap, BookOpen, Users, Code2, Award, Briefcase } from "lucide-react"
 import dynamic from "next/dynamic"
 import Image from "next/image"
+import { useReducedMotion } from "framer-motion"
 import { AnimatedSection } from "../animations/animated-section"
 import { AnimatedCounter } from "../animations/animated-counter"
 import { SectionHeader } from "../layout/section-header"
 import { ShimmerOverlay } from "../ui/shimmer-overlay"
 import { lightGradients as lg, hex } from "@/lib/theme"
 
-const TerminalReveal = dynamic(
-  () => import("../terminal/terminal-reveal").then((mod) => mod.TerminalReveal),
-  { ssr: false }
+/* memo: TerminalReveal's typing loop re-arms its timers on every render, so a
+   parent re-render inside the ~300ms line pause cancels it and the typing
+   stalls at the end of a line. Stable props + memo keep re-renders out. */
+const TerminalReveal = memo(
+  dynamic(() => import("../terminal/terminal-reveal").then((mod) => mod.TerminalReveal), { ssr: false }),
 )
 
 const ParticleField = dynamic(
@@ -78,7 +81,7 @@ function GlyphPlinth({ icon: Icon }: { icon: typeof GraduationCap }) {
         className="absolute inset-0 rounded-full opacity-60 transition-opacity duration-500 group-hover:opacity-100"
         style={{
           background:
-            "conic-gradient(from 0deg, transparent 0deg, rgba(255,255,255,0.85) 60deg, transparent 150deg, rgba(169,207,214,0.7) 250deg, transparent 340deg)",
+            "conic-gradient(from 0deg, transparent 0deg, rgb(var(--white-rgb) / 0.85) 60deg, transparent 150deg, rgba(169,207,214,0.7) 250deg, transparent 340deg)",
           WebkitMask:
             "radial-gradient(farthest-side, transparent calc(100% - 1.5px), #000 calc(100% - 1.5px))",
           mask: "radial-gradient(farthest-side, transparent calc(100% - 1.5px), #000 calc(100% - 1.5px))",
@@ -91,7 +94,7 @@ function GlyphPlinth({ icon: Icon }: { icon: typeof GraduationCap }) {
         className="absolute -inset-2 rounded-full opacity-25 transition-opacity duration-500 group-hover:opacity-50"
         style={{
           background:
-            "repeating-conic-gradient(from 0deg, rgba(255,255,255,0.6) 0deg 2deg, transparent 2deg 18deg)",
+            "repeating-conic-gradient(from 0deg, rgb(var(--white-rgb) / 0.6) 0deg 2deg, transparent 2deg 18deg)",
           WebkitMask:
             "radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 4px))",
           mask: "radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 4px))",
@@ -101,7 +104,7 @@ function GlyphPlinth({ icon: Icon }: { icon: typeof GraduationCap }) {
       />
       {/* Glass core, lifted toward the viewer */}
       <div
-        className="absolute inset-[9px] flex items-center justify-center rounded-[34%] bg-gradient-to-br from-white/[0.16] via-white/[0.06] to-white/[0.02] shadow-[0_10px_30px_-10px_rgba(0,0,0,0.9)] ring-1 ring-inset ring-white/20 backdrop-blur-md transition-transform duration-500 group-hover:scale-105"
+        className="absolute inset-[9px] flex items-center justify-center rounded-[34%] bg-gradient-to-br from-white/[0.16] via-white/[0.06] to-white/[0.02] shadow-xl shadow-black/40 ring-1 ring-inset ring-white/20 backdrop-blur-md transition-transform duration-500 group-hover:scale-105"
         style={{ transform: "translateZ(30px)" }}
       >
         <Icon className="h-6 w-6 text-foreground/90" aria-hidden />
@@ -131,10 +134,10 @@ const highlights = [
     icon: Briefcase,
     title: "Experience",
     subtitleNum: "",
-    subtitleText: "Apple, Walmart, LBNL",
-    detail: "Fortune 500 + National Labs",
+    subtitleText: "EchoStar, Apple, Walmart",
+    detail: "Staff AI Engineer · Fortune 500 · LBNL",
     gradient: lg.accentToCyan,
-    backDescription: "Led ML inference pipelines at Apple serving 100M+ users, architected cloud-native microservices at Walmart, and built ML pipelines at Lawrence Berkeley National Lab.",
+    backDescription: "Staff AI Engineer at EchoStar building consumer-scale telecom AI. Before that: ML inference at Apple serving 100M+ users, cloud-native microservices at Walmart, ML pipelines at Lawrence Berkeley National Lab, and Honda Innovations.",
   },
   {
     icon: BookOpen,
@@ -167,14 +170,40 @@ const highlights = [
     icon: Code2,
     title: "Open Source",
     subtitleNum: "",
-    subtitleText: "LangChain, CrewAI, Spring",
-    detail: "Community Driven",
+    subtitleText: "MCP Servers + CLIs",
+    detail: "imsg · imail · inotes · wa-mcp · jenkins-mcp",
     gradient: lg.magentaToAccent,
-    backDescription: "Active contributor to LangChain, CrewAI, and Spring ecosystems. Built open-source MCP tool servers, agent templates, and shared knowledge through community talks and demos.",
+    backDescription: "Maintains the agent-tool family — imsg, imail, inotes, wa-mcp, bitbucket-cli, confluence-cli, pdfify-md, jenkins-mcp — local-first CLIs that double as MCP servers for Claude, Cursor, and VS Code.",
   },
 ]
 
+/* Typed into the terminal. Opens on the current role so the first line a
+   visitor reads is the one that matters. */
+const bio = [
+  "Staff AI Engineer @ EchoStar — building the AI pipelines behind consumer-scale telecom.",
+  "Before that: Polaris Wireless, Apple, Walmart, LBNL, and Honda Innovations.",
+  "Shipped production multi-agent orchestration, RAG, and real-time ML inference serving millions.",
+  "Published 6 peer-reviewed papers on ML for hydrology & environmental science.",
+  "Maintains the agent-tool family — imsg, imail, inotes, wa-mcp, jenkins-mcp — as MCP servers + CLIs.",
+  "Co-founded Equiverse.ml — AI-driven tooling for 5,000+ underrepresented students.",
+]
+/* Non-string lines skip TerminalReveal's per-character loop, so this reveals
+   the whole bio at once for reduced-motion visitors. Built once: the memo
+   above only holds if the prop is referentially stable. */
+const bioStatic = bio.map((l, i) => <span key={i}>{l}</span>)
+
+/* Static "now" strip under the terminal — the facts that don't need typing. */
+const now = [
+  ["now", "EchoStar · Staff AI Engineer"],
+  ["where", "SF Bay Area"],
+  ["since", "Sep 2026"],
+  ["building", "RAG · agents · evals at telecom scale"],
+]
+
 export function About() {
+  // The global CSS zeroes CSS animations, but the typewriter and counter are
+  // timer-driven and need their own branch: render the finished state.
+  const reduce = useReducedMotion() ?? false
   return (
     <AnimatedSection id="about" className="relative section-y overflow-hidden">
       {/* Ambient background orbs — constant, overlapping, smoothly drifting */}
@@ -204,7 +233,7 @@ export function About() {
           {/* Stacked (mobile): the source's own 4:5 ratio, so nothing crops.
               Side-by-side (md+): fills the terminal's height, with min-h so the
               row never collapses while the terminal is still typing itself out. */}
-          <div className="group/photo relative aspect-[4/5] shrink-0 overflow-hidden rounded-2xl border border-white/15 shadow-2xl shadow-black/50 md:aspect-auto md:h-auto md:min-h-[22rem] md:w-72 lg:w-80">
+          <div className="group/photo relative mx-auto aspect-[4/5] w-full max-w-[20rem] shrink-0 overflow-hidden rounded-2xl border border-white/15 shadow-2xl shadow-black/50 md:mx-0 md:aspect-auto md:h-auto md:min-h-[22rem] md:w-72 md:max-w-none lg:w-80">
             <Image
               src="/misha-desk-laptop.png"
               alt="Misha Lubich at his desk"
@@ -218,24 +247,29 @@ export function About() {
             <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" aria-hidden />
           </div>
 
-          <div className="min-w-0 flex-1">
-            <TerminalReveal
-            /* Fills the stretched row so the card ends level with the portrait
-               instead of stopping short and leaving a gap beside it. */
-            className="h-full"
-            title="~/about — misha.bio"
-            prompt=">"
-            charSpeed={18}
-            linePause={350}
-            startDelay={400}
-            lines={[
-              "Experience at Apple, Walmart, LBNL, and Honda Innovations.",
-              "Built production AI platform with multi-agent orchestration serving millions.",
-              "Deploying real-time ML inference and RAG pipelines at scale.",
-              "Published 6 peer-reviewed papers in ML for hydrology & environmental science.",
-              "Co-founded Equiverse.ml — AI-driven solutions for 5,000+ underrepresented students.",
-            ]}
-            />
+          <div className="flex min-w-0 flex-1 flex-col gap-4">
+            {/* flex-1 + h-full: the terminal takes whatever height the row has
+                above the strip, so the card never stops short of the portrait. */}
+            <div className="flex-1">
+              <TerminalReveal
+                className="h-full"
+                title="~/about — misha.bio"
+                prompt=">"
+                charSpeed={reduce ? 0 : 14}
+                linePause={reduce ? 0 : 320}
+                startDelay={reduce ? 0 : 400}
+                lines={reduce ? bioStatic : bio}
+              />
+            </div>
+
+            <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-white/[0.08] bg-white/[0.06] font-mono sm:grid-cols-4">
+              {now.map(([k, v]) => (
+                <div key={k} className="bg-background/70 px-4 py-3 backdrop-blur-xl">
+                  <dt className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground/60">{k}</dt>
+                  <dd className="mt-1 text-xs leading-snug text-foreground/90">{v}</dd>
+                </div>
+              ))}
+            </dl>
           </div>
         </div>
 
@@ -243,9 +277,9 @@ export function About() {
             The `gap-px` over a faint panel background is what draws the
             dividing hairlines; each cell is transparent glass, not a card. */}
         <div className="relative overflow-hidden rounded-3xl border border-white/[0.06] bg-white/[0.05]">
-          <ul className="grid gap-px sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="grid grid-cols-1 gap-px sm:grid-cols-2 lg:grid-cols-3">
             {highlights.map((item, i) => (
-              <li key={item.title} className="bg-background/70 backdrop-blur-xl">
+              <li key={item.title} className="bg-background/70 backdrop-blur-xl transition-colors duration-500 hover:bg-background/50">
                 <AnimatedSection delay={i * 80} className="h-full">
                   <HoloCell className="group h-full px-6 py-10">
                     <GlyphPlinth icon={item.icon} />
@@ -256,7 +290,7 @@ export function About() {
                       </p>
                       <p className="mt-2 font-display text-xl font-light text-foreground sm:text-2xl">
                         {item.subtitleNum ? (
-                          <><AnimatedCounter value={item.subtitleNum} duration={1800} />{item.subtitleText}</>
+                          <>{reduce ? item.subtitleNum : <AnimatedCounter value={item.subtitleNum} duration={1800} />}{item.subtitleText}</>
                         ) : (
                           item.subtitleText
                         )}
