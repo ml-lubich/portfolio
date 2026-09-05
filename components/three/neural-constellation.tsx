@@ -1,35 +1,21 @@
 "use client"
 
 /* ──────────────────────────────────────────────────────────────────────
- *  NeuralConstellation — interactive 3D skill graph.
+ *  NeuralConstellation — the "Core Proficiency" skill map.
  *
- *  Replaces the flat metric cards + horizontal proficiency bars with a
- *  living neural network that speaks the same visual language as the hero
- *  <Brain3D>: Bézier synapses, glowing signal orbs, and the multi-layer
- *  Gaussian glow shader from <NeuralOrbDemo>.
- *
- *  Each skill is a node whose radius ∝ proficiency. Signal orbs stream
- *  along the synapses. Hovering a node lifts it and slides its detail
- *  bullets into the side panel. Reduced-motion / touch / no-WebGL visitors
- *  fall back to the accessible <AnimatedBars> chart.
+ *  SVG geometry + HTML labels, not WebGL: it renders on phones, under
+ *  prefers-reduced-motion (static but complete), and in both themes via
+ *  currentColor. Five domain nodes sit on a ring around a hub; halo size
+ *  and edge weight scale with proficiency. Signal pulses travel hub → node
+ *  along the spokes and one orbits the ring. The side panel always shows a
+ *  selected domain — it auto-cycles on a cadence; hovering, tapping or
+ *  focusing a node overrides it, leaving resumes.
  * ────────────────────────────────────────────────────────────────────── */
 
-import React, {
-  Component,
-  Suspense,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type ReactNode,
-} from "react"
-import dynamic from "next/dynamic"
-import { Canvas, useFrame, useThree } from "@react-three/fiber"
-import { Html } from "@react-three/drei"
-import * as THREE from "three"
-import { AnimatedBars, type BarItem } from "../animations/animated-bars"
+import React, { useEffect, useMemo, useState } from "react"
+import { useReducedMotion } from "framer-motion"
+import { type BarItem } from "../animations/animated-bars"
 import { AnimatedCounter } from "../animations/animated-counter"
-import { hexNum } from "@/lib/theme"
 
 /* ── Public data shapes ───────────────────────────────────────────────── */
 
@@ -38,430 +24,328 @@ export interface ConstellationMetric {
   label: string
 }
 
-interface NodePlacement {
-  /** short label rendered on the node */
+/* Short node labels, in the same order as the `bars` prop. */
+const SHORT = ["PyTorch / TF", "LLMs / RAG", "Multi-Agent", "MLOps / AWS", "Guardrails"]
+
+const CYCLE_MS = 4000
+const RING_R = 28 // node ring radius, viewBox units (0–100)
+const CX = 50
+const CY = 50
+
+/* proficiency (0–100) → node radius in viewBox units (88 → ~3.7, 95 → 5) */
+function nodeRadius(v: number) {
+  const t = Math.max(0, Math.min(1, (v - 85) / 10))
+  return 3.2 + t * 1.8
+}
+
+interface Node {
+  i: number
+  x: number
+  y: number
+  r: number
+  value: number
   short: string
-  /** world position (face-on 2.5D layout) */
-  pos: [number, number, number]
-  /** base RGB tint (0–1) for the orb glow */
-  color: [number, number, number]
+  /** HTML label anchor: where the label box attaches relative to its point */
+  anchor: string
+  lx: number
+  ly: number
 }
 
-/* Pentagon layout — top, then clockwise. Slight z-depth for parallax life. */
-const PLACEMENTS: NodePlacement[] = [
-  { short: "PyTorch / TF", pos: [0.0, 1.5, 0.0], color: [0.42, 0.72, 1.0] },
-  { short: "LLMs / RAG", pos: [1.62, 0.42, 0.35], color: [0.62, 0.5, 1.0] },
-  { short: "Multi-Agent", pos: [1.0, -1.32, -0.25], color: [0.32, 0.86, 0.95] },
-  { short: "MLOps / AWS", pos: [-1.0, -1.32, 0.28], color: [0.36, 0.82, 0.86] },
-  { short: "Guardrails", pos: [-1.62, 0.42, -0.18], color: [0.52, 0.62, 1.0] },
-]
-
-const CORE: [number, number, number] = [0, 0, 0.12]
-const POINT_SIZE_SCALE = 900
-
-/* Map proficiency (0–100) → orb world size. */
-function sizeForValue(v: number): number {
-  const t = Math.max(0, Math.min(1, (v - 80) / 20)) // 80→0, 100→1
-  return 0.24 + t * 0.2
-}
-
-function lerp(a: number, b: number, t: number): number {
-  return a + (b - a) * t
-}
-
-/* ── Shared glow shader (multi-layer Gaussian, per-point color + glow) ─── */
-
-function makeGlowMaterial(): THREE.ShaderMaterial {
-  return new THREE.ShaderMaterial({
-    transparent: true,
-    depthWrite: false,
-    blending: THREE.AdditiveBlending,
-    uniforms: { uTime: { value: 0 } },
-    vertexShader: /* glsl */ `
-      attribute float size;
-      attribute float aGlow;
-      attribute vec3 aColor;
-      varying vec3 vColor;
-      varying float vGlow;
-      void main() {
-        vColor = aColor;
-        vGlow = aGlow;
-        vec4 mv = modelViewMatrix * vec4(position, 1.0);
-        gl_PointSize = size * (${POINT_SIZE_SCALE.toFixed(1)} / -mv.z);
-        gl_Position = projectionMatrix * mv;
-      }
-    `,
-    fragmentShader: /* glsl */ `
-      uniform float uTime;
-      varying vec3 vColor;
-      varying float vGlow;
-      void main() {
-        float d = length(gl_PointCoord - vec2(0.5));
-        if (d > 0.5) discard;
-
-        float core   = exp(-d * d * 160.0);
-        float inner  = exp(-d * d * 50.0) * 0.9;
-        float mid    = exp(-d * d * 18.0) * 0.55;
-        float outer  = exp(-d * d * 6.0)  * 0.3;
-        float fringe = exp(-d * d * 2.5)  * 0.12;
-
-        float intensity = (core + inner + mid + outer + fringe) * vGlow;
-        intensity *= 0.9 + 0.1 * sin(uTime * 4.0);
-
-        vec3 col = vColor * (outer + mid + fringe)
-                 + mix(vColor, vec3(1.0), 0.6) * inner
-                 + vec3(1.0) * core;
-        col = min(col, vec3(1.0));
-
-        gl_FragColor = vec4(col, intensity);
-      }
-    `,
-  })
-}
-
-/* ── The 3D scene ─────────────────────────────────────────────────────── */
-
-interface SceneProps {
-  values: number[]
-  onHover: (index: number | null) => void
-}
-
-function ConstellationScene({ values, onHover }: SceneProps) {
-  const groupRef = useRef<THREE.Group>(null!)
-
-  const nodeCount = PLACEMENTS.length
-  const coreIndex = nodeCount
-
-  /* Full point set = skill nodes + central core. */
-  const points = useMemo<[number, number, number][]>(
-    () => [...PLACEMENTS.map((p) => p.pos), CORE],
-    []
-  )
-
-  /* Edges: core → each node (spokes) + pentagon ring. */
-  const edges = useMemo<[number, number][]>(() => {
-    const spokes: [number, number][] = PLACEMENTS.map((_, i) => [coreIndex, i])
-    const ring: [number, number][] = PLACEMENTS.map((_, i) => [
+function layout(values: number[]): Node[] {
+  const n = values.length
+  return values.map((value, i) => {
+    const a = -Math.PI / 2 + (i / n) * Math.PI * 2 // top, then clockwise
+    const cos = Math.cos(a)
+    const sin = Math.sin(a)
+    const r = nodeRadius(value)
+    /* side labels hug the node a touch closer so they clear a 390px card */
+    const d = RING_R + r + (Math.abs(cos) > 0.3 ? 2 : 4.5)
+    const anchor =
+      cos > 0.3
+        ? "translate(0,-50%)"
+        : cos < -0.3
+          ? "translate(-100%,-50%)"
+          : sin < 0
+            ? "translate(-50%,-100%)"
+            : "translate(-50%,0)"
+    return {
       i,
-      (i + 1) % nodeCount,
-    ])
-    return [...spokes, ...ring]
-  }, [coreIndex, nodeCount])
-
-  /* ── Node point attributes ──────────────────────────────────────────── */
-  const nodePositions = useMemo(() => {
-    const arr = new Float32Array((nodeCount + 1) * 3)
-    points.forEach((p, i) => {
-      arr[i * 3] = p[0]
-      arr[i * 3 + 1] = p[1]
-      arr[i * 3 + 2] = p[2]
-    })
-    return arr
-  }, [points, nodeCount])
-
-  const nodeColors = useMemo(() => {
-    const arr = new Float32Array((nodeCount + 1) * 3)
-    PLACEMENTS.forEach((p, i) => {
-      arr[i * 3] = p.color[0]
-      arr[i * 3 + 1] = p.color[1]
-      arr[i * 3 + 2] = p.color[2]
-    })
-    // core = white-blue
-    arr[coreIndex * 3] = 0.75
-    arr[coreIndex * 3 + 1] = 0.85
-    arr[coreIndex * 3 + 2] = 1.0
-    return arr
-  }, [nodeCount, coreIndex])
-
-  const baseSizes = useMemo(() => {
-    const arr = new Float32Array(nodeCount + 1)
-    for (let i = 0; i < nodeCount; i++) arr[i] = sizeForValue(values[i] ?? 90)
-    arr[coreIndex] = 0.3
-    return arr
-  }, [values, nodeCount, coreIndex])
-
-  const nodeSizes = useMemo(() => Float32Array.from(baseSizes), [baseSizes])
-  const nodeGlows = useMemo(() => new Float32Array(nodeCount + 1).fill(1), [nodeCount])
-
-  /* current (eased) hover amount per node */
-  const hoverAmt = useRef<Float32Array>(new Float32Array(nodeCount + 1))
-  const hoverTargetRef = useRef<number>(-1)
-
-  /* ── Signal orbs streaming along edges ─────────────────────────────── */
-  const signals = useMemo(
-    () =>
-      edges.map((e, i) => ({
-        a: e[0],
-        b: e[1],
-        progress: (i * 0.37) % 1,
-        speed: 0.28 + (i % 3) * 0.06,
-      })),
-    [edges]
-  )
-  const signalPositions = useMemo(
-    () => new Float32Array(signals.length * 3),
-    [signals.length]
-  )
-  const signalColors = useMemo(() => {
-    const arr = new Float32Array(signals.length * 3)
-    signals.forEach((s, i) => {
-      // tint each signal toward its destination node's color
-      const c = s.b < nodeCount ? PLACEMENTS[s.b].color : [0.7, 0.85, 1.0]
-      arr[i * 3] = c[0]
-      arr[i * 3 + 1] = c[1]
-      arr[i * 3 + 2] = c[2]
-    })
-    return arr
-  }, [signals, nodeCount])
-  const signalSizes = useMemo(
-    () => new Float32Array(signals.length).fill(0.14),
-    [signals.length]
-  )
-  const signalGlows = useMemo(
-    () => new Float32Array(signals.length).fill(1.1),
-    [signals.length]
-  )
-
-  /* ── Dim base synapse lines ────────────────────────────────────────── */
-  const lineGeo = useMemo(() => {
-    const positions = new Float32Array(edges.length * 2 * 3)
-    const colors = new Float32Array(edges.length * 2 * 3)
-    edges.forEach((e, i) => {
-      const pa = points[e[0]]
-      const pb = points[e[1]]
-      const off = i * 6
-      positions[off] = pa[0]
-      positions[off + 1] = pa[1]
-      positions[off + 2] = pa[2]
-      positions[off + 3] = pb[0]
-      positions[off + 4] = pb[1]
-      positions[off + 5] = pb[2]
-      const ca = e[0] < nodeCount ? PLACEMENTS[e[0]].color : [0.6, 0.75, 1]
-      const cb = e[1] < nodeCount ? PLACEMENTS[e[1]].color : [0.6, 0.75, 1]
-      colors[off] = ca[0] * 0.22
-      colors[off + 1] = ca[1] * 0.22
-      colors[off + 2] = ca[2] * 0.22
-      colors[off + 3] = cb[0] * 0.22
-      colors[off + 4] = cb[1] * 0.22
-      colors[off + 5] = cb[2] * 0.22
-    })
-    const g = new THREE.BufferGeometry()
-    g.setAttribute("position", new THREE.BufferAttribute(positions, 3))
-    g.setAttribute("color", new THREE.BufferAttribute(colors, 3))
-    return g
-  }, [edges, points, nodeCount])
-
-  const lineMaterial = useMemo(
-    () =>
-      new THREE.LineBasicMaterial({
-        vertexColors: true,
-        transparent: true,
-        opacity: 0.9,
-        depthWrite: false,
-        blending: THREE.AdditiveBlending,
-      }),
-    []
-  )
-
-  const nodeMaterial = useMemo(() => makeGlowMaterial(), [])
-  const signalMaterial = useMemo(() => makeGlowMaterial(), [])
-
-  /* ── Node/signal geometries ──────────────────────────────────────────
-   * Attributes are attached synchronously here (useMemo), not via a
-   * ref + useEffect: R3F's useFrame loop can tick before a passive effect
-   * flushes, so an effect-attached attribute can still be undefined on an
-   * early frame (see components/brain/neural-orbs.tsx for the same fix). */
-  const nodeGeo = useMemo(() => {
-    const g = new THREE.BufferGeometry()
-    g.setAttribute("position", new THREE.BufferAttribute(nodePositions, 3))
-    g.setAttribute("size", new THREE.BufferAttribute(nodeSizes, 1))
-    g.setAttribute("aColor", new THREE.BufferAttribute(nodeColors, 3))
-    g.setAttribute("aGlow", new THREE.BufferAttribute(nodeGlows, 1))
-    return g
-  }, [nodePositions, nodeSizes, nodeColors, nodeGlows])
-
-  const signalGeo = useMemo(() => {
-    const g = new THREE.BufferGeometry()
-    g.setAttribute("position", new THREE.BufferAttribute(signalPositions, 3))
-    g.setAttribute("size", new THREE.BufferAttribute(signalSizes, 1))
-    g.setAttribute("aColor", new THREE.BufferAttribute(signalColors, 3))
-    g.setAttribute("aGlow", new THREE.BufferAttribute(signalGlows, 1))
-    return g
-  }, [signalPositions, signalSizes, signalColors, signalGlows])
-
-  const { pointer } = useThree()
-  const elapsed = useRef(0)
-
-  useFrame((_state, delta) => {
-    const dt = Math.min(delta, 0.05)
-    elapsed.current += dt
-    const t = elapsed.current
-
-    /* gentle parallax + idle sway (kept small so labels stay readable) */
-    if (groupRef.current) {
-      const targetY = pointer.x * 0.18 + Math.sin(t * 0.25) * 0.05
-      const targetX = -pointer.y * 0.14
-      groupRef.current.rotation.y = lerp(groupRef.current.rotation.y, targetY, 0.05)
-      groupRef.current.rotation.x = lerp(groupRef.current.rotation.x, targetX, 0.05)
+      x: CX + RING_R * cos,
+      y: CY + RING_R * sin,
+      r,
+      value,
+      short: SHORT[i] ?? `Node ${i + 1}`,
+      anchor,
+      lx: CX + d * cos,
+      ly: CY + d * sin,
     }
-
-    /* node pulse + eased hover lift */
-    const amt = hoverAmt.current
-    for (let i = 0; i <= nodeCount; i++) {
-      const target = i === hoverTargetRef.current ? 1 : 0
-      amt[i] = lerp(amt[i], target, 0.15)
-      const pulse = 1 + 0.06 * Math.sin(t * 2.2 + i * 1.3)
-      nodeSizes[i] = baseSizes[i] * pulse * (1 + amt[i] * 0.6)
-      nodeGlows[i] = 1 + amt[i] * 1.1
-    }
-
-    /* stream signal orbs along their edges */
-    signals.forEach((s, i) => {
-      s.progress += s.speed * dt
-      if (s.progress > 1) s.progress -= 1
-      const pa = points[s.a]
-      const pb = points[s.b]
-      const p = s.progress
-      signalPositions[i * 3] = lerp(pa[0], pb[0], p)
-      signalPositions[i * 3 + 1] = lerp(pa[1], pb[1], p)
-      signalPositions[i * 3 + 2] = lerp(pa[2], pb[2], p)
-      // fade in/out at the ends so orbs don't pop at nodes
-      const fade = Math.sin(Math.PI * p)
-      signalSizes[i] = 0.1 + 0.07 * fade
-      signalGlows[i] = 0.5 + 0.9 * fade
-    })
-
-    nodeMaterial.uniforms.uTime.value = t
-    signalMaterial.uniforms.uTime.value = t
-
-    const nSize = nodeGeo.getAttribute("size") as THREE.BufferAttribute
-    const nGlow = nodeGeo.getAttribute("aGlow") as THREE.BufferAttribute
-    if (nSize) nSize.needsUpdate = true
-    if (nGlow) nGlow.needsUpdate = true
-
-    const sPos = signalGeo.getAttribute("position") as THREE.BufferAttribute
-    const sSize = signalGeo.getAttribute("size") as THREE.BufferAttribute
-    const sGlow = signalGeo.getAttribute("aGlow") as THREE.BufferAttribute
-    if (sPos) sPos.needsUpdate = true
-    if (sSize) sSize.needsUpdate = true
-    if (sGlow) sGlow.needsUpdate = true
   })
+}
 
-  const setHover = (i: number | null) => {
-    hoverTargetRef.current = i ?? -1
-    onHover(i)
-    if (typeof document !== "undefined") {
-      document.body.style.cursor = i === null ? "" : "pointer"
-    }
-  }
+/* Component-scoped keyframes. Everything animated carries .nm-anim so the
+   reduced-motion media query can flatten it even before JS hydrates. */
+const STYLE = `
+@keyframes nm-spin { to { transform: rotate(360deg) } }
+@keyframes nm-spin-rev { to { transform: rotate(-360deg) } }
+@keyframes nm-breathe { 0%,100% { transform: scale(1) } 50% { transform: scale(1.025) } }
+@keyframes nm-progress { from { transform: scaleX(0) } to { transform: scaleX(1) } }
+@keyframes nm-hub { 0%,100% { opacity: .55; transform: scale(1) } 50% { opacity: 1; transform: scale(1.2) } }
+.nm-ring-a { animation: nm-spin 90s linear infinite }
+.nm-ring-b { animation: nm-spin-rev 140s linear infinite }
+.nm-breathe { animation: nm-breathe 7s ease-in-out infinite }
+.nm-active-ring { animation: nm-spin 14s linear infinite }
+.nm-hub { animation: nm-hub 3.2s ease-in-out infinite }
+.cycle-progress { animation: nm-progress ${CYCLE_MS}ms linear forwards; transform-origin: left }
+/* Glow is the site's accent-glow token (blue in both themes), never the
+   foreground: a foreground disc through blur is a black smudge in light.
+   Cores are bright in dark and a deep accent in light. */
+.nm-map { --nm-glow: var(--accent-glow); --nm-core: hsl(var(--foreground)); --nm-core-edge: var(--accent-glow) }
+.light .nm-map { --nm-core: var(--accent-glow); --nm-core-edge: hsl(var(--accent)) }
+.nm-halo { fill: var(--nm-glow); opacity: var(--nm-halo) }
+.light .nm-halo { opacity: min(var(--nm-halo), 0.25) }
+@media (prefers-reduced-motion: reduce) { .nm-anim { animation: none !important } }
+`
+
+/* ── The map ──────────────────────────────────────────────────────────── */
+
+interface MapProps {
+  nodes: Node[]
+  active: number
+  hovered: number | null
+  reduce: boolean
+  onEnter: (i: number) => void
+  onLeave: () => void
+}
+
+function NeuralMap({ nodes, active, hovered, reduce, onEnter, onLeave }: MapProps) {
+  const n = nodes.length
+  const dim = hovered !== null
+  const ringPath = useMemo(
+    () => nodes.map((p, i) => `${i ? "L" : "M"}${p.x} ${p.y}`).join(" ") + " Z",
+    [nodes]
+  )
+  const isAdjacent = (i: number) =>
+    i === active || (i + 1) % n === active || (active + 1) % n === i
 
   return (
-    <group ref={groupRef}>
-      {/* dim synapses */}
-      <lineSegments geometry={lineGeo} material={lineMaterial} />
+    <div className="nm-map relative mx-auto aspect-square w-full max-w-[520px] text-foreground">
+      <style>{STYLE}</style>
+      <svg
+        viewBox="0 0 100 100"
+        className="absolute inset-0 h-full w-full overflow-visible"
+        aria-hidden="true"
+      >
+        <defs>
+          <filter id="nm-glow-soft" x="-150%" y="-150%" width="400%" height="400%">
+            <feGaussianBlur stdDeviation="2" />
+          </filter>
+          <radialGradient id="nm-node">
+            <stop offset="0%" style={{ stopColor: "var(--nm-core)" }} />
+            <stop offset="65%" style={{ stopColor: "var(--nm-core)", stopOpacity: 0.92 }} />
+            <stop offset="100%" style={{ stopColor: "var(--nm-core-edge)" }} />
+          </radialGradient>
+        </defs>
 
-      {/* streaming signal orbs */}
-      <points material={signalMaterial} geometry={signalGeo} />
+        {/* outer instrument rings — slow counter-rotation + breathing */}
+        {/* CSS transforms replace the SVG transform attribute, so the
+            translate lives on its own wrapper and the animation on a child */}
+        <g transform={`translate(${CX} ${CY})`}>
+        <g className="nm-anim nm-breathe">
+          <circle
+            r={46.5}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={0.22}
+            strokeDasharray="0.6 2.2"
+            opacity={0.32}
+            className="nm-anim nm-ring-a"
+          />
+          <circle
+            r={49}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={0.5}
+            strokeDasharray="0.25 6.5"
+            opacity={0.22}
+            className="nm-anim nm-ring-b"
+          />
+          <circle r={RING_R} fill="none" stroke="currentColor" strokeWidth={0.12} opacity={0.14} />
+        </g>
+        </g>
 
-      {/* skill + core nodes */}
-      <points material={nodeMaterial} geometry={nodeGeo} />
+        {/* pentagon ring edges */}
+        {nodes.map((p, i) => {
+          const q = nodes[(i + 1) % n]
+          const lit = isAdjacent(i) && (i === active || (i + 1) % n === active)
+          return (
+            <line
+              key={`ring-${i}`}
+              x1={p.x}
+              y1={p.y}
+              x2={q.x}
+              y2={q.y}
+              stroke={lit ? "var(--nm-glow)" : "currentColor"}
+              strokeWidth={lit ? 0.4 : 0.22}
+              opacity={lit ? 0.7 : dim ? 0.07 : 0.16}
+              style={{ transition: "opacity .45s, stroke-width .45s" }}
+            />
+          )
+        })}
 
-      {/* invisible hover targets + labels */}
-      {PLACEMENTS.map((p, i) => {
-        const r = sizeForValue(values[i] ?? 90) * 0.95
-        const lx = p.pos[0] * 1.16
-        const ly = p.pos[1] * 1.16 + (p.pos[1] >= 0 ? 0.28 : -0.28)
+        {/* spokes hub → node, weighted by proficiency */}
+        {nodes.map((p) => {
+          const lit = p.i === active
+          return (
+            <line
+              key={`spoke-${p.i}`}
+              x1={CX}
+              y1={CY}
+              x2={p.x}
+              y2={p.y}
+              stroke={lit ? "var(--nm-glow)" : "currentColor"}
+              strokeWidth={lit ? 0.55 : 0.18 + (p.r - 3.2) * 0.12}
+              opacity={lit ? 0.9 : dim ? 0.08 : 0.24}
+              style={{ transition: "opacity .45s, stroke-width .45s" }}
+            />
+          )
+        })}
+
+        {/* signal pulses — hub → node on each spoke, one orbiting the ring */}
+        {!reduce && (
+          <g fill="var(--nm-glow)">
+            {nodes.map((p) => {
+              const lit = p.i === active
+              const dur = lit ? "1.5s" : "2.8s"
+              /* no SVG filter here: filtered elements under animateMotion
+                 paint their filter region as a box in Chromium */
+              return (
+                <g key={`pulse-${p.i}`}>
+                  <animateMotion
+                    dur={dur}
+                    begin={`${p.i * 0.55}s`}
+                    repeatCount="indefinite"
+                    path={`M${CX} ${CY} L${p.x} ${p.y}`}
+                  />
+                  <animate
+                    attributeName="opacity"
+                    values="0;1;1;0"
+                    keyTimes="0;0.12;0.82;1"
+                    dur={dur}
+                    begin={`${p.i * 0.55}s`}
+                    repeatCount="indefinite"
+                  />
+                  <circle r={lit ? 2.2 : 1.6} opacity={0.25} />
+                  <circle r={lit ? 0.9 : 0.6} />
+                </g>
+              )
+            })}
+            <g opacity={0.9}>
+              <animateMotion dur="11s" repeatCount="indefinite" path={ringPath} />
+              <circle r={1.4} opacity={0.25} />
+              <circle r={0.55} />
+            </g>
+          </g>
+        )}
+
+        {/* hub */}
+        <g transform={`translate(${CX} ${CY})`}>
+          <circle
+            r={4.5}
+            filter="url(#nm-glow-soft)"
+            className="nm-anim nm-hub nm-halo"
+            style={{ ["--nm-halo" as string]: 0.3 }}
+          />
+          <circle r={2.4} fill="url(#nm-node)" />
+          <circle r={4.2} fill="none" stroke="var(--nm-glow)" strokeWidth={0.2} opacity={0.6} />
+        </g>
+
+        {/* nodes */}
+        {nodes.map((p) => {
+          const lit = p.i === active
+          const faded = dim && !lit
+          const haloOpacity = 0.14 + ((p.value - 85) / 10) * 0.22
+          return (
+            <g
+              key={p.i}
+              transform={`translate(${p.x} ${p.y})`}
+              role="button"
+              tabIndex={0}
+              aria-label={`${p.short}, ${p.value}%`}
+              onPointerEnter={() => onEnter(p.i)}
+              onPointerLeave={onLeave}
+              onFocus={() => onEnter(p.i)}
+              onBlur={onLeave}
+              className="cursor-pointer outline-none"
+              style={{ opacity: faded ? 0.45 : 1, transition: "opacity .45s" }}
+            >
+              <circle
+                r={p.r * 1.5}
+                filter="url(#nm-glow-soft)"
+                className="nm-halo"
+                style={{
+                  ["--nm-halo" as string]: lit ? haloOpacity + 0.3 : haloOpacity,
+                  transform: `scale(${lit ? 1.25 : 1})`,
+                  transition: "opacity .45s, transform .6s cubic-bezier(.16,1,.3,1)",
+                }}
+              />
+              <circle
+                r={p.r}
+                fill="url(#nm-node)"
+                stroke="var(--nm-core-edge)"
+                strokeWidth={0.25}
+                style={{
+                  transform: `scale(${lit ? 1.18 : 1})`,
+                  transition: "transform .6s cubic-bezier(.16,1,.3,1)",
+                }}
+              />
+              <circle
+                r={p.r + 2.6}
+                fill="none"
+                stroke="var(--nm-glow)"
+                strokeWidth={0.28}
+                strokeDasharray="1.2 1.4"
+                className="nm-anim nm-active-ring"
+                style={{ opacity: lit ? 0.7 : 0, transition: "opacity .45s" }}
+              />
+              {/* generous invisible hit target */}
+              <circle r={p.r + 6} fill="transparent" />
+            </g>
+          )
+        })}
+      </svg>
+
+      {/* HTML labels: fixed px type regardless of map size */}
+      {nodes.map((p) => {
+        const lit = p.i === active
+        const faded = dim && !lit
         return (
-          <group key={p.short}>
-            <mesh
-              position={p.pos}
-              onPointerOver={(e) => {
-                e.stopPropagation()
-                setHover(i)
-              }}
-              onPointerOut={() => setHover(null)}
+          <div
+            key={p.i}
+            aria-hidden="true"
+            className="pointer-events-none absolute whitespace-nowrap rounded-md bg-background/60 px-1 py-0.5 text-center leading-tight backdrop-blur-[2px]"
+            style={{
+              left: `${p.lx}%`,
+              top: `${p.ly}%`,
+              transform: p.anchor,
+              opacity: faded ? 0.4 : 1,
+              transition: "opacity .45s",
+            }}
+          >
+            <div
+              className={`text-[11px] tracking-wide transition-colors duration-300 md:text-xs ${
+                lit ? "font-semibold text-foreground" : "font-medium text-foreground/80"
+              }`}
             >
-              <sphereGeometry args={[r, 16, 16]} />
-              <meshBasicMaterial transparent opacity={0} depthWrite={false} />
-            </mesh>
-
-            <Html
-              position={[lx, ly, p.pos[2]]}
-              center
-              style={{ pointerEvents: "none", userSelect: "none" }}
-              zIndexRange={[20, 0]}
-            >
-              <div className="flex flex-col items-center whitespace-nowrap text-center">
-                <span className="text-[11px] font-medium tracking-wide text-foreground/90 drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]">
-                  {p.short}
-                </span>
-                <span
-                  className="font-mono text-[10px] tabular-nums"
-                  style={{
-                    color: `rgb(${p.color.map((c) => Math.round(c * 235)).join(",")})`,
-                  }}
-                >
-                  <NodeCount value={values[i] ?? 90} />
-                </span>
-              </div>
-            </Html>
-          </group>
+              {p.short}
+            </div>
+            <div className="font-mono text-[10px] tabular-nums text-muted-foreground">
+              {p.value}%
+            </div>
+          </div>
         )
       })}
-    </group>
+    </div>
   )
-}
-
-/* Tiny count-up used inside a node label (mounts when section scrolls in). */
-function NodeCount({ value }: { value: number }) {
-  const [n, setN] = useState(0)
-  useEffect(() => {
-    let raf = 0
-    const start = performance.now()
-    const dur = 1400
-    const tick = (now: number) => {
-      const p = Math.min(1, (now - start) / dur)
-      const eased = 1 - Math.pow(1 - p, 3)
-      setN(Math.round(eased * value))
-      if (p < 1) raf = requestAnimationFrame(tick)
-    }
-    raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
-  }, [value])
-  return <>{n}%</>
-}
-
-/* ── WebGL error boundary → falls back to bars ────────────────────────── */
-
-class WebGLBoundary extends Component<
-  { fallback: ReactNode; children: ReactNode },
-  { failed: boolean }
-> {
-  state = { failed: false }
-  static getDerivedStateFromError() {
-    return { failed: true }
-  }
-  componentDidCatch() {}
-  render() {
-    return this.state.failed ? this.props.fallback : this.props.children
-  }
-}
-
-/* ── Enable heavy 3D only on capable, motion-OK, non-touch viewports ──── */
-
-function useEnable3D(): boolean {
-  const [enabled, setEnabled] = useState(false)
-  useEffect(() => {
-    const compute = () =>
-      window.innerWidth >= 768 &&
-      !window.matchMedia("(prefers-reduced-motion: reduce)").matches &&
-      !window.matchMedia("(pointer: coarse)").matches
-    setEnabled(compute())
-    const onResize = () => setEnabled(compute())
-    window.addEventListener("resize", onResize)
-    return () => window.removeEventListener("resize", onResize)
-  }, [])
-  return enabled
 }
 
 /* ── Public component ─────────────────────────────────────────────────── */
@@ -471,22 +355,36 @@ interface NeuralConstellationProps {
   metrics: ConstellationMetric[]
 }
 
-function NeuralConstellationImpl({ bars, metrics }: NeuralConstellationProps) {
-  const nodeBars = bars.slice(0, PLACEMENTS.length)
-  const values = nodeBars.map((b) => b.value)
-  const enable3D = useEnable3D()
+export function NeuralConstellation({ bars, metrics }: NeuralConstellationProps) {
+  const nodeBars = bars.slice(0, SHORT.length)
+  const nodes = useMemo(() => layout(bars.slice(0, SHORT.length).map((b) => b.value)), [bars])
+  const n = nodeBars.length
+  const topIndex = nodeBars.reduce((best, b, i) => (b.value > nodeBars[best].value ? i : best), 0)
+
+  const reduce = useReducedMotion() ?? false
   const [hovered, setHovered] = useState<number | null>(null)
+  const [cycled, setCycled] = useState(topIndex)
+  /* bumping this restarts both the interval and the progress bar together */
+  const [epoch, setEpoch] = useState(0)
 
-  const active = hovered !== null ? nodeBars[hovered] : null
+  useEffect(() => {
+    if (reduce || hovered !== null) return
+    const id = setInterval(() => setCycled((c) => (c + 1) % n), CYCLE_MS)
+    return () => clearInterval(id)
+  }, [reduce, hovered, epoch, n])
 
-  const fallback = (
-    <div className="rounded-2xl border border-white/[0.04] bg-card/25 p-5 backdrop-blur-xl frosted-panel md:p-8">
-      <h3 className="mb-4 text-lg font-bold text-foreground md:mb-6">
-        Core Proficiency
-      </h3>
-      <AnimatedBars bars={bars} duration={1600} stagger={150} />
-    </div>
-  )
+  const active = hovered ?? cycled
+  const bar = nodeBars[active]
+
+  const onEnter = (i: number) => setHovered(i)
+  const onLeave = () => {
+    setHovered(null)
+    setEpoch((e) => e + 1)
+  }
+  const select = (i: number) => {
+    setCycled(i)
+    setEpoch((e) => e + 1)
+  }
 
   return (
     <div>
@@ -498,7 +396,7 @@ function NeuralConstellationImpl({ bars, metrics }: NeuralConstellationProps) {
             className="group relative overflow-hidden rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3 backdrop-blur-md transition-colors duration-500 hover:border-primary/25"
           >
             <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent opacity-60" />
-            <div className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.18em] text-primary/50">
+            <div className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-[0.18em] text-muted-foreground">
               <span
                 className="h-1 w-1 rounded-full bg-primary/70"
                 style={{
@@ -517,124 +415,120 @@ function NeuralConstellationImpl({ bars, metrics }: NeuralConstellationProps) {
         ))}
       </div>
 
-      {/* The constellation */}
-      {enable3D ? (
-        <WebGLBoundary fallback={fallback}>
-          <div className="relative overflow-hidden rounded-2xl border border-white/[0.04] bg-[#05060c]/60 backdrop-blur-xl frosted-panel">
-            <div className="absolute inset-0 dot-pattern opacity-20" aria-hidden="true" />
+      {/* The map */}
+      <div className="relative overflow-hidden rounded-2xl border border-white/[0.06] bg-card/40 backdrop-blur-xl frosted-panel">
+        <div className="absolute inset-0 dot-pattern opacity-20" aria-hidden="true" />
 
-            {/* header */}
-            <div className="relative z-10 flex items-center justify-between px-5 pt-5 md:px-8 md:pt-6">
-              <h3 className="text-lg font-bold text-foreground">
-                Core Proficiency
-              </h3>
-              <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground/50">
-                neural map · hover a node
+        <div className="relative z-10 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-5 pt-5 md:px-8 md:pt-6">
+          <h3 className="text-lg font-bold text-foreground">Core Proficiency</h3>
+          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+            hover or tap a node
+          </span>
+        </div>
+
+        <div className="relative grid lg:grid-cols-[1.35fr_1fr]">
+          <div className="p-4 pt-2 md:p-6 md:pt-3">
+            <NeuralMap
+              nodes={nodes}
+              active={active}
+              hovered={hovered}
+              reduce={reduce}
+              onEnter={onEnter}
+              onLeave={onLeave}
+            />
+          </div>
+
+          {/* detail panel — always populated */}
+          <aside
+            className="relative z-10 flex flex-col border-t border-white/[0.06] p-5 lg:border-l lg:border-t-0 md:p-6"
+            aria-live="polite"
+          >
+            <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+              <span>{hovered !== null ? "Selected" : "Now tracing"}</span>
+              <span className="tabular-nums">
+                {String(active + 1).padStart(2, "0")} / {String(n).padStart(2, "0")}
               </span>
             </div>
 
-            <div className="relative grid gap-0 lg:grid-cols-[1.6fr_1fr]">
-              {/* canvas */}
-              <div className="relative h-[380px] md:h-[460px]" aria-hidden="true">
-                {/* z=5.5: frustum half-height ≈2.28 at the layout plane — clears the
-                    top "PyTorch / TF" label (y≈2.02 + text height); 4.8 clipped it. */}
-                <Canvas
-                  camera={{ position: [0, 0, 5.5], fov: 45 }}
-                  dpr={[1, 1.75]}
-                  gl={{ antialias: true, alpha: true }}
-                  style={{ background: "transparent" }}
-                  onCreated={({ gl }) => {
-                    gl.setClearColor(hexNum.background, 0)
-                    gl.domElement.addEventListener(
-                      "webglcontextlost",
-                      (e) => e.preventDefault(),
-                      false
-                    )
+            <div key={active} className="mt-3 flex flex-1 flex-col">
+              <h4 className="font-display text-2xl font-light leading-tight text-foreground">
+                {bar.label}
+              </h4>
+
+              <div className="mt-3 flex items-baseline gap-3">
+                <span className="font-display text-4xl font-light tabular-nums text-foreground">
+                  {bar.value}
+                  <span className="text-xl text-muted-foreground">%</span>
+                </span>
+                {bar.display && (
+                  <span className="rounded-full border border-white/[0.12] bg-white/[0.04] px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.16em] text-foreground/80">
+                    {bar.display}
+                  </span>
+                )}
+              </div>
+              <div className="mt-2 h-px w-full overflow-hidden bg-white/[0.08]">
+                <div
+                  className="h-full bg-foreground/70"
+                  style={{
+                    width: `${bar.value}%`,
+                    transition: "width .7s cubic-bezier(.16,1,.3,1)",
                   }}
-                >
-                  <Suspense fallback={null}>
-                    <ConstellationScene values={values} onHover={setHovered} />
-                  </Suspense>
-                </Canvas>
+                />
               </div>
 
-              {/* detail panel */}
-              <div className="relative z-10 border-t border-white/[0.05] p-5 md:border-l md:border-t-0 md:p-6">
-                <div className="flex min-h-[280px] flex-col">
-                  {active ? (
-                    <>
-                      <div className="flex items-center gap-2">
-                        <span
-                          className="h-2.5 w-2.5 rounded-full"
-                          style={{
-                            background: `rgb(${PLACEMENTS[hovered!].color
-                              .map((c) => Math.round(c * 235))
-                              .join(",")})`,
-                            boxShadow: `0 0 10px 1px rgb(${PLACEMENTS[hovered!].color
-                              .map((c) => Math.round(c * 200))
-                              .join(",")})`,
-                          }}
-                        />
-                        <h4 className="text-base font-semibold text-foreground">
-                          {active.label}
-                        </h4>
-                      </div>
-                      {active.display && (
-                        <div className="mt-1 font-mono text-xs text-primary/70">
-                          {active.value}% · {active.display}
-                        </div>
-                      )}
-                      <div className="mt-4 space-y-2">
-                        {active.details?.map((d, idx) => (
-                          <div
-                            key={idx}
-                            className="flex items-start gap-2.5 rounded-lg border border-white/[0.04] bg-white/[0.02] px-3 py-2"
-                            style={{
-                              animation: "panel-slide-up 0.4s ease-out both",
-                              animationDelay: `${idx * 60}ms`,
-                            }}
-                          >
-                            <div className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary/60" />
-                            <p className="text-xs leading-relaxed text-muted-foreground">
-                              {d}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-                    </>
-                  ) : (
-                    <div className="flex flex-1 flex-col items-center justify-center text-center">
-                      <div className="mb-3 h-10 w-10 rounded-full border border-primary/20 bg-primary/5" />
-                      <p className="max-w-[16rem] text-sm text-muted-foreground/70">
-                        Each node is a domain — its glow scales with depth of
-                        expertise. Hover any node to trace the details.
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
+              <ul className="mt-4 space-y-2">
+                {bar.details?.map((d, idx) => (
+                  <li
+                    key={idx}
+                    className="flex items-start gap-2.5 rounded-lg border border-white/[0.05] bg-white/[0.02] px-3 py-2"
+                    style={{
+                      animation: reduce ? undefined : "panel-slide-up 0.35s ease-out both",
+                      animationDelay: `${idx * 50}ms`,
+                    }}
+                  >
+                    <span className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-foreground/60" aria-hidden />
+                    <p className="text-xs leading-relaxed text-muted-foreground">{d}</p>
+                  </li>
+                ))}
+              </ul>
             </div>
 
-            {/* Screen-reader accessible equivalent of the graph */}
-            <ul className="sr-only">
-              {nodeBars.map((b) => (
-                <li key={b.label}>
-                  {b.label}: {b.value}% {b.display ?? ""}.{" "}
-                  {b.details?.join(" ")}
-                </li>
+            {/* node selector + cycle progress */}
+            <div className="mt-5 flex items-center gap-2">
+              {nodeBars.map((b, i) => (
+                <button
+                  key={b.label}
+                  type="button"
+                  onClick={() => select(i)}
+                  aria-label={`Show ${b.label}`}
+                  aria-current={i === active}
+                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                    i === active ? "w-7 bg-foreground/80" : "w-1.5 bg-white/25 hover:bg-white/50"
+                  }`}
+                />
               ))}
-            </ul>
-          </div>
-        </WebGLBoundary>
-      ) : (
-        fallback
-      )}
+              {!reduce && (
+                <div className="ml-auto h-px w-16 overflow-hidden bg-white/[0.08]" aria-hidden="true">
+                  <div
+                    key={`${cycled}-${epoch}`}
+                    className="cycle-progress nm-anim h-full w-full bg-foreground/50"
+                    style={{ animationPlayState: hovered !== null ? "paused" : "running" }}
+                  />
+                </div>
+              )}
+            </div>
+          </aside>
+        </div>
+
+        {/* Screen-reader equivalent of the whole graph */}
+        <ul className="sr-only">
+          {nodeBars.map((b) => (
+            <li key={b.label}>
+              {b.label}: {b.value}% {b.display ?? ""}. {b.details?.join(" ")}
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   )
 }
-
-/* WebGL/Canvas must not run through SSR. */
-export const NeuralConstellation = dynamic(
-  () => Promise.resolve(NeuralConstellationImpl),
-  { ssr: false }
-)
