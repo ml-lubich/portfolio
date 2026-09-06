@@ -135,8 +135,11 @@ export function BrainWireframe() {
   const { geo, brainData } = result
 
   return (
-    <group ref={groupRef} scale={brainScale} rotation={[0, Math.PI * 0.5, 0]}>
-      <group rotation={[-Math.PI * 0.5 + Math.PI * 0.08, 0, 0]}>
+    <group ref={groupRef} name="brain-root" scale={brainScale} rotation={[0, Math.PI * 0.5, 0]}>
+      {/* Pitched ~28° so the camera looks down onto the brain (3/4 view):
+          the silhouette reads rounder and taller instead of a flat side
+          profile — the josephheupler.com read. */}
+      <group rotation={[-Math.PI * 0.5 + Math.PI * 0.155, 0, 0]}>
         <mesh
           ref={hitRef}
           onPointerMove={(e) => {
@@ -154,7 +157,10 @@ export function BrainWireframe() {
           <sphereGeometry args={[1.35, 32, 16]} />
           <meshBasicMaterial transparent opacity={0} depthWrite={false} />
         </mesh>
-        <lineSegments geometry={geo} material={material} />
+        {/* Named so BrainTelemetry (components/brain/index.tsx) can measure the
+            real mesh extent — the invisible hit sphere above is bigger than
+            the brain and must not be what the fit guard measures. */}
+        <lineSegments name="brain-mesh" geometry={geo} material={material} />
         <lineSegments geometry={geo} material={glowMaterial} scale={1.02} />
         <lineSegments geometry={signalGeo.geometry} material={signalMaterial} />
         <points geometry={orbBundle.geometry} material={orbMaterial} />

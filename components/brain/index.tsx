@@ -2,7 +2,7 @@
 
 import React, { Suspense, Component } from "react"
 import type { ReactNode } from "react"
-import { Canvas, useThree } from "@react-three/fiber"
+import { Canvas, useThree, useFrame } from "@react-three/fiber"
 import { OrbitControls } from "@react-three/drei"
 import * as THREE from "three"
 import { BrainWireframe } from "./brain-wireframe"
@@ -38,18 +38,99 @@ function getInitialCam() {
   if (w < 480) return { z: 1.34, fov: 46 }
   if (w < 640) return { z: 1.42, fov: 45 }
   if (w < 1024) return { z: 1.58, fov: 44 }
-  /* Desktop carries the largest mesh (0.54). At z 1.46 the frustum half-height
-     was 0.56 against a 0.54 long axis — under 4% margin, so the auto-rotating
-     brain swept its long axis through a *square* canvas edge and got sliced.
-     The hero canvas is now a landscape 6:5 box (components/hero/index.tsx),
-     so the long axis sweeps horizontally with 1.2x the room: at z 1.40 the
-     half-height is 0.54 — the long axis spans the full height but only ~84%
-     of the width, and the (shorter) vertical extent fills ~72% of the height.
-     The polar clamp on OrbitControls below keeps a vertical drag from pitching
-     the long axis into the top/bottom edge, and the underlay mask fades both
-     edges anyway. Parity target: josephheupler.com's mesh is ~91% of the
-     viewport height. */
-  return { z: 1.4, fov: 42 }
+  /* Desktop: the box is one viewport tall (components/hero/index.tsx), so the
+     mesh's share of the viewport is set here. Target: the projected mesh
+     spans 82–88% of the viewport height at 1440×900 and 1920×1080 — the
+     josephheupler.com read — and stays inside the box on every side while
+     it auto-rotates (the 6:5 landscape box gives the long axis its room).
+     The narrower FOV at this distance keeps the near side from ballooning
+     the way a close camera at 42° did. Measured, not guessed: BrainTelemetry
+     writes the projected extent to the canvas and e2e/hero-brain-fit.spec.ts
+     asserts it at four viewports. */
+  return { z: 1.9, fov: 38 }
+}
+
+function prefersReducedMotion(): boolean {
+  return typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches
+}
+
+function coarsePointer(): boolean {
+  return typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches
+}
+
+/* ── Telemetry — the fit/motion e2e guards read this off the canvas ─── */
+
+/** Vertices sampled for the silhouette — enough to hug the outline, cheap at 6 Hz. */
+const TELEMETRY_SAMPLES = 1500
+
+/**
+ * Every 10th frame: project a fixed subsample of the mesh's own vertices
+ * through the camera and write the screen-space extent (page px) plus the
+ * camera's azimuth onto the <canvas> as data attributes. Real vertices, not
+ * bounding-box corners — perspective inflates the near corners of a box so
+ * badly that it reported the mesh taller than the viewport. ~1500 vector
+ * projections at 6 Hz is cheap enough to leave on in production, which is
+ * the build the push gate actually tests.
+ */
+function BrainTelemetry() {
+  const { scene, camera, gl } = useThree()
+  const frame = React.useRef(0)
+  const v = React.useMemo(() => new THREE.Vector3(), [])
+  useFrame(() => {
+    if (++frame.current % 10) return
+    const mesh = scene.getObjectByName("brain-mesh") as THREE.LineSegments | undefined
+    const pos = mesh?.geometry.getAttribute("position") as THREE.BufferAttribute | undefined
+    if (!mesh || !pos) return
+    const stride = Math.max(1, Math.floor(pos.count / TELEMETRY_SAMPLES))
+    const rect = gl.domElement.getBoundingClientRect()
+    let l = Infinity, t = Infinity, r = -Infinity, b = -Infinity
+    for (let i = 0; i < pos.count; i += stride) {
+      v.fromBufferAttribute(pos, i)
+      mesh.localToWorld(v).project(camera)
+      const x = rect.left + ((v.x + 1) / 2) * rect.width
+      const y = rect.top + ((1 - v.y) / 2) * rect.height
+      if (x < l) l = x
+      if (x > r) r = x
+      if (y < t) t = y
+      if (y > b) b = y
+    }
+    gl.domElement.dataset.brainBbox = `${l.toFixed(0)},${t.toFixed(0)},${r.toFixed(0)},${b.toFixed(0)}`
+    gl.domElement.dataset.brainRot = Math.atan2(camera.position.x, camera.position.z).toFixed(4)
+  })
+  return null
+}
+
+/* ── Pointer tilt — the brain leans toward the cursor (desktop only) ─── */
+
+const TILT_PITCH = 0.14
+const TILT_ROLL = 0.18
+
+/**
+ * Subtle lean toward the pointer on top of the orbit: pitch follows the
+ * cursor's vertical position, roll its horizontal one, eased in the frame
+ * loop. Fine pointers only, and never under reduced motion — touch and
+ * reduced-motion visitors get the static orbit (or none).
+ */
+function BrainTilt() {
+  const { scene } = useThree()
+  const target = React.useRef({ x: 0, z: 0 })
+  React.useEffect(() => {
+    if (coarsePointer() || prefersReducedMotion()) return
+    const onMove = (e: PointerEvent) => {
+      target.current.x = (e.clientY / window.innerHeight - 0.5) * TILT_PITCH
+      target.current.z = (e.clientX / window.innerWidth - 0.5) * TILT_ROLL
+    }
+    window.addEventListener("pointermove", onMove, { passive: true })
+    return () => window.removeEventListener("pointermove", onMove)
+  }, [])
+  useFrame((_state, delta) => {
+    const root = scene.getObjectByName("brain-root")
+    if (!root) return
+    const k = Math.min(1, delta * 2.5)
+    root.rotation.x += (target.current.x - root.rotation.x) * k
+    root.rotation.z += (target.current.z - root.rotation.z) * k
+  })
+  return null
 }
 
 function InitialCamera() {
@@ -79,6 +160,7 @@ export function Brain3D({
   fadeDurationMs = 2350,
 }: Brain3DProps) {
   const initCam = React.useMemo(() => getInitialCam(), [])
+  const reducedMotion = React.useMemo(() => prefersReducedMotion(), [])
   const [geometryCommitted, setGeometryCommitted] = React.useState(false)
   const [visible, setVisible] = React.useState(false)
 
@@ -138,12 +220,17 @@ export function Brain3D({
           }}
         >
           <InitialCamera />
+          <BrainTelemetry />
+          <BrainTilt />
           <Suspense fallback={null}>
             <BrainWireframe />
             <OrbitControls
               makeDefault
-              autoRotate
-              autoRotateSpeed={0.8}
+              /* Idle orbit is the hero's motion — perceptible, not a crawl
+                 (1.8 ≈ 33s per revolution). Off under prefers-reduced-motion:
+                 the e2e motion guard asserts the azimuth holds still there. */
+              autoRotate={!reducedMotion}
+              autoRotateSpeed={1.8}
               /* Pitch stays within ±12.6° of the equator: with the tight
                  desktop camera the long axis would otherwise clip vertically. */
               minPolarAngle={Math.PI / 2 - 0.22}

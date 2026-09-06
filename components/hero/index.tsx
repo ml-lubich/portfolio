@@ -119,10 +119,22 @@ export function Hero() {
               HeroScrollLayer adds the scroll-out "release" (desktop only). */}
           <HeroScrollLayer
             layer="brain"
-            className="hero-brain-underlay pointer-events-none absolute inset-0 z-0 flex items-center justify-center"
+            className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center"
             aria-hidden
           >
-            <div className="shrink-0 max-sm:aspect-square max-sm:w-[min(112vw,64svh)] sm:aspect-[6/5] sm:h-[min(120svh,80vw)] sm:translate-y-[1.5svh]">
+            {/* The mask lives on the box, not the underlay: a mask clips to its
+                own border box, and the underlay is only the stage's height —
+                on the underlay it silently sliced the crown and foot off any
+                box taller than the stage.
+
+                Sized from the viewport's SHORT side and never taller than one
+                viewport: a box taller than the section runs past its bottom
+                edge and gets hard-clipped by overflow-hidden before the mask's
+                foot fade finishes (shipped like that once; the fit guard in
+                e2e/hero-brain-fit.spec.ts now fails on it), and a box bound
+                only by svh runs off the sides on wide monitors. The mesh's
+                share of the box is the camera's job (components/brain). */}
+            <div className="hero-brain-underlay shrink-0 max-sm:aspect-square max-sm:w-[min(112vw,64svh)] sm:aspect-[6/5] sm:h-[min(100svh,70vw)]">
               {showBrain && (
                 <div className="h-full w-full">
                   <Brain3D

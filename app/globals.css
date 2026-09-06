@@ -152,7 +152,7 @@
     --accent-glow-soft: #2d84c657;
     /* Dark type on a pale mesh needs far less cover than white type on a
        dense white one — at the dark theme's strength the brain ghosted out. */
-    --hero-stage-scrim: radial-gradient(ellipse 50% 42% at 50% 48%, rgba(249,250,252,0.86) 0%, rgba(249,250,252,0.56) 48%, rgba(249,250,252,0.14) 74%, transparent 86%), linear-gradient(to bottom, rgba(249,250,252,0.45) 0%, transparent 22%, transparent 64%, rgba(249,250,252,0.65) 100%);
+    --hero-stage-scrim: radial-gradient(ellipse 52% 50% at 50% 44%, rgba(249,250,252,0.96) 0%, rgba(249,250,252,0.74) 48%, rgba(249,250,252,0.22) 74%, transparent 86%), linear-gradient(to bottom, rgba(249,250,252,0.45) 0%, transparent 22%, transparent 64%, rgba(249,250,252,0.65) 100%);
 
     /* Light: the same three pools, pitched pale and cool so the page keeps its
        depth without going muddy. */
