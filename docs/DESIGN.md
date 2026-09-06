@@ -109,3 +109,113 @@ be wrapped in `AnimatedSection`; their modals would be trapped inside the
 section box. Their reveal comes from `SectionHeader`'s scroll-triggered
 `AnimatedText` instead. `skills.tsx` is safe to wrap because its modal is a
 Radix `Dialog`, which portals to `document.body` and escapes the transform.
+
+## Charts: pie readout lives in the legend (2026-09-05)
+
+Pie charts (blog + MLBot) have no hover tooltip box. In a 20–34rem chat card
+the Recharts tooltip lands on the ring itself, and its item text defaults to
+`#000` (`contentStyle.color` never reaches the item rows), so it both clipped
+the chart and was unreadable in dark mode. The legend is the readout instead:
+each row shows swatch · name (wrapping, never truncated) · `value · pct%`;
+hovering a slice or a row highlights the row and dims the other slices. Slice
+percentages stay inside the ring; the legend is the only place names and
+values are printed. Guarded by `__tests__/mlbot-chat-visuals.test.ts`.
+
+## Hero CTAs: three weights, one pill language (2026-09-05)
+
+The hero action row was five equal boxes reading as a toolbar. It now has
+three weights: one filled pill (`bg-white text-background`, Get In Touch),
+one glass pill (Ask MLBot — the site's signature), and a muted 13px text row
+for View AI Expertise / Download Resume / Schedule Call, all `rounded-full`
+to match the nav pill. Every action carries a distinct lucide icon (Mail,
+MessageSquare, BrainCircuit, FileDown, CalendarDays). Hover and
+`focus-visible` share the same −2px lift/fill — `__tests__/hero-ctas.test.ts`
+enforces a `focus-visible:` twin for every `hover:` utility — and
+`focus-visible:rounded-full` counters the global 4px focus radius. The
+tertiary row sits in a faint `bg-background/45 backdrop-blur-sm` wash so 13px
+text survives the densest part of the brain mesh. The pointer-tilt scene no
+longer applies to this row (its transform fought the hover lift).
+
+## Core Proficiency map: SVG, never empty, light-safe (2026-09-05)
+
+`components/three/neural-constellation.tsx` is an SVG + HTML-label piece, not
+WebGL: five monochrome nodes on a ring around a hub, node radius and spoke
+weight scaling with proficiency, two slow counter-rotating dashed instrument
+rings with a 7s breathe, signal pulses running hub → node on every spoke
+(faster on the active node) and one orbiting the ring. The side panel is never
+empty: it starts on the highest-scoring domain and auto-cycles every 4s with a
+thin progress line; hovering, tapping, or keyboard-focusing a node (nodes are
+`role="button"` with `tabIndex=0`) overrides it and lights only that node's
+edges; leaving resumes the cycle. The dot selector under the panel jumps
+directly. Under `prefers-reduced-motion` the map is static but complete. Every
+mark paints with `currentColor`/theme tokens so it holds in light mode; `.light`
+halves halo opacity so the blur reads as depth, not smudge (the first light
+pass rendered halos through the themed `white`, which became black blobs).
+Below `lg` the panel stacks under the map; it reads at 390px. Gate:
+`__tests__/neural-map-redesign.test.ts` (replaces the WebGL-era
+`neural-constellation-regression.test.ts`, whose frame-loop guard no longer
+has a frame loop to guard).
+
+## Hero brain: viewport-anchored, Heupler-scale, contained; scroll release (2026-09-05)
+
+The 3D brain stage is anchored to the viewport (`svh`), never to the hero's
+height, and it is **bounded by both viewport axes**: on sm+ the box is a
+landscape 6:5 `min(100svh, 70vw)` tall, never taller than the section and
+never wider than the screen. Two things shipped wrong in one afternoon and
+the guards below pin both: a 118–120svh box ran past the hero's bottom edge
+and was hard-clipped by `overflow-hidden` before the mask's foot fade
+finished, and a box bound only by height ran off the sides at 2000px wide.
+The mask lives on the box itself (a mask clips to its own border box). The
+mesh's share of that box is the camera's job: desktop z 1.9 / fov 38 puts
+the projected silhouette at 82–85% of the viewport height across a full
+rotation at 1440×900 and 1920×1080 (josephheupler.com runs ~90% under a
+shorter header; our floating pill is the binding constraint), crown ~45px
+under the pill inside the crown fade, foot dissolving before the fold.
+Phones keep the square `min(112vw, 64svh)` tier.
+
+Motion: idle orbit at `autoRotateSpeed` 1.8 (~33s/rev — the old 0.45–0.8 read
+as "not rotating"), drag-to-rotate with damping, and a pointer tilt
+(`BrainTilt`: pitch follows cursor Y, roll follows X) on fine pointers only.
+Auto-rotate and tilt are off under `prefers-reduced-motion`.
+
+Measured, not asserted from class names: `BrainTelemetry` projects a fixed
+subsample of the mesh's own vertices through the camera every 10th frame and
+writes the page-pixel extent (`data-brain-bbox="l,t,r,b"`) and the camera
+azimuth (`data-brain-rot`) onto the `<canvas>`. Bounding-box corners were
+tried first and are useless — perspective inflates the near corners to 1.4×
+the viewport. `e2e/hero-brain-fit.spec.ts` (in the push gate) asserts at
+1280×720 / 1440×900 / 1920×1080 / 2560×1440: height share 0.78–0.94, centre
+within 5% of the viewport centre, inside the viewport on all four sides and
+inside the hero at the bottom, no horizontal overflow, and a pixel check that
+the hero's last 4px match the page background (a sliced mesh leaves bright
+pixels there). Its motion tests assert the azimuth advances at idle, moves
+≥0.25rad on a 260px drag, resumes after release, and holds still under
+reduced motion.
+
+Scroll craft: `HeroScrollLayer` (`components/hero/hero-scroll-release.tsx`)
+drives two transform/opacity-only moves — the brain recedes (scale 1→0.78,
+fade) over the first 0.9vh of scroll, and the Tokscale/stat block lags the
+page by 0.12·scrollY capped at 48px. Both route through
+`shouldUseCompactScrollStackViewport`, so phones, tablets, coarse pointers,
+reduced-motion and ≤4-core devices get a static hero. Nothing here changes
+layout, which is what keeps `#contact` anchor scrolling exact. Journey,
+Projects and Publications already run `ScrollStackSection`; the skill's rule
+is one stack per page and we are at three, so no fourth was added. Gates:
+`__tests__/hero-brain-size.test.ts`, `__tests__/scroll-craft.test.ts`,
+`e2e/hero-brain-fit.spec.ts`.
+
+## About section: leads with the current role, no dead space (2026-09-05)
+
+`components/sections/about.tsx` opens on EchoStar: the intro names the Staff
+AI Engineer role, the Anduril/Mach offers it was chosen over, and why
+(consumer-scale telecom). The `~/about — misha.bio` terminal types six lines
+(EchoStar → prior employers → shipped systems → 6 papers → the agent-tool
+family → Equiverse) and is sized to its content; a NOW / WHERE / SINCE /
+BUILDING strip sits under it so the card never shows a blank lower half while
+typing. The six tiles are token-based (`bg-card`, `border-border`) and
+current: EXPERIENCE reads "EchoStar, Apple, Walmart", OPEN SOURCE reads "MCP
+Servers + CLIs · imsg · imail · inotes · wa-mcp · jenkins-mcp" (was
+"LangChain, CrewAI, Spring"). Grid is 1/2/3 columns at <640/640–1023/≥1024;
+the portrait caps at 20rem when stacked. Typing and count-ups render their
+final state immediately under `prefers-reduced-motion`. Gate:
+`__tests__/about-section.test.ts`.

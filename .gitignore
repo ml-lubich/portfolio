@@ -35,3 +35,6 @@ coverage/
 
 # Local verification screenshots
 .shots/
+
+# Per-agent dev-server dist dirs (parallel workers share the tree)
+.next-agent-*/
