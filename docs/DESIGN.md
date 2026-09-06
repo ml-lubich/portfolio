@@ -219,3 +219,40 @@ Servers + CLIs · imsg · imail · inotes · wa-mcp · jenkins-mcp" (was
 the portrait caps at 20rem when stacked. Typing and count-ups render their
 final state immediately under `prefers-reduced-motion`. Gate:
 `__tests__/about-section.test.ts`.
+
+## Scroll devices below the hero (2026-09-05)
+
+scroll-craft's first rule: a page uses several device families and never the
+same one twice in a row. Below the hero this site had one — fade-on-enter on
+every section, i.e. dead scroll between reveals. Three different families now
+sit where reveals-only were, all on one primitive, `useSectionProgress`
+(`lib/use-section-progress.ts`): 0 when a section's top reaches the viewport
+bottom, 1 when its bottom leaves the top, delivered once per frame, and only
+on viewports the scroll-stack table routes to motion (>1366px, fine pointer,
+no touch slate, motion-ok, >4 cores). Everywhere else no listener attaches
+and the section is exactly what it was.
+
+- **Skill map is scrubbed** (`components/three/neural-constellation.tsx`): the
+  section's travel selects the node — top node as it enters, bottom node as
+  it leaves, middle 70% is the scrub band — and the 4s timer cycle stands
+  down (panel reads "Scroll to trace", the progress line is hidden). Hover
+  still overrides.
+- **Consulting rail pans with the wheel** (`consulting-clients.tsx`): each
+  frame of scroll while the rail is in view becomes a sideways impulse on
+  the rail's existing momentum physics (`SCROLL_PAN_GAIN` 2400 → ~600px of
+  pan per 900px of wheel at 60fps). Deltas above 0.12 of the span are jumps
+  (resize, anchor click, `scrollTo`), not travel, and are ignored; drags
+  are never fought.
+- **Testimonials ground shifts** (`client-testimonials.tsx`): an accent-token
+  tint layer the size of the section rises to 0.6 as the section centres and
+  falls to 0 as it leaves — dark at both ends. Opacity only.
+
+Each device publishes what it actually paints as `data-sc-verify-state`
+(scroll-craft's verification convention — rendered values, never raw
+progress). `e2e/scroll-devices.spec.ts` at 1600×1000 asserts each state
+changes with scroll and, under reduced motion, does not. Two things the
+gate taught: publish the rail's state from the physics tick, not the scroll
+callback (the impulse hasn't moved anything yet there), and scroll like a
+wheel in headless Chromium — `mouse.wheel(0, 500)` lands as one instant jump
+the guard rightly ignores; ten 100px ticks are what a wheel sends. Gates:
+`__tests__/scroll-devices.test.ts`, `e2e/scroll-devices.spec.ts`.

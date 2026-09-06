@@ -12,7 +12,8 @@
  *  focusing a node overrides it, leaving resumes.
  * ────────────────────────────────────────────────────────────────────── */
 
-import React, { useEffect, useMemo, useState } from "react"
+import React, { useEffect, useMemo, useRef, useState } from "react"
+import { useSectionProgress } from "@/lib/use-section-progress"
 import { useReducedMotion } from "framer-motion"
 import { type BarItem } from "../animations/animated-bars"
 import { AnimatedCounter } from "../animations/animated-counter"
@@ -367,11 +368,29 @@ export function NeuralConstellation({ bars, metrics }: NeuralConstellationProps)
   /* bumping this restarts both the interval and the progress bar together */
   const [epoch, setEpoch] = useState(0)
 
+  /* Scroll scrubs the map (desktop only). scroll-craft: the wheel is a
+     scrubber, so on a wide, motion-ok viewport the section's travel through
+     the viewport selects the node — top node as it enters, bottom node as it
+     leaves — and the timer cycle stands down. The middle 70% of the travel is
+     the scrub band so the first and last nodes hold at the edges instead of
+     flickering at the boundaries. Hover still overrides. On phones, tablets,
+     coarse pointers and reduced motion the hook never attaches, so the timer
+     cycle (or, under reduce, the static top node) is exactly what it was. */
+  const rootRef = useRef<HTMLDivElement>(null)
+  const [scrubbing, setScrubbing] = useState(false)
+  useSectionProgress(rootRef, (p, el) => {
+    const band = Math.min(1, Math.max(0, (p - 0.15) / 0.7))
+    const i = Math.min(n - 1, Math.floor(band * n))
+    setScrubbing(true)
+    setCycled(i)
+    el.dataset.scVerifyState = `node:${i}`
+  })
+
   useEffect(() => {
-    if (reduce || hovered !== null) return
+    if (reduce || hovered !== null || scrubbing) return
     const id = setInterval(() => setCycled((c) => (c + 1) % n), CYCLE_MS)
     return () => clearInterval(id)
-  }, [reduce, hovered, epoch, n])
+  }, [reduce, hovered, scrubbing, epoch, n])
 
   const active = hovered ?? cycled
   const bar = nodeBars[active]
@@ -387,7 +406,7 @@ export function NeuralConstellation({ bars, metrics }: NeuralConstellationProps)
   }
 
   return (
-    <div>
+    <div ref={rootRef}>
       {/* Telemetry readouts — the headline metrics reframed as HUD counters */}
       <div className="mb-4 grid grid-cols-2 gap-3 md:mb-6 md:grid-cols-4 md:gap-4">
         {metrics.map((m, i) => (
@@ -444,7 +463,7 @@ export function NeuralConstellation({ bars, metrics }: NeuralConstellationProps)
             aria-live="polite"
           >
             <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-              <span>{hovered !== null ? "Selected" : "Now tracing"}</span>
+              <span>{hovered !== null ? "Selected" : scrubbing ? "Scroll to trace" : "Now tracing"}</span>
               <span className="tabular-nums">
                 {String(active + 1).padStart(2, "0")} / {String(n).padStart(2, "0")}
               </span>
@@ -507,7 +526,7 @@ export function NeuralConstellation({ bars, metrics }: NeuralConstellationProps)
                   }`}
                 />
               ))}
-              {!reduce && (
+              {!reduce && !scrubbing && (
                 <div className="ml-auto h-px w-16 overflow-hidden bg-white/[0.08]" aria-hidden="true">
                   <div
                     key={`${cycled}-${epoch}`}

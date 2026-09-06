@@ -20,6 +20,7 @@ import {
 } from "lucide-react"
 import { AnimatedLobsterClaw } from "../animations/animated-lobster-claw"
 import { AnimatedSection } from "../animations/animated-section"
+import { useSectionProgress } from "@/lib/use-section-progress"
 import { SectionHeader } from "../layout/section-header"
 import { ShimmerOverlay } from "../ui/shimmer-overlay"
 import { consultingClients, type ConsultingClient } from "@/data/consulting-clients"
@@ -37,6 +38,15 @@ const DRAG_SLOP = 8
  *  first has to cover the widest realistic box. A set is ~1.7k px, so 3 copies
  *  ran out at 3840 and swept a 448px blank through the rail; 4 covers it. */
 const RAIL_COPIES = 4
+/* Scroll pans the rail (desktop only). scroll-craft: "rails pan sideways".
+   Each frame of page scroll while the section is in view becomes a sideways
+   impulse on the rail's existing momentum — one viewport of scroll travels
+   the rail a few hundred px, then the normal drift and damping take over.
+   px/s of rail velocity per unit of rail progress. Measured at 1600×1000:
+   900px of wheel pans the rail ~600px at 60fps; the tick's 0.94/frame decay
+   halves that at 30fps, which is still a clear pan. 4200 wrapped a whole
+   card set on one screen of scroll — too much. */
+const SCROLL_PAN_GAIN = 2400
 
 /** Each tag gets its own glyph so a card reads at a glance, not as a wall of pills. */
 const TAG_ICON: Record<string, typeof Globe> = {
@@ -312,6 +322,19 @@ export function ConsultingClients() {
   const lastPointerXRef = useRef(0)
   const lastPointerTimeRef = useRef(0)
   const offscreenRef = useRef(false)
+  const lastProgressRef = useRef<number | null>(null)
+
+  useSectionProgress(railRef, (p, el) => {
+    const last = lastProgressRef.current
+    lastProgressRef.current = p
+    // First sample and any jump (resize, anchor jump, programmatic scrollTo)
+    // are not wheel travel. A wheel tick is ~0.04 of the rail's span and a
+    // fast fling ~0.08 per frame; anything above this is a jump.
+    if (last === null || Math.abs(p - last) > 0.12) return
+    if (!isDraggingRef.current) velocityRef.current -= (p - last) * SCROLL_PAN_GAIN
+    // Rendered state is published from the physics tick below, where the
+    // transform is written — here the impulse hasn't moved anything yet.
+  })
   const [dragging, setDragging] = useState(false)
   const [reducedMotion, setReducedMotion] = useState(false)
 
@@ -362,6 +385,8 @@ export function ConsultingClients() {
       if (trackRef.current) {
         trackRef.current.style.transform = `translate3d(${offsetRef.current}px,0,0)`
       }
+      // scroll-craft verification state: what the rail actually painted this frame.
+      if (railRef.current) railRef.current.dataset.scVerifyState = `rail:${Math.round(offsetRef.current)}`
       rafRef.current = requestAnimationFrame(animate)
     },
     [drifting, wrapOffset],

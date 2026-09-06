@@ -1,6 +1,7 @@
 "use client"
 
-import { useCallback, useEffect, useId, useState } from "react"
+import { useCallback, useEffect, useId, useRef, useState } from "react"
+import { useSectionProgress } from "@/lib/use-section-progress"
 import Image from "next/image"
 import { Quote, Star } from "lucide-react"
 import { AnimatedSection } from "../animations/animated-section"
@@ -187,11 +188,36 @@ export function ClientTestimonials() {
     return () => window.clearInterval(id)
   }, [api, paused])
 
+  /* Ground shift (desktop only). scroll-craft: "the page ground shifts colour
+     as you travel". A tint layer the size of the section fades in as the
+     section approaches the centre of the viewport and out as it leaves —
+     dark at both ends, warmest in the middle — so the testimonials read as a
+     distinct place on the page rather than another card row. Opacity only;
+     the tint is the accent token so it holds in light mode. Phones, coarse
+     pointers and reduced motion never attach the hook: opacity stays 0. */
+  const groundRef = useRef<HTMLDivElement>(null)
+  useSectionProgress(groundRef, (p, el) => {
+    const o = Math.sin(p * Math.PI)
+    el.style.opacity = (o * 0.6).toFixed(3)
+    el.dataset.scVerifyState = `ground:${Math.round(o * 100)}`
+  })
+
   return (
     <AnimatedSection
       id="testimonials"
       className="relative scroll-mt-28 section-y px-3 md:px-6"
     >
+      <div
+        ref={groundRef}
+        data-sc-verify-state="ground:0"
+        className="pointer-events-none absolute inset-0 rounded-[2rem]"
+        style={{
+          opacity: 0,
+          background:
+            "radial-gradient(ellipse 80% 70% at 50% 35%, color-mix(in srgb, var(--accent-glow) 22%, transparent), transparent 70%)",
+        }}
+        aria-hidden
+      />
       <div className="pointer-events-none absolute left-1/3 top-1/4 h-72 w-72 rounded-full bg-primary/[0.05] blur-[90px]" aria-hidden />
       <div className="pointer-events-none absolute bottom-1/4 right-1/4 h-64 w-64 rounded-full bg-accent/[0.05] blur-[80px]" aria-hidden />
 
