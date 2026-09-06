@@ -50,8 +50,14 @@ describe("hero brain stage sizing", () => {
     // edges the way it does on josephheupler.com; the section clips it.
     const m = boxLine.match(/max-sm:w-\[min\((\d+)vw,(\d+)svh\)\]/)
     expect(m, "phone box must stay bound by BOTH vw and svh").not.toBeNull()
-    expect(Number(m![1]), "narrower than the viewport leaves the brain small").toBeGreaterThanOrEqual(150)
-    expect(Number(m![2]), "taller than this and the brain pushes the stat row off").toBeLessThanOrEqual(92)
+    expect(Number(m![1]), "narrower than the viewport leaves the brain small").toBeGreaterThanOrEqual(100)
+    expect(Number(m![1]), "190vw was the box the owner could not scroll past on a real phone").toBeLessThanOrEqual(140)
+    expect(Number(m![2]), "taller than this and the brain swallows the hero on a handset").toBeLessThanOrEqual(64)
+  })
+
+  it("touches never reach the brain canvas on a coarse pointer (the scroll trap)", () => {
+    const block = /@media \(pointer: coarse\) \{[\s\S]*?\.hero-brain-underlay[\s\S]*?\}/.exec(css)?.[0] ?? ""
+    expect(block, "pointer-events: none on coarse pointers, !important over the utility").toMatch(/pointer-events: none !important/)
   })
 
   it("keeps the nav-clearance top padding on the section", () => {

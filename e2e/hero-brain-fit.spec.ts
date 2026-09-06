@@ -190,10 +190,20 @@ test.describe(`phone ${vp.width}x${vp.height}`, () => {
     const box = await readBbox(page)
     const share = (box.b - box.t) / vp.height
 
-    // Was ~0.40 when the phone inherited the desktop box and camera; the point
-    // of the phone tier is that it reads as the centrepiece on a handset.
-    expect(share, `mesh height share of viewport (${(box.b - box.t).toFixed(0)}px)`).toBeGreaterThanOrEqual(0.7)
-    expect(share, "taller than this and the mesh swallows the CTAs").toBeLessThanOrEqual(0.92)
+    // ~0.40 when the phone inherited the desktop box; ~0.80 after the first
+    // phone tier — which the owner, on a real handset, could not scroll past
+    // ("brain is too big"). The centrepiece read holds at half the viewport.
+    expect(share, `mesh height share of viewport (${(box.b - box.t).toFixed(0)}px)`).toBeGreaterThanOrEqual(0.42)
+    expect(share, "taller than this and the mesh swallows the hero on a handset").toBeLessThanOrEqual(0.62)
+
+    // Touches never reach the canvas on a coarse pointer — what's under a
+    // finger on the brain is the page, so a swipe scrolls it. This is the
+    // property `touch-action: pan-y` alone failed to deliver on iOS.
+    const underFinger = await page.evaluate(([bl, bt, br, bb]) => {
+      const el = document.elementFromPoint((bl + br) / 2, (bt + bb) / 2)
+      return { tag: el?.tagName ?? null, inBrain: !!el?.closest(".hero-brain-underlay") }
+    }, [box.l, box.t, box.r, box.b] as const)
+    expect(underFinger.inBrain, `a touch on the brain must land on the page, got <${underFinger.tag}> inside the brain box`).toBe(false)
 
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,

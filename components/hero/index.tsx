@@ -155,7 +155,7 @@ export function Hero() {
                 e2e/hero-brain-fit.spec.ts now fails on it), and a box bound
                 only by svh runs off the sides on wide monitors. The mesh's
                 share of the box is the camera's job (components/brain). */}
-            <div className="hero-brain-underlay shrink-0 max-sm:aspect-square max-sm:w-[min(190vw,88svh)] sm:aspect-[6/5] sm:h-[min(100svh,70vw)]">
+            <div className="hero-brain-underlay shrink-0 max-sm:aspect-square max-sm:w-[min(120vw,56svh)] sm:aspect-[6/5] sm:h-[min(100svh,70vw)]">
               {showBrain && (
                 <div className="h-full w-full">
                   <Brain3D

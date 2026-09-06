@@ -3529,3 +3529,17 @@ article .blog-prose b a[href],
     touch-action: pan-y !important;
   }
 }
+
+/* On a real handset `touch-action: pan-y` was not enough: OrbitControls still
+   received the touch pointer events and iOS still trapped the swipe, so the
+   owner could not scroll past the hero. On coarse pointers the brain is a
+   picture — touches never reach the canvas at all, the page scrolls, and the
+   mesh keeps its idle orbit. Drag-to-rotate and the pointer tilt are fine-
+   pointer features. `!important` because the wrapper carries
+   `pointer-events-auto` as a utility. */
+@media (pointer: coarse) {
+  .hero-brain-underlay,
+  .hero-brain-underlay * {
+    pointer-events: none !important;
+  }
+}

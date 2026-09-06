@@ -256,3 +256,21 @@ callback (the impulse hasn't moved anything yet there), and scroll like a
 wheel in headless Chromium — `mouse.wheel(0, 500)` lands as one instant jump
 the guard rightly ignores; ten 100px ticks are what a wheel sends. Gates:
 `__tests__/scroll-devices.test.ts`, `e2e/scroll-devices.spec.ts`.
+
+## Phone hero brain: half the viewport, and a picture — not a control (2026-09-06)
+
+The first phone tier (box `min(190vw,88svh)`, mesh ~80% of the viewport)
+failed on a real handset: the owner could not scroll past the hero. Two
+causes, two fixes. Size: the box is now `max-sm:w-[min(120vw,56svh)]` — mesh
+~49% of a 390×844 viewport, still the centrepiece behind the name, no longer
+the whole screen. Scroll trap: `touch-action: pan-y` on the canvas was not
+enough on iOS — OrbitControls still received the touch pointer events and the
+swipe was eaten. On `(pointer: coarse)` the brain box and everything in it get
+`pointer-events: none !important`, so a finger on the brain is a finger on the
+page: it scrolls, the idle orbit keeps running, and drag-to-rotate/pointer tilt
+stay fine-pointer features. Guards: `__tests__/hero-brain-size.test.ts`
+(box bounds 100–140vw / ≤64svh, the coarse-pointer rule present) and the phone
+cases in `e2e/hero-brain-fit.spec.ts` (mesh share 0.42–0.62 at 375/390/430,
+`elementFromPoint` on the brain's centre is not inside the brain box, and the
+page scrolls past the hero). Not verifiable here: the actual device — if it
+still traps, check on the phone before touching numbers.
