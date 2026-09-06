@@ -226,6 +226,16 @@ const { external, anchors, pages } = categorise()
 
 // ── Tests ──────────────────────────────────────────────────────────────────────
 
+/**
+ * Link-rot checks reach the public internet. They belong in the test suite —
+ * a dead link on a portfolio is a real defect — but they must not gate a
+ * production deploy: a transient outage on somebody else's CDN would then
+ * block shipping a change that has nothing to do with it. Vercel runs
+ * `vitest run && next build`, so these skip when VERCEL is set and run
+ * everywhere else (local, pre-commit, pre-push, CI).
+ */
+const NETWORK_GATED = Boolean(process.env.VERCEL)
+
 describe("Link smoke tests", () => {
   it("should discover links in the codebase", () => {
     expect(allLinks.length).toBeGreaterThan(0)
@@ -260,6 +270,7 @@ describe("Link smoke tests", () => {
 
   // ── External URLs ────────────────────────────────────────────────────────
   describe("External URLs (HTTP 2xx/3xx)", () => {
+    // See NETWORK_GATED: reachable-from-here is not a release criterion.
     for (const [url, locs] of external) {
       if (EXTERNAL_ALLOWLIST.has(url)) continue // preconnect / dns-prefetch — no page at root
       const host = new URL(url).hostname
@@ -267,7 +278,7 @@ describe("Link smoke tests", () => {
       if (TEMP_HIDDEN_URL_PREFIXES.some((p) => url.startsWith(p))) continue // see TEMP note above
       const where = locs.map((l) => `${l.file}:${l.line}`).join(", ")
       const short = url.length > 60 ? url.slice(0, 57) + "…" : url
-      it(`${short}  (${where})`, async () => {
+      it.skipIf(NETWORK_GATED)(`${short}  (${where})`, async () => {
         const result = await checkUrl(url)
         expect(
           result.ok,

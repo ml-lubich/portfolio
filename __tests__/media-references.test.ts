@@ -324,6 +324,16 @@ const remoteReferencesByUrl = groupByUrl(
   nonDataReferences.filter((reference) => isRemoteUrl(reference.url))
 )
 
+/**
+ * Link-rot checks reach the public internet. They belong in the test suite —
+ * a dead link on a portfolio is a real defect — but they must not gate a
+ * production deploy: a transient outage on somebody else's CDN would then
+ * block shipping a change that has nothing to do with it. Vercel runs
+ * `vitest run && next build`, so these skip when VERCEL is set and run
+ * everywhere else (local, pre-commit, pre-push, CI).
+ */
+const NETWORK_GATED = Boolean(process.env.VERCEL)
+
 describe("media references", () => {
   it("discovers media and static resource references across the app", () => {
     expect(mediaReferences.length).toBeGreaterThan(0)
@@ -360,7 +370,7 @@ describe("media references", () => {
     expect(missingHosts, missingHosts.join("\n")).toEqual([])
   })
 
-  it("gets a successful HTTP response for every remote media URL", async () => {
+  it.skipIf(NETWORK_GATED)("gets a successful HTTP response for every remote media URL", async () => {
     const remoteUrls = [...remoteReferencesByUrl.keys()]
     const results = await mapWithConcurrency(remoteUrls, 6, async (url) => ({
       url,
