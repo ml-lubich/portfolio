@@ -35,8 +35,8 @@ class WebGLErrorBoundary extends Component<
 function getInitialCam() {
   const w = typeof window !== "undefined" ? window.innerWidth : 1200
   /* Tighter z + slightly wider FOV on phones so the mesh fills the hero square. */
-  if (w < 480) return { z: 1.34, fov: 46 }
-  if (w < 640) return { z: 1.42, fov: 45 }
+  if (w < 480) return { z: 1.15, fov: 46 }
+  if (w < 640) return { z: 1.22, fov: 45 }
   if (w < 1024) return { z: 1.58, fov: 44 }
   /* Desktop: the box is one viewport tall (components/hero/index.tsx), so the
      mesh's share of the viewport is set here. Target: the projected mesh

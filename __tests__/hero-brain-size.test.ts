@@ -43,8 +43,15 @@ describe("hero brain stage sizing", () => {
     expect(boxLine).toMatch(/sm:aspect-\[\s*6\s*\/\s*5\s*\]/)
   })
 
-  it("keeps the phone tier untouched (mobile perf tier is a separate decision)", () => {
-    expect(boxLine).toContain("max-sm:w-[min(112vw,64svh)]")
+  it("gives the phone its own box, sized for the phone rather than inherited", () => {
+    // The phone tier is authored separately from sm+: at 112vw/64svh the mesh
+    // read only ~40% of viewport height and looked lost on a handset. The box
+    // is deliberately wider than the viewport so the brain bleeds off both
+    // edges the way it does on josephheupler.com; the section clips it.
+    const m = boxLine.match(/max-sm:w-\[min\((\d+)vw,(\d+)svh\)\]/)
+    expect(m, "phone box must stay bound by BOTH vw and svh").not.toBeNull()
+    expect(Number(m![1]), "narrower than the viewport leaves the brain small").toBeGreaterThanOrEqual(150)
+    expect(Number(m![2]), "taller than this and the brain pushes the stat row off").toBeLessThanOrEqual(92)
   })
 
   it("keeps the nav-clearance top padding on the section", () => {

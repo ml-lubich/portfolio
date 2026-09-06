@@ -3495,3 +3495,37 @@ article .blog-prose b a[href],
   background: var(--accent-glow);
   opacity: 0.5;
 }
+
+/* ── Phone hero: the brain is authored, not inherited ─────────────────
+   The phone tier runs a mesh roughly twice the size of the old one (see
+   components/hero/index.tsx and the <480 camera tier), which fills ~80% of
+   viewport height instead of ~40%. At that size the desktop scrims are far
+   too weak: the dense white wireframe runs straight through the name and the
+   body copy. These wash harder and reach wider so the type keeps its contrast
+   without shrinking the brain back down. Phone only — sm+ is untouched.
+
+   Also hands vertical scrolling back to the browser. OrbitControls stamps
+   touch-action:none on its canvas when it connects, so on a handset every
+   swipe that starts on the brain — which is now most of the screen — rotates
+   the mesh instead of scrolling the page. `pan-y` keeps horizontal drag for
+   the controls, and !important is required because OrbitControls rewrites the
+   inline style itself on connect. */
+@media (max-width: 639px) {
+  :root {
+    --hero-scrim: radial-gradient(ellipse 76% 40% at 50% 44%, rgba(6,8,14,0.93) 0%, rgba(6,8,14,0.74) 54%, rgba(6,8,14,0.32) 78%, transparent 92%),
+      linear-gradient(to bottom, rgba(6,8,14,0.58) 0%, rgba(6,8,14,0.5) 30%, rgba(6,8,14,0.36) 50%, rgba(6,8,14,0.16) 68%, transparent 86%);
+    --hero-stage-scrim: radial-gradient(ellipse 78% 46% at 50% 48%, rgba(5,6,12,0.9) 0%, rgba(5,6,12,0.66) 50%, rgba(5,6,12,0.22) 76%, transparent 90%),
+      linear-gradient(to bottom, rgba(5,6,12,0.55) 0%, transparent 26%, transparent 62%, rgba(5,6,12,0.7) 100%);
+  }
+
+  .light {
+    --hero-scrim: radial-gradient(ellipse 76% 40% at 50% 44%, rgba(250,251,253,0.94) 0%, rgba(250,251,253,0.78) 54%, rgba(250,251,253,0.36) 78%, transparent 92%),
+      linear-gradient(to bottom, rgba(250,251,253,0.62) 0%, rgba(250,251,253,0.54) 30%, rgba(250,251,253,0.4) 50%, rgba(250,251,253,0.18) 68%, transparent 86%);
+    --hero-stage-scrim: radial-gradient(ellipse 78% 46% at 50% 48%, rgba(250,251,253,0.92) 0%, rgba(250,251,253,0.7) 50%, rgba(250,251,253,0.26) 76%, transparent 90%),
+      linear-gradient(to bottom, rgba(250,251,253,0.58) 0%, transparent 26%, transparent 62%, rgba(250,251,253,0.72) 100%);
+  }
+
+  .hero-brain-underlay canvas {
+    touch-action: pan-y !important;
+  }
+}

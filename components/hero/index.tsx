@@ -37,18 +37,39 @@ function useMobilePerformanceMode() {
   return mobilePerformanceMode
 }
 
-/** Defer 3D brain (and Three.js) until well after LCP on every viewport.
- *  The brain is essential to the experience but should never compete with first paint —
- *  the page renders fully, then the brain chunk loads on its own and fades in.
- *  Same long timeout on desktop and mobile so behavior is consistent. */
+/** Defer the 3D brain (and Three.js) past LCP, then get it on screen quickly.
+ *
+ *  Two separate concerns, previously conflated into one 5s idle timeout:
+ *
+ *  1. *Downloading* the chunk and brain.bin costs no main-thread time, so it
+ *     starts immediately and overlaps first paint instead of queuing behind it.
+ *  2. *Mounting* Three.js is what competes with LCP, so that still waits for an
+ *     idle slot — but the phone gets a much shorter ceiling.
+ *
+ *  The old 5s applied equally to both viewports, on the reasoning that the two
+ *  should behave the same. On a phone that reads as a bug rather than restraint:
+ *  the mesh is now most of the hero, and a handset's main thread rarely goes idle
+ *  early, so the timeout — not the idle callback — decided when it appeared, and
+ *  the hero sat empty for five seconds. Prefetching means the mount is warm when
+ *  the gate opens, so the shorter ceiling does not drag the chunk onto the
+ *  critical path. */
+const BRAIN_IDLE_TIMEOUT_DESKTOP_MS = 5000
+const BRAIN_IDLE_TIMEOUT_PHONE_MS = 1200
+
 function useDeferBrain() {
   const [show, setShow] = useState(false)
   useEffect(() => {
+    // Warm the network immediately; neither of these blocks the main thread.
+    void import("../brain")
+    void import("../brain/use-brain-data").then((m) => m.getBrainBinPromise()).catch(() => {})
+
+    const phone = window.matchMedia("(max-width: 639px)").matches
+    const timeout = phone ? BRAIN_IDLE_TIMEOUT_PHONE_MS : BRAIN_IDLE_TIMEOUT_DESKTOP_MS
     const cb = () => setShow(true)
     const id =
       typeof requestIdleCallback !== "undefined"
-        ? requestIdleCallback(cb, { timeout: 5000 })
-        : window.setTimeout(cb, 4500)
+        ? requestIdleCallback(cb, { timeout })
+        : window.setTimeout(cb, timeout - 500)
     return () => {
       if (typeof cancelIdleCallback !== "undefined") cancelIdleCallback(id as number)
       else clearTimeout(id)
@@ -134,7 +155,7 @@ export function Hero() {
                 e2e/hero-brain-fit.spec.ts now fails on it), and a box bound
                 only by svh runs off the sides on wide monitors. The mesh's
                 share of the box is the camera's job (components/brain). */}
-            <div className="hero-brain-underlay shrink-0 max-sm:aspect-square max-sm:w-[min(112vw,64svh)] sm:aspect-[6/5] sm:h-[min(100svh,70vw)]">
+            <div className="hero-brain-underlay shrink-0 max-sm:aspect-square max-sm:w-[min(190vw,88svh)] sm:aspect-[6/5] sm:h-[min(100svh,70vw)]">
               {showBrain && (
                 <div className="h-full w-full">
                   <Brain3D

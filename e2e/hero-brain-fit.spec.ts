@@ -161,3 +161,46 @@ test("brain holds still under prefers-reduced-motion", async ({ page }) => {
   const r1 = await readRot(page)
   expect(Math.abs(r1 - r0), "no idle orbit under reduced motion").toBeLessThan(0.001)
 })
+
+/* ── Phone ─────────────────────────────────────────────────────────────
+ * The phone tier is authored, not inherited, so it gets its own assertions
+ * rather than a fifth entry in VIEWPORTS. Two things differ deliberately:
+ *
+ *  - The box is wider than the viewport, so the mesh bleeds off both edges.
+ *    The desktop "mesh inside the viewport" bound would fail by design here;
+ *    what matters instead is that the bleed never becomes horizontal scroll.
+ *  - touch-action must be pan-y. OrbitControls stamps touch-action:none on the
+ *    canvas when it connects, and with the mesh covering most of the screen
+ *    that turns every vertical swipe into a rotation and traps the reader on
+ *    the hero. This is the regression guard for that.
+ */
+test.describe("phone", () => {
+  test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true })
+
+  test("brain fills the phone hero without stealing the scroll", async ({ page }) => {
+    await waitForTelemetry(page)
+
+    const box = await readBbox(page)
+    const share = (box.b - box.t) / 844
+
+    // Was ~0.40 when the phone inherited the desktop box and camera; the point
+    // of the phone tier is that it reads as the centrepiece on a handset.
+    expect(share, `mesh height share of viewport (${(box.b - box.t).toFixed(0)}px)`).toBeGreaterThanOrEqual(0.7)
+    expect(share, "taller than this and the mesh swallows the CTAs").toBeLessThanOrEqual(0.92)
+
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    )
+    expect(overflow, "the box is wider than the viewport, but it must not scroll sideways").toBe(0)
+
+    const touchAction = await page
+      .locator(".hero-brain-underlay canvas")
+      .first()
+      .evaluate((el) => getComputedStyle(el).touchAction)
+    expect(touchAction, "vertical swipes over the brain must scroll the page").toBe("pan-y")
+
+    // And prove the page actually moves, rather than trusting the declaration.
+    await page.evaluate(() => window.scrollTo({ top: 900, behavior: "instant" as ScrollBehavior }))
+    expect(await page.evaluate(() => Math.round(window.scrollY)), "page scrolls past the hero").toBeGreaterThan(500)
+  })
+})
