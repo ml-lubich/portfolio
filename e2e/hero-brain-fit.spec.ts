@@ -174,14 +174,21 @@ test("brain holds still under prefers-reduced-motion", async ({ page }) => {
  *    that turns every vertical swipe into a rotation and traps the reader on
  *    the hero. This is the regression guard for that.
  */
-test.describe("phone", () => {
-  test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true })
+const PHONES = [
+  { width: 375, height: 667 }, // SE / small handset — the tightest case
+  { width: 390, height: 844 },
+  { width: 430, height: 932 }, // Pro Max — the box is bound by svh here, not vw
+]
+
+for (const vp of PHONES) {
+test.describe(`phone ${vp.width}x${vp.height}`, () => {
+  test.use({ viewport: vp, hasTouch: true, isMobile: true })
 
   test("brain fills the phone hero without stealing the scroll", async ({ page }) => {
     await waitForTelemetry(page)
 
     const box = await readBbox(page)
-    const share = (box.b - box.t) / 844
+    const share = (box.b - box.t) / vp.height
 
     // Was ~0.40 when the phone inherited the desktop box and camera; the point
     // of the phone tier is that it reads as the centrepiece on a handset.
@@ -204,3 +211,4 @@ test.describe("phone", () => {
     expect(await page.evaluate(() => Math.round(window.scrollY)), "page scrolls past the hero").toBeGreaterThan(500)
   })
 })
+}
