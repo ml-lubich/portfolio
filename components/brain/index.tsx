@@ -47,7 +47,13 @@ function getInitialCam() {
      the way a close camera at 42° did. Measured, not guessed: BrainTelemetry
      writes the projected extent to the canvas and e2e/hero-brain-fit.spec.ts
      asserts it at four viewports. */
-  return { z: 1.9, fov: 38 }
+  /* 1.82, not 1.9: flattening the mesh pitch to josephheupler.com's 0.08π
+     (components/brain/brain-wireframe.tsx) foreshortens the crown-to-stem
+     axis, and the projected height fell to 80.3% of the viewport — inside the
+     e2e tolerance but under the 82–88% target. The pose is the look; the
+     camera distance is the knob that serves the fit, so the knob moved.
+     Measured back to ~84% at all four widths. */
+  return { z: 1.82, fov: 38 }
 }
 
 function prefersReducedMotion(): boolean {

@@ -44,17 +44,25 @@ function useMobilePerformanceMode() {
  *  1. *Downloading* the chunk and brain.bin costs no main-thread time, so it
  *     starts immediately and overlaps first paint instead of queuing behind it.
  *  2. *Mounting* Three.js is what competes with LCP, so that still waits for an
- *     idle slot — but the phone gets a much shorter ceiling.
+ *     idle slot — but the ceiling on that wait is short.
  *
- *  The old 5s applied equally to both viewports, on the reasoning that the two
- *  should behave the same. On a phone that reads as a bug rather than restraint:
- *  the mesh is now most of the hero, and a handset's main thread rarely goes idle
- *  early, so the timeout — not the idle callback — decided when it appeared, and
- *  the hero sat empty for five seconds. Prefetching means the mount is warm when
- *  the gate opens, so the shorter ceiling does not drag the chunk onto the
- *  critical path. */
-const BRAIN_IDLE_TIMEOUT_DESKTOP_MS = 5000
-const BRAIN_IDLE_TIMEOUT_PHONE_MS = 1200
+ *  The ceiling used to be 5s, on the reasoning that it protected LCP. It did
+ *  not: on both viewports the idle callback never found a slot, so the ceiling
+ *  — not idleness — decided when the brain appeared. The phone showed it first
+ *  (five seconds of empty hero on a handset, where the mesh *is* the hero), and
+ *  desktop turned out to have the same bug: measured at 1440×900 on a
+ *  production build, first telemetry landed 6.8s after navigation while LCP had
+ *  already finished at 0.34s. Five seconds of empty hero protecting a paint
+ *  that happened in a third of a second.
+ *
+ *  1200ms on every viewport — josephheupler.com's number, and this brain is
+ *  modelled on that one down to the load. Prefetching (above) means the mount
+ *  is warm when the gate opens, so the shorter ceiling never drags the chunk
+ *  onto the critical path, and LCP does not move: 344ms before, 232ms after,
+ *  median of 3 production loads at 1440×900 — i.e. unchanged within the noise
+ *  of this machine, certainly not a regression. Time to first brain over the
+ *  same runs: 6.8s → 3.5s. */
+const BRAIN_IDLE_TIMEOUT_MS = 1200
 
 function useDeferBrain() {
   const [show, setShow] = useState(false)
@@ -63,13 +71,11 @@ function useDeferBrain() {
     void import("../brain")
     void import("../brain/use-brain-data").then((m) => m.getBrainBinPromise()).catch(() => {})
 
-    const phone = window.matchMedia("(max-width: 639px)").matches
-    const timeout = phone ? BRAIN_IDLE_TIMEOUT_PHONE_MS : BRAIN_IDLE_TIMEOUT_DESKTOP_MS
     const cb = () => setShow(true)
     const id =
       typeof requestIdleCallback !== "undefined"
-        ? requestIdleCallback(cb, { timeout })
-        : window.setTimeout(cb, timeout - 500)
+        ? requestIdleCallback(cb, { timeout: BRAIN_IDLE_TIMEOUT_MS })
+        : window.setTimeout(cb, BRAIN_IDLE_TIMEOUT_MS - 500)
     return () => {
       if (typeof cancelIdleCallback !== "undefined") cancelIdleCallback(id as number)
       else clearTimeout(id)
