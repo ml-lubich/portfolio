@@ -59,17 +59,20 @@ export const hex = {
     cyan: "#06b6d4",
     cyanLight: "#22d3ee",
     background: "#0a0c14",
-    /** brain wireframe base — near-white so the mesh reads bright on the dark hero */
-    wireBase: "#f4f7ff",
-    /** brain wireframe glow — subtle teal tint */
-    wireGlow: "#c6e4ea",
+    /** brain wireframe base — pure white, the josephheupler.com read */
+    wireBase: "#ffffff",
+    /** brain wireframe glow — pure white; the halo is opacity, not hue */
+    wireGlow: "#ffffff",
 } as const
 
 /* ── Three.js numeric hex colors ────────────────────────────────── */
 
 export const hexNum = {
-    wireBase: 0xf4f7ff,
-    wireGlow: 0xc6e4ea,
+    /** Monochrome mesh: the brain is white light, never a tinted line drawing.
+     *  A teal-tinted glow layer (0xc6e4ea) read as a coloured double-stroke
+     *  next to josephheupler.com's white filaments. */
+    wireBase: 0xffffff,
+    wireGlow: 0xffffff,
     /** Light-mode brain: the mesh inverts to near-black so it reads against a
      *  pale page exactly as the near-white mesh reads against the dark one. */
     wireBaseLight: 0x0b1018,

@@ -111,5 +111,8 @@ export const TRAIL_LENGTH = 1.5
 /** Ambient base intensity on all edges (0–1) */
 export const AMBIENT_RAINBOW = 0.024
 
-/** How much to mix rainbow colors toward greyish-white (0 = full rainbow, 1 = pure white) */
-export const WHITE_MIX = 0.78
+/** How much to mix rainbow colors toward greyish-white (0 = full rainbow, 1 = pure white).
+ *  1 = the josephheupler.com read: the ambient edge wash is white light, and
+ *  the only colour on the mesh is the blue core of a travelling orb. At 0.78
+ *  the residual hue drift tinted whole regions of the brain warm or green. */
+export const WHITE_MIX = 1

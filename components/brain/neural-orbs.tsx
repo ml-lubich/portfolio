@@ -242,19 +242,19 @@ export function NeuralOrbs({
         const hotA = Math.exp(-absA * 3.0)
         const hotB = Math.exp(-absB * 3.0)
 
+        /* Equal R/G/B: the trail behind an orb is white heat on the filament.
+           Weighting blue over red (0.3/0.6/1.0) laid a cyan streak down every
+           edge an orb had crossed, which is the single most obvious way this
+           mesh diverged from josephheupler.com's monochrome one. */
         const g = trailGlowMul
-        colors[off] = Math.min(1, colors[off] + g * (0.3 + 0.7 * hotA) * wA)
-        colors[off + 1] = Math.min(
-          1,
-          colors[off + 1] + g * (0.6 + 0.4 * hotA) * wA
-        )
-        colors[off + 2] = Math.min(1, colors[off + 2] + g * 1.0 * wA)
-        colors[off + 3] = Math.min(1, colors[off + 3] + g * (0.3 + 0.7 * hotB) * wB)
-        colors[off + 4] = Math.min(
-          1,
-          colors[off + 4] + g * (0.6 + 0.4 * hotB) * wB
-        )
-        colors[off + 5] = Math.min(1, colors[off + 5] + g * 1.0 * wB)
+        const addA = g * (0.55 + 0.45 * hotA) * wA
+        const addB = g * (0.55 + 0.45 * hotB) * wB
+        colors[off] = Math.min(1, colors[off] + addA)
+        colors[off + 1] = Math.min(1, colors[off + 1] + addA)
+        colors[off + 2] = Math.min(1, colors[off + 2] + addA)
+        colors[off + 3] = Math.min(1, colors[off + 3] + addB)
+        colors[off + 4] = Math.min(1, colors[off + 4] + addB)
+        colors[off + 5] = Math.min(1, colors[off + 5] + addB)
       }
     }
 

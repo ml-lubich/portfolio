@@ -43,7 +43,13 @@ export function BrainWireframe() {
     const m = new THREE.LineBasicMaterial({
       color: isLight ? hexNum.wireBaseLight : hexNum.wireBase,
       transparent: true,
-      opacity: 1,
+      /* 0.72 on the dark hero, not 1: at full opacity every filament is an
+         opaque white stroke and the mesh reads as a scribble. Translucent
+         strokes let the far side of the brain show through the near side,
+         which is what gives josephheupler.com's mesh its depth. Light mode
+         keeps the heavier stroke — a near-black line on a pale page has no
+         glow layer helping it. */
+      opacity: isLight ? 1 : 0.72,
       depthWrite: false,
     })
     injectPull(m, pull)
@@ -54,7 +60,9 @@ export function BrainWireframe() {
     const m = new THREE.LineBasicMaterial({
       color: isLight ? hexNum.wireGlowLight : hexNum.wireGlow,
       transparent: true,
-      opacity: 0.8,
+      /* The halo copy of the mesh. At 0.8 it is a second visible stroke
+         offset from the first (a doubled outline); at 0.38 it is a bloom. */
+      opacity: isLight ? 0.8 : 0.38,
       depthWrite: false,
     })
     injectPull(m, pull)
@@ -136,10 +144,12 @@ export function BrainWireframe() {
 
   return (
     <group ref={groupRef} name="brain-root" scale={brainScale} rotation={[0, Math.PI * 0.5, 0]}>
-      {/* Pitched ~28° so the camera looks down onto the brain (3/4 view):
-          the silhouette reads rounder and taller instead of a flat side
-          profile — the josephheupler.com read. */}
-      <group rotation={[-Math.PI * 0.5 + Math.PI * 0.155, 0, 0]}>
+      {/* Pitch 0.08π ≈ 14°, the josephheupler.com pose — measured off that
+          site, not inferred. The near-lateral profile is what makes the
+          silhouette legible as a brain: frontal lobe, temporal fold, stem
+          hanging at the back. The 3/4 look-down this used to carry (0.155π)
+          foreshortens the lobes into an anonymous blob. */}
+      <group rotation={[-Math.PI * 0.5 + Math.PI * 0.08, 0, 0]}>
         <mesh
           ref={hitRef}
           onPointerMove={(e) => {
@@ -161,7 +171,9 @@ export function BrainWireframe() {
             real mesh extent — the invisible hit sphere above is bigger than
             the brain and must not be what the fit guard measures. */}
         <lineSegments name="brain-mesh" geometry={geo} material={material} />
-        <lineSegments geometry={geo} material={glowMaterial} scale={1.02} />
+        {/* 1.045, not 1.02: the halo has to stand off the stroke far enough to
+            read as light around the filament rather than as a second line. */}
+        <lineSegments geometry={geo} material={glowMaterial} scale={1.045} />
         <lineSegments geometry={signalGeo.geometry} material={signalMaterial} />
         <points geometry={orbBundle.geometry} material={orbMaterial} />
         <NeuralOrbs

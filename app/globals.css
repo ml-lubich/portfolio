@@ -805,6 +805,27 @@ body {
   mask-image: linear-gradient(to bottom, transparent 0%, black 13%, black 84%, transparent 100%);
   /* Bright white & vivid brain visualization - visible behind glass controls */
   opacity: 1;
+  /* Bloom. josephheupler.com's mesh glows because the canvas is wrapped in
+     three stacked white drop-shadows, not because its lines are opaque —
+     which is why raising the wireframe opacity to 1 here made the brain
+     harder and *less* luminous. Filter runs before the mask, so the halo is
+     clipped by the same top/foot fade as the mesh and cannot bleed past it. */
+  filter:
+    drop-shadow(0 0 28px rgba(255, 255, 255, 0.22))
+    drop-shadow(0 0 64px rgba(255, 255, 255, 0.12))
+    drop-shadow(0 0 120px rgba(255, 255, 255, 0.06));
+}
+
+/* The bloom is white light on a dark page. In light mode the mesh inverts to
+   near-black, so a white halo would only fog the page around it. */
+.light .hero-brain-underlay {
+  filter: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-brain-underlay {
+    filter: none;
+  }
 }
 
 @media (max-width: 639px) {

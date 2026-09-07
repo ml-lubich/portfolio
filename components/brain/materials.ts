@@ -1,6 +1,5 @@
 import * as THREE from "three"
 import type { PullUniforms } from "./types"
-import { glsl } from "@/lib/theme"
 
 /* ── Create pull-deform uniforms ──────────────────────────────────── */
 
@@ -106,7 +105,12 @@ export function makeOrbMaterial(pull?: PullUniforms) {
         intensity *= uFade;
         intensity *= uPointGlowMul;
 
-        vec3 color = ${glsl.glowColor} * fringe
+        // Fringe is white, not the site's blue glow token: it is the widest and
+        // dimmest of the five layers, so a blue one puts a cold cast on the
+        // halo of every dot. josephheupler.com keeps all five monochrome-to-
+        // blue-core. (components/three/neural-orb-demo.tsx keeps the blue
+        // token — that demo is not the brain.)
+        vec3 color = vec3(1.0, 1.0, 1.0) * fringe
                    + vec3(0.35, 0.65, 0.88) * (outer + mid)
                    + vec3(0.70, 0.82, 0.90) * inner
                    + vec3(0.92, 0.92, 0.94)  * core;
