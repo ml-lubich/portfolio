@@ -313,6 +313,19 @@ export function MLBot() {
                         >
                             <Maximize2 className="h-4 w-4" />
                         </button>
+
+                        {/* Always visible, unlike the resize control: on a phone
+                            the panel is inset-0 full-screen and Escape — the only
+                            other way out — does not exist on a touch device. */}
+                        <button
+                            type="button"
+                            onClick={() => setOpen(false)}
+                            aria-label="Close MLBot"
+                            title="Close MLBot"
+                            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-white/[0.06] hover:text-foreground"
+                        >
+                            <X className="h-4 w-4" />
+                        </button>
                     </header>
 
                     <div ref={scrollRef} className="min-w-0 flex-1 space-y-4 overflow-x-hidden overflow-y-auto px-4 py-4">
@@ -415,7 +428,11 @@ export function MLBot() {
                             maxLength={1000}
                             placeholder="Ask about Misha…"
                             aria-label="Message MLBot"
-                            className="max-h-28 min-h-[38px] min-w-0 flex-1 resize-none overflow-y-auto bg-transparent py-2 text-[13px] text-foreground border-0 outline-none focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 placeholder:text-muted-foreground/60"
+                            /* 16px, not 13: iOS zooms the page on focus below that, and the zoom
+                               shrinks the layout viewport under this inset-0 panel — which is
+                               what read as horizontal and vertical overflow. Declining the zoom
+                               any other way means user-scalable=no, which fails WCAG 1.4.4. */
+                            className="max-h-28 min-h-[38px] min-w-0 flex-1 resize-none overflow-y-auto bg-transparent py-2 text-[16px] text-foreground border-0 outline-none focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 placeholder:text-muted-foreground/60"
                         />
                         <button
                             type="submit"

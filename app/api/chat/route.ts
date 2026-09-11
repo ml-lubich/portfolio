@@ -12,6 +12,7 @@ import { NextRequest } from "next/server"
 import { runTool, TOOL_SCHEMAS, SYSTEM_PROMPT } from "@/lib/ai/profile-tools"
 import { checkRateLimit, clientIp, buildCookie, acquireSlot, COOKIE_NAME } from "@/lib/ai/rate-limit"
 import { FollowupStream } from "@/lib/ai/followups"
+import { ToolMemo } from "@/lib/ai/tool-memo"
 
 export const runtime = "nodejs"
 export const maxDuration = 60
@@ -124,6 +125,10 @@ function runAgent(history: ChatMessage[], apiKey: string, release: () => void): 
             const messages: ChatMessage[] = [{ role: "system", content: SYSTEM_PROMPT }, ...history]
 
             try {
+                /* Scoped to this request: one conversation's lookups, so a
+                   later question still gets fresh data. */
+                const memo = new ToolMemo()
+
                 for (let round = 0; round < LIMITS.maxToolRounds; round++) {
                     const reply = await callModel(messages, apiKey, send)
 
@@ -139,6 +144,23 @@ function runAgent(history: ChatMessage[], apiKey: string, release: () => void): 
 
                     for (const call of reply.tool_calls) {
                         const args = safeParseArgs(call.function.arguments)
+
+                        /* A repeat is served from memory. maxToolRounds caps
+                           rounds, not calls — one round can carry several — so
+                           without this the model re-asked for the same data
+                           until the budget ran out and it gave up. No `tool`
+                           event either: nine "Pulling up projects" lines was
+                           the same lookup echoed, not nine lookups. */
+                        const prior = memo.recall(call.function.name, args)
+                        if (prior !== null) {
+                            messages.push({
+                                role: "tool",
+                                tool_call_id: call.id,
+                                content: memo.repeatNotice(call.function.name, prior),
+                            })
+                            continue
+                        }
+
                         send("tool", { name: call.function.name })
 
                         const result = runTool(call.function.name, args)
@@ -149,10 +171,12 @@ function runAgent(history: ChatMessage[], apiKey: string, release: () => void): 
                         // spec so it knows the card is on screen and does not paste a URL.
                         if ("booking" in result) send("booking", result.booking)
 
+                        const serialized = JSON.stringify(result).slice(0, 6000)
+                        memo.remember(call.function.name, args, serialized)
                         messages.push({
                             role: "tool",
                             tool_call_id: call.id,
-                            content: JSON.stringify(result).slice(0, 6000),
+                            content: serialized,
                         })
                     }
                 }

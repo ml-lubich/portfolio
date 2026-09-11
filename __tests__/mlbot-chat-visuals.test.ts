@@ -83,6 +83,43 @@ describe("MLBot panel", () => {
     const source = read("components/ai-chat/mlbot.tsx")
     const panel = source.slice(source.indexOf('role="dialog"'), source.indexOf('role="dialog"') + 700)
 
+    /* iOS Safari zooms the page whenever a focused input renders below 16px,
+     * and there is no way to decline it without disabling pinch-zoom for
+     * everyone (user-scalable=no fails WCAG 1.4.4). The zoom is not merely
+     * ugly: it shrinks the layout viewport under a panel pinned to inset-0,
+     * which is what surfaced as "overflow both horizontally and vertically".
+     * One cause, three symptoms — so this is the guard for all of them. */
+    it("sizes the composer at 16px so iOS cannot zoom the panel on focus", () => {
+        const panel = read("components/ai-chat/mlbot.tsx")
+        const composer = panel
+            .split("\n")
+            .find((l) => l.includes("resize-none") && l.includes("flex-1"))
+        expect(composer, "composer textarea class list not found").toBeDefined()
+
+        const px = composer!.match(/text-\[([\d.]+)px\]/)
+        expect(px, `composer must pin an explicit px font size, got: ${composer?.trim()}`).not.toBeNull()
+        expect(
+            Number(px![1]),
+            "below 16px iOS zooms on focus and the fixed panel overflows",
+        ).toBeGreaterThanOrEqual(16)
+    })
+
+    /* The panel is inset-0 full-screen on a phone and Escape is the only other
+     * way out — which a touch device does not have. Without a visible close
+     * control the reader is trapped in the chat. The resize button next to it
+     * is deliberately sm:-only, so this must NOT be. */
+    it("offers a close control that is visible on a phone, not just at sm and up", () => {
+        const panel = read("components/ai-chat/mlbot.tsx")
+        const close = panel
+            .split("\n")
+            .find((l) => /aria-label="(Close|Dismiss)[^"]*"/i.test(l))
+        expect(close, "no close control found in the panel header").toBeDefined()
+
+        const idx = panel.split("\n").findIndex((l) => l === close)
+        const markup = panel.split("\n").slice(idx - 6, idx + 6).join("\n")
+        expect(markup, "the close control must not be hidden below sm").not.toMatch(/\bhidden\b[^"]*\bsm:flex\b/)
+    })
+
     it("fills the whole screen on mobile", () => {
         expect(panel).toContain("inset-0")
         expect(panel).toMatch(/h-dvh|h-\[100dvh\]/)
