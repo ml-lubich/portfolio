@@ -46,7 +46,8 @@ export const ossDemos: OssDemo[] = [
     {
         id: "imsg-mcp",
         repoUrl: "https://github.com/ml-lubich/imsg",
-        install: "pip install mac-imsg",
+        packageUrl: "https://pypi.org/project/mac-imsg/",
+        install: "brew install ml-lubich/tap/imsg",
         tagline: "Local iMessage CLI + MCP server, Rust-accelerated search",
         badge: "Rust core",
         demo: [
@@ -76,7 +77,8 @@ export const ossDemos: OssDemo[] = [
     {
         id: "imail-mcp",
         repoUrl: "https://github.com/ml-lubich/imail",
-        install: "PyPI: mac-imail",
+        packageUrl: "https://pypi.org/project/mac-imail/",
+        install: "brew install ml-lubich/tap/imail",
         tagline: "Local Apple Mail CLI with hard work/personal account walls",
         demo: [
             { t: "cmd", s: "imail accounts" },
@@ -104,7 +106,8 @@ export const ossDemos: OssDemo[] = [
     {
         id: "inotes-mcp",
         repoUrl: "https://github.com/ml-lubich/inotes",
-        install: "PyPI: mac-inotes",
+        packageUrl: "https://pypi.org/project/mac-inotes/",
+        install: "brew install ml-lubich/tap/inotes",
         tagline: "Local Apple Notes CLI with an agent-schema command surface",
         demo: [
             { t: "cmd", s: "inotes search \"grocery list\"" },
@@ -131,6 +134,8 @@ export const ossDemos: OssDemo[] = [
     {
         id: "wa-mcp",
         repoUrl: "https://github.com/ml-lubich/whatsapp-mcp",
+        packageUrl: "https://pypi.org/project/mac-wa/",
+        install: "brew install ml-lubich/tap/wa",
         tagline: "Ops CLI for the open-source WhatsApp MCP bridge",
         demo: [
             { t: "cmd", s: "wa doctor" },
@@ -157,7 +162,8 @@ export const ossDemos: OssDemo[] = [
     {
         id: "bitbucket-cli",
         repoUrl: "https://github.com/ml-lubich/bitbucket-cli",
-        install: "PyPI: bitbucket-client",
+        packageUrl: "https://pypi.org/project/bitbucket-client/",
+        install: "brew install ml-lubich/tap/bitbucket-client",
         tagline: "gh-style Bitbucket CLI with a built-in read-only MCP server",
         demo: [
             { t: "cmd", s: "bb pr list --json" },
@@ -174,7 +180,7 @@ export const ossDemos: OssDemo[] = [
     {
         id: "twig",
         repoUrl: "https://github.com/ml-lubich/twig",
-        install: "pipx install twig-cli",
+        install: "git clone https://github.com/ml-lubich/twig",
         tagline: "Agent-first Git worktree CLI with a Rust hot path",
         badge: "Rust core",
         demo: [
@@ -192,6 +198,8 @@ export const ossDemos: OssDemo[] = [
     {
         id: "confluence-cli",
         repoUrl: "https://github.com/ml-lubich/confluence-cli",
+        packageUrl: "https://github.com/ml-lubich/homebrew-tap/blob/master/Formula/confluence-cli.rb",
+        install: "brew install ml-lubich/tap/confluence-cli",
         tagline: "Bulk Confluence move/delete and idempotent mirror, safe for AI agents",
         demo: [
             { t: "cmd", s: "confluence-cli move --page-id 4021 --to-parent 3100" },

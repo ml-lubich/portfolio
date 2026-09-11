@@ -5,6 +5,8 @@
  */
 
 import { describe, it, expect } from "vitest"
+import https from "https"
+import http from "http"
 import { ossDemos } from "@/data/oss-demos"
 import { projects } from "@/data/projects"
 
@@ -131,4 +133,82 @@ describe("oss-demos data integrity", () => {
       expect(demo).not.toHaveProperty("diagramType")
     }
   })
+})
+
+/**
+ * Install commands + package links must be real, copyable, and verified —
+ * never fabricated. See docs/DESIGN.md-adjacent PR context: only
+ * `brew install`, `pip install`, `pipx install`, `npm i -g`, or a plain
+ * `git clone` (for tools with no published package) are allowed shapes.
+ */
+const INSTALL_COMMAND_RE =
+  /^(brew install |pip install |pipx install |npm (?:i|install) -g |git clone )\S/
+
+describe("oss-demos install commands + package links", () => {
+  it("every install command matches a real package-manager syntax", () => {
+    for (const demo of ossDemos) {
+      if (demo.install === undefined) continue
+      expect(demo.install.trim().length, `empty install command in '${demo.id}'`).toBeGreaterThan(0)
+      expect(
+        INSTALL_COMMAND_RE.test(demo.install),
+        `install command '${demo.install}' in '${demo.id}' doesn't match a real package-manager syntax`,
+      ).toBe(true)
+    }
+  })
+
+  it("every packageUrl is an absolute https URL", () => {
+    for (const demo of ossDemos) {
+      if (demo.packageUrl === undefined) continue
+      expect(demo.packageUrl).toMatch(/^https:\/\//)
+    }
+  })
+
+  it("a git-clone install has no packageUrl (nothing published to link to)", () => {
+    for (const demo of ossDemos) {
+      if (demo.install?.startsWith("git clone ")) {
+        expect(demo.packageUrl, `'${demo.id}' has a git-clone install but also a packageUrl`).toBeUndefined()
+      }
+    }
+  })
+
+  // Reachability isn't a release criterion — a transient registry outage
+  // shouldn't block a deploy that has nothing to do with it. Same gate as
+  // __tests__/links.test.ts.
+  const NETWORK_GATED = Boolean(process.env.VERCEL)
+
+  function headOk(targetUrl: string): Promise<{ ok: boolean; status: number | string }> {
+    return new Promise((resolve) => {
+      const doRequest = (method: string, url: string, redirects = 0) => {
+        if (redirects > 5) return resolve({ ok: false, status: "too many redirects" })
+        const lib = url.startsWith("https") ? https : http
+        const req = lib.request(
+          url,
+          { method, timeout: 8_000, headers: { "User-Agent": "Mozilla/5.0" } },
+          (res) => {
+            if ([301, 302, 307, 308].includes(res.statusCode!) && res.headers.location) {
+              return doRequest("HEAD", new URL(res.headers.location, url).href, redirects + 1)
+            }
+            const ok = res.statusCode! >= 200 && res.statusCode! < 400
+            if (!ok && method === "HEAD" && [403, 405, 406].includes(res.statusCode!)) {
+              return doRequest("GET", url, redirects)
+            }
+            resolve({ ok, status: res.statusCode! })
+            res.resume()
+          },
+        )
+        req.on("timeout", () => { req.destroy(); resolve({ ok: false, status: "timeout" }) })
+        req.on("error", () => resolve({ ok: false, status: 0 }))
+        req.end()
+      }
+      doRequest("HEAD", targetUrl)
+    })
+  }
+
+  for (const demo of ossDemos) {
+    if (!demo.packageUrl) continue
+    it.skipIf(NETWORK_GATED)(`packageUrl for '${demo.id}' resolves (${demo.packageUrl})`, async () => {
+      const result = await headOk(demo.packageUrl!)
+      expect(result.ok, `${demo.packageUrl} → HTTP ${result.status}`).toBe(true)
+    }, 20_000)
+  }
 })

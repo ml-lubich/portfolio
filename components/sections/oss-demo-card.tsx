@@ -212,6 +212,17 @@ export function OssDemoCard({ demo, active = true, onExplore }: OssDemoCardProps
                 {copied ? "Copied" : demo.install}
               </button>
             )}
+            {demo.packageUrl && (
+              <a
+                href={demo.packageUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${project.name} package page`}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-white/[0.10] bg-white/[0.03] px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-muted-foreground/60 transition-colors hover:border-primary/40 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary/60"
+              >
+                Package
+              </a>
+            )}
             {project.tags.slice(0, 3).map((tag) => (
               <span
                 key={tag}
