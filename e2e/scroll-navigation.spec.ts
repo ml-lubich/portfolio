@@ -96,18 +96,34 @@ test.beforeEach(async ({ page }) => {
   await expect(page.getByRole("button", { name: /get in touch/i })).toBeVisible()
 })
 
+/**
+ * The nav's section links only exist in the always-visible desktop pill row
+ * (`nav a[href=…]`, hidden below the `xl` breakpoint) OR inside the mobile
+ * hamburger overlay (`#mobile-nav-overlay a[href=…]`) once it's open — never
+ * both at once for a given viewport. Mirror how a real visitor reaches the
+ * link on each device instead of clicking a hidden desktop pill on a phone.
+ */
+async function clickNavLink(page: Page, href: string, isMobile: boolean) {
+  if (isMobile) {
+    await page.getByRole("button", { name: /toggle menu/i }).click()
+    await page.locator(`#mobile-nav-overlay a[href='${href}']`).first().click()
+  } else {
+    await page.locator(`nav a[href='${href}']`).first().click()
+  }
+}
+
 test("hero 'Get In Touch' button scrolls to #contact and stays", async ({ page }) => {
   await page.getByRole("button", { name: /get in touch/i }).click()
   await expectLandedOnContact(page)
 })
 
-test("nav 'Get In Touch' pill scrolls to #contact and stays", async ({ page }) => {
-  await page.locator("nav a[href='#contact']").first().click()
+test("nav 'Get In Touch' pill scrolls to #contact and stays", async ({ page, isMobile }) => {
+  await clickNavLink(page, "#contact", isMobile)
   await expectLandedOnContact(page)
 })
 
-test("nav section link ('Journey') lands on its section and stays", async ({ page }) => {
-  await page.locator("nav a[href='#journey']").first().click()
+test("nav section link ('Journey') lands on its section and stays", async ({ page, isMobile }) => {
+  await clickNavLink(page, "#journey", isMobile)
   await settledScrollY(page)
   const top = await page.evaluate(
     () => document.getElementById("journey")?.getBoundingClientRect().top ?? Number.POSITIVE_INFINITY,

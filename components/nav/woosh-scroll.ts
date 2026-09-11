@@ -126,26 +126,57 @@ const LAYOUT_STABLE_POLLS = 15
 const LAYOUT_STABLE_CAP_MS = 5000
 
 /**
- * Poll for the target id to exist AND document.documentElement.scrollHeight
- * to stop changing for LAYOUT_STABLE_POLLS consecutive polls — i.e. every
- * LazySection dispatched by "portfolio:mount-all" has finished mounting and
- * expanding. Hard-capped at LAYOUT_STABLE_CAP_MS so a section that never
- * appears can't stall navigation forever. Aborts silently (no onReady call)
- * if a newer navigateTo() has superseded this one.
+ * A real handset tap felt delayed: this fixed ~1.5s tax (LAYOUT_STABLE_POLLS
+ * × LAYOUT_POLL_MS) is paid before every scroll, even when the target needs
+ * no stabilization at all. On coarse pointers we track the TARGET's own Y
+ * offset instead of the whole document's height (see measureFor below) —
+ * sections below the target growing later (GitHub stats' async swap, etc.)
+ * can't move it, so it settles fast — and only need a short quiet window to
+ * confirm it. Desktop's constants above are untouched, so mouse/trackpad
+ * timing does not change.
+ */
+const LAYOUT_STABLE_POLLS_COARSE = 5
+
+function isCoarsePointer(): boolean {
+  return typeof window !== "undefined" && !!window.matchMedia && window.matchMedia("(pointer: coarse)").matches
+}
+
+/**
+ * What "layout changed" means while waiting to scroll. Desktop measures the
+ * whole document (unchanged behavior). Coarse pointers measure the target's
+ * own absolute Y — unaffected by sections below it still expanding, so it
+ * reaches its final value as soon as everything ABOVE it (the only thing
+ * that could shift it) has settled.
+ */
+function measureFor(id: string, coarse: boolean): number {
+  if (!coarse) return document.documentElement.scrollHeight
+  const el = document.getElementById(id) ?? document.querySelector(`[data-section="${id}"]`)
+  return el ? el.getBoundingClientRect().top + window.scrollY : document.documentElement.scrollHeight
+}
+
+/**
+ * Poll for the target id to exist AND its layout measure (see measureFor) to
+ * stop changing for the required number of consecutive polls — i.e. every
+ * LazySection dispatched by "portfolio:mount-all" that could affect it has
+ * finished mounting and expanding. Hard-capped at LAYOUT_STABLE_CAP_MS so a
+ * section that never appears can't stall navigation forever. Aborts silently
+ * (no onReady call) if a newer navigateTo() has superseded this one.
  */
 function waitForStableLayout(id: string, thisNavigation: number, onReady: () => void) {
+  const coarse = isCoarsePointer()
+  const requiredPolls = coarse ? LAYOUT_STABLE_POLLS_COARSE : LAYOUT_STABLE_POLLS
   const start = performance.now()
-  let lastHeight = document.documentElement.scrollHeight
+  let lastMeasure = measureFor(id, coarse)
   let stablePolls = 0
 
   function poll() {
     if (thisNavigation !== navigationId) return // superseded
 
-    const height = document.documentElement.scrollHeight
-    stablePolls = height === lastHeight ? stablePolls + 1 : 0
-    lastHeight = height
+    const measure = measureFor(id, coarse)
+    stablePolls = measure === lastMeasure ? stablePolls + 1 : 0
+    lastMeasure = measure
 
-    const ready = !!document.getElementById(id) && stablePolls >= LAYOUT_STABLE_POLLS
+    const ready = !!document.getElementById(id) && stablePolls >= requiredPolls
     const timedOut = performance.now() - start >= LAYOUT_STABLE_CAP_MS
     if (ready || timedOut) {
       onReady()
