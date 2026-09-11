@@ -40,7 +40,14 @@ const MODELS = [
     "inclusionai/ling-3.0-flash",
     "z-ai/glm-4.7-flash",
     "qwen/qwen3.7-flash",
-    "openai/gpt-oss-20b:free",
+    /* Two free nets, different labs, because the previous single one died:
+       OpenRouter retired `openai/gpt-oss-20b:free` and it began 404ing with
+       "This model is unavailable for free", which took the bot down once the
+       paid tier ahead of it was also failing. __tests__/ai-model-slugs.test.ts
+       now asserts every slug here still exists upstream and advertises tools,
+       so a retirement fails a test instead of production. */
+    "inclusionai/ling-3.0-flash-vl:free",
+    "nex-agi/nex-n2.5-mini:free",
 ] as const
 
 const LIMITS = {

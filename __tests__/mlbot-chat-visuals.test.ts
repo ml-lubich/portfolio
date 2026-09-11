@@ -4,6 +4,14 @@ import { join } from "node:path"
 
 import { splitChatSegments } from "@/lib/ai/chat-segments"
 
+/** The MODELS array carries prose that quotes upstream error text and file
+ *  paths. Matching strings straight out of the raw slice reads that prose as a
+ *  model id — a comment mentioning `a/b` satisfied even the `/`-requiring
+ *  pattern. Strip comments before any string match. */
+function stripComments(src: string): string {
+    return src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/[^\n]*/g, "")
+}
+
 const root = process.cwd()
 const read = (p: string) => readFileSync(join(root, p), "utf8")
 
@@ -141,7 +149,9 @@ describe("MLBot spend governor", () => {
 
     it("keeps more than one lab in the roster so an outage is not an outage", () => {
         const route = read("app/api/chat/route.ts")
-        const models = route.slice(route.indexOf("const MODELS"), route.indexOf("] as const"))
+        const models = stripComments(
+            route.slice(route.indexOf("const MODELS"), route.indexOf("] as const")),
+        )
         const labs = new Set([...models.matchAll(/"([^"]+)\//g)].map((m) => m[1]))
 
         expect(labs.size).toBeGreaterThanOrEqual(2)
@@ -186,7 +196,9 @@ describe("isPinnedToBottom", () => {
 
 describe("MLBot model roster", () => {
     const route = read("app/api/chat/route.ts")
-    const models = route.slice(route.indexOf("const MODELS"), route.indexOf("] as const"))
+    const models = stripComments(
+        route.slice(route.indexOf("const MODELS"), route.indexOf("] as const")),
+    )
 
     /* Free tiers carry normal traffic, so spend stays near zero; the paid
      * fallback tier is where the Chinese open-weight preference still applies.
