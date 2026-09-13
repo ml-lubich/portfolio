@@ -177,7 +177,12 @@ const AUTO_SPEED = 40
 const COPIES = 4
 
 /** Pointer travel (px) past which a gesture counts as a drag, not a click */
-const DRAG_SLOP = 6
+export const DRAG_SLOP = 6
+
+/** Whether accumulated pointer travel makes this gesture a drag rather than a tap. */
+export function isDragGesture(maxTravelPx: number): boolean {
+    return maxTravelPx > DRAG_SLOP
+}
 
 /** Marks only — the brand name stays in the tree for screen readers and as the
  *  link's accessible name, but is never painted beside the glyph. */
@@ -234,6 +239,12 @@ export function LogoScroll() {
      *  reflow on every tick — the single most expensive thing this strip did. */
     const setWidthRef = useRef(0)
     const reducedMotionRef = useRef(false)
+    /** Hover (mouse) or focus-within (keyboard) pauses auto-scroll — lets a
+     *  visitor line up a click, and gives keyboard users a way to stop the
+     *  motion per WCAG 2.2.2. JS-side because this strip is rAF-driven, not
+     *  CSS-animated, so the `.marquee-row:hover`/`:focus-within` rule in
+     *  globals.css never reaches it. */
+    const hoverPausedRef = useRef(false)
 
     const repeated = Array.from({ length: COPIES }, () => LOGOS).flat()
 
@@ -298,9 +309,10 @@ export function LogoScroll() {
                 } else {
                     velocityRef.current = 0
                 }
-                // Auto-scroll, unless the visitor asked for reduced motion —
-                // dragging still works, it just never drifts on its own.
-                if (!reducedMotionRef.current) {
+                // Auto-scroll, unless the visitor asked for reduced motion or
+                // is hovering/focused on the strip — dragging still works, it
+                // just never drifts on its own.
+                if (!reducedMotionRef.current && !hoverPausedRef.current) {
                     offsetRef.current -= AUTO_SPEED * dt
                 }
             }
@@ -344,6 +356,11 @@ export function LogoScroll() {
     }, [animate])
 
     /* ── Pointer (mouse + touch) handlers ─────────────────────────── */
+    /* Pointer capture is only acquired once a gesture actually proves out as a
+     * drag (in onPointerMove below) — never on pointerdown. Capturing eagerly
+     * retargets the eventual "click" to the capturing div instead of the logo
+     * <a> it landed on, so the anchor never sees the click and never navigates.
+     * That silently broke every tap, not just drags. */
     const onPointerDown = useCallback((e: React.PointerEvent) => {
         isDraggingRef.current = true
         setDragging(true)
@@ -353,7 +370,6 @@ export function LogoScroll() {
         dragOffsetRef.current = offsetRef.current
         lastPointerXRef.current = e.clientX
         lastPointerTimeRef.current = performance.now()
-            ; (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
     }, [])
 
     const onPointerMove = useCallback((e: React.PointerEvent) => {
@@ -361,6 +377,13 @@ export function LogoScroll() {
         const dx = e.clientX - dragStartXRef.current
         offsetRef.current = dragOffsetRef.current + dx
         dragDistRef.current = Math.max(dragDistRef.current, Math.abs(dx))
+
+        // Once travel crosses the drag threshold, capture the pointer so the
+        // strip keeps tracking it even if the cursor leaves the track element.
+        const el = e.currentTarget as HTMLElement
+        if (isDragGesture(dragDistRef.current) && !el.hasPointerCapture(e.pointerId)) {
+            el.setPointerCapture(e.pointerId)
+        }
 
         // Track velocity for momentum
         const now = performance.now()
@@ -372,16 +395,35 @@ export function LogoScroll() {
         lastPointerTimeRef.current = now
     }, [])
 
-    const onPointerUp = useCallback(() => {
+    const onPointerUp = useCallback((e: React.PointerEvent) => {
         isDraggingRef.current = false
         setDragging(false)
+        const el = e.currentTarget as HTMLElement
+        if (el.hasPointerCapture(e.pointerId)) el.releasePointerCapture(e.pointerId)
     }, [])
 
-    /** Swallow the click that ends a drag so dragging the strip never navigates. */
+    /** Belt-and-suspenders: swallow the click that ends a drag, in case a
+     *  browser still delivers it to the anchor despite the capture above. */
     const onClickCapture = useCallback((e: React.MouseEvent) => {
-        if (dragDistRef.current > DRAG_SLOP) {
+        if (isDragGesture(dragDistRef.current)) {
             e.preventDefault()
             e.stopPropagation()
+        }
+    }, [])
+
+    const pauseForHover = useCallback(() => {
+        hoverPausedRef.current = true
+    }, [])
+
+    const resumeFromHover = useCallback(() => {
+        hoverPausedRef.current = false
+    }, [])
+
+    /** Blur only resumes once focus has actually left the strip — moving
+     *  focus between logos fires blur+focus back to back and must not flicker. */
+    const onTrackBlur = useCallback((e: React.FocusEvent) => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) {
+            hoverPausedRef.current = false
         }
     }, [])
 
@@ -416,6 +458,10 @@ export function LogoScroll() {
                 onPointerUp={onPointerUp}
                 onPointerCancel={onPointerUp}
                 onClickCapture={onClickCapture}
+                onMouseEnter={pauseForHover}
+                onMouseLeave={resumeFromHover}
+                onFocus={pauseForHover}
+                onBlur={onTrackBlur}
                 className={`flex items-center will-change-transform touch-pan-y ${dragging ? "cursor-grabbing" : "cursor-grab"}`}
                 style={{ touchAction: "pan-y" }}
             >

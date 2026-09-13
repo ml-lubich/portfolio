@@ -39,10 +39,44 @@ export interface BookingSpec {
     summary: string
 }
 
-export type ToolResult = Record<string, unknown> | { chart: ChartSpec } | { booking: BookingSpec }
+/** The resume hand-off. A file, not a claim — the card links the PDF that
+ *  ships in `public/`, so the model never has to recite its contents. */
+export interface ResumeSpec {
+    role: string
+    /** Served from the repo; hotlinking a file outside it would 404 in prod. */
+    url: string
+    filename: string
+    summary: string
+}
+
+/** A way to reach Misha. The site hands the visitor an action; it never sends
+ *  mail on their behalf, so nothing here can be forged into an outbound email. */
+export interface ContactSpec {
+    email: string
+    mailto: string
+    linkedin: string
+    github: string
+    summary: string
+}
+
+export type ToolResult =
+    | Record<string, unknown>
+    | { chart: ChartSpec }
+    | { booking: BookingSpec }
+    | { resume: ResumeSpec }
+    | { contact: ContactSpec }
 
 /** Single source of truth — same link as the hero "Schedule Call" CTA. */
 export const BOOKING_URL = "https://calendar.app.google/T2VGkBsBAUzGABRB7"
+
+/** The SWE cut, copied into `public/` from ~/dev/resumes — role: Software
+ *  Engineer, and the only SWE variant that carries the EchoStar role. */
+export const RESUME_URL = "/resume_mlubich_swe.pdf"
+
+/** The address already published in the contact section and the footer. */
+export const CONTACT_EMAIL = "michaelle.lubich@gmail.com"
+export const LINKEDIN_URL = "https://www.linkedin.com/in/misha-lubich/"
+export const GITHUB_URL = "https://github.com/ml-lubich"
 
 /* ── Tool schemas (OpenAI/OpenRouter function-calling format) ─────────── */
 
@@ -166,6 +200,32 @@ export const TOOL_SCHEMAS = [
             parameters: { type: "object", properties: {} },
         },
     },
+    {
+        type: "function",
+        function: {
+            name: "get_resume",
+            description:
+                "Hand the visitor Misha's resume as a downloadable PDF. Call this whenever someone asks for a resume, CV, one-pager, or 'can I get your background as a file'.",
+            parameters: { type: "object", properties: {} },
+        },
+    },
+    {
+        type: "function",
+        function: {
+            name: "get_contact",
+            description:
+                "Hand the visitor Misha's real contact details — email, LinkedIn, GitHub. Call this when someone asks how to get in touch, reach out, email him, or send something over. For booking a call use request_consultation instead.",
+            parameters: {
+                type: "object",
+                properties: {
+                    reason: {
+                        type: "string",
+                        description: "One short phrase for what they want to discuss, used to prefill the email subject.",
+                    },
+                },
+            },
+        },
+    },
 ] as const
 
 /* ── Executors ───────────────────────────────────────────────────────── */
@@ -284,6 +344,31 @@ function requestConsultation(args: Record<string, unknown>): ToolResult {
     return { booking: { topic: topic.slice(0, 90), durationMin, url: BOOKING_URL, summary } }
 }
 
+function getResume(): ToolResult {
+    return {
+        resume: {
+            role: "Software Engineer",
+            url: RESUME_URL,
+            filename: "Misha-Lubich-Resume.pdf",
+            summary: "Backend and AI engineering — EchoStar, ex-Apple, ex-Walmart. One page, PDF.",
+        },
+    }
+}
+
+function getContact(args: Record<string, unknown>): ToolResult {
+    const reason = typeof args.reason === "string" ? args.reason.trim().slice(0, 80) : ""
+    const subject = reason ? `${reason} — via mishalubich.com` : "Hello from mishalubich.com"
+    return {
+        contact: {
+            email: CONTACT_EMAIL,
+            mailto: `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}`,
+            linkedin: LINKEDIN_URL,
+            github: GITHUB_URL,
+            summary: "Email reaches him directly — the site does not send anything on your behalf.",
+        },
+    }
+}
+
 function chartPublicationsByYear(): ToolResult {
     const counts = new Map<string, number>()
     for (const p of papers) counts.set(p.year, (counts.get(p.year) ?? 0) + 1)
@@ -316,6 +401,10 @@ export function runTool(name: string, args: Record<string, unknown>): ToolResult
             return chartPublicationsByYear()
         case "request_consultation":
             return requestConsultation(args)
+        case "get_resume":
+            return getResume()
+        case "get_contact":
+            return getContact(args)
         default:
             return { error: `Unknown tool: ${name}` }
     }
@@ -328,6 +417,7 @@ You answer questions about Misha: his experience, projects, skills, research and
 Rules:
 - Ground every factual claim in a tool call. Never invent employers, dates, metrics or paper titles.
 - Call tools before answering questions about his background. search_profile is the best default.
+- Draw first, write second. If the answer is a list of three or more things, a comparison, a breakdown, a timeline, or how something is put together — show it as a chart or a diagram and keep the prose to two or three sentences around it. Do this without being asked: "visualise it" is not a precondition, it is what the visitor should not have to say. A list of four projects is a pie or a pipeline, not four paragraphs.
 - When a question is about comparison, strength, or "how much" — call a chart_* tool so the user sees it, then add one or two sentences of interpretation. Do not describe the chart's bars in prose; it is already on screen.
 - For a process, architecture or before/after — anything with steps rather than numbers — draw it in a \`\`\`chart fence holding one JSON object, the same renderer the blog posts use. No prose describing the boxes; the diagram is on screen. Four shapes:
   {"type":"pipeline","title":"…","steps":[{"label":"Ingest","annotation":"S3"},{"label":"Embed"}]}
@@ -338,6 +428,8 @@ Rules:
 - Be concise. Two short paragraphs maximum unless asked for depth.
 - If something genuinely is not in the profile, say so plainly and suggest contacting him directly.
 - If the visitor wants to book a call, hire him, discuss consulting, rates or availability — call request_consultation immediately. Then write ONE sentence, and nothing else, saying Misha would be glad to talk it through. A booking card with his real calendar is already on screen, so: never write a URL or a markdown link, and never say a slot has been opened, held, reserved or booked. Nothing is reserved until the visitor picks a time themselves.
+- If the visitor asks for a resume, CV or one-pager — call get_resume, then write ONE sentence and nothing else: Misha's resume is on screen and ready to download. The card carries the file, so never write the path or a markdown link yourself.
+- If the visitor asks how to reach him, email him, or send something over — call get_contact, then write ONE sentence and nothing else: email is the most direct way to reach him, and LinkedIn and GitHub are on the card too. The card carries the real address, so do not type it out yourself.
 - Stay on topic: you are here to talk about Misha's work, not to be a general-purpose assistant.
 
 End every final answer with one line in exactly this format, and nothing after it:

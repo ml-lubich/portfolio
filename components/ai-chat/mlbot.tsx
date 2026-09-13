@@ -26,13 +26,10 @@ import remarkGfm from "remark-gfm"
 import { wooshScrollTo } from "@/components/nav/woosh-scroll"
 import { ChatChart, type ChartSpec } from "./chat-chart"
 import { BookingCard } from "./booking-card"
-import { BOOKING_URL, type BookingSpec } from "@/lib/ai/profile-tools"
-
-/** One tool call, as a step the reader can watch: it runs, then it settles. */
-interface ToolStep {
-    name: string
-    done: boolean
-}
+import { ContactCard, ResumeCard } from "./handoff-cards"
+import { TOOL_LABELS, collapseToolSteps, type ToolStep } from "@/lib/ai/tool-labels"
+import { stripCardLinks } from "@/lib/ai/card-links"
+import type { BookingSpec, ContactSpec, ResumeSpec } from "@/lib/ai/profile-tools"
 
 interface Turn {
     role: "user" | "assistant"
@@ -43,14 +40,25 @@ interface Turn {
     followups?: Followup[]
     /** Calendar hand-off, when the visitor asked about working together. */
     booking?: BookingSpec
+    /** Downloadable resume, when the visitor asked for one. */
+    resume?: ResumeSpec
+    /** Email / social hand-off, when the visitor asked how to reach him. */
+    contact?: ContactSpec
 }
 
-/* Panel footprint. One generous default — briopedia's 480px × min(85dvh,760px)
- * — plus a wider rung for a chart or a table. Mobile ignores this: the panel
- * is full-screen there. */
+/* Panel footprint, smallest first. One generous default — briopedia's 480px ×
+ * min(85dvh,760px) — then a wider rung for a chart or a table, then near
+ * full-screen for reading a long answer on a laptop.
+ *
+ * The largest rung leaves only the bottom-right anchor's own gutters, so at
+ * 1440×900 it is 1280×780. It is a rung you climb to, not the default: a panel
+ * that always swallows the page is worse than one you can grow.
+ *
+ * Mobile ignores all of this — the panel is inset-0 full-screen there. */
 const PANEL_SIZES = [
     "sm:h-[min(47.5rem,85dvh,calc(100dvh-8rem))] sm:w-[min(30rem,calc(100vw-2rem))]",
     "sm:h-[min(56rem,90dvh,calc(100dvh-8rem))] sm:w-[min(42rem,calc(100vw-2rem))]",
+    "sm:h-[min(60rem,calc(100dvh-7.5rem))] sm:w-[min(80rem,calc(100vw-3rem))]",
 ] as const
 
 const SUGGESTIONS = [
@@ -61,19 +69,6 @@ const SUGGESTIONS = [
 ]
 
 /** Human-readable labels for the tool names the model calls. */
-/** The booking card already carries the link. Models paste it anyway, which
- *  renders as raw markdown and duplicates the card — so strip it on display
- *  rather than trusting the prompt to hold. */
-function stripBookingLink(text: string): string {
-    const escaped = BOOKING_URL.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
-    return text
-        .replace(new RegExp(`\\[([^\\]]*)\\]\\(\\s*${escaped}[^)]*\\)`, "gi"), "$1")
-        .replace(new RegExp(escaped, "gi"), "")
-        .replace(/[ \t]{2,}/g, " ")
-        .replace(/\n{3,}/g, "\n\n")
-        .trim()
-}
-
 /* Cycled while waiting. "Thinking…" is what every other chat says; these are
  * the site's own vocabulary, and the motion tells you it is alive rather than
  * hung — which is most of what a loading state is for. */
@@ -113,19 +108,6 @@ function ThinkingVerb() {
             </span>
         </span>
     )
-}
-
-const TOOL_LABELS: Record<string, string> = {
-    search_profile: "Searching the profile",
-    get_experience: "Reading work history",
-    get_projects: "Pulling up projects",
-    get_skills: "Checking skills",
-    get_publications: "Looking up publications",
-    get_testimonials: "Fetching testimonials",
-    chart_skills: "Charting skills",
-    chart_tech_usage: "Charting tech usage",
-    chart_publications_by_year: "Charting publications",
-    request_consultation: "Opening the calendar",
 }
 
 /* One tool call, drawn as a numbered step. A static line made the panel look
@@ -364,6 +346,10 @@ export function MLBot() {
                             })
                         } else if (event === "booking") {
                             patch((t) => ({ ...t, booking: data as BookingSpec }))
+                        } else if (event === "resume") {
+                            patch((t) => ({ ...t, resume: data as ResumeSpec }))
+                        } else if (event === "contact") {
+                            patch((t) => ({ ...t, contact: data as ContactSpec }))
                         } else if (event === "followups") {
                             // Wire form is a plain string, optionally `label :: question`.
                             // An object pair is accepted too, so either server works.
@@ -472,17 +458,17 @@ export function MLBot() {
                             </button>
                         )}
 
-                        {/* Toggles between the roomy default and a wider rung for
-                            charts and tables. */}
+                        {/* Cycles the rungs: default → wide → near full-screen →
+                            back to default. */}
                         <button
                             type="button"
                             onClick={() => setSize((n) => (n + 1) % PANEL_SIZES.length)}
                             aria-label="Resize MLBot"
-                            aria-pressed={size === 1}
-                            title={size === 0 ? "Enlarge" : "Shrink"}
+                            aria-pressed={size > 0}
+                            title={size === PANEL_SIZES.length - 1 ? "Shrink" : "Enlarge"}
                             className="hidden h-8 w-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-white/[0.06] hover:text-foreground sm:flex"
                         >
-                            {size === 0 ? <Maximize2 className="h-4 w-4" /> : <Minimize2 className="h-4 w-4" />}
+                            {size === PANEL_SIZES.length - 1 ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
                         </button>
 
                         {/* Always visible, unlike the resize control: on a phone
@@ -585,7 +571,7 @@ export function MLBot() {
                                     )
                                 ) : (
                                     <>
-                                        {turn.tools?.map(({ name, done }, j) =>
+                                        {collapseToolSteps(turn.tools ?? []).map(({ name, done }, j) =>
                                             TOOL_LABELS[name] ? <ToolStepRow key={j} name={name} done={done} index={j} /> : null,
                                         )}
 
@@ -593,7 +579,11 @@ export function MLBot() {
 
                                         {turn.booking && <BookingCard booking={turn.booking} />}
 
-                                        {splitChatSegments(turn.content).map((seg, j) =>
+                                        {turn.resume && <ResumeCard resume={turn.resume} />}
+
+                                        {turn.contact && <ContactCard contact={turn.contact} />}
+
+                                        {splitChatSegments(stripCardLinks(turn.content)).map((seg, j) =>
                                             seg.kind === "diagram" ? (
                                                 <div key={j} className="my-2 max-w-full overflow-x-auto">
                                                     <BlogChart json={seg.json} />
@@ -613,7 +603,7 @@ export function MLBot() {
                                             last one, since it replaces that answer. */}
                                         {!busy && (turn.content || turn.charts?.length) ? (
                                             <div className="flex items-center gap-0.5 pt-0.5">
-                                                <CopyButton text={stripBookingLink(turn.content)} label="Copy answer" />
+                                                <CopyButton text={stripCardLinks(turn.content)} label="Copy answer" />
                                                 {i === lastAssistant && (
                                                     <button type="button" onClick={retry} aria-label="Retry" title="Retry" className={ACTION}>
                                                         <RotateCcw className="h-3.5 w-3.5" />

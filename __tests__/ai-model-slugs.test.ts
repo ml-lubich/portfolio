@@ -49,6 +49,34 @@ describe("chat model cascade", () => {
     expect(models.some((m) => m.endsWith(":free"))).toBe(true)
   })
 
+  /* Free-first is the owner's call, traded against first-token latency — the
+   * rationale is on the MODELS comment. Assert the shape so a later "just move
+   * the fast one up" has to argue with a failing test. */
+  it("tries every free model before spending money", () => {
+    const firstPaid = models.findIndex((m) => !m.endsWith(":free"))
+    const lastFree = models.map((m) => m.endsWith(":free")).lastIndexOf(true)
+    expect(firstPaid, "no paid backstop behind the free tier").toBeGreaterThan(0)
+    expect(lastFree).toBeLessThan(firstPaid)
+  })
+
+  it("backstops the free tier with paid models, so a free 429 is not the end", () => {
+    expect(models.filter((m) => !m.endsWith(":free")).length).toBeGreaterThanOrEqual(2)
+  })
+
+  /* Every paid backstop is open-weight and served by several providers. A
+   * single-host proprietary model is one business decision away from being the
+   * retired slug that took the bot down last time. */
+  it("draws each entry from a different lab", () => {
+    const labs = models.map((m) => m.split("/")[0])
+    expect(new Set(labs).size).toBe(labs.length)
+  })
+
+  it("excludes a model that answered a lookup without calling the tool", () => {
+    // nex-n2.5-pro:free claimed the resume card was on screen having never
+    // called get_resume. Fabricating a tool result is worse than being slow.
+    for (const m of models) expect(m).not.toMatch(/nex-n2\.5-pro/)
+  })
+
   it("excludes models that stream reasoning as ordinary content", () => {
     // These leak the system prompt into the panel; reasoning.exclude does not
     // stop them, so they are barred regardless of capability.

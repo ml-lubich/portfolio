@@ -71,9 +71,12 @@ describe("MLBot panel proportions", () => {
     const sizes = source.slice(source.indexOf("const PANEL_SIZES"), source.indexOf("] as const"))
     const rungs = [...sizes.matchAll(/"([^"]+)"/g)].map((m) => m[1])
 
-    it("defaults to the generous size, not a small one", () => {
+    /* Rung 0 is the default. More rungs are fine — the top one is near
+       full-screen on a laptop — but the panel must not open at it. */
+    it("opens at the smallest rung, however many rungs there are", () => {
         expect(source).toMatch(/useState\(0\)/)
-        expect(rungs.length).toBeLessThanOrEqual(2)
+        expect(rungs.length).toBeGreaterThanOrEqual(2)
+        expect(rungs.length).toBeLessThanOrEqual(4)
     })
 
     it("is briopedia-sized by default: ~30rem wide, ~85dvh tall", () => {

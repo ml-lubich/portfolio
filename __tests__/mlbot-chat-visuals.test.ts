@@ -134,6 +134,36 @@ describe("MLBot panel", () => {
         const sizes = source.slice(source.indexOf("const PANEL_SIZES"), source.indexOf("] as const"))
         expect(sizes).toMatch(/sm:h-\[min\(/)
         expect(sizes).toMatch(/sm:w-\[min\(/)
+        // EVERY rung, not just the first — a near-full-screen rung that dropped
+        // the sm: prefix would take the phone's full-screen layout with it.
+        for (const rung of sizes.split("\n").filter((l) => l.includes("sm:h-"))) {
+            expect(rung, `rung is not a bottom-right sm footprint: ${rung}`).toMatch(/sm:h-\[min\(.*sm:w-\[min\(/)
+        }
+    })
+
+    /* "Almost full screen if we expand the chat" — a rung you climb to, while
+     * the default stays a panel. Mobile is untouched: it is inset-0 already. */
+    it("offers a near-full-screen rung on a laptop without making it the default", () => {
+        const sizes = source.slice(source.indexOf("const PANEL_SIZES"), source.indexOf("] as const"))
+        const rungs = sizes.split("\n").filter((l) => l.includes("sm:h-"))
+        expect(rungs.length).toBeGreaterThanOrEqual(3)
+
+        // Largest rung: bounded only by the viewport minus the anchor's gutters.
+        expect(rungs[rungs.length - 1]).toMatch(/calc\(100dvh-[\d.]+rem\)/)
+        expect(rungs[rungs.length - 1]).toMatch(/calc\(100vw-[\d.]+rem\)/)
+
+        // Default stays a panel: the first rung is still capped by a rem width.
+        expect(rungs[0]).toMatch(/sm:w-\[min\(3\d(\.\d+)?rem/)
+    })
+
+    /* The resize button cycles with (n + 1) % PANEL_SIZES.length. Anything that
+     * hard-codes the top rung as index 1 goes stale the moment one is added —
+     * the icon and the tooltip would say "Shrink" halfway up the ladder. */
+    it("derives the top rung from PANEL_SIZES rather than hard-coding an index", () => {
+        const control = source.slice(source.indexOf('aria-label="Resize MLBot"') - 400, source.indexOf('aria-label="Resize MLBot"') + 500)
+        expect(control).toContain("(n + 1) % PANEL_SIZES.length")
+        expect(control).toContain("PANEL_SIZES.length - 1")
+        expect(control, "icon/tooltip must not assume rung 1 is the largest").not.toMatch(/size === 1|size === 0 \?/)
     })
 
     it("squares off the corners only while it is full-screen", () => {
@@ -237,24 +267,28 @@ describe("MLBot model roster", () => {
         route.slice(route.indexOf("const MODELS"), route.indexOf("] as const")),
     )
 
-    /* Free tiers carry normal traffic, so spend stays near zero; the paid
-     * fallback tier is where the Chinese open-weight preference still applies.
-     * Both cannot hold at once — OpenRouter currently ships no free Chinese
-     * model with tool calling, so the free entries are necessarily other
-     * vendors, chosen for clean (non-chain-of-thought) output. */
-    it("is ordered fastest-first, with a free model kept as a net", () => {
+    /* Free-first, replacing a fastest-first order that led with a paid model:
+     * a portfolio chat should cost nothing to run by default, and the paid tier
+     * is a backstop for when the free one 429s. Ordering and lab-diversity are
+     * asserted in __tests__/ai-model-slugs.test.ts, which also checks the slugs
+     * still exist upstream; this only pins the free-first policy itself. */
+    it("leads with free models and keeps a paid backstop behind them", () => {
         const ids = [...models.matchAll(/"([^"]+\/[^"]+)"/g)].map((m) => m[1])
         expect(ids.length).toBeGreaterThanOrEqual(2)
-        expect(ids[0]).toBe("inclusionai/ling-3.0-flash")
-        expect(ids.some((i) => i.endsWith(":free"))).toBe(true)
+        expect(ids[0].endsWith(":free"), `cascade leads with a paid model: ${ids[0]}`).toBe(true)
+        expect(ids.some((i) => !i.endsWith(":free"))).toBe(true)
     })
 
-    it("keeps every paid model Chinese open-weight", () => {
+    /* The backstop is picked for still being there in six months, not for being
+     * cheapest this week. Every paid entry is an open-weight model served by
+     * several providers, so one host withdrawing does not retire the slug —
+     * which is how `openai/gpt-oss-20b:free` died and took the bot with it. */
+    it("backstops with open-weight models rather than single-host proprietary ones", () => {
         const ids = [...models.matchAll(/"([^"]+\/[^"]+)"/g)].map((m) => m[1])
         const paid = ids.filter((i) => !i.endsWith(":free"))
         expect(paid.length).toBeGreaterThan(0)
         for (const id of paid) {
-            expect(id).toMatch(/^(z-ai|qwen|deepseek|moonshotai|minimax|inclusionai)\//)
+            expect(id).toMatch(/^(mistralai|meta-llama|openai\/gpt-oss|qwen|deepseek|z-ai|moonshotai|inclusionai|google\/gemma)/)
         }
     })
 

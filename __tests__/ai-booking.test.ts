@@ -66,23 +66,26 @@ describe("no fabricated appointments", () => {
 
     it("strips the pasted booking link on display rather than trusting the prompt", () => {
         const panel = read("components/ai-chat/mlbot.tsx")
-        expect(panel).toContain("stripBookingLink")
-        expect(panel).toContain("BOOKING_URL")
+        expect(panel).toContain("stripCardLinks")
+        // Stripped before the answer is rendered, not only before it is copied —
+        // the card and a pasted URL used to sit one above the other.
+        expect(panel).toContain("splitChatSegments(stripCardLinks(turn.content))")
+        expect(read("lib/ai/card-links.ts")).toContain("BOOKING_URL")
     })
 })
 
 describe("model cascade", () => {
     const route = read("app/api/chat/route.ts")
 
-    /* Ordered by measured latency, not price. Free models here are the slow
-     * ones and spend their budget on reasoning tokens before answering, so
-     * free-first made the panel feel broken. The paid leaders cost about
-     * $0.0001 per conversation, which makes "fast" and "cheap" the same pick;
-     * the free tier stays as a last-resort net if they all fail. */
-    it("leads with the fastest verified model", () => {
+    /* Was ordered by measured latency, leading with a paid model. Now free
+     * first: a portfolio chat should cost nothing to run by default, and the
+     * paid tier only catches a free 429. The trade is real — free models are
+     * the slow ones — and it is written out on the MODELS comment. Ordering
+     * and lab diversity live in __tests__/ai-model-slugs.test.ts. */
+    it("leads with a free model", () => {
         const block = route.slice(route.indexOf("const MODELS"), route.indexOf("] as const"))
         const models = [...block.matchAll(/"([^"]+)"/g)].map((m) => m[1])
-        expect(models[0]).toBe("inclusionai/ling-3.0-flash")
+        expect(models[0].endsWith(":free"), `leads with ${models[0]}`).toBe(true)
     })
 
     it("keeps a free model in the cascade as a cost/outage net", () => {
