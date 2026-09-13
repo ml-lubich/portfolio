@@ -15,7 +15,8 @@ import { test, expect, type Page } from "@playwright/test"
  * viewport height, sits centred, and is inside the viewport and the hero on
  * every side — and the hero's bottom edge holds no stray wireframe pixels.
  * Motion (1440×900): the azimuth advances at idle, a drag moves it further,
- * it keeps advancing after release, and it holds still under reduced motion.
+ * it keeps advancing after release, and it keeps a slow orbit under reduced
+ * motion (josephheupler.com's read; a phone with Reduce Motion on froze it once).
  */
 
 const VIEWPORTS = [
@@ -151,15 +152,19 @@ test("brain rotates at idle, responds to a drag, and resumes", async ({ page }) 
     .toBeGreaterThanOrEqual(0.05)
 })
 
-test("brain holds still under prefers-reduced-motion", async ({ page }) => {
+test("brain keeps a slow idle orbit under prefers-reduced-motion", async ({ page }) => {
+  // Used to assert stillness. That gate is what froze the brain on the
+  // owner's iPhone (Reduce Motion on); josephheupler.com keeps orbiting under
+  // reduce at 0.9, and ours now matches — slower than the 1.8 fine-pointer
+  // idle (≈0.03 rad/2s vs ≈0.06), but never zero.
   await page.setViewportSize({ width: 1440, height: 900 })
   await page.emulateMedia({ reducedMotion: "reduce" })
   await waitForTelemetry(page)
 
   const r0 = await readRot(page)
-  await page.waitForTimeout(2000)
-  const r1 = await readRot(page)
-  expect(Math.abs(r1 - r0), "no idle orbit under reduced motion").toBeLessThan(0.001)
+  await expect
+    .poll(async () => Math.abs((await readRot(page)) - r0), { message: "slow orbit under reduce", timeout: 6_000 })
+    .toBeGreaterThanOrEqual(0.02)
 })
 
 /* ── Phone ─────────────────────────────────────────────────────────────
@@ -192,9 +197,12 @@ test.describe(`phone ${vp.width}x${vp.height}`, () => {
 
     // ~0.40 when the phone inherited the desktop box; ~0.80 after the first
     // phone tier — which the owner, on a real handset, could not scroll past
-    // ("brain is too big"). The centrepiece read holds at half the viewport.
-    expect(share, `mesh height share of viewport (${(box.b - box.t).toFixed(0)}px)`).toBeGreaterThanOrEqual(0.42)
-    expect(share, "taller than this and the mesh swallows the hero on a handset").toBeLessThanOrEqual(0.62)
+    // ("brain is too big"); 0.48 at the 120vw square. Now josephheupler.com's
+    // phone mesh, measured with Playwright: ~300px tall = 0.355 of 844, 0.32
+    // of 932, 0.45 of 667. The band brackets those three and rejects both the
+    // inherited-desktop read and the old square.
+    expect(share, `mesh height share of viewport (${(box.b - box.t).toFixed(0)}px)`).toBeGreaterThanOrEqual(0.3)
+    expect(share, "taller than this and it is no longer the reference's ~300px mesh").toBeLessThanOrEqual(0.48)
 
     // Touches never reach the canvas on a coarse pointer — what's under a
     // finger on the brain is the page, so a swipe scrolls it. This is the
@@ -219,6 +227,31 @@ test.describe(`phone ${vp.width}x${vp.height}`, () => {
     // And prove the page actually moves, rather than trusting the declaration.
     await page.evaluate(() => window.scrollTo({ top: 900, behavior: "instant" as ScrollBehavior }))
     expect(await page.evaluate(() => Math.round(window.scrollY)), "page scrolls past the hero").toBeGreaterThan(500)
+  })
+
+  /* Rotation was only ever asserted in the desktop block above; the phone
+   * tier shipped with a brain the owner saw frozen on his iPhone. Cause:
+   * iOS "Reduce Motion" is on, and autoRotate was gated on
+   * prefers-reduced-motion. josephheupler.com — the brain he wants — keeps
+   * its idle orbit under reduce (measured live: the canvas keeps changing
+   * with reducedMotion: 'reduce'; its OrbitControls has an unconditional
+   * autoRotate at speed 0.9). Both cases below were red before the fix:
+   * at rest passed only because it isn't reduce; under reduce Δ was 0.0000. */
+  test("brain orbits at rest on a touch viewport", async ({ page }) => {
+    await waitForTelemetry(page)
+    const r0 = await readRot(page)
+    await expect
+      .poll(async () => Math.abs((await readRot(page)) - r0), { message: "idle orbit advances on touch", timeout: 6_000 })
+      .toBeGreaterThanOrEqual(0.02)
+  })
+
+  test("brain keeps a slow idle orbit under prefers-reduced-motion (Heupler's read)", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" })
+    await waitForTelemetry(page)
+    const r0 = await readRot(page)
+    await expect
+      .poll(async () => Math.abs((await readRot(page)) - r0), { message: "reduce still orbits, slowly", timeout: 6_000 })
+      .toBeGreaterThanOrEqual(0.02)
   })
 })
 }

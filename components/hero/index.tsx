@@ -99,8 +99,15 @@ export function Hero() {
     <section
       id="hero"
       /* Top padding clears the fixed nav shell — the name block must never sit
-         tight against it. */
-      className="relative flex min-h-[90svh] flex-col items-center overflow-hidden pb-16 max-sm:pt-[9.5rem] sm:pt-28 md:min-h-screen md:pb-24 md:pt-36"
+         tight against it.
+         Phones: one screenful with the content centred in it, the
+         josephheupler.com hero measured at 390×844 / 430×932 (section
+         `min-h-[100svh] justify-center pt-24 pb-16`, pt-32 here because
+         our floating nav pill ends 22px lower than his header; see
+         __tests__/hero-mobile-layout.test.ts). Before, the 9.5rem pad left a
+         210px empty band under the nav and the section ran to 150% of the
+         viewport with the stat row a full screen down. */
+      className="relative flex min-h-[90svh] flex-col items-center overflow-hidden pb-16 max-sm:min-h-[100svh] max-sm:justify-center max-sm:pt-32 sm:pt-28 md:min-h-screen md:pb-24 md:pt-36"
     >
       {/* Spectrum lives only in this section (not fixed to viewport) — avoids mobile scroll seam / mask repaint */}
       <BackgroundOrbs />
@@ -134,7 +141,10 @@ export function Hero() {
           2. everything else, which sits *below* the mesh instead of across it —
              the Tokscale card and stat row used to land mid-brain. */}
       <div className="relative z-10 mx-auto w-full max-w-6xl px-3 text-center pointer-events-none md:px-6">
-        <div className="relative flex min-h-[calc(100svh-13rem)] w-full flex-col items-center justify-center">
+        {/* Phones: no forced screenful — the stage is the copy's own height so
+            the Tokscale badge / social row / stats sit inside the first screen
+            (where the reference keeps its portrait). */}
+        <div className="relative flex min-h-[calc(100svh-13rem)] w-full flex-col items-center justify-center max-sm:min-h-0">
           {/* Brain stage — anchored to the viewport height (svh), never to the
               hero's own height. On sm+ it is a landscape 6:5 box a full
               viewport-plus tall ("Joseph-sized"): the mesh reads as the
@@ -146,7 +156,14 @@ export function Hero() {
               HeroScrollLayer adds the scroll-out "release" (desktop only). */}
           <HeroScrollLayer
             layer="brain"
-            className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center"
+            /* Phones: the layer is centred on the copy, but the reference
+               hangs its brain ~100px lower than its text block's centre, so
+               the name clears the crown and the CTAs ride the lower half.
+               Our copy is taller (role slot, 2-row CTAs), so 48px lands the
+               mesh centre the same 230px under the name and on the CTA row —
+               measured at 390×844 and 430×932. HeroScrollLayer never attaches
+               its scroll transform on phones, so nothing overwrites this. */
+            className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center max-sm:translate-y-12"
             aria-hidden
           >
             {/* The mask lives on the box, not the underlay: a mask clips to its
@@ -160,8 +177,14 @@ export function Hero() {
                 foot fade finishes (shipped like that once; the fit guard in
                 e2e/hero-brain-fit.spec.ts now fails on it), and a box bound
                 only by svh runs off the sides on wide monitors. The mesh's
-                share of the box is the camera's job (components/brain). */}
-            <div className="hero-brain-underlay shrink-0 max-sm:aspect-square max-sm:w-[min(120vw,56svh)] sm:aspect-[6/5] sm:h-[min(100svh,70vw)]">
+                share of the box is the camera's job (components/brain).
+
+                Phones: josephheupler.com's canvas verbatim — full width, a
+                fixed 420px tall, mesh ~300px inside it (camera tiers in
+                components/brain/index.tsx). Fixed px, not vw/svh: his mesh is
+                the same 300px on a 390 and a 430 wide phone, and a height-
+                framed camera makes ours the same. */}
+            <div className="hero-brain-underlay shrink-0 max-sm:h-[420px] max-sm:w-full sm:aspect-[6/5] sm:h-[min(100svh,70vw)]">
               {showBrain && (
                 <div className="h-full w-full">
                   <Brain3D
@@ -175,9 +198,13 @@ export function Hero() {
           </HeroScrollLayer>
 
           {/* Centre wash — the mesh is dense enough to swallow body copy, so the
-              middle of the stage is dimmed before the type is drawn over it. */}
+              middle of the stage is dimmed before the type is drawn over it.
+              Phones: shifted with the brain layer above, or it dims the crown
+              and leaves the foot (under the CTAs) raw; and run out to the
+              screen edges (the wrapper's px-3), or the ellipse clips into a
+              visible vertical seam at the stage's sides. */}
           <div
-            className="pointer-events-none absolute inset-0 z-[1]"
+            className="pointer-events-none absolute inset-0 z-[1] max-sm:-inset-x-3 max-sm:translate-y-12"
             style={{ background: "var(--hero-stage-scrim)" }}
             aria-hidden="true"
           />

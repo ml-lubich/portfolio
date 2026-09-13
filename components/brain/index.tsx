@@ -34,9 +34,14 @@ class WebGLErrorBoundary extends Component<
 
 function getInitialCam() {
   const w = typeof window !== "undefined" ? window.innerWidth : 1200
-  /* Tighter z + slightly wider FOV on phones so the mesh fills the hero square. */
-  if (w < 480) return { z: 1.15, fov: 46 }
-  if (w < 640) return { z: 1.22, fov: 45 }
+  /* Phones: the box is josephheupler.com's 100vw × 420px canvas
+     (components/hero/index.tsx) and the target is his mesh — ~300px tall,
+     ~71% of the box, 35% of an 844px viewport. At z 1.15 / 1.22 ours filled
+     86% of a 468px square (404px, 48% of the viewport). The two tiers differ
+     because getBrainMeshViewportScale steps 0.42 → 0.46 at 480px. Measured
+     via BrainTelemetry; e2e/hero-brain-fit.spec.ts asserts the share. */
+  if (w < 480) return { z: 1.4, fov: 46 }
+  if (w < 640) return { z: 1.56, fov: 45 }
   if (w < 1024) return { z: 1.58, fov: 44 }
   /* Desktop: the box is one viewport tall (components/hero/index.tsx), so the
      mesh's share of the viewport is set here. Target: the projected mesh
@@ -233,10 +238,15 @@ export function Brain3D({
             <OrbitControls
               makeDefault
               /* Idle orbit is the hero's motion — perceptible, not a crawl
-                 (1.8 ≈ 33s per revolution). Off under prefers-reduced-motion:
-                 the e2e motion guard asserts the azimuth holds still there. */
-              autoRotate={!reducedMotion}
-              autoRotateSpeed={1.8}
+                 (1.8 ≈ 33s per revolution) on a fine pointer. Always on: it
+                 used to switch off under prefers-reduced-motion, and the
+                 owner's iPhone (Reduce Motion on) showed a frozen brain.
+                 josephheupler.com's keeps orbiting under reduce at 0.9, and
+                 that is the brain he asked for — so reduce and touch get his
+                 0.9 (≈67s per revolution) rather than stillness. Pointer
+                 tilt (BrainTilt) is the only motion reduce still removes. */
+              autoRotate
+              autoRotateSpeed={reducedMotion || coarsePointer() ? 0.9 : 1.8}
               /* Pitch stays within ±12.6° of the equator: with the tight
                  desktop camera the long axis would otherwise clip vertically. */
               minPolarAngle={Math.PI / 2 - 0.22}

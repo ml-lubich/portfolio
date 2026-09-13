@@ -44,15 +44,16 @@ describe("hero brain stage sizing", () => {
   })
 
   it("gives the phone its own box, sized for the phone rather than inherited", () => {
-    // The phone tier is authored separately from sm+: at 112vw/64svh the mesh
-    // read only ~40% of viewport height and looked lost on a handset. The box
-    // is deliberately wider than the viewport so the brain bleeds off both
-    // edges the way it does on josephheupler.com; the section clips it.
-    const m = boxLine.match(/max-sm:w-\[min\((\d+)vw,(\d+)svh\)\]/)
-    expect(m, "phone box must stay bound by BOTH vw and svh").not.toBeNull()
-    expect(Number(m![1]), "narrower than the viewport leaves the brain small").toBeGreaterThanOrEqual(100)
-    expect(Number(m![1]), "190vw was the box the owner could not scroll past on a real phone").toBeLessThanOrEqual(140)
-    expect(Number(m![2]), "taller than this and the brain swallows the hero on a handset").toBeLessThanOrEqual(64)
+    // The phone tier is authored separately from sm+. It went through a
+    // 112vw/64svh box (mesh ~40% of the viewport, lost), a 190vw one (the
+    // owner could not scroll past it), a 120vw/56svh square (48%), and is now
+    // josephheupler.com's canvas measured on a phone: full width, a fixed
+    // 420px tall, mesh ~300px inside. Fixed px so the mesh is the same size
+    // on a 390 and a 430 wide phone, as his is. Details in
+    // __tests__/hero-mobile-layout.test.ts.
+    expect(boxLine).toContain("max-sm:h-[420px]")
+    expect(boxLine).toContain("max-sm:w-full")
+    expect(boxLine, "vw-wide boxes are how the scroll trap shipped").not.toMatch(/max-sm:w-\[min\(\d+vw/)
   })
 
   it("touches never reach the brain canvas on a coarse pointer (the scroll trap)", () => {
@@ -86,14 +87,20 @@ describe("hero brain camera and motion", () => {
     expect(brain).toMatch(/maxPolarAngle=\{Math\.PI \/ 2 \+ 0\.\d+\}/)
   })
 
-  it("idle rotation is perceptible, not a two-minute crawl", () => {
-    const m = /autoRotateSpeed=\{([\d.]+)\}/.exec(brain)
-    expect(Number(m?.[1])).toBeGreaterThanOrEqual(1.5)
+  it("idle rotation is perceptible on a fine pointer, Heupler's 0.9 on touch and under reduce", () => {
+    const m = /autoRotateSpeed=\{reducedMotion \|\| coarsePointer\(\) \? ([\d.]+) : ([\d.]+)\}/.exec(brain)
+    expect(m, "speed is the reduce/touch-vs-fine ternary").not.toBeNull()
+    expect(Number(m![1]), "josephheupler.com's idle speed").toBe(0.9)
+    expect(Number(m![2]), "desktop: not a two-minute crawl").toBeGreaterThanOrEqual(1.5)
   })
 
-  it("auto-rotate is off under prefers-reduced-motion", () => {
-    expect(brain).toContain("prefers-reduced-motion")
-    expect(brain).toMatch(/autoRotate=\{!reducedMotion\}/)
+  it("auto-rotate is never gated on prefers-reduced-motion (the frozen-iPhone ship)", () => {
+    // The owner's phone has Reduce Motion on; `autoRotate={!reducedMotion}`
+    // is what he saw as a broken, static brain. The reference keeps its orbit
+    // under reduce; e2e/hero-brain-fit.spec.ts asserts ours does on phones
+    // and desktop. Reduce still disables the pointer tilt (BrainTilt).
+    expect(brain).toMatch(/^\s*autoRotate\s*$/m)
+    expect(brain).not.toMatch(/autoRotate=\{/)
   })
 
   it("pointer tilt is desktop-only: skipped on coarse pointers and reduced motion", () => {
