@@ -19,6 +19,10 @@ interface TerminalRevealProps {
     className?: string
     /** Optional prompt symbol */
     prompt?: string
+    /** Floor for the body, as a Tailwind class. A card whose script is only a
+     *  few short lines (About) needs a lower floor than the default, or the
+     *  leftover shows as a blank lower half. */
+    bodyMinHeight?: string
 }
 
 /**
@@ -36,6 +40,7 @@ export function TerminalReveal({
     linePause = 550,
     className = "",
     prompt = "$",
+    bodyMinHeight = "min-h-[220px]",
 }: TerminalRevealProps) {
     const ref = useRef<HTMLDivElement>(null)
     const isInView = useInView(ref, { once: true, margin: "-80px" })
@@ -112,7 +117,7 @@ export function TerminalReveal({
                 </div>
 
                 {/* Terminal body */}
-                <div className="flex-1 px-5 py-4 font-mono text-sm leading-relaxed min-h-[220px]">
+                <div className={`flex-1 px-5 py-4 font-mono text-sm leading-relaxed ${bodyMinHeight}`}>
                     {lines.map((line, i) => {
                         const isTypingThis = i === revealedLines && started
                         const isRevealed = i < revealedLines

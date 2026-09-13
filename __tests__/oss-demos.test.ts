@@ -120,6 +120,24 @@ describe("oss-demos data integrity", () => {
     }
   })
 
+  /* Owner (2026-09-13): "the demos have too much text, needs to have more
+     animations / coloring". Each demo is now a short script — the mesh
+     signature and its signal pulses carry the story, not a transcript. */
+  it("every demo script is at most four lines — the demo is a glance, not a transcript", () => {
+    for (const demo of ossDemos) {
+      expect(demo.demo.length, `'${demo.id}' demo script is ${demo.demo.length} lines`).toBeLessThanOrEqual(4)
+    }
+  })
+
+  it("no demo line is long enough to wrap on a phone-width terminal", () => {
+    for (const demo of ossDemos) {
+      for (const line of demo.demo) {
+        if (line.t === "gap") continue
+        expect(line.s.length, `'${demo.id}' line too long: "${line.s}"`).toBeLessThanOrEqual(70)
+      }
+    }
+  })
+
   it("every entry has a non-empty tagline", () => {
     for (const demo of ossDemos) {
       expect(demo.tagline.trim().length).toBeGreaterThan(0)

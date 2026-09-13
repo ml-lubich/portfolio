@@ -61,7 +61,7 @@ export function HeroCTAs() {
           View AI Expertise
         </button>
         <a
-          href="/resume_mlubich.pdf"
+          href="/resume_mlubich_swe.pdf"
           target="_blank"
           rel="noopener noreferrer"
           download="Misha_Lubich_Resume.pdf"

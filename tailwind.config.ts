@@ -73,12 +73,14 @@ const config: Config = {
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
       },
+      /* One voice, two roles: `font-display` is Oxanium a size up and tighter,
+         `font-sans` is the same face for running text. The `italiana` and
+         `cormorant` scales are gone — nothing outside layout.tsx ever used
+         them. */
       fontFamily: {
-        sans: ['var(--font-urbanist)', 'var(--font-geist-sans)', 'system-ui', 'sans-serif'],
-        display: ['var(--font-instrument-serif)', 'Georgia', 'Times New Roman', 'serif'],
-        mono: ['var(--font-geist-mono)', 'var(--font-jetbrains)', 'monospace'],
-        italiana: ['var(--font-italiana)', 'serif'],
-        cormorant: ['var(--font-cormorant)', 'Georgia', 'serif'],
+        sans: ['var(--font-oxanium)', 'system-ui', 'sans-serif'],
+        display: ['var(--font-oxanium)', 'system-ui', 'sans-serif'],
+        mono: ['var(--font-jetbrains)', 'ui-monospace', 'monospace'],
       },
       keyframes: {
         'accordion-down': {

@@ -127,7 +127,7 @@ export function ArchitectureDiagram({ type, accent }: DiagramProps) {
                 textAnchor="middle"
                 fill={archDiagram.labelFill}
                 fontSize="2.8"
-                fontFamily="var(--font-geist-mono), monospace"
+                fontFamily="var(--font-jetbrains), monospace"
                 fontWeight="500"
               >
                 {node.label}

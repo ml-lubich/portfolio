@@ -17,12 +17,14 @@ import { ArrowRight, Check, Copy, Github } from "lucide-react"
 import { DemoTerminal } from "@/components/terminal/demo-terminal"
 import { OssDemoSim } from "./oss-demo-sim"
 import { AnimatedCounter } from "@/components/animations"
-import { terminalChrome } from "@/lib/theme"
+import { ossAccent, terminalChrome } from "@/lib/theme"
 import { projects } from "@/data/projects"
 import type { OssDemo } from "@/data/oss-demos"
 
 interface OssDemoCardProps {
   demo: OssDemo
+  /** Position in the rail — picks the tool's accent off `ossAccent`. */
+  index?: number
   /** Gates DemoTerminal's typing loop; only the featured tool types. */
   active?: boolean
   onExplore?: (projectId: string) => void
@@ -84,22 +86,21 @@ function useMesh(id: string, count = 22) {
   }, [id, count])
 }
 
+/* The mesh paints in the tool's own accent and runs signal pulses along every
+ * third edge, so the panel reads as a live graph rather than a static wireframe
+ * next to a transcript. Node pulses moved off SVG <animate> onto a CSS class —
+ * SMIL is out of reach of `prefers-reduced-motion`, a class isn't. */
 function ToolSignature({ id, accent }: { id: string; accent: string }) {
   const { nodes, edges } = useMesh(id)
 
   return (
-    <div className="relative aspect-square w-full max-w-[220px]">
+    <div className="relative aspect-square w-full max-w-[230px]">
       <div
-        className="absolute inset-4 rounded-full opacity-30 blur-2xl"
+        className="absolute inset-3 rounded-full opacity-40 blur-2xl"
         style={{ background: accent }}
         aria-hidden
       />
-      <svg
-        viewBox="0 0 100 100"
-        className="relative h-full w-full"
-        style={{ animation: "holo-spin 46s linear infinite" }}
-        aria-hidden
-      >
+      <svg viewBox="0 0 100 100" className="oss-signature-spin relative h-full w-full" aria-hidden>
         {edges.map(([a, b], i) => (
           <line
             key={i}
@@ -107,28 +108,48 @@ function ToolSignature({ id, accent }: { id: string; accent: string }) {
             y1={a.y}
             x2={b.x}
             y2={b.y}
-            stroke="rgba(223,226,236,0.28)"
-            strokeWidth={0.3}
+            stroke={accent}
+            strokeOpacity={0.22}
+            strokeWidth={0.35}
           />
         ))}
-        {nodes.map((n, i) => (
-          <circle key={i} cx={n.x} cy={n.y} r={n.r} fill="rgba(255,255,255,0.85)">
-            <animate
-              attributeName="opacity"
-              values="0.25;1;0.25"
-              dur="3.6s"
-              begin={`${n.delay}s`}
-              repeatCount="indefinite"
+        {/* Every third edge carries a travelling pulse — a short dash running
+            the length of the segment, staggered so the graph never blinks. */}
+        {edges
+          .filter((_, i) => i % 3 === 0)
+          .map(([a, b], i) => (
+            <line
+              key={`s${i}`}
+              className="oss-signal"
+              x1={a.x}
+              y1={a.y}
+              x2={b.x}
+              y2={b.y}
+              stroke={accent}
+              strokeWidth={1}
+              strokeLinecap="round"
+              style={{ animationDelay: `${(i % 7) * 0.4}s` }}
             />
-          </circle>
+          ))}
+        {nodes.map((n, i) => (
+          <circle
+            key={i}
+            className="oss-node-pulse"
+            cx={n.x}
+            cy={n.y}
+            r={n.r}
+            fill={accent}
+            style={{ animationDelay: `${n.delay}s` }}
+          />
         ))}
       </svg>
     </div>
   )
 }
 
-export function OssDemoCard({ demo, active = true, onExplore }: OssDemoCardProps) {
+export function OssDemoCard({ demo, index = 0, active = true, onExplore }: OssDemoCardProps) {
   const project = projects.find((p) => p.id === demo.id)
+  const accent = ossAccent(index)
   const [copied, setCopied] = useState(false)
 
   const handleCopy = useCallback(() => {
@@ -150,20 +171,24 @@ export function OssDemoCard({ demo, active = true, onExplore }: OssDemoCardProps
       <span className="pointer-events-none absolute bottom-4 right-4 h-5 w-5 border-b border-r border-white/25" aria-hidden />
 
       <div className="grid gap-6 p-5 sm:p-7 lg:grid-cols-[minmax(0,260px)_minmax(0,1fr)] lg:gap-8">
-        {/* ── Signature + gauges ── */}
-        <div className="flex flex-col items-center gap-5">
-          <ToolSignature id={demo.id} accent={project.accent} />
+        {/* ── Signature + gauges ──
+            justify-center: the identity column is much shorter than the
+            terminal column beside it, and left-aligned to the top it hung the
+            card open under the gauges. */}
+        <div className="flex flex-col items-center justify-center gap-5">
+          <ToolSignature id={demo.id} accent={accent} />
 
           <div className="grid w-full grid-cols-2 gap-3">
             {demo.stats.map((stat) => (
               <div
                 key={stat.label}
-                className="rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2.5 text-center"
+                className="overflow-hidden rounded-xl border border-white/[0.08] bg-white/[0.03] text-center"
               >
-                <div className="font-mono text-base font-semibold text-foreground">
+                <div className="h-[2px] w-full" style={{ background: accent }} aria-hidden />
+                <div className="mt-2 px-3 font-mono text-base font-semibold text-foreground">
                   {active && isAnimatable(stat.value) ? <AnimatedCounter value={stat.value} /> : stat.value}
                 </div>
-                <div className="mt-0.5 font-mono text-[9px] uppercase tracking-[0.14em] text-muted-foreground/50">
+                <div className="px-3 pb-2.5 pt-0.5 font-mono text-[9px] uppercase tracking-[0.14em] text-muted-foreground/50">
                   {stat.label}
                 </div>
               </div>

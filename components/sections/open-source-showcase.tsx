@@ -31,6 +31,7 @@ import {
 import { DetailPanel } from "../detail-panel"
 import { SectionHeader } from "../layout/section-header"
 import { OssDemoCard } from "./oss-demo-card"
+import { ossAccent } from "@/lib/theme"
 import { ossDemos } from "@/data/oss-demos"
 import { projects } from "@/data/projects"
 
@@ -127,16 +128,20 @@ export function OpenSourceShowcase() {
           className="mb-5 flex flex-wrap justify-center gap-2"
           aria-label="Open source tools"
         >
-          {ossDemos.map((demo) => {
+          {ossDemos.map((demo, i) => {
             const Icon = TOOL_ICON[demo.id] ?? Terminal
             const isActive = demo.id === activeId
+            /* The rail was eight identical grey chips. Each tool now carries its
+               own accent — the same one its mesh and gauges paint with — so the
+               rail reads as a colour picker rather than a row of labels. */
+            const accent = ossAccent(i)
             return (
               <li key={demo.id}>
                 <button
                   type="button"
                   onClick={() => pick(demo.id)}
                   aria-pressed={isActive}
-                  className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.12em] transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary/60 ${
+                  className={`relative inline-flex items-center gap-1.5 overflow-hidden rounded-lg border px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.12em] transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary/60 ${
                     isActive
                       ? "border-white/35 bg-white/[0.10] text-foreground"
                       : "border-white/[0.08] bg-white/[0.02] text-muted-foreground/55 hover:border-white/25 hover:text-foreground/85"
@@ -144,6 +149,11 @@ export function OpenSourceShowcase() {
                 >
                   <Icon className="h-3.5 w-3.5 shrink-0" aria-hidden />
                   {demo.id}
+                  <span
+                    className="absolute inset-x-0 bottom-0 h-[2px] transition-opacity duration-300"
+                    style={{ background: accent, opacity: isActive ? 1 : 0.28 }}
+                    aria-hidden
+                  />
                 </button>
               </li>
             )
@@ -154,6 +164,7 @@ export function OpenSourceShowcase() {
           <OssDemoCard
             key={activeDemo.id}
             demo={activeDemo}
+            index={ossDemos.findIndex((d) => d.id === activeDemo.id)}
             active={activeDemo.id === activeId}
             onExplore={handleExplore}
           />

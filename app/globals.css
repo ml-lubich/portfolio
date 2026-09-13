@@ -32,18 +32,18 @@
 
     /* Hero washes — applied as inline styles, so they must be vars to theme. */
     --hero-overlay: linear-gradient(rgba(4,5,10,0.80), rgba(4,5,10,0.80)), radial-gradient(ellipse 60% 50% at 50% 45%, rgba(8,10,18,0.35) 0%, transparent 100%);
-    --hero-scrim: radial-gradient(ellipse 48% 32% at 50% 40%, rgba(6,8,14,0.78) 0%, rgba(6,8,14,0.5) 52%, transparent 82%), linear-gradient(to bottom, rgba(6,8,14,0.44) 0%, rgba(6,8,14,0.42) 30%, rgba(6,8,14,0.28) 46%, rgba(6,8,14,0.10) 60%, transparent 76%);
+    --hero-scrim: radial-gradient(ellipse 48% 32% at 50% 40%, rgba(6,8,14,0.52) 0%, rgba(6,8,14,0.34) 52%, transparent 82%), linear-gradient(to bottom, rgba(6,8,14,0.30) 0%, rgba(6,8,14,0.28) 30%, rgba(6,8,14,0.18) 46%, rgba(6,8,14,0.06) 60%, transparent 76%);
     /* Centre wash behind the hero copy — the only layer that dims the mesh
        (`--hero-scrim` is painted at z-[4], underneath the whole content
-       wrapper, so it never touches the brain). At 0.82 dead centre it took
-       the wireframe down to a grey blob: the "I still don't see it"
-       complaint. Two things let it come down to a haze: the CTA pills and the
-       blurred tertiary bar moved off the mesh entirely (components/hero), and
-       the copy that remains carries its own ink halo (.hero-copy-halo), which
-       is how josephheupler.com keeps type legible over a live wireframe. The
-       bottom band went with them — the band ends above the CTA strip now, so
-       there is no foot to fade. */
-    --hero-stage-scrim: radial-gradient(ellipse 54% 44% at 50% 50%, rgba(5,6,12,0.78) 0%, rgba(5,6,12,0.5) 46%, rgba(5,6,12,0.14) 72%, transparent 86%);
+       wrapper, so it never touches the brain). It is now a haze, not a disc.
+       At 0.78 it was the "weird highlighting around the text": dense enough
+       to be seen as an ellipse drawn over the wireframe, and it greyed the
+       mesh everywhere the type wasn't. josephheupler.com carries no scrim at
+       all — the darkness lives on the letterforms (.hero-copy-halo), so it
+       follows the glyphs instead of forming a shape. This is kept at a third
+       of its old strength only to take the edge off the densest wires, and
+       spread wider so its own falloff has no visible rim. */
+    --hero-stage-scrim: radial-gradient(ellipse 62% 52% at 50% 50%, rgba(5,6,12,0.34) 0%, rgba(5,6,12,0.22) 46%, rgba(5,6,12,0.05) 72%, transparent 88%);
 
     /* Page-wide washes. These used to be hard-coded dark radials applied to
        <body> and .page-texture regardless of theme, which is what smeared the
@@ -160,7 +160,7 @@
     --accent-glow-soft: #2d84c657;
     /* Dark type on a pale mesh needs far less cover than white type on a
        dense white one — at the dark theme's strength the brain ghosted out. */
-    --hero-stage-scrim: radial-gradient(ellipse 52% 50% at 50% 44%, rgba(249,250,252,0.78) 0%, rgba(249,250,252,0.5) 48%, rgba(249,250,252,0.16) 74%, transparent 86%);
+    --hero-stage-scrim: radial-gradient(ellipse 62% 56% at 50% 44%, rgba(249,250,252,0.34) 0%, rgba(249,250,252,0.23) 48%, rgba(249,250,252,0.06) 74%, transparent 88%);
 
     /* Light: the same three pools, pitched pale and cool so the page keeps its
        depth without going muddy. */
@@ -218,7 +218,7 @@
     /* Light hero: the same two washes inverted to pale, so the dark brain
        reads against them exactly as the white brain reads against the dark. */
     --hero-overlay: linear-gradient(rgba(250,251,253,0.86), rgba(250,251,253,0.86)), radial-gradient(ellipse 60% 50% at 50% 45%, rgba(235,240,247,0.5) 0%, transparent 100%);
-    --hero-scrim: radial-gradient(ellipse 48% 32% at 50% 40%, rgba(250,251,253,0.82) 0%, rgba(250,251,253,0.55) 52%, transparent 82%), linear-gradient(to bottom, rgba(250,251,253,0.5) 0%, rgba(250,251,253,0.46) 30%, rgba(250,251,253,0.3) 46%, rgba(250,251,253,0.12) 60%, transparent 76%);
+    --hero-scrim: radial-gradient(ellipse 48% 32% at 50% 40%, rgba(250,251,253,0.56) 0%, rgba(250,251,253,0.38) 52%, transparent 82%), linear-gradient(to bottom, rgba(250,251,253,0.34) 0%, rgba(250,251,253,0.31) 30%, rgba(250,251,253,0.20) 46%, rgba(250,251,253,0.08) 60%, transparent 76%);
   }
 
 }
@@ -230,14 +230,6 @@
 
   * {
     @apply border-border;
-  }
-
-  /* Instrument Serif ships a single 400 weight. Existing headings carry
-     font-light..font-bold utilities; without this the browser fakes the
-     heavy end and the serif renders smeared. Synthesis off = true 400,
-     which is how cua.ai sets it. */
-  .font-display {
-    font-synthesis-weight: none;
   }
 
   body {
@@ -840,11 +832,31 @@ body {
     0 0 20px hsl(var(--background) / 0.95),
     0 2px 28px hsl(var(--background) / 0.9),
     0 0 60px hsl(var(--background) / 0.75);
+  /* text-shadow alone cannot carry this hero. The name, the rotating role and
+     the subtitle's animated words paint their fill with `background-clip:
+     text`, and that fill is a *background* — backgrounds render below
+     text-shadow, so every layer added here veils the glyph it is meant to
+     back. Piling them on blacked the name out.
+
+     `filter: drop-shadow` composites behind the whole element, fill included,
+     and traces its alpha — so the darkness follows the letterforms exactly
+     the way josephheupler.com's text-shadow does on its plain-fill type,
+     without touching the metallic. Stacked, the three radii are the same
+     near/mid/far falloff as the shadow above. */
+  filter:
+    drop-shadow(0 0 7px hsl(var(--background) / 0.95))
+    drop-shadow(0 1px 16px hsl(var(--background) / 0.88))
+    drop-shadow(0 0 38px hsl(var(--background) / 0.65));
 }
 
 /* The name is 72px on a desktop and sits over the densest part of the mesh,
    so it needs a proportionally wider halo — a 20px blur under a 72px glyph is
-   a rim, not a backing. Same ratio josephheupler.com uses for its own h1. */
+   a rim, not a backing. Same ratio josephheupler.com uses for its own h1.
+
+   Layers stay translucent and wide for the reason given on .hero-copy-halo
+   above: on this metallic type every text-shadow layer is a veil over the
+   fill, not a backing behind it. The lift comes from the drop-shadow there;
+   these only widen the falloff under the biggest glyphs. */
 .hero-copy-halo h1,
 .hero-copy-halo .no-metallic {
   text-shadow:
@@ -853,9 +865,48 @@ body {
     0 0 88px hsl(var(--background) / 0.85);
 }
 
+/* One-shot loading hairline — josephheupler.com's `.scanline`. It sweeps the
+   hero once while the WebGL brain is still compiling, so the wait has
+   somewhere to look instead of an empty band.
+
+   Deliberately NOT the existing `scan-sweep` keyframe: that one drives
+   `.scan-sweep::after` as a 6s ambient shimmer loop. Sharing the name would
+   couple a decorative loop to a load affordance. See __tests__/hero-scanline.test.ts. */
+.hero-scanline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+  animation: hero-scan-sweep 2.8s ease-out 0.4s both;
+  pointer-events: none;
+}
+
+@keyframes hero-scan-sweep {
+  from {
+    transform: translateY(-40vh);
+    opacity: 0;
+  }
+
+  20% {
+    opacity: 1;
+  }
+
+  to {
+    transform: translateY(70vh);
+    opacity: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hero-brain-underlay {
     filter: none;
+  }
+
+  /* `animation: none` would leave a permanent hairline ruled across the hero,
+     which is worse than the sweep. It must not render at all. */
+  .hero-scanline {
+    display: none;
   }
 }
 
@@ -3193,6 +3244,66 @@ article .blog-prose b a[href],
   color: transparent;
 }
 
+/* ── OSS tool signature — an accent-lit mesh, not a transcript ────
+ *  The showcase's demos were carrying their story in terminal text. The mesh
+ *  now carries it instead: it turns slowly, its nodes breathe, and a short
+ *  dash runs the length of every third edge. Node breathing used to be an SVG
+ *  <animate> element — SMIL ignores prefers-reduced-motion, a class does not,
+ *  which is why all three live here as classes with one guard below.
+ * ─────────────────────────────────────────────────────────────────── */
+.oss-signature-spin {
+  animation: holo-spin 46s linear infinite;
+}
+
+.oss-node-pulse {
+  animation: oss-node-glow 3.6s ease-in-out infinite;
+}
+
+.oss-signal {
+  stroke-dasharray: 4 44;
+  animation: oss-signal-run 2.8s linear infinite;
+}
+
+@keyframes oss-node-glow {
+
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes oss-signal-run {
+  from {
+    stroke-dashoffset: 48;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .oss-signature-spin,
+  .oss-node-pulse,
+  .oss-signal {
+    animation: none !important;
+  }
+
+  .oss-node-pulse {
+    opacity: 0.85;
+  }
+
+  .oss-signal {
+    stroke-dasharray: none;
+    opacity: 0.4;
+  }
+}
+
 /* ── OSS demo simulation rows ────────────────────────────────────
  *  Rows and flow stages fade up in sequence; the inline animationDelay the
  *  component sets is what staggers them. `forwards` holds the end state, so a
@@ -3447,7 +3558,10 @@ article .blog-prose b a[href],
   border-radius: 4px;
   background: hsl(var(--muted) / 0.5);
   padding: 0.1em 0.35em;
-  font-family: var(--font-mono), monospace;
+  /* --font-mono was never defined here (that is josephheupler.com's name for
+     it), so inline code in a chat answer silently fell back to the browser's
+     default monospace while the block above it rendered in JetBrains. */
+  font-family: var(--font-jetbrains), monospace;
   font-size: 0.92em;
 }
 
@@ -3567,18 +3681,20 @@ article .blog-prose b a[href],
    inline style itself on connect. */
 @media (max-width: 639px) {
   :root {
-    --hero-scrim: radial-gradient(ellipse 76% 40% at 50% 44%, rgba(6,8,14,0.93) 0%, rgba(6,8,14,0.74) 54%, rgba(6,8,14,0.32) 78%, transparent 92%),
-      linear-gradient(to bottom, rgba(6,8,14,0.58) 0%, rgba(6,8,14,0.5) 30%, rgba(6,8,14,0.36) 50%, rgba(6,8,14,0.16) 68%, transparent 86%);
+    --hero-scrim: radial-gradient(ellipse 76% 40% at 50% 44%, rgba(6,8,14,0.56) 0%, rgba(6,8,14,0.44) 54%, rgba(6,8,14,0.19) 78%, transparent 92%),
+      linear-gradient(to bottom, rgba(6,8,14,0.34) 0%, rgba(6,8,14,0.30) 30%, rgba(6,8,14,0.22) 50%, rgba(6,8,14,0.09) 68%, transparent 86%);
     /* Radial only, and light: the CTA pills no longer sit on the mesh, so the
        only thing this has to cover is the name / role / tagline — and those
-       carry .hero-copy-halo. At 0.9 it erased the brain on a handset. */
-    --hero-stage-scrim: radial-gradient(ellipse 78% 46% at 50% 48%, rgba(5,6,12,0.6) 0%, rgba(5,6,12,0.42) 50%, rgba(5,6,12,0.14) 76%, transparent 90%);
+       carry .hero-copy-halo, which is what actually keeps them legible. At
+       0.9 it erased the brain on a handset; even 0.6 read as a grey wash
+       across the whole mesh on a 390px screen. */
+    --hero-stage-scrim: radial-gradient(ellipse 84% 54% at 50% 48%, rgba(5,6,12,0.32) 0%, rgba(5,6,12,0.22) 50%, rgba(5,6,12,0.07) 76%, transparent 92%);
   }
 
   .light {
-    --hero-scrim: radial-gradient(ellipse 76% 40% at 50% 44%, rgba(250,251,253,0.94) 0%, rgba(250,251,253,0.78) 54%, rgba(250,251,253,0.36) 78%, transparent 92%),
-      linear-gradient(to bottom, rgba(250,251,253,0.62) 0%, rgba(250,251,253,0.54) 30%, rgba(250,251,253,0.4) 50%, rgba(250,251,253,0.18) 68%, transparent 86%);
-    --hero-stage-scrim: radial-gradient(ellipse 78% 46% at 50% 48%, rgba(250,251,253,0.74) 0%, rgba(250,251,253,0.52) 50%, rgba(250,251,253,0.2) 76%, transparent 90%);
+    --hero-scrim: radial-gradient(ellipse 76% 40% at 50% 44%, rgba(250,251,253,0.58) 0%, rgba(250,251,253,0.46) 54%, rgba(250,251,253,0.21) 78%, transparent 92%),
+      linear-gradient(to bottom, rgba(250,251,253,0.36) 0%, rgba(250,251,253,0.32) 30%, rgba(250,251,253,0.24) 50%, rgba(250,251,253,0.10) 68%, transparent 86%);
+    --hero-stage-scrim: radial-gradient(ellipse 84% 54% at 50% 48%, rgba(250,251,253,0.34) 0%, rgba(250,251,253,0.24) 50%, rgba(250,251,253,0.08) 76%, transparent 92%);
   }
 
   .hero-brain-underlay canvas {

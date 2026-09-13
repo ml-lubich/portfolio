@@ -107,11 +107,34 @@ describe("hero brain camera and motion", () => {
     expect(brain).toMatch(/maxPolarAngle=\{Math\.PI \/ 2 \+ 0\.\d+\}/)
   })
 
-  it("idle rotation is perceptible on a fine pointer, Heupler's 0.9 on touch and under reduce", () => {
-    const m = /autoRotateSpeed=\{reducedMotion \|\| coarsePointer\(\) \? ([\d.]+) : ([\d.]+)\}/.exec(brain)
-    expect(m, "speed is the reduce/touch-vs-fine ternary").not.toBeNull()
+  /* This used to be a ternary: 0.9 for reduce/touch, 1.8 for a fine pointer.
+     The owner's read of the fine-pointer half was "spinning a bit too fast" —
+     josephheupler.com runs one unconditional 0.9 (≈67s per revolution) and
+     that is the brain he asked for. One value now, which also means reduce
+     and touch keep exactly the orbit they already had. */
+  it("idles at josephheupler.com's speed for everyone, with no pointer/motion ternary", () => {
+    const m = /autoRotateSpeed=\{([\d.]+)\}/.exec(brain)
+    expect(m, "speed is a single literal, not a ternary").not.toBeNull()
     expect(Number(m![1]), "josephheupler.com's idle speed").toBe(0.9)
-    expect(Number(m![2]), "desktop: not a two-minute crawl").toBeGreaterThanOrEqual(1.5)
+    expect(brain, "no speed ternary").not.toMatch(/autoRotateSpeed=\{[^}]*\?/)
+  })
+
+  /* Joseph clamps nothing; our desktop camera is tighter (fov 38 @ z 1.82 vs
+     his 44 @ 1.55), and a free pitch measurably runs the crown past the canvas
+     top. ±0.9 rad is the loosest clamp that still fits — ±0.22 was so tight a
+     vertical drag moved the mesh 3px, which read as "not rotatable". */
+  it("keeps the pitch range wide enough to tumble, narrow enough to fit", () => {
+    const lo = /minPolarAngle=\{Math\.PI \/ 2 - ([\d.]+)\}/.exec(brain)
+    const hi = /maxPolarAngle=\{Math\.PI \/ 2 \+ ([\d.]+)\}/.exec(brain)
+    expect(lo, "minPolarAngle clamp").not.toBeNull()
+    expect(Number(lo![1])).toBe(Number(hi![1]))
+    expect(Number(lo![1]), "±0.22 was effectively locked").toBeGreaterThanOrEqual(0.8)
+    expect(Number(lo![1]), "measured: past ~1.1 the mesh clips the canvas").toBeLessThanOrEqual(1.0)
+  })
+
+  it("damps and tracks the drag at the reference's feel", () => {
+    expect(brain).toMatch(/dampingFactor=\{0\.06\}/)
+    expect(brain).toMatch(/rotateSpeed=\{0\.7\}/)
   })
 
   it("auto-rotate is never gated on prefers-reduced-motion (the frozen-iPhone ship)", () => {

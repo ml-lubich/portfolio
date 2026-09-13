@@ -138,6 +138,11 @@ export function Hero() {
         style={{ background: heroContentScrim }}
       />
 
+      {/* One-shot loading hairline (josephheupler.com's `.scanline`) — sweeps
+          the hero once while the WebGL brain compiles. Above the copy rather
+          than under it: at z-[5] the brain's own canvas hid it. */}
+      <div className="hero-scanline z-20" aria-hidden="true" style={{ top: 0 }} />
+
       {/* Content — three stacked bands:
           1. the brain band, where the mesh sits behind the name / role /
              tagline and NOTHING else (josephheupler.com's read: type over the

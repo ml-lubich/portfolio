@@ -171,7 +171,6 @@ export function Brain3D({
   fadeDurationMs = 2350,
 }: Brain3DProps) {
   const initCam = React.useMemo(() => getInitialCam(), [])
-  const reducedMotion = React.useMemo(() => prefersReducedMotion(), [])
   const [geometryCommitted, setGeometryCommitted] = React.useState(false)
   const [visible, setVisible] = React.useState(false)
 
@@ -245,17 +244,42 @@ export function Brain3D({
                  that is the brain he asked for — so reduce and touch get his
                  0.9 (≈67s per revolution) rather than stillness. Pointer
                  tilt (BrainTilt) is the only motion reduce still removes. */
+              /* josephheupler.com's controls, ported: 0.9 (≈67s per
+                 revolution), damping 0.06, rotateSpeed 0.7. 0.9 is
+                 unconditional there and here — the speed used to double to
+                 1.8 on a fine pointer, which is the "spinning a bit too fast"
+                 complaint, and the old reduced-motion/coarse branch existed
+                 only to bring those back down to 0.9. One value, so reduce
+                 and touch keep the same slow orbit they already had
+                 (e2e/hero-brain-fit.spec.ts asserts reduce still orbits — a
+                 frozen brain on an iPhone with Reduce Motion on was a bug,
+                 not a feature). Pointer tilt (BrainTilt) is still the only
+                 motion reduce removes. */
               autoRotate
-              autoRotateSpeed={reducedMotion || coarsePointer() ? 0.9 : 1.8}
-              /* Pitch stays within ±12.6° of the equator: with the tight
-                 desktop camera the long axis would otherwise clip vertically. */
-              minPolarAngle={Math.PI / 2 - 0.22}
-              maxPolarAngle={Math.PI / 2 + 0.22}
+              autoRotateSpeed={0.9}
+              enableRotate
+              /* Joseph clamps nothing, and at ±0.22 (±12.6°) a vertical drag
+                 here moved the mesh 3px — the "not rotatable fully"
+                 complaint. His camera is wider than ours (fov 44 @ z 1.55 vs
+                 our desktop 38 @ 1.82), so a truly free pitch does not fit:
+                 measured, it runs 88px past the canvas top near the poles and
+                 the crown is sliced off.
+
+                 ±0.9 (±51.6°) is the loosest clamp that still fits. Measured
+                 worst case — pitched to the stop, then swept a full azimuth
+                 turn, since the mesh is not axisymmetric and its projected
+                 height depends on both angles: 37px of margin at 1440×900,
+                 52px at 390×844. ±1.1 left only 13px, which is inside the
+                 noise. The camera is the knob that would buy a free pitch,
+                 and it is tuned to the hero fit (see getInitialCam), so the
+                 clamp gives way instead. */
+              minPolarAngle={Math.PI / 2 - 0.9}
+              maxPolarAngle={Math.PI / 2 + 0.9}
               enableZoom={false}
               enablePan={false}
               enableDamping
-              dampingFactor={0.12}
-              rotateSpeed={0.6}
+              dampingFactor={0.06}
+              rotateSpeed={0.7}
             />
           </Suspense>
         </Canvas>

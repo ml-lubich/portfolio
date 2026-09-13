@@ -101,3 +101,52 @@ describe("OssDemoCard visual signature", () => {
     expect(cardSrc).toMatch(/<DemoTerminal lines=\{demo\.demo\} active=\{active\}/)
   })
 })
+
+/* ── Motion + colour pass (2026-09-13) ───────────────────────────────
+ *  Owner: "the demos have too much text, needs to have more animations /
+ *  coloring". The signature mesh now paints with the tool's own accent and
+ *  runs signal pulses along its edges; the rail and the stat gauges pick up
+ *  the tool's gradient. Every new animation is guarded for reduced motion.
+ * ─────────────────────────────────────────────────────────────────── */
+describe("OssDemoCard — motion and colour carry the demo", () => {
+  const railSrc = fs.readFileSync(COMPONENT_PATH, "utf8")
+  const cardSrc = fs.readFileSync(CARD_PATH, "utf8")
+  const cssSrc = fs.readFileSync(path.join(ROOT, "app/globals.css"), "utf8")
+
+  it("paints the mesh with the tool's own accent instead of a flat white wireframe", () => {
+    expect(cardSrc).not.toMatch(/stroke="rgba\(223,226,236/)
+    expect(cardSrc).not.toMatch(/fill="rgba\(255,\s*255,\s*255/)
+    expect(cardSrc).toMatch(/stroke=\{accent\}/)
+  })
+
+  it("runs signal pulses along the mesh edges", () => {
+    expect(cardSrc).toMatch(/oss-signal/)
+    expect(cssSrc).toMatch(/@keyframes oss-signal-run/)
+  })
+
+  it("guards every new OSS animation behind prefers-reduced-motion", () => {
+    for (const cls of ["oss-signal", "oss-signature-spin", "oss-node-pulse"]) {
+      const guard = cssSrc.match(
+        new RegExp(`@media \\(prefers-reduced-motion: reduce\\)[\\s\\S]{0,600}?\\.${cls}\\b`),
+      )
+      expect(guard, `.${cls} has no reduced-motion guard`).not.toBeNull()
+    }
+  })
+
+  it("gives every tool its own accent, from the theme's hue cycle", () => {
+    const theme = fs.readFileSync(path.join(ROOT, "lib/theme.ts"), "utf8")
+    expect(theme).toMatch(/export function ossAccent/)
+    // Hues the gradient table already owns — no new colour language.
+    expect(theme).toMatch(/ossAccentCycle[\s\S]{0,200}hsl\.cyan/)
+    expect(theme).toMatch(/ossAccentCycle[\s\S]{0,200}hsl\.magenta/)
+    // ...and it reaches the rail chip, the mesh and the gauges.
+    expect(railSrc).toMatch(/ossAccent\(i\)/)
+    expect(cardSrc).toMatch(/ossAccent\(index\)/)
+    expect(cardSrc).toMatch(/accent=\{accent\}/)
+  })
+
+  it("hardcodes no hex colour — every accent comes from lib/theme", () => {
+    expect(cardSrc).not.toMatch(/#[0-9a-fA-F]{6}\b/)
+    expect(railSrc).not.toMatch(/#[0-9a-fA-F]{6}\b/)
+  })
+})

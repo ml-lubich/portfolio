@@ -13,8 +13,10 @@ function source(rel: string) {
   return fs.readFileSync(path.join(ROOT, rel), "utf8")
 }
 
+/* about.tsx deliberately left this list on 2026-09-13 — the owner's note was
+   "too much shimmer and lit, it looks like liquid glass but not a big fan",
+   and About was the heaviest offender. See the no-shimmer assertion below. */
 const SHIMMER_SECTIONS = [
-  "components/sections/about.tsx",
   "components/sections/skills.tsx",
   "components/sections/ai-expertise.tsx",
   "components/sections/consulting-clients.tsx",
@@ -42,6 +44,10 @@ describe("shared ShimmerOverlay component", () => {
       const src = source(file)
       expect(src).toContain("ShimmerOverlay")
     })
+  })
+
+  it("about.tsx carries no shimmer at all — it reads as liquid glass there", () => {
+    expect(source("components/sections/about.tsx")).not.toContain("ShimmerOverlay")
   })
 
   it("no section hides the shimmer until hover (opacity-0 + group-hover gating)", () => {

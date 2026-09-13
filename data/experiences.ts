@@ -31,7 +31,7 @@ export const experiences: Experience[] = [
         period: "Sep 2026 – Present",
         location: "SF Bay Area",
         summary:
-            "Builds the AI pipelines behind consumer-grade telecom — retrieval, agent orchestration and evaluation running against a network millions of customers depend on every day.",
+            "Builds the AI pipelines behind consumer-scale telecom — retrieval, agent orchestration and evaluation running against a network millions of customers depend on every day.",
         tags: ["Python", "LLM", "RAG", "Agents", "Pipelines", "Telecom", "Evaluation"],
         gradient: g.primaryViaSkyToAccent,
         accent: accentCycle[1],
@@ -43,7 +43,7 @@ export const experiences: Experience[] = [
             period: "September 2026 – Present",
             location: "SF Bay Area",
             description:
-                "Chose EchoStar over offers and final-round outcomes at defense-tech companies including Anduril and Mach Industries. The draw was blast radius: consumer-grade telecom puts AI in front of millions of ordinary customers rather than a narrow mission set, so the same pipeline work reaches far more people.",
+                "Chose EchoStar over offers and final-round outcomes at defense-tech companies including Anduril and Mach Industries. The draw was blast radius: consumer-scale telecom puts AI in front of millions of ordinary customers rather than a narrow mission set, so the same pipeline work reaches far more people.",
             highlights: [
                 "Builds production AI pipelines — retrieval, agent orchestration, and evaluation — against consumer telecom systems serving millions of subscribers",
                 "Received offers from and passed final rounds at top defense and frontier-tech companies including Anduril and Mach Industries",

@@ -67,3 +67,62 @@ describe("about — reduced motion", () => {
         expect(source).toMatch(/useReducedMotion/)
     })
 })
+
+/* ── Calm pass (2026-09-13) ───────────────────────────────────────────
+ *  Owner: "too much shimmer and lit, it looks like liquid glass but not a
+ *  big fan" / "looks too wall of text". The section drops the liquid-glass
+ *  plinths, the 3D tilt and the always-on shimmer, and the copy is cut to
+ *  short single lines. Facts are unchanged — only the prose around them.
+ * ─────────────────────────────────────────────────────────────────── */
+describe("about — calm, not liquid glass", () => {
+    it("has no liquid-glass plinth: no conic ring, no spin, no floor-light pool", () => {
+        expect(source).not.toMatch(/conic-gradient/)
+        expect(source).not.toMatch(/holo-spin/)
+        expect(source).not.toMatch(/backdrop-blur-md/)
+    })
+
+    it("has no pointer-tilt 3D cell — depth came from the transform and read as glass", () => {
+        expect(source).not.toMatch(/HoloCell/)
+        expect(source).not.toMatch(/translateZ/)
+        expect(source).not.toMatch(/preserve-3d/)
+        expect(source).not.toMatch(/rotateX\(\$\{/)
+    })
+
+    it("drops the always-on shimmer sweep over the tile panel", () => {
+        expect(source).not.toMatch(/ShimmerOverlay/)
+    })
+
+    it("paints the tiles with design tokens, not white-alpha glass", () => {
+        expect(source).toMatch(/bg-card/)
+        expect(source).toMatch(/border-border/)
+        expect(source).not.toMatch(/bg-white\/\[0\.0/)
+    })
+
+    it("uses the same two-orb ambient wash as the open-source section, not a pulsing orb stack", () => {
+        expect(source).not.toMatch(/translucent-glow/)
+        expect(source).not.toMatch(/ParticleField/)
+        expect((source.match(/blur-\[100px\]/g) ?? []).length).toBe(2)
+    })
+})
+
+describe("about — not a wall of text", () => {
+    const bioBlock = source.slice(source.indexOf("const bio = ["), source.indexOf("]\n", source.indexOf("const bio = [")))
+    const bioLines = [...bioBlock.matchAll(/^\s*"(.*)",$/gm)].map((m) => m[1])
+
+    it("types at most four bio lines", () => {
+        expect(bioLines.length).toBeGreaterThan(0)
+        expect(bioLines.length).toBeLessThanOrEqual(4)
+    })
+
+    it("keeps every bio line short enough to sit on one row", () => {
+        for (const line of bioLines) {
+            expect(line.length, `bio line too long: "${line}"`).toBeLessThanOrEqual(72)
+        }
+    })
+
+    it("keeps the section subtitle to a single short sentence pair", () => {
+        const subtitle = source.match(/subtitle="([^"]+)"/)?.[1] ?? ""
+        expect(subtitle.length).toBeGreaterThan(0)
+        expect(subtitle.length).toBeLessThanOrEqual(190)
+    })
+})

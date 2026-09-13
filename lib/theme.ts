@@ -141,6 +141,28 @@ export const accentCycle = [
     toHsl(hsl.primary),
 ] as const
 
+/* ── Open-source showcase — one accent hue per tool ───────────────
+ * `accentCycle` is four-sixths neutral (primary/accent are 0%-saturation
+ * white and near-white), so every tool in the showcase rendered the same
+ * grey mesh and the rail read as eight identical chips. These are the hues
+ * the gradient table above already uses — cyan, magenta, sky, rose — spread
+ * one per tool so the mesh, its gauges and the rail change colour tool to
+ * tool without introducing a hue the site doesn't already own. */
+
+export const ossAccentCycle = [
+    toHsl(hsl.cyan),
+    toHsl(hsl.magenta),
+    toHsl(hsl.sky),
+    toHsl(hsl.rose),
+] as const
+
+/** Accent for the nth showcased tool. Wraps, so the order of the set is the
+ *  only thing that decides a tool's colour — never its index modulo nothing. */
+export function ossAccent(index: number): string {
+    const n = ossAccentCycle.length
+    return ossAccentCycle[((index % n) + n) % n]
+}
+
 /* ── Semantic text color classes ─────────────────────────────────── */
 
 export const textColors = {

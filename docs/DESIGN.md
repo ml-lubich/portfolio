@@ -38,12 +38,9 @@ Visual reference: `cua.ai` (its `<html class="landing-redesign">` build). Adopte
 design *language* over the existing page structure; sections, hero brain, skill storm and
 terminal are unchanged.
 
-- **Fonts** (`app/layout.tsx` + `tailwind.config.ts`): `font-sans` → **Urbanist**, `font-display` →
-  **Instrument Serif**, mono unchanged (**JetBrains Mono**). Geist remains as the sans fallback.
-- **Instrument Serif is 400-only.** Existing headings carry `font-light`…`font-bold`, so
-  `.font-display { font-synthesis-weight: none }` in `globals.css` blocks faux-bold — the serif
-  always renders as a true 400, matching cua. Do not remove this without also normalising the
-  weight utilities on all `font-display` call sites.
+- **Fonts:** superseded on 2026-09-13 — see "Typography" below. This pass set `font-sans` →
+  Urbanist and `font-display` → Instrument Serif, with Geist as the sans fallback; all three are
+  gone. The rest of this section (ink, accents, radii) still stands.
 - **Ink:** `--muted-foreground` moved `215 15% 55%` → `217 15% 69%` (cua `--color-ink-muted`
   `#a4adbb`); secondary copy no longer sinks into the background.
 - **Accents:** `--brand` `205 100% 69%` (cua `#61bcff`), plus `--brand-soft`, `--brand-glow`,
@@ -306,3 +303,110 @@ cases in `e2e/hero-brain-fit.spec.ts` (mesh share 0.42–0.62 at 375/390/430,
 `elementFromPoint` on the brain's centre is not inside the brain box, and the
 page scrolls past the hero). Not verifiable here: the actual device — if it
 still traps, check on the phone before touching numbers.
+
+## About + Open Source: calm surfaces, colour instead of transcripts (2026-09-13)
+
+The owner's read of these two sections was "too much shimmer and lit, it looks
+like liquid glass but not a big fan", "just not consistent with the branding",
+"looks too wall of text", and on the demos "too much text, needs to have more
+animations / coloring". Both fixes are the same move: take the decoration out
+and let the section's own content carry it.
+
+**About drops the glass.** The six tiles were `HoloCell` — a pointer-tilted 3D
+cell — each holding a `GlyphPlinth`: a conic-gradient hairline ring on
+`holo-spin`, a counter-rotating tick ring, a `backdrop-blur-md` glass core
+lifted 30px on Z, and a blurred floor-light pool under it. A `ShimmerOverlay`
+swept the whole panel on top of that. All of it is gone. A tile is now a glyph
+in a bordered square beside its label, then the value and the detail line,
+left-aligned on `bg-card` over a `bg-border` panel that draws the hairlines
+with `gap-px`. The ambient layer is the same two `blur-[100px]` orbs
+`#open-source` uses, replacing three pulsing `translucent-glow` orbs plus a
+WebGL `ParticleField` — the two sections now wash the same way, which is what
+"consistent with the branding" meant.
+
+**About's copy is four lines, not six.** The terminal types four one-row lines
+(EchoStar → prior employers → shipped systems → Equiverse); the papers count
+and the agent-tool family moved out of the transcript into the tiles that
+already carry them, so nothing was dropped, only de-duplicated. The section
+subtitle lost its third sentence the same way. `TerminalReveal` grew a
+`bodyMinHeight` prop because its 220px body floor left a blank lower half under
+a four-line script; About passes `min-h-[140px]`, `ai-expertise.tsx` keeps the
+default. Section height at 1440×900 went 1440 → 1035, so
+`app/page.tsx`'s LazySection reservation came down with it.
+
+**The showcase's demos are three or four lines.** Every script lost its second
+command block; the remaining lines fit one row at phone width. Install commands
+and `packageUrl`s are untouched — those are registry-verified and a rewrite
+risks re-inventing a command that doesn't exist. Guards:
+`demo.length <= 4` and `line.s.length <= 70` in `__tests__/oss-demos.test.ts`.
+
+**The mesh carries the demo now.** `ToolSignature` paints edges, signal dashes
+and nodes in the tool's accent, turns on `.oss-signature-spin`, breathes its
+nodes on `.oss-node-pulse`, and runs a short dash along every third edge on
+`.oss-signal`. Node breathing moved off SVG `<animate>`: SMIL is out of reach of
+`prefers-reduced-motion`, a class is not, and all three classes share one guard
+in the OSS block of `globals.css`.
+
+**Every tool has its own colour.** `project.accent` comes from `accentCycle`,
+four of whose six entries are 0%-saturation white or near-white, so half the
+showcase rendered the same grey. `ossAccent(index)` in `lib/theme.ts` spreads
+cyan / magenta / sky / rose — hues the gradient table already owns — one per
+tool, and the mesh, the stat gauges and the rail chip's underline all read it.
+The rail is a colour picker rather than eight identical chips.
+
+Gates: `__tests__/about-section.test.ts` (no plinth, no tilt, no shimmer, token
+tiles, ≤4 bio lines each ≤72 chars), `__tests__/shimmer-consistency.test.ts`
+(about.tsx is deliberately off the shimmer list),
+`__tests__/open-source-showcase.test.ts` (accent cycle reaches rail + card, no
+hex literals, every new class reduced-motion guarded).
+
+
+## Typography: two families, Oxanium + JetBrains Mono (2026-09-13)
+
+The owner's read was "the font needs to change … too literate, it needs to be
+more techy / oriented … I like the joseph heupler font honestly … I want a more
+futuristic / minimalist." The measurable inconsistency behind it: `app/layout.tsx`
+loaded **seven** families — JetBrains Mono, Cormorant Garamond, Italiana,
+Urbanist, Instrument Serif, Geist Sans and Geist Mono. Three were literary
+serifs, and `font-display` resolving to Instrument Serif is what rendered the
+"Misha Lubich" wordmark as a Garamond-ish display serif over a wireframe brain.
+
+It is now the same two josephheupler.com runs:
+
+| Role | Face | Token |
+|---|---|---|
+| headings + running text | **Oxanium** (variable 200–800) | `--font-oxanium` |
+| eyebrows, labels, terminals, code | **JetBrains Mono** | `--font-jetbrains` |
+
+`font-sans` and `font-display` both resolve to Oxanium — one voice, two roles,
+which is what "consistent" has to mean here; `font-display` keeps its own size
+and tracking, so headings still read as headings. The `italiana` and `cormorant`
+Tailwind scales are gone (nothing outside `layout.tsx` ever used them), as is
+`.font-display { font-synthesis-weight: none }` — that guard existed because
+Instrument Serif shipped a single 400 weight, and Oxanium is variable, so the
+`font-light`…`font-bold` utilities on heading call sites resolve to real weights
+with nothing to synthesise.
+
+**The blog keeps one face, deliberately.** A display face can punish long-form
+prose, so the post body was checked at 1440 and 390 before committing to it.
+Oxanium is a rounded-square humanist, not a headline-only face; at the blog's
+measure and leading it reads cleanly, so no second body face was introduced.
+Revisit only with a screenshot that shows it failing.
+
+**Two orphan variables surfaced and were fixed**, which is the whole reason the
+gate checks references rather than just imports: `.mlbot-md code` asked for
+`var(--font-mono)` (josephheupler.com's name for it — never defined here, so
+inline code in a chat answer fell back to the browser default while the block
+above it rendered in JetBrains), and `architecture-diagram.tsx` asked for
+`var(--font-geist-mono)`, which the swap would have left dangling.
+
+**Payload, measured** at 1440×900 against the dev server, counting every
+`woff2` response on the homepage: **7 files / 265.3 KB → 2 files / 51.6 KB**, a
+213.7 KB drop. Font bytes compete with LCP text on first paint, so this should
+help it; the drop itself is the measured part, the LCP delta is not.
+
+Gate: `__tests__/typography-system.test.ts` — the `next/font/google` import is
+exactly `{ JetBrains_Mono, Oxanium }`, no retired family or `--font-*` variable
+is referenced anywhere under `app/`, `components/`, `lib/` or the Tailwind
+config, and every `var(--font-*)` any stylesheet reads is one `layout.tsx`
+actually defines.

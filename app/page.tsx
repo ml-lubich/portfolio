@@ -95,7 +95,7 @@ export default function Home() {
         <LazySection sectionId="ai-expertise" className={`min-h-[2630px] md:min-h-[2180px] ${LAZY_SECTION_TOP}`}>
           <AIExpertise />
         </LazySection>
-        <LazySection sectionId="about" className={`min-h-[2940px] md:min-h-[1480px] ${LAZY_SECTION_TOP}`}>
+        <LazySection sectionId="about" className={`min-h-[2190px] md:min-h-[1050px] ${LAZY_SECTION_TOP}`}>
           <About />
         </LazySection>
         <LazySection sectionId="journey" className={`min-h-[3510px] md:min-h-[2590px] ${LAZY_SECTION_TOP}`}>
@@ -114,7 +114,7 @@ export default function Home() {
         >
           <Projects />
         </LazySection>
-        <LazySection sectionId="open-source" className={`min-h-[1380px] md:min-h-[1060px] ${LAZY_SECTION_TOP}`}>
+        <LazySection sectionId="open-source" className={`min-h-[1500px] md:min-h-[1060px] ${LAZY_SECTION_TOP}`}>
           <OpenSourceShowcase />
         </LazySection>
         <LazySection sectionId="mac-demos" className={`min-h-[850px] md:min-h-[750px] ${LAZY_SECTION_TOP}`}>
