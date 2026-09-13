@@ -7,8 +7,8 @@ import { shouldUseCompactScrollStackViewport } from "@/lib/scroll-stack-layout"
  *  Two scroll-linked moves, both transform/opacity only so the document
  *  never reflows (the `#contact` anchor-scroll fix depends on that):
  *
- *   brain — the "release": scrolling out of the hero scales the mesh down
- *           and fades it, instead of the next section simply covering it.
+ *   brain — identity. It used to scale the mesh down and fade it out; it now
+ *           holds steady and the next section simply covers it.
  *   stats — the Tokscale badge / stat row lags the page a touch (capped so
  *           the lagging row stays inside the hero's bottom padding and is
  *           never clipped by the section's overflow-hidden).
@@ -19,24 +19,25 @@ import { shouldUseCompactScrollStackViewport } from "@/lib/scroll-stack-layout"
  *  React state, so SSR markup and first paint are identical either way.
  * ────────────────────────────────────────────────────────────────────── */
 
-/** Scroll distance (as a fraction of the viewport) over which the brain fully recedes. */
-const RELEASE_SPAN_VH = 0.9
 const STATS_PARALLAX_RATE = 0.12
 export const HERO_STATS_PARALLAX_MAX_PX = 48
 
 /**
- * The release is a fade, not a shrink. The mesh holds full size the whole way
- * down so the next section arrives over a steady brain — scaling it read as the
- * hero collapsing rather than handing off. `scale` stays in the return shape
- * because the layer still writes a transform; it is simply always 1.
+ * There is no release any more. The brain holds full size AND full opacity all
+ * the way down, so the next section arrives over a steady mesh.
+ *
+ * Misha, 2026-09-13: "i dont want the brain to shrink as i scroll, it needs to
+ * stay the same just like joseph heupler thing" — and josephheupler.com has no
+ * scroll-linked treatment on its mesh at all. The shrink went first; the fade
+ * survived that round and still took the mesh to 0.37 opacity by 600px, which
+ * is not "the same" by any reading. Both are gone.
+ *
+ * Kept as a function returning constants rather than deleted: HeroScrollLayer
+ * still writes transform/opacity for the stats lane, and this is the one place
+ * that says the brain lane writes identity. Args are ignored by design.
  */
-export function heroReleaseAt(scrollY: number, viewportHeight: number) {
-  const p = Math.min(Math.max(scrollY / (viewportHeight * RELEASE_SPAN_VH), 0), 1)
-  const eased = p * p
-  return {
-    scale: 1,
-    opacity: 1 - Math.min(1, eased * 1.15),
-  }
+export function heroReleaseAt(_scrollY: number, _viewportHeight: number) {
+  return { scale: 1, opacity: 1 }
 }
 
 export function heroStatsParallaxAt(scrollY: number): number {

@@ -42,18 +42,20 @@ describe("heroReleaseAt (pure)", () => {
     }
   })
 
-  it("still fades out by one viewport of scroll", () => {
-    expect(heroReleaseAt(900, 900).opacity).toBeLessThanOrEqual(0.15)
+  // Same complaint, second half. The shrink went first and the fade survived,
+  // still taking the mesh to 0.37 opacity by 600px — which is not "stay the
+  // same" either. josephheupler.com has no scroll-linked treatment on its mesh
+  // at all, so neither do we.
+  it("never fades the brain, at any scroll depth", () => {
+    for (let y = 0; y <= 5000; y += 50) {
+      expect(heroReleaseAt(y, 900).opacity).toBe(1)
+    }
   })
 
-  it("fades monotonically and clamps past the hero", () => {
-    let prev = heroReleaseAt(0, 900)
-    for (let y = 50; y <= 1800; y += 50) {
-      const cur = heroReleaseAt(y, 900)
-      expect(cur.opacity).toBeLessThanOrEqual(prev.opacity)
-      prev = cur
+  it("is identity everywhere, so scrolling can never move the mesh", () => {
+    for (let y = 0; y <= 5000; y += 50) {
+      expect(heroReleaseAt(y, 900)).toEqual({ scale: 1, opacity: 1 })
     }
-    expect(heroReleaseAt(5000, 900)).toEqual(heroReleaseAt(1800, 900))
   })
 })
 
