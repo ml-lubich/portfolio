@@ -171,6 +171,26 @@ test.describe("MLBot tool calls animate", () => {
     test("the running step moves, and each call reads as its own step", async ({ page }) => {
         await ask(page, "What has Misha built with agents?")
 
+        /* Record every state the rows pass through, from now on. The pair
+           assertion below used to POLL for a snapshot, which only reads
+           ["done","running"] inside the 400ms between the second tool frame
+           (1500ms) and the first text frame (1900ms) that settles it. One
+           poll landing inside a 400ms window is a coin flip under parallel
+           load, and it came up tails. An observer cannot miss it. */
+        await page.evaluate(() => {
+            const w = window as unknown as { __toolStates: (string | undefined)[][] }
+            w.__toolStates = []
+            const snap = () => {
+                const rows = [...document.querySelectorAll("[data-mlbot-tool]")]
+                if (!rows.length) return
+                w.__toolStates.push(
+                    rows.map((r) => r.querySelector("[data-mlbot-tool-state]")?.getAttribute("data-mlbot-tool-state") ?? undefined),
+                )
+            }
+            snap()
+            new MutationObserver(snap).observe(document.body, { subtree: true, childList: true, attributes: true })
+        })
+
         const running = steps(page).nth(0)
         const spinner = running.locator('[data-mlbot-tool-state="running"]')
         await expect(spinner).toBeVisible()
@@ -208,20 +228,36 @@ test.describe("MLBot tool calls animate", () => {
         expect(moved.changed, "spinner transform never changed — it is not animating").toBe(true)
         expect(moved.ticked, "spinner animation clock never advanced").toBe(true)
 
-        // Two sequential calls, each numbered, so progress is readable — and
-        // sampled at the instant the second appears, the first has already
-        // settled. Two spinners at once is the "wall of identical lines" this
-        // replaces.
-        const pair = await page
-            .waitForFunction(() => {
-                const rows = [...document.querySelectorAll("[data-mlbot-tool]")]
-                if (rows.length < 2) return null
-                return rows.map((r) => r.querySelector("[data-mlbot-tool-state]")?.getAttribute("data-mlbot-tool-state"))
-            }, null, { timeout: 10_000 })
-            .then((h) => h.jsonValue())
-        expect(pair).toEqual(["done", "running"])
+        // Two sequential calls, each its own numbered step. Two spinners at
+        // once is the "wall of identical lines" this replaces; one merged row
+        // is the opposite failure — two real lookups collapsed into one.
+        await expect(steps(page)).toHaveCount(2, { timeout: 10_000 })
 
-        await expect(steps(page)).toHaveCount(2, { timeout: 5_000 })
+        const seen = await page.evaluate(
+            () => (window as unknown as { __toolStates: (string | undefined)[][] }).__toolStates,
+        )
+        const why = ` — transitions: ${JSON.stringify(seen)}`
+
+        /* Asserted over EVERY rendered state, not one sampled instant.
+           An earlier version demanded that the exact frame ["done","running"]
+           be caught. That is a claim about React's commit granularity, not
+           about the widget: when the box is loaded the tool frame (1500ms) and
+           the text frame (1900ms) are read from the stream together and
+           committed once, so the DOM steps straight from ["running"] to
+           ["done","done"] having been correct throughout. It went red on a
+           panel that was behaving perfectly, which is the flake this spec's
+           own comment warns about. These three invariants hold at every commit
+           and still fail on every way the steps could actually be wrong. */
+        expect(seen.some((row) => row.length === 2), `the second call never got its own step${why}`).toBe(true)
+        expect(
+            seen.every((row) => row.filter((state) => state === "running").length <= 1),
+            `two lookups span at once${why}`,
+        ).toBe(true)
+        expect(
+            seen.every((row) => row.length < 2 || row[0] === "done"),
+            `an earlier step was still spinning after the next one started${why}`,
+        ).toBe(true)
+
         await expect(steps(page).nth(0)).toContainText("Searching the profile")
         await expect(steps(page).nth(1)).toContainText("Pulling up projects")
 
