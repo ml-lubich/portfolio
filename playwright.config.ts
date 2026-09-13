@@ -11,7 +11,11 @@ import { defineConfig, devices } from "@playwright/test"
 //     page loads are fast and *consistent* instead of "however long the dev
 //     compiler takes right now" — the dev-server approach was the direct
 //     cause of a batch of `page.goto` 90s timeouts under concurrent load.
-const PORT = 3900
+//  3. Overridable, so two sessions can run this gate at the same time. It was
+//     hardcoded, which meant the second run died on "http://localhost:3900 is
+//     already used" — or the two servers killed each other and it surfaced as
+//     ERR_CONNECTION_REFUSED, a failure that reads like broken code and is not.
+const PORT = Number(process.env.PLAYWRIGHT_PORT ?? 3900)
 
 export default defineConfig({
   testDir: "./e2e",
