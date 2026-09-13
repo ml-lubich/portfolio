@@ -88,14 +88,17 @@ describe("MLBot panel proportions", () => {
     })
 })
 
+/* A follow-up is now a pair — a short pill label and the full question it
+ * asks. The pill wears `q.label`; `q.question` is what gets sent and what the
+ * transcript shows. See e2e/mlbot-chat.spec.ts for the behavioural proof. */
 describe("MLBot follow-up pills send the whole question", () => {
-    const pills = source.slice(source.indexOf("turn.followups?.length"), source.indexOf("turn.followups?.length") + 1400)
+    const pills = source.slice(source.indexOf("turn.followups?.length"), source.indexOf("turn.followups?.length") + 1600)
 
-    it("sends the model's full text on click, and only shortens the label", () => {
-        expect(pills).toMatch(/onClick=\{\(\) => send\(q\)\}/)
-        expect(pills).toMatch(/\{clampFollowup\(q\)\}/)
-        expect(pills).toContain("title={q}")
-        expect(pills).toContain("aria-label={q}")
+    it("sends the model's full question on click, and only shortens the label", () => {
+        expect(pills).toMatch(/onClick=\{\(\) => send\(q\.question\)\}/)
+        expect(pills).toMatch(/\{clampFollowup\(q\.label\)\}/)
+        expect(pills).toContain("title={q.question}")
+        expect(pills).toContain("aria-label={q.question}")
     })
 })
 

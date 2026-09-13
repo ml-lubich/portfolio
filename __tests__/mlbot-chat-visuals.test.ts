@@ -403,7 +403,7 @@ describe("MLBot tool trace", () => {
  * and one line each. */
 describe("MLBot follow-up pills", () => {
     const source = read("components/ai-chat/mlbot.tsx")
-    const pills = source.slice(source.indexOf("turn.followups?.length"), source.indexOf("turn.followups?.length") + 900)
+    const pills = source.slice(source.indexOf("turn.followups?.length"), source.indexOf("turn.followups?.length") + 1600)
 
     it("left-aligns the pill text instead of centring wrapped lines", () => {
         expect(pills).toContain("text-left")
@@ -457,7 +457,7 @@ describe("follow-up text is never cut mid-word", () => {
 
     it("shows the whole question in the pill rather than clipping it", () => {
         const source = read("components/ai-chat/mlbot.tsx")
-        const pills = source.slice(source.indexOf("turn.followups?.length"), source.indexOf("turn.followups?.length") + 900)
+        const pills = source.slice(source.indexOf("turn.followups?.length"), source.indexOf("turn.followups?.length") + 1600)
         expect(pills).not.toContain("truncate")
         expect(pills).toContain("text-left")
     })

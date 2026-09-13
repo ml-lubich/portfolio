@@ -53,6 +53,29 @@ export class FollowupStream {
     }
 }
 
+/** A follow-up is a pair: what the pill says, and what tapping it asks.
+ *  The wire stays a plain string — `Short label :: Full question?` — so a
+ *  server that has not been taught the pair form still works. */
+export interface Followup {
+    label: string
+    question: string
+}
+
+/** Separates the pill label from the question inside one follow-up string.
+ *  Only the FIRST `::` separates; a question is allowed to contain a colon. */
+const FOLLOWUP_SPLIT = /\s*::\s*/
+
+/** Splits `label :: question`. With no separator — or with one side empty —
+ *  the whole thing is both, which is exactly the old plain-string behaviour. */
+export function splitFollowup(raw: string): Followup {
+    const [head, ...rest] = raw.split(FOLLOWUP_SPLIT)
+    const label = head.trim()
+    const question = rest.join(" :: ").trim()
+    if (!label) return { label: question, question }
+    if (!question) return { label, question: label }
+    return { label, question }
+}
+
 /** Display-only: shortens a pill LABEL to `maxChars` without splitting a
  *  word. The question itself is never clamped — what the model wrote is what
  *  gets sent when the pill is tapped. A pill reading "…multi-agent pipeli…"
