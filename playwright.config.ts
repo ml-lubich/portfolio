@@ -1,4 +1,4 @@
-import { defineConfig } from "@playwright/test"
+import { defineConfig, devices } from "@playwright/test"
 
 // A dedicated port + dist dir (see next.config.mjs) so this suite builds and
 // serves its OWN production server, independent of whatever `bun run dev`
@@ -26,8 +26,26 @@ export default defineConfig({
   reporter: [["list"]],
   use: {
     baseURL: `http://localhost:${PORT}`,
-    viewport: { width: 1440, height: 900 },
   },
+  // Every spec runs on a laptop AND a phone. The phone profile brings touch,
+  // isMobile, DPR 3 and a mobile UA; Chromium for both (the iPhone profile
+  // defaults to WebKit, which isn't installed here and would double runtime).
+  // A spec that asserts desktop-only behaviour opts out of the phone project
+  // with `test.skip(({ isMobile }) => isMobile, ...)` — never by loosening the
+  // assertion. hero-brain-fit.spec.ts is ignored on the phone project instead:
+  // its desktop describes call page.setViewportSize (isMobile would still be
+  // on) and its own phone describes already pin phone viewports via test.use.
+  projects: [
+    {
+      name: "desktop",
+      use: { viewport: { width: 1440, height: 900 } },
+    },
+    {
+      name: "mobile",
+      use: { ...devices["iPhone 14 Pro"], browserName: "chromium" },
+      testIgnore: /hero-brain-fit\.spec\.ts/,
+    },
+  ],
   webServer: {
     // Always rebuild: this is a push gate, so it must test the code that is
     // actually about to be pushed, not a stale server left over from a

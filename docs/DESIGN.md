@@ -1,5 +1,37 @@
 # Design
 
+## MLBot: briopedia's chat, phone-first (2026-09-11)
+
+The chat follows briopedia's `ChatMessage` model. A muted action row sits under
+each finished answer: Copy (tick + "Copied" for 1.6s — a label swap, not
+motion, so reduced motion is unaffected) and, on the last answer only, Retry.
+Your own messages get Copy + Edit; Edit opens an inline editor (Cancel /
+Resend, Enter resends, Escape cancels) and resends from that point. Retry uses
+the same truncate-and-resend path, so neither ever appends a duplicate. While
+streaming, Send becomes Stop (AbortController on the `/api/chat` fetch) and the
+partial answer is kept; an empty aborted turn reads "Stopped." rather than
+showing a blank bubble. New chat lives in the header once there are turns.
+There is no history and no persistence — deliberately: this is a public
+portfolio, not a logged-in product.
+
+The panel is one generous size — 480px × min(85dvh, 760px), briopedia's
+proportions — with a single Enlarge/Shrink rung for wide charts, replacing the
+old S/M/L cycle. Full-screen on phones.
+
+**Phone-first typography.** The complaint was pinch-to-read, and the measured
+cause was neither overflow nor iOS auto-zoom (the composer was already 16px):
+everything was simply small — 14.5px prose, 12.5px pills, 12px labels, 28–32px
+controls. Below `sm` prose and user messages are 16px/1.7, pills and actions
+14px, and every control (Send/Stop, header buttons, Copy/Edit/Retry, pills) is
+a 44px hit target; from `sm` up it returns to 15.5px/1.7 and compact controls.
+
+**Follow-up pills carry the model's whole question**, sent on tap and exposed
+in `title` and `aria-label`; only the visible label is shortened by
+`clampFollowup` (52 chars, word boundary, ellipsis). Previously `parseFollowups`
+clamped the *value*, so tapping a pill sent the fragment — and a visuals test
+had enshrined that by asserting the value ended in an ellipsis. Both fixed.
+Gates: `__tests__/mlbot-chat-actions.test.ts`, `__tests__/ai-followups.test.ts`.
+
 ## Type system & tokens — cua.ai landing-redesign (2026-08-10)
 
 Visual reference: `cua.ai` (its `<html class="landing-redesign">` build). Adopted its

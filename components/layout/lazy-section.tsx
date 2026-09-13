@@ -6,9 +6,11 @@ interface LazySectionProps {
   children: ReactNode
   /** How far before entering viewport to trigger load (px). Default: 200 */
   rootMargin?: string
-  /** Minimum height placeholder to prevent layout shift. Default: 100vh */
-  minHeight?: string
-  /** CSS class on the wrapper (always applied) */
+  /**
+   * CSS class on the wrapper (always applied). Must carry the section's
+   * height reservation (`min-h-[…] md:min-h-[…]`, see app/page.tsx): a
+   * wrapper shorter than its content grows on mount and shoves the page.
+   */
   className?: string
   /**
    * Section id used for nav scroll targeting. Sets a data-section attribute
@@ -29,7 +31,6 @@ interface LazySectionProps {
 export function LazySection({
   children,
   rootMargin = "1600px",
-  minHeight = "min(38dvh, 320px)",
   className = "",
   sectionId,
 }: LazySectionProps) {
@@ -77,10 +78,9 @@ export function LazySection({
       className={["lazy-section-wrap", className].filter(Boolean).join(" ") || undefined}
       data-section={sectionId || undefined}
       data-lazy-loaded={visible ? "true" : "false"}
-      /* Floor stays applied after mount too: dropping it the instant the IO
-         fires collapses the wrapper to 0 for the frame or two before the
-         dynamic chunk paints, which is itself a jump. */
-      style={{ minHeight }}
+      /* The className floor stays applied after mount too: dropping it the
+         instant the IO fires collapses the wrapper to 0 for the frame or two
+         before the dynamic chunk paints, which is itself a jump. */
     >
       {visible ? children : null}
     </div>

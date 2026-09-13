@@ -54,6 +54,10 @@ async function readState(page: Page, id: string): Promise<string | null> {
   }, id)
 }
 
+// Anything ≤1366px or touch-driven routes to the static branch by design, so
+// the phone project has nothing to scrub here.
+test.skip(({ isMobile }) => isMobile, "scroll devices are desktop-only by design")
+
 test.describe("desktop: scroll changes what the section paints", () => {
   test.beforeEach(async ({ page }) => {
     await page.setViewportSize(DESKTOP)

@@ -62,6 +62,10 @@ async function mountAllSections(page: Page, ids: readonly string[]): Promise<voi
   await page.waitForTimeout(300)
 }
 
+// Wide monitors are a desktop concern; the phone project's touch/isMobile
+// emulation at 2560px wide is not a device that exists.
+test.skip(({ isMobile }) => isMobile, "desktop-only viewports")
+
 for (const viewport of WIDE_VIEWPORTS) {
   test.describe(`wide layout @ ${viewport.width}x${viewport.height}`, () => {
     test.use({ viewport })
