@@ -50,7 +50,11 @@ describe("Hero entrance ladder", () => {
   it("starts after the name reveal begins and settles inside 2s", async () => {
     const { HERO_BEAT } = await import("@/components/hero/data")
     const { HERO_NAME_REVEAL } = await import("@/components/hero/role-rotator")
-    expect(HERO_BEAT.tagline).toBeGreaterThan(HERO_NAME_REVEAL.delayMs)
+    /* The eyebrow leads: it is the topmost block in the hero now, above the
+       name, so it must reveal BEFORE the name does — the ladder still reads
+       strictly top to bottom, the top just moved. */
+    expect(HERO_BEAT.tagline).toBeLessThan(HERO_NAME_REVEAL.delayMs)
+    expect(HERO_BEAT.subtitle).toBeGreaterThan(HERO_NAME_REVEAL.delayMs)
     expect(HERO_BEAT.scrollCue).toBeLessThanOrEqual(2000)
   })
 

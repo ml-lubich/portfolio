@@ -882,6 +882,47 @@ body {
   pointer-events: none;
 }
 
+/* Role rotator — one line in the DOM at a time (components/hero/role-rotator.tsx).
+   The old rotator stacked every role as an absolutely-positioned span and
+   cross-faded by opacity, so mid-swap two or three were legible at once on top
+   of each other. These run sequentially: the mounted line animates out, then
+   the next one mounts and animates in. */
+.role-line {
+  will-change: opacity, transform;
+}
+
+.role-line--in {
+  animation: role-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.role-line--out {
+  animation: role-out 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes role-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 0.55em, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes role-out {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translate3d(0, -0.45em, 0);
+  }
+}
+
 @keyframes hero-scan-sweep {
   from {
     transform: translateY(-40vh);
@@ -907,6 +948,19 @@ body {
      which is worse than the sweep. It must not render at all. */
   .hero-scanline {
     display: none;
+  }
+
+  /* The role line still swaps — it is content, not decoration — it just
+     arrives without the slide. `!important` is load-bearing: the global
+     reduced-motion reset further down sets `animation-duration: 0.001ms
+     !important` on `*`, which does not cancel the animation, it finishes it
+     instantly — and role-out's `both` fill then pins the line at opacity 0.
+     Measured: the slot went blank for the whole out phase, every cycle. */
+  .role-line--in,
+  .role-line--out {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
   }
 }
 

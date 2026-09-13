@@ -63,7 +63,10 @@ export const STAT_STAGGER_DELAY = 120
  *  stay ascending, or the ladder stops reading top-to-bottom.
  * ────────────────────────────────────────────────────────────────────── */
 export const HERO_BEAT = {
-  tagline: 620,
+  /* The eyebrow sits ABOVE the name now (josephheupler.com's order), so it
+     leads the ladder and reveals before the name does — HERO_NAME_REVEAL
+     starts at 400ms. It used to be 620, which was correct while it sat third. */
+  tagline: 220,
   subtitle: 820,
   ctas: 1000,
   tokscale: 1160,

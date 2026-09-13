@@ -211,9 +211,13 @@ export function Hero() {
               aria-hidden="true"
             />
 
+            {/* josephheupler.com's vertical rhythm: eyebrow, name, role,
+                lede. Ours had the eyebrow third, between the role and the
+                lede, which buried it. Same elements, reordered — nothing
+                dropped. */}
             <div className="hero-copy-halo relative z-[2] w-full">
-              <RoleRotator />
               <HeroTagline />
+              <RoleRotator />
               <HeroSubtitle />
             </div>
           </div>

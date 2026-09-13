@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useEffect } from "react"
 import { roles, HERO_BEAT, heroBeatDelay } from "./data"
 import { AnimatedName } from "../animations/animated-name"
 import { AnimatedText } from "../animations/animated-text"
@@ -10,31 +10,55 @@ import { AnimatedText } from "../animations/animated-text"
 /** Hero H1 name timing — shared with brain fade-in in `hero/index.tsx`. */
 export const HERO_NAME_REVEAL = { delayMs: 400, durationMs: 700 } as const
 
+/** Hold, then animate out before the next role mounts — 4.5s per role total. */
+const ROLE_HOLD_MS = 4120
+const ROLE_OUT_MS = 380
+
 export function RoleRotator({
   onNameRevealStart,
 }: {
   onNameRevealStart?: () => void
 } = {}) {
   const [roleIndex, setRoleIndex] = useState(0)
-  const [prevRoleIndex, setPrevRoleIndex] = useState(-1)
-  const [isTransitioning, setIsTransitioning] = useState(false)
-  const transitionTimeout = useRef<ReturnType<typeof setTimeout>>(undefined)
+  const [phase, setPhase] = useState<"in" | "out">("in")
+  /* Set in an effect, not in the initializer: the server has no matchMedia,
+     and a different first client render would be a hydration mismatch
+     (__tests__/hero-ssr-consistency.test.ts). */
+  const [reducedMotion, setReducedMotion] = useState(false)
+  useEffect(() => {
+    setReducedMotion(window.matchMedia("(prefers-reduced-motion: reduce)").matches)
+  }, [])
+
+  /* Single slot, josephheupler.com's: the line animates out, THEN the next
+     one mounts. Every role used to be rendered at once as stacked absolute
+     spans cross-fading by opacity, plus an sr-only twin — 10 elements, and
+     up to three legible simultaneously mid-swap, which is what read as a
+     ghosting, broken hero. One element at a time cannot overlap itself. */
+  useEffect(() => {
+    /* Reduced motion never enters the out phase at all. Suppressing the
+       animation in CSS was not enough: the `--out` class still applied, and
+       the line still measured opacity 0 partway through every cycle even with
+       `animation: none !important` winning. The phase is the thing that should
+       not exist here — so the word just changes, with no exit. */
+    if (reducedMotion) {
+      const swap = setTimeout(
+        () => setRoleIndex((prev) => (prev + 1) % roles.length),
+        ROLE_HOLD_MS + ROLE_OUT_MS,
+      )
+      return () => clearTimeout(swap)
+    }
+    const hold = setTimeout(() => setPhase("out"), ROLE_HOLD_MS)
+    return () => clearTimeout(hold)
+  }, [roleIndex, reducedMotion])
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setRoleIndex((prev) => {
-        setPrevRoleIndex(prev)
-        setIsTransitioning(true)
-        if (transitionTimeout.current) clearTimeout(transitionTimeout.current)
-        transitionTimeout.current = setTimeout(() => setIsTransitioning(false), 1000)
-        return (prev + 1) % roles.length
-      })
-    }, 4500)
-    return () => {
-      clearInterval(interval)
-      if (transitionTimeout.current) clearTimeout(transitionTimeout.current)
-    }
-  }, [])
+    if (phase !== "out") return
+    const swap = setTimeout(() => {
+      setRoleIndex((prev) => (prev + 1) % roles.length)
+      setPhase("in")
+    }, ROLE_OUT_MS)
+    return () => clearTimeout(swap)
+  }, [phase])
 
   return (
     <h1
@@ -58,57 +82,37 @@ export function RoleRotator({
       {/* min-h is sized to fit the role's line box *plus* the pb-[0.18em] the
           gradient span needs for its descenders (see below) — otherwise this
           overflow-hidden slot re-clips exactly what that padding buys back. */}
-      <span className="relative mt-2 block min-h-[2.15rem] w-full overflow-hidden sm:min-h-[2.6rem] md:min-h-[3.15rem] lg:min-h-[3.6rem]">
-        {roles.map((role, i) => {
-          const isActive = i === roleIndex
-          const isLeaving = i === prevRoleIndex && isTransitioning
-
-          let translateY = "60px"
-          let opacity = 0
-          let scale = "scale(0.96)"
-
-          if (isActive) {
-            translateY = "0px"
-            opacity = 1
-            scale = "scale(1)"
-          } else if (isLeaving) {
-            translateY = "-50px"
-            opacity = 0
-            scale = "scale(0.97)"
-          }
-
-          return (
-            <span
-              key={role}
-              className="absolute inset-x-0 top-0 flex items-start justify-center"
-              style={{
-                opacity,
-                transform: `translateY(${translateY}) ${scale}`,
-                transition: isActive || isLeaving
-                  ? "opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1)"
-                  : "none",
-              }}
-              aria-hidden={!isActive}
-            >
-              {/* No text-pretty here: it resets text-wrap-mode to wrap, silently
-                  defeating whitespace-nowrap and clipping long roles in the
-                  fixed-height slot. lg size caps at 2.6rem so the longest role
-                  ("AI & Machine Learning Engineer") stays on one line. */}
-              {/* pb-[0.18em]: the metallic sheen class below paints its glyphs
-                  with `background-clip: text`, so the letters only exist where
-                  the element's own box gets painted. The h1's line-height of
-                  1.15 leaves Instrument Serif's descenders sitting within a
-                  hair of that box's bottom edge, so the closed loop of every
-                  `g` ("Learning", "Engineer", "Engineering Lead") rendered
-                  sliced flat. The padding grows the paint box only — with
-                  items-start/top-0 the text itself does not move. */}
-              <span className="gradient-text mx-auto px-2 pb-[0.18em] text-center font-light whitespace-nowrap text-[clamp(0.95rem,4.2vw,1.5rem)] sm:text-3xl md:text-4xl lg:text-[2.6rem]">
-                {role}
-              </span>
-            </span>
-          )
-        })}
-        <span className="sr-only">{roles[roleIndex]}</span>
+      {/* min-h is sized to fit the role's line box *plus* the pb-[0.18em] the
+          gradient span needs for its descenders (see below) — otherwise this
+          overflow-hidden slot re-clips exactly what that padding buys back.
+          The fixed height is also what keeps the swap from reflowing the hero
+          now that only one line is mounted at a time. */}
+      <span
+        className="relative mt-2 flex min-h-[2.15rem] w-full items-start justify-center overflow-hidden sm:min-h-[2.6rem] md:min-h-[3.15rem] lg:min-h-[3.6rem]"
+        data-testid="role-rotator"
+      >
+        {/* No text-pretty here: it resets text-wrap-mode to wrap, silently
+            defeating whitespace-nowrap and clipping long roles in the fixed-
+            height slot. lg size caps at 2.6rem so the longest role
+            ("AI & Machine Learning Engineer") stays on one line. */}
+        {/* pb-[0.18em]: the metallic sheen class below paints its glyphs with
+            `background-clip: text`, so the letters only exist where the
+            element's own box gets painted. The h1's line-height of 1.15
+            leaves Instrument Serif's descenders sitting within a hair of that
+            box's bottom edge, so the closed loop of every `g` ("Learning",
+            "Engineer", "Engineering Lead") rendered sliced flat. The padding
+            grows the paint box only. */}
+        {/* aria-live replaces the sr-only twin: a duplicated copy is why the
+            same role could be read twice in the DOM at once. */}
+        <span
+          key={`${roleIndex}-${phase}`}
+          className={`role-line gradient-text mx-auto px-2 pb-[0.18em] text-center font-light whitespace-nowrap text-[clamp(0.95rem,4.2vw,1.5rem)] sm:text-3xl md:text-4xl lg:text-[2.6rem] ${
+            phase === "in" ? "role-line--in" : "role-line--out"
+          }`}
+          aria-live="polite"
+        >
+          {roles[roleIndex]}
+        </span>
       </span>
     </h1>
   )
@@ -119,7 +123,7 @@ export function RoleRotator({
 export function HeroTagline() {
   return (
     <p
-      className="animate-fade-in-up-subtle mx-auto mt-4 max-w-2xl text-balance text-center font-medium uppercase tracking-[0.18em] text-foreground/70 text-[clamp(0.62rem,2.6vw,0.8rem)] sm:mt-5 sm:tracking-[0.22em] sm:text-sm"
+      className="animate-fade-in-up-subtle mx-auto mb-4 max-w-2xl text-balance text-center font-medium uppercase tracking-[0.18em] text-foreground/70 text-[clamp(0.62rem,2.6vw,0.8rem)] sm:mb-5 sm:tracking-[0.22em] sm:text-sm"
       /* No `opacity: 0` here: `fade-in-up-subtle` is transform-only by design
          (it keeps hero text eligible for LCP), so an inline opacity would
          never be animated back. */

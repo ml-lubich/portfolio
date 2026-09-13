@@ -56,13 +56,21 @@ describe("Hero heading — stable layout", () => {
     expect(fs.existsSync(path.join(ROOT, "components/hero/hero-name-3d.tsx"))).toBe(false)
   })
 
-  it("rotating roles are absolutely positioned in a fixed-height slot — no layout push", () => {
+  /* The slot used to hold every role at once as stacked absolutely-positioned
+     spans, cross-faded by opacity, plus an sr-only twin — which is exactly how
+     two or three ended up legible on top of each other mid-swap. It is a single
+     slot now (josephheupler.com's), so the fixed height is what does the
+     no-layout-push job the absolute positioning used to. */
+  it("one role line at a time, in a fixed-height slot — no layout push, no stacking", () => {
     const src = fs.readFileSync(
       path.join(ROOT, "components/hero/role-rotator.tsx"),
       "utf8"
     )
     expect(src).toMatch(/min-h-\[/)
-    expect(src).toMatch(/absolute inset-x-0 top-0/)
+    expect(src, "every role rendered at once is the stacking bug").not.toMatch(/roles\.map/)
+    expect(src, "a duplicated copy is why a role could be read twice").not.toMatch(/className="[^"]*sr-only/)
+    expect(src, "one keyed element, remounted per swap").toMatch(/key=\{`\$\{roleIndex\}-\$\{phase\}`\}/)
+    expect(src, "aria-live replaces the sr-only twin").toMatch(/aria-live="polite"/)
   })
 
   it("role text keeps one non-wrapping line — text-pretty resets text-wrap-mode and silently defeats whitespace-nowrap", () => {
