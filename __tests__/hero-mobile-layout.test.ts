@@ -27,7 +27,7 @@ const css = fs.readFileSync(path.join(ROOT, "app/globals.css"), "utf8")
 const brain = fs.readFileSync(path.join(ROOT, "components/brain/index.tsx"), "utf8")
 
 const sectionLine = hero.split("\n").find((l) => l.includes('min-h-[90svh]')) ?? ""
-const stageLine = hero.split("\n").find((l) => l.includes("min-h-[calc(100svh-13rem)]")) ?? ""
+const bandLine = hero.split("\n").find((l) => l.includes("sm:min-h-[min(")) ?? ""
 const boxLine = hero.split("\n").find((l) => l.includes("sm:aspect-[6/5]")) ?? ""
 
 describe("phone hero layout (josephheupler.com parity)", () => {
@@ -40,11 +40,14 @@ describe("phone hero layout (josephheupler.com parity)", () => {
   })
 
   it("the stage stops forcing its own screenful so the stat row joins the first screen", () => {
-    expect(stageLine).toContain("max-sm:min-h-0")
+    // The old `min-h-[calc(100svh-13rem)]` stage is gone: the hero is three
+    // stacked bands, each only as tall as its own content, so nothing forces
+    // a screenful any more.
+    expect(hero, "the forced-screenful stage must not come back").not.toContain("min-h-[calc(100svh-13rem)]")
   })
 
-  it("brain box is the reference canvas: full width, 420px tall, no square/vw sizing", () => {
-    expect(boxLine).toContain("max-sm:h-[420px]")
+  it("brain band is the reference canvas: full width, 420px tall, no square/vw sizing", () => {
+    expect(bandLine).toContain("min-h-[min(420px,50svh)]")
     expect(boxLine).toContain("max-sm:w-full")
     expect(boxLine).not.toMatch(/max-sm:aspect-square|max-sm:w-\[min\(/)
   })
@@ -67,10 +70,11 @@ describe("phone hero layout (josephheupler.com parity)", () => {
     expect(block).not.toMatch(/linear-gradient/)
   })
 
-  it("desktop sizing is untouched", () => {
-    expect(boxLine).toContain("sm:aspect-[6/5] sm:h-[min(100svh,70vw)]")
+  it("desktop keeps its own tier", () => {
+    expect(boxLine).toContain("sm:aspect-[6/5]")
+    expect(bandLine).toContain("sm:min-h-[min(64svh,52vw)]")
     expect(sectionLine).toContain("sm:pt-28")
-    expect(sectionLine).toContain("md:pt-36")
+    expect(sectionLine).toContain("md:pt-28")
     expect(/return \{ z: 1\.82, fov: 38 \}/.test(brain)).toBe(true)
   })
 })

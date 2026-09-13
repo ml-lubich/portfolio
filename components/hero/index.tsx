@@ -107,7 +107,11 @@ export function Hero() {
          __tests__/hero-mobile-layout.test.ts). Before, the 9.5rem pad left a
          210px empty band under the nav and the section ran to 150% of the
          viewport with the stat row a full screen down. */
-      className="relative flex min-h-[90svh] flex-col items-center overflow-hidden pb-16 max-sm:min-h-[100svh] max-sm:justify-center max-sm:pt-32 sm:pt-28 md:min-h-screen md:pb-24 md:pt-36"
+      /* md:pt-28, not pt-36: the hero is three stacked bands now (brain, CTAs,
+         stats) rather than one centred stack, so the 144px pad was 32px the
+         CTA row could not spare — it pushed the row down onto the scroll cue
+         at 1440×900. */
+      className="relative flex min-h-[90svh] flex-col items-center overflow-hidden pb-16 max-sm:min-h-[100svh] max-sm:justify-center max-sm:pt-32 sm:pt-28 md:min-h-screen md:pb-24 md:pt-28"
     >
       {/* Spectrum lives only in this section (not fixed to viewport) — avoids mobile scroll seam / mask repaint */}
       <BackgroundOrbs />
@@ -134,85 +138,83 @@ export function Hero() {
         style={{ background: heroContentScrim }}
       />
 
-      {/* Content — two stacked blocks:
-          1. the stage, one screenful, where the big brain sits behind the copy
-             and CTAs (modelled on josephheupler.com: full-bleed mesh, strong
-             centre wash so the type stays readable over it);
-          2. everything else, which sits *below* the mesh instead of across it —
-             the Tokscale card and stat row used to land mid-brain. */}
+      {/* Content — three stacked bands:
+          1. the brain band, where the mesh sits behind the name / role /
+             tagline and NOTHING else (josephheupler.com's read: type over the
+             wireframe, no chrome on it);
+          2. the CTA band, which owns its own strip of the hero *underneath*
+             the mesh — the pills and the tertiary row used to land dead centre
+             on the brain, which is what "the buttons are obscuring it" meant,
+             and what forced the centre wash up to ~0.96 combined opacity just
+             to keep 13px text legible on top of them;
+          3. everything else — the Tokscale card and stat row. */}
       <div className="relative z-10 mx-auto w-full max-w-6xl px-3 text-center pointer-events-none md:px-6">
-        {/* Phones: no forced screenful — the stage is the copy's own height so
-            the Tokscale badge / social row / stats sit inside the first screen
-            (where the reference keeps its portrait). */}
-        <div className="relative flex min-h-[calc(100svh-13rem)] w-full flex-col items-center justify-center max-sm:min-h-0">
-          {/* Brain stage — anchored to the viewport height (svh), never to the
-              hero's own height. On sm+ it is a landscape 6:5 box a full
-              viewport-plus tall ("Joseph-sized"): the mesh reads as the
-              dominant object with the name across its centre, the landscape
-              aspect gives the auto-rotating long axis horizontal headroom so
-              the tighter desktop camera never slices it, and the section's
-              top padding + the underlay mask keep the crown clear of the nav.
-              Phones keep their own tier (mobile perf decision).
-              HeroScrollLayer adds the scroll-out "release" (desktop only). */}
-          <HeroScrollLayer
-            layer="brain"
-            /* Phones: the layer is centred on the copy, but the reference
-               hangs its brain ~100px lower than its text block's centre, so
-               the name clears the crown and the CTAs ride the lower half.
-               Our copy is taller (role slot, 2-row CTAs), so 48px lands the
-               mesh centre the same 230px under the name and on the CTA row —
-               measured at 390×844 and 430×932. HeroScrollLayer never attaches
-               its scroll transform on phones, so nothing overwrites this. */
-            className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center max-sm:translate-y-12"
-            aria-hidden
-          >
-            {/* The mask lives on the box, not the underlay: a mask clips to its
-                own border box, and the underlay is only the stage's height —
-                on the underlay it silently sliced the crown and foot off any
-                box taller than the stage.
+        <div className="relative flex w-full flex-col items-center">
+          {/* Brain band. Its height IS the brain box's height — the box below
+              is `h-full`, so the canvas can never reach past this band into
+              the CTA strip. That invariant is what e2e/hero-cta-clearance.spec.ts
+              asserts with getBoundingClientRect at three viewports; sizing the
+              box independently of the band (`h-[min(100svh,70vw)]`, as it was)
+              is exactly how the canvas came to cover the whole hero.
 
-                Sized from the viewport's SHORT side and never taller than one
-                viewport: a box taller than the section runs past its bottom
-                edge and gets hard-clipped by overflow-hidden before the mask's
-                foot fade finishes (shipped like that once; the fit guard in
-                e2e/hero-brain-fit.spec.ts now fails on it), and a box bound
-                only by svh runs off the sides on wide monitors. The mesh's
-                share of the box is the camera's job (components/brain).
+              The band never shrinks below the copy it holds, so a long role
+              line grows the band and the mesh with it rather than clipping. */}
+          <div className="relative flex w-full items-center justify-center min-h-[min(420px,50svh)] sm:min-h-[min(64svh,52vw)]">
+            {/* HeroScrollLayer adds the scroll-out "release" (desktop only). */}
+            <HeroScrollLayer
+              layer="brain"
+              className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center"
+              aria-hidden
+            >
+              {/* The mask lives on the box, not the underlay: a mask clips to
+                  its own border box.
 
-                Phones: josephheupler.com's canvas verbatim — full width, a
-                fixed 420px tall, mesh ~300px inside it (camera tiers in
-                components/brain/index.tsx). Fixed px, not vw/svh: his mesh is
-                the same 300px on a 390 and a 430 wide phone, and a height-
-                framed camera makes ours the same. */}
-            <div className="hero-brain-underlay shrink-0 max-sm:h-[420px] max-sm:w-full sm:aspect-[6/5] sm:h-[min(100svh,70vw)]">
-              {showBrain && (
-                <div className="h-full w-full">
-                  <Brain3D
-                    className="h-full w-full pointer-events-auto"
-                    revealGate={brainRevealGate}
-                    fadeDurationMs={BRAIN_FADE_MS}
-                  />
-                </div>
-              )}
+                  `h-full` ties the box to the band (see above). sm+ keeps the
+                  landscape 6:5 aspect so the auto-rotating long axis has
+                  horizontal headroom and the tighter desktop camera never
+                  slices it. Phones stay full-width at the band's height —
+                  josephheupler.com's 420px canvas, mesh ~300px inside it
+                  (camera tiers in components/brain/index.tsx), but capped at
+                  half the viewport: a flat 420px is 64% of a 659px-tall
+                  screen, which pushed the CTA row down onto the floating
+                  chat button. min(420px,50svh) holds the mesh at ~0.345 of
+                  the viewport — the reference's ratio — on both tall and
+                  short handsets instead of drifting 0.31→0.44. */}
+              <div className="hero-brain-underlay h-full shrink-0 max-sm:w-full sm:aspect-[6/5]">
+                {showBrain && (
+                  <div className="h-full w-full">
+                    <Brain3D
+                      className="h-full w-full pointer-events-auto"
+                      revealGate={brainRevealGate}
+                      fadeDurationMs={BRAIN_FADE_MS}
+                    />
+                  </div>
+                )}
+              </div>
+            </HeroScrollLayer>
+
+            {/* Centre wash — only the name / role / tagline are drawn over the
+                mesh now, and those carry their own ink halo (.hero-copy-halo
+                in app/globals.css, josephheupler.com's technique), so this can
+                be a light touch instead of the near-opaque disc that made the
+                brain read as a grey blob. Run out to the screen edges (past
+                the wrapper's px-3) or the ellipse clips into a visible
+                vertical seam at the band's sides. */}
+            <div
+              className="pointer-events-none absolute inset-0 z-[1] max-sm:-inset-x-3"
+              style={{ background: "var(--hero-stage-scrim)" }}
+              aria-hidden="true"
+            />
+
+            <div className="hero-copy-halo relative z-[2] w-full">
+              <RoleRotator />
+              <HeroTagline />
+              <HeroSubtitle />
             </div>
-          </HeroScrollLayer>
+          </div>
 
-          {/* Centre wash — the mesh is dense enough to swallow body copy, so the
-              middle of the stage is dimmed before the type is drawn over it.
-              Phones: shifted with the brain layer above, or it dims the crown
-              and leaves the foot (under the CTAs) raw; and run out to the
-              screen edges (the wrapper's px-3), or the ellipse clips into a
-              visible vertical seam at the stage's sides. */}
-          <div
-            className="pointer-events-none absolute inset-0 z-[1] max-sm:-inset-x-3 max-sm:translate-y-12"
-            style={{ background: "var(--hero-stage-scrim)" }}
-            aria-hidden="true"
-          />
-
+          {/* CTA band — below the mesh, never on it. */}
           <div className="relative z-[2] w-full">
-            <RoleRotator />
-            <HeroTagline />
-            <HeroSubtitle />
             <HeroCTAs />
           </div>
         </div>

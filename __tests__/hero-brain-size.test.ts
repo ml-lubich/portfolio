@@ -22,11 +22,20 @@ const brain = fs.readFileSync(path.join(ROOT, "components/brain/index.tsx"), "ut
 const wireframe = fs.readFileSync(path.join(ROOT, "components/brain/brain-wireframe.tsx"), "utf8")
 
 const boxLine = hero.split("\n").find((l) => l.includes("sm:aspect-[6/5]")) ?? ""
+/* The hero is banded now: the brain band declares the height and the box is
+   `h-full` inside it, so the canvas can never extend past the band into the
+   CTA strip below (e2e/hero-cta-clearance.spec.ts is the pixel guard). */
+const bandLine = hero.split("\n").find((l) => l.includes("sm:min-h-[min(")) ?? ""
 
 describe("hero brain stage sizing", () => {
-  it("sm+ box is at most one viewport tall and bound by viewport width", () => {
-    const m = /sm:h-\[min\((\d+)svh,(\d+)vw\)\]/.exec(boxLine)
-    expect(m, "sm+ brain box must be `sm:h-[min(<N>svh,<M>vw)]`").not.toBeNull()
+  it("the box takes its height from the band, never its own", () => {
+    expect(boxLine, "box must be h-full so the canvas cannot outgrow its band").toMatch(/\bh-full\b/)
+    expect(boxLine, "an independent height is how the canvas came to cover the CTAs").not.toMatch(/sm:h-\[/)
+  })
+
+  it("sm+ band is at most one viewport tall and bound by viewport width", () => {
+    const m = /sm:min-h-\[min\((\d+)svh,(\d+)vw\)\]/.exec(bandLine)
+    expect(m, "sm+ brain band must be `sm:min-h-[min(<N>svh,<M>vw)]`").not.toBeNull()
     expect(Number(m![1]), "taller than the section → hard-clipped foot").toBeLessThanOrEqual(100)
     expect(Number(m![2]), "must be bound by width or it runs off the sides").toBeLessThanOrEqual(75)
   })
@@ -47,11 +56,11 @@ describe("hero brain stage sizing", () => {
     // The phone tier is authored separately from sm+. It went through a
     // 112vw/64svh box (mesh ~40% of the viewport, lost), a 190vw one (the
     // owner could not scroll past it), a 120vw/56svh square (48%), and is now
-    // josephheupler.com's canvas measured on a phone: full width, a fixed
-    // 420px tall, mesh ~300px inside. Fixed px so the mesh is the same size
-    // on a 390 and a 430 wide phone, as his is. Details in
-    // __tests__/hero-mobile-layout.test.ts.
-    expect(boxLine).toContain("max-sm:h-[420px]")
+    // josephheupler.com's canvas measured on a phone: full width, 420px tall,
+    // mesh ~300px inside. Capped at half the viewport so a short handset
+    // (659px of usable height in a browser) doesn't get a 64%-tall mesh that
+    // shoves the CTA row onto the floating chat button.
+    expect(bandLine).toContain("min-h-[min(420px,50svh)]")
     expect(boxLine).toContain("max-sm:w-full")
     expect(boxLine, "vw-wide boxes are how the scroll trap shipped").not.toMatch(/max-sm:w-\[min\(\d+vw/)
   })
@@ -63,7 +72,18 @@ describe("hero brain stage sizing", () => {
 
   it("keeps the nav-clearance top padding on the section", () => {
     expect(hero).toMatch(/sm:pt-28/)
-    expect(hero).toMatch(/md:pt-36/)
+    // md:pt-28, down from pt-36: the banded hero spends its height on three
+    // stacked rows, and the extra 32px pushed the CTA row onto the scroll cue.
+    expect(hero).toMatch(/md:pt-28/)
+  })
+
+  it("no CTA is drawn inside the brain band", () => {
+    // The structural half of the "buttons are obscuring the brain" fix. The
+    // pixel half is e2e/hero-cta-clearance.spec.ts; this catches a refactor
+    // that folds HeroCTAs back into the copy stack without running a browser.
+    const band = /min-h-\[min\(420px,50svh\)\][\s\S]*?<\/div>\s*\n\s*\{\/\* CTA band/.exec(hero)?.[0] ?? ""
+    expect(band, "brain band must be followed by a separate CTA band").not.toBe("")
+    expect(band, "HeroCTAs must not render inside the brain band").not.toContain("<HeroCTAs")
   })
 
   it("mask fades the crown under the nav AND the foot into the stat row", () => {

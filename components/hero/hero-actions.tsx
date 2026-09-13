@@ -51,10 +51,11 @@ export function HeroCTAs() {
         </button>
       </div>
 
-      {/* Quiet row. The faint wash keeps 13px text legible where the brain
-          mesh is densest; it disappears into the page rather than reading as
-          a third box. */}
-      <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 rounded-full bg-background/45 px-5 py-1.5 backdrop-blur-sm">
+      {/* Quiet row. It used to carry a blurred wash so 13px text stayed
+          legible where the mesh was densest — the row sat on the brain. The
+          CTA band is below the mesh now (components/hero/index.tsx), so the
+          wash has nothing to do except read as a third box. */}
+      <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 px-5 py-1.5">
         <button type="button" data-weight="tertiary" onClick={() => navigateTo("#ai-expertise")} className={TERTIARY}>
           <BrainCircuit className="h-3.5 w-3.5 shrink-0" aria-hidden />
           View AI Expertise

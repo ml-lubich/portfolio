@@ -101,8 +101,17 @@ for (const vp of VIEWPORTS) {
     const share = h / vp.height
     const centreOffset = Math.abs((box.l + box.r) / 2 - vp.width / 2) / vp.width
 
-    expect(share, `mesh height share of viewport (${h.toFixed(0)}px)`).toBeGreaterThanOrEqual(0.78)
-    expect(share, `mesh height share of viewport (${h.toFixed(0)}px)`).toBeLessThanOrEqual(0.94)
+    /* 0.78–0.94 while the mesh was a full-bleed backdrop and the whole copy
+       stack — CTA pills included — was drawn on top of it. The hero is banded
+       now (components/hero/index.tsx): the brain owns the upper band outright
+       and the CTA row has its own strip underneath, which caps the mesh at
+       the height that still leaves that strip above the fold. Measured 0.54
+       at all four viewports; the band is the measurement ±0.06, and it still
+       rejects both the "brain shrank to a thumbnail" and the "brain went
+       full-bleed again" ships. e2e/hero-cta-clearance.spec.ts is the guard
+       that stops the mesh growing back over the buttons. */
+    expect(share, `mesh height share of viewport (${h.toFixed(0)}px)`).toBeGreaterThanOrEqual(0.48)
+    expect(share, `mesh height share of viewport (${h.toFixed(0)}px)`).toBeLessThanOrEqual(0.6)
     // The brain is not symmetric, so its silhouette centre wanders ±3% of the
     // viewport as it orbits; 5% still catches the "shifted left" ship.
     expect(centreOffset, "mesh centred horizontally").toBeLessThanOrEqual(0.05)
@@ -136,11 +145,18 @@ test("brain rotates at idle, responds to a drag, and resumes", async ({ page }) 
     .poll(async () => Math.abs((await readRot(page)) - r0), { message: "idle orbit advances", timeout: 6_000 })
     .toBeGreaterThanOrEqual(0.05)
 
-  // Drag on the mesh, away from the headline and CTAs (left lobe).
+  // Drag inside the canvas, below the copy and above the CTA band. Read off
+  // the live canvas rect rather than hard-coded page coordinates: the old
+  // (300, 450) was inside a full-bleed canvas and is outside the banded one,
+  // so the drag landed on the page and rotated nothing.
+  const canvasBox = (await page.locator(".hero-brain-underlay canvas").first().boundingBox())!
+  const dragY = canvasBox.y + canvasBox.height * 0.85
+  const dragX = canvasBox.x + canvasBox.width * 0.12
+
   const before = await readRot(page)
-  await page.mouse.move(300, 450)
+  await page.mouse.move(dragX, dragY)
   await page.mouse.down()
-  await page.mouse.move(560, 450, { steps: 12 })
+  await page.mouse.move(dragX + 260, dragY, { steps: 12 })
   await page.mouse.up()
   await expect
     .poll(async () => Math.abs((await readRot(page)) - before), { message: "drag rotates the brain", timeout: 4_000 })

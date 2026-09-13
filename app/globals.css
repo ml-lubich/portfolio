@@ -33,9 +33,17 @@
     /* Hero washes — applied as inline styles, so they must be vars to theme. */
     --hero-overlay: linear-gradient(rgba(4,5,10,0.80), rgba(4,5,10,0.80)), radial-gradient(ellipse 60% 50% at 50% 45%, rgba(8,10,18,0.35) 0%, transparent 100%);
     --hero-scrim: radial-gradient(ellipse 48% 32% at 50% 40%, rgba(6,8,14,0.78) 0%, rgba(6,8,14,0.5) 52%, transparent 82%), linear-gradient(to bottom, rgba(6,8,14,0.44) 0%, rgba(6,8,14,0.42) 30%, rgba(6,8,14,0.28) 46%, rgba(6,8,14,0.10) 60%, transparent 76%);
-    /* Centre wash behind the hero copy — dims the dense mesh so the type on
-       top of it stays readable without shrinking the brain. */
-    --hero-stage-scrim: radial-gradient(ellipse 50% 42% at 50% 48%, rgba(5,6,12,0.82) 0%, rgba(5,6,12,0.52) 48%, rgba(5,6,12,0.12) 74%, transparent 86%), linear-gradient(to bottom, rgba(5,6,12,0.45) 0%, transparent 22%, transparent 66%, rgba(5,6,12,0.6) 100%);
+    /* Centre wash behind the hero copy — the only layer that dims the mesh
+       (`--hero-scrim` is painted at z-[4], underneath the whole content
+       wrapper, so it never touches the brain). At 0.82 dead centre it took
+       the wireframe down to a grey blob: the "I still don't see it"
+       complaint. Two things let it come down to a haze: the CTA pills and the
+       blurred tertiary bar moved off the mesh entirely (components/hero), and
+       the copy that remains carries its own ink halo (.hero-copy-halo), which
+       is how josephheupler.com keeps type legible over a live wireframe. The
+       bottom band went with them — the band ends above the CTA strip now, so
+       there is no foot to fade. */
+    --hero-stage-scrim: radial-gradient(ellipse 54% 44% at 50% 50%, rgba(5,6,12,0.78) 0%, rgba(5,6,12,0.5) 46%, rgba(5,6,12,0.14) 72%, transparent 86%);
 
     /* Page-wide washes. These used to be hard-coded dark radials applied to
        <body> and .page-texture regardless of theme, which is what smeared the
@@ -152,7 +160,7 @@
     --accent-glow-soft: #2d84c657;
     /* Dark type on a pale mesh needs far less cover than white type on a
        dense white one — at the dark theme's strength the brain ghosted out. */
-    --hero-stage-scrim: radial-gradient(ellipse 52% 50% at 50% 44%, rgba(249,250,252,0.96) 0%, rgba(249,250,252,0.74) 48%, rgba(249,250,252,0.22) 74%, transparent 86%), linear-gradient(to bottom, rgba(249,250,252,0.45) 0%, transparent 22%, transparent 64%, rgba(249,250,252,0.65) 100%);
+    --hero-stage-scrim: radial-gradient(ellipse 52% 50% at 50% 44%, rgba(249,250,252,0.78) 0%, rgba(249,250,252,0.5) 48%, rgba(249,250,252,0.16) 74%, transparent 86%);
 
     /* Light: the same three pools, pitched pale and cool so the page keeps its
        depth without going muddy. */
@@ -820,6 +828,29 @@ body {
    near-black, so a white halo would only fog the page around it. */
 .light .hero-brain-underlay {
   filter: none;
+}
+
+/* Ink halo on the hero copy — josephheupler.com's `.hero-copy` technique.
+   The alternative is what this site used to do: dim the mesh under the type
+   with a near-opaque wash, which costs the brain its brightness everywhere,
+   not just behind the glyphs. A per-glyph shadow is local, so the wireframe
+   keeps reading between the words. */
+.hero-copy-halo {
+  text-shadow:
+    0 0 20px hsl(var(--background) / 0.95),
+    0 2px 28px hsl(var(--background) / 0.9),
+    0 0 60px hsl(var(--background) / 0.75);
+}
+
+/* The name is 72px on a desktop and sits over the densest part of the mesh,
+   so it needs a proportionally wider halo — a 20px blur under a 72px glyph is
+   a rim, not a backing. Same ratio josephheupler.com uses for its own h1. */
+.hero-copy-halo h1,
+.hero-copy-halo .no-metallic {
+  text-shadow:
+    0 0 26px hsl(var(--background) / 1),
+    0 4px 44px hsl(var(--background) / 0.96),
+    0 0 88px hsl(var(--background) / 0.85);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -3538,15 +3569,16 @@ article .blog-prose b a[href],
   :root {
     --hero-scrim: radial-gradient(ellipse 76% 40% at 50% 44%, rgba(6,8,14,0.93) 0%, rgba(6,8,14,0.74) 54%, rgba(6,8,14,0.32) 78%, transparent 92%),
       linear-gradient(to bottom, rgba(6,8,14,0.58) 0%, rgba(6,8,14,0.5) 30%, rgba(6,8,14,0.36) 50%, rgba(6,8,14,0.16) 68%, transparent 86%);
-    /* Radial only. The stage is now the copy's own height (not a screenful),
-       so a top/bottom linear band drew a visible rectangle around the wash. */
-    --hero-stage-scrim: radial-gradient(ellipse 78% 46% at 50% 48%, rgba(5,6,12,0.9) 0%, rgba(5,6,12,0.66) 50%, rgba(5,6,12,0.22) 76%, transparent 90%);
+    /* Radial only, and light: the CTA pills no longer sit on the mesh, so the
+       only thing this has to cover is the name / role / tagline — and those
+       carry .hero-copy-halo. At 0.9 it erased the brain on a handset. */
+    --hero-stage-scrim: radial-gradient(ellipse 78% 46% at 50% 48%, rgba(5,6,12,0.6) 0%, rgba(5,6,12,0.42) 50%, rgba(5,6,12,0.14) 76%, transparent 90%);
   }
 
   .light {
     --hero-scrim: radial-gradient(ellipse 76% 40% at 50% 44%, rgba(250,251,253,0.94) 0%, rgba(250,251,253,0.78) 54%, rgba(250,251,253,0.36) 78%, transparent 92%),
       linear-gradient(to bottom, rgba(250,251,253,0.62) 0%, rgba(250,251,253,0.54) 30%, rgba(250,251,253,0.4) 50%, rgba(250,251,253,0.18) 68%, transparent 86%);
-    --hero-stage-scrim: radial-gradient(ellipse 78% 46% at 50% 48%, rgba(250,251,253,0.92) 0%, rgba(250,251,253,0.7) 50%, rgba(250,251,253,0.26) 76%, transparent 90%);
+    --hero-stage-scrim: radial-gradient(ellipse 78% 46% at 50% 48%, rgba(250,251,253,0.74) 0%, rgba(250,251,253,0.52) 50%, rgba(250,251,253,0.2) 76%, transparent 90%);
   }
 
   .hero-brain-underlay canvas {
