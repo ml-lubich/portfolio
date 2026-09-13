@@ -9,14 +9,17 @@ import { AnimatedSection } from "../animations/animated-section"
 import { AnimatedCounter } from "../animations/animated-counter"
 import { SectionHeader } from "../layout/section-header"
 import { ShimmerOverlay } from "../ui/shimmer-overlay"
+import { TerminalReveal as TerminalRevealImpl } from "../terminal/terminal-reveal"
 import { lightGradients as lg, hex } from "@/lib/theme"
 
 /* memo: TerminalReveal's typing loop re-arms its timers on every render, so a
    parent re-render inside the ~300ms line pause cancels it and the typing
-   stalls at the end of a line. Stable props + memo keep re-renders out. */
-const TerminalReveal = memo(
-  dynamic(() => import("../terminal/terminal-reveal").then((mod) => mod.TerminalReveal), { ssr: false }),
-)
+   stalls at the end of a line. Stable props + memo keep re-renders out.
+   Static import, not dynamic({ ssr: false }): a client-only chunk mounted the
+   card (435px on a phone) AFTER the section was on screen, shoving everything
+   below it — the page "scrolling by itself". Its first render is deterministic
+   (typing starts from useInView), so SSR is safe and it lands at full height. */
+const TerminalReveal = memo(TerminalRevealImpl)
 
 const ParticleField = dynamic(
   () => import("../three/scene-backgrounds").then((mod) => mod.ParticleField),

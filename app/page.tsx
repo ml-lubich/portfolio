@@ -65,7 +65,8 @@ const Footer = dynamic(() => import("@/components/sections/footer").then(m => m.
 /* Each LazySection reserves a floor close to its real height per viewport
  * (`min-h-[phone] md:min-h-[desktop]`: the mounted WRAPPER's height — padding
  * and child margins included, not just the <section> — measured at 393px and
- * 1440px wide, then trimmed 2% so a slightly-shorter render never leaves a gap). A short floor is a page-height
+ * 1440px wide, rounded UP to 10px: any shortfall is a page-height jump on mount,
+ * while a few px of slack is invisible). A short floor is a page-height
  * jump on mount; before these, every section reserved 320px and the page grew
  * 16k px (desktop) / 24k px (phone) as the reader scrolled, which Safari —
  * no scroll anchoring — shows as the page scrolling by itself. Literal
@@ -88,49 +89,49 @@ export default function Home() {
         <LogoScroll />
 
         <ProfileIntro />
-        <LazySection className="min-h-[710px] md:min-h-[840px]">
+        <LazySection className="min-h-[730px] md:min-h-[870px]">
           <LiveTerminal />
         </LazySection>
-        <LazySection sectionId="ai-expertise" className={`min-h-[2540px] md:min-h-[2120px] ${LAZY_SECTION_TOP}`}>
+        <LazySection sectionId="ai-expertise" className={`min-h-[2630px] md:min-h-[2180px] ${LAZY_SECTION_TOP}`}>
           <AIExpertise />
         </LazySection>
-        <LazySection sectionId="about" className={`min-h-[2840px] md:min-h-[1420px] ${LAZY_SECTION_TOP}`}>
+        <LazySection sectionId="about" className={`min-h-[2940px] md:min-h-[1480px] ${LAZY_SECTION_TOP}`}>
           <About />
         </LazySection>
-        <LazySection sectionId="journey" className={`min-h-[3430px] md:min-h-[2530px] ${LAZY_SECTION_TOP}`}>
+        <LazySection sectionId="journey" className={`min-h-[3510px] md:min-h-[2590px] ${LAZY_SECTION_TOP}`}>
           <Journey />
         </LazySection>
-        <LazySection sectionId="consulting" className={`min-h-[1500px] md:min-h-[1460px] ${LAZY_SECTION_TOP}`}>
+        <LazySection sectionId="consulting" className={`min-h-[1540px] md:min-h-[1500px] ${LAZY_SECTION_TOP}`}>
           <ConsultingClients />
         </LazySection>
         <WorkMarquee />
-        <LazySection sectionId="testimonials" className={`min-h-[790px] md:min-h-[860px] ${LAZY_SECTION_TOP}`}>
+        <LazySection sectionId="testimonials" className={`min-h-[810px] md:min-h-[890px] ${LAZY_SECTION_TOP}`}>
           <ClientTestimonials />
         </LazySection>
         <LazySection
           sectionId="projects"
-          className={`min-h-[1620px] md:min-h-[1830px] border-t border-white/[0.06] ${LAZY_SECTION_TOP}`}
+          className={`min-h-[1660px] md:min-h-[1870px] border-t border-white/[0.06] ${LAZY_SECTION_TOP}`}
         >
           <Projects />
         </LazySection>
-        <LazySection sectionId="open-source" className={`min-h-[1320px] md:min-h-[1030px] ${LAZY_SECTION_TOP}`}>
+        <LazySection sectionId="open-source" className={`min-h-[1380px] md:min-h-[1060px] ${LAZY_SECTION_TOP}`}>
           <OpenSourceShowcase />
         </LazySection>
-        <LazySection sectionId="mac-demos" className={`min-h-[830px] md:min-h-[720px] ${LAZY_SECTION_TOP}`}>
+        <LazySection sectionId="mac-demos" className={`min-h-[850px] md:min-h-[750px] ${LAZY_SECTION_TOP}`}>
           <MacAppDemos />
         </LazySection>
-        <LazySection sectionId="skills" className={`min-h-[3330px] md:min-h-[1080px] ${LAZY_SECTION_TOP}`}>
+        <LazySection sectionId="skills" className={`min-h-[3410px] md:min-h-[1110px] ${LAZY_SECTION_TOP}`}>
           <Skills />
         </LazySection>
-        <LazySection sectionId="github" className={`min-h-[4010px] md:min-h-[2510px] ${LAZY_SECTION_TOP}`}>
+        <LazySection sectionId="github" className={`min-h-[4100px] md:min-h-[2570px] ${LAZY_SECTION_TOP}`}>
           <GitHubStats />
         </LazySection>
-        <LazySection sectionId="research" className={`min-h-[2290px] md:min-h-[2350px] ${LAZY_SECTION_TOP}`}>
+        <LazySection sectionId="research" className={`min-h-[2350px] md:min-h-[2400px] ${LAZY_SECTION_TOP}`}>
           <Publications />
         </LazySection>
         <LazySection
           sectionId="contact"
-          className={`min-h-[1150px] md:min-h-[770px] ${LAZY_SECTION_TOP}`}
+          className={`min-h-[1180px] md:min-h-[800px] ${LAZY_SECTION_TOP}`}
         >
           <Contact />
         </LazySection>

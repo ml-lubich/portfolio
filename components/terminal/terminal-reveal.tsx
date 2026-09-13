@@ -144,21 +144,25 @@ export function TerminalReveal({
                                     ) : isTypingThis ? (
                                         <>
                                             {lineText.slice(0, currentLineChars)}
-                                            {/* Blinking cursor */}
-                                            <span className="inline-block w-[7px] h-[1.1em] align-middle ml-px bg-emerald-400 animate-terminal-blink" />
+                                            {/* Blinking cursor. Zero-width in the line box: a 7px
+                                                inline cursor wrapped a near-full line onto a second
+                                                row while it typed, then unwrapped when it finished —
+                                                everything below the card bounced by a line each time. */}
+                                            <span className="relative inline-block w-0 align-middle">
+                                                <span className="absolute left-px top-1/2 h-[1.1em] w-[7px] -translate-y-1/2 bg-emerald-400 animate-terminal-blink" />
+                                            </span>
                                         </>
                                     ) : null}
                                 </span>
                             </div>
                         )
                     })}
-                    {/* Cursor on empty new line when done */}
-                    {done && (
-                        <div className="flex gap-2 mt-0.5">
-                            <span className="shrink-0 select-none text-emerald-400/80">{prompt}</span>
-                            <span className="inline-block w-[7px] h-[1.1em] align-middle bg-emerald-400 animate-terminal-blink" />
-                        </div>
-                    )}
+                    {/* Cursor on empty new line when done — the row is reserved from the
+                        first frame (visibility, not mount) so finishing never adds a line. */}
+                    <div className={`flex gap-2 mt-0.5 ${done ? "" : "invisible"}`} aria-hidden={!done}>
+                        <span className="shrink-0 select-none text-emerald-400/80">{prompt}</span>
+                        <span className="inline-block w-[7px] h-[1.1em] align-middle bg-emerald-400 animate-terminal-blink" />
+                    </div>
                 </div>
 
                 {/* Subtle inner glow on bottom-right */}

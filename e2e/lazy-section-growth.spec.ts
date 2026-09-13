@@ -42,22 +42,26 @@ test("mounting every section grows the document by at most a few hundred px", as
 
 test("sitting still mid-page, the content under the reader does not drift", async ({ page }) => {
   await page.goto("/", { waitUntil: "domcontentloaded" })
-  await page.waitForSelector("[data-lazy-loaded]")
+  await page.waitForSelector("[data-lazy-loaded]", { state: "attached" })
   await page.waitForTimeout(500)
   await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight * 0.5))
   await page.waitForTimeout(300)
-  const anchorTop = await page.evaluate(() => {
-    // Track the section wrapper under the reader, not the leaf element: the
-    // leaf may be an entrance-animated word whose own motion is not drift.
-    const leaf = document.elementFromPoint(innerWidth / 2, innerHeight / 2) as HTMLElement | null
-    const el = (leaf?.closest("[data-lazy-loaded], section") as HTMLElement | null) ?? leaf
-    ;(window as unknown as { __anchor: HTMLElement | null }).__anchor = el
-    return Math.round(el?.getBoundingClientRect().top ?? 0)
-  })
+  // Layout position of the block under the viewport centre, via the
+  // offsetTop chain: the section reveal animates transform (scale/translate),
+  // which moves getBoundingClientRect without moving any layout — only real
+  // layout movement counts here.
+  const layoutTop = `(() => {
+    const w = window;
+    if (!w.__anchor) {
+      const leaf = document.elementFromPoint(innerWidth / 2, innerHeight / 2);
+      w.__anchor = leaf && (leaf.closest("div, section, li, p, h2, h3") || leaf);
+    }
+    let el = w.__anchor, y = 0;
+    while (el) { y += el.offsetTop; el = el.offsetParent; }
+    return Math.round(y - scrollY);
+  })()`
+  const before = await page.evaluate<number>(layoutTop)
   await page.waitForTimeout(4000)
-  const drift = await page.evaluate(
-    (t) => Math.round(((window as unknown as { __anchor: HTMLElement | null }).__anchor?.getBoundingClientRect().top ?? 0) - t),
-    anchorTop,
-  )
-  expect(Math.abs(drift), "anchor drift while idle").toBeLessThanOrEqual(24)
+  const after = await page.evaluate<number>(layoutTop)
+  expect(Math.abs(after - before), `anchor moved ${before} -> ${after} while idle`).toBeLessThanOrEqual(24)
 })
