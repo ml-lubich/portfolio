@@ -175,23 +175,38 @@ test.describe("MLBot tool calls animate", () => {
         const spinner = running.locator('[data-mlbot-tool-state="running"]')
         await expect(spinner).toBeVisible()
 
-        // Animation, not just presence: ONE pinned element, sampled at two
-        // moments inside its own running window, must render differently.
-        const [a, b, ticked] = await spinner.evaluate(
+        // Animation, not just presence: ONE pinned element must render
+        // differently at two moments inside its own running window.
+        //
+        // This POLLS rather than taking a single fixed-delay snapshot. The
+        // original sampled transform once at +250ms, which passed alone and
+        // failed inside the full 205-test parallel run — under load the step
+        // can settle before the second sample lands, so the gate went red on a
+        // spinner that was working perfectly. A flaky gate is worse than no
+        // gate: it teaches everyone to re-run instead of read.
+        const moved = await spinner.evaluate(
             (el) =>
-                new Promise<[string, string, boolean]>((resolve) => {
+                new Promise<{ first: string; ticked: boolean; changed: boolean }>((resolve) => {
                     const first = getComputedStyle(el).transform
-                    const clock = el.getAnimations()[0]
-                    const t0 = Number(clock?.currentTime ?? 0)
-                    setTimeout(() => {
-                        const later = el.getAnimations()[0]
-                        resolve([first, getComputedStyle(el).transform, Number(later?.currentTime ?? 0) > t0])
-                    }, 250)
+                    const t0 = Number(el.getAnimations()[0]?.currentTime ?? 0)
+                    const deadline = performance.now() + 4000
+                    const poll = () => {
+                        const changed = getComputedStyle(el).transform !== first
+                        const ticked = Number(el.getAnimations()[0]?.currentTime ?? 0) > t0
+                        // Either signal is sufficient proof it is running; we
+                        // still require the element to have a transform at all.
+                        if ((changed && ticked) || performance.now() > deadline) {
+                            resolve({ first, ticked, changed })
+                            return
+                        }
+                        requestAnimationFrame(poll)
+                    }
+                    requestAnimationFrame(poll)
                 }),
         )
-        expect(a).not.toBe("none")
-        expect(a).not.toBe(b)
-        expect(ticked).toBe(true)
+        expect(moved.first).not.toBe("none")
+        expect(moved.changed, "spinner transform never changed — it is not animating").toBe(true)
+        expect(moved.ticked, "spinner animation clock never advanced").toBe(true)
 
         // Two sequential calls, each numbered, so progress is readable — and
         // sampled at the instant the second appears, the first has already
