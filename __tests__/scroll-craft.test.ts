@@ -32,17 +32,24 @@ describe("heroReleaseAt (pure)", () => {
     expect(heroReleaseAt(0, 900)).toEqual({ scale: 1, opacity: 1 })
   })
 
-  it("has receded and faded by one viewport of scroll", () => {
-    const { scale, opacity } = heroReleaseAt(900, 900)
-    expect(scale).toBeLessThanOrEqual(0.85)
-    expect(opacity).toBeLessThanOrEqual(0.15)
+  // Misha, 2026-09-13: "i dont want the brain to shrink as i scroll, it needs
+  // to stay the same". The release is a fade only now — the mesh holds full
+  // size the whole way down, so the next section arrives over a steady brain
+  // rather than a shrinking one.
+  it("never shrinks the brain, at any scroll depth", () => {
+    for (let y = 0; y <= 5000; y += 50) {
+      expect(heroReleaseAt(y, 900).scale).toBe(1)
+    }
   })
 
-  it("is monotonic and clamped past the hero", () => {
+  it("still fades out by one viewport of scroll", () => {
+    expect(heroReleaseAt(900, 900).opacity).toBeLessThanOrEqual(0.15)
+  })
+
+  it("fades monotonically and clamps past the hero", () => {
     let prev = heroReleaseAt(0, 900)
     for (let y = 50; y <= 1800; y += 50) {
       const cur = heroReleaseAt(y, 900)
-      expect(cur.scale).toBeLessThanOrEqual(prev.scale)
       expect(cur.opacity).toBeLessThanOrEqual(prev.opacity)
       prev = cur
     }

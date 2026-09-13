@@ -21,15 +21,20 @@ import { shouldUseCompactScrollStackViewport } from "@/lib/scroll-stack-layout"
 
 /** Scroll distance (as a fraction of the viewport) over which the brain fully recedes. */
 const RELEASE_SPAN_VH = 0.9
-const RELEASE_MIN_SCALE = 0.78
 const STATS_PARALLAX_RATE = 0.12
 export const HERO_STATS_PARALLAX_MAX_PX = 48
 
+/**
+ * The release is a fade, not a shrink. The mesh holds full size the whole way
+ * down so the next section arrives over a steady brain — scaling it read as the
+ * hero collapsing rather than handing off. `scale` stays in the return shape
+ * because the layer still writes a transform; it is simply always 1.
+ */
 export function heroReleaseAt(scrollY: number, viewportHeight: number) {
   const p = Math.min(Math.max(scrollY / (viewportHeight * RELEASE_SPAN_VH), 0), 1)
   const eased = p * p
   return {
-    scale: 1 - (1 - RELEASE_MIN_SCALE) * p,
+    scale: 1,
     opacity: 1 - Math.min(1, eased * 1.15),
   }
 }
