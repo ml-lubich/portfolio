@@ -25,10 +25,25 @@
 import { createHmac, randomBytes, timingSafeEqual } from "node:crypto"
 
 export const CHAT_LIMITS = {
-    /** Per-browser (signed cookie), generous — a real conversation is ~10 turns. */
-    cookie: { max: 25, windowMs: 60 * 60 * 1000 },
-    /** Per-IP floor. Tighter than the cookie limit: wiping cookies lands you here. */
-    ip: { max: 40, windowMs: 60 * 60 * 1000 },
+    /** Per-browser (signed cookie). A real conversation is ~10 turns, and Misha
+     *  asked for "10-15 per person" explicitly, so 12 is a full conversation
+     *  with headroom rather than a budget anyone bumps into by reading the site. */
+    cookie: { max: 12, windowMs: 60 * 60 * 1000 },
+    /** Per-IP ceiling, and the reason the cookie layer is worth anything.
+     *
+     *  This USED TO BE 40 against a cookie limit of 25, while the comment here
+     *  claimed it was "tighter than the cookie limit". It was the looser of the
+     *  two, so the cheapest attack in existence — clear cookies, reload — bought
+     *  15 extra requests. The bypass test passed the whole time because it only
+     *  asserted an IP ceiling EXISTS, never that reaching it cost more than the
+     *  cookie path did.
+     *
+     *  Now it genuinely is a ceiling: wiping cookies is worth 3 requests, not 15.
+     *  Kept marginally above the cookie limit on purpose — a shared NAT (an
+     *  office, a conference, a university) puts real distinct visitors behind one
+     *  address, and a hard equality would make the first person to hit 12 lock
+     *  out everyone beside them. */
+    ip: { max: 15, windowMs: 60 * 60 * 1000 },
     /** Short burst guard — stops a scripted hammer regardless of the hourly budget. */
     burst: { max: 5, windowMs: 20 * 1000 },
     /** Whole-site daily ceiling, sized to a ~$10/month OpenRouter budget.
