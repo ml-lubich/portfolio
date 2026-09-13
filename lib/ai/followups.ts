@@ -13,7 +13,8 @@
 
 export const FOLLOWUP_MARKER = "FOLLOWUPS:"
 
-/** Hard caps, enforced here rather than trusted to the prompt. */
+/** `max` is a hard cap on the count; `maxChars` only shortens the pill label
+ *  (see `clampFollowup`) — the full question is still what gets sent. */
 export const FOLLOWUP_LIMITS = {
     max: 3,
     maxChars: 52,
@@ -52,17 +53,19 @@ export class FollowupStream {
     }
 }
 
-/** Splits, trims and clamps the raw follow-up line. Never trusts the model's count. */
-/** Clamps to `maxChars` without splitting a word. A pill reading
- *  "…multi-agent pipeli…" looks broken; one that stops on a whole word does
- *  not. */
-function clamp(s: string): string {
+/** Display-only: shortens a pill LABEL to `maxChars` without splitting a
+ *  word. The question itself is never clamped — what the model wrote is what
+ *  gets sent when the pill is tapped. A pill reading "…multi-agent pipeli…"
+ *  looks broken; one that stops on a whole word does not. */
+export function clampFollowup(s: string): string {
     if (s.length <= FOLLOWUP_LIMITS.maxChars) return s
     const cut = s.slice(0, FOLLOWUP_LIMITS.maxChars)
     const lastSpace = cut.lastIndexOf(" ")
     return (lastSpace > 0 ? cut.slice(0, lastSpace) : cut).trimEnd() + "…"
 }
 
+/** Splits, trims and dedupes the raw follow-up line. Never trusts the model's
+ *  count — but does keep each question whole. */
 export function parseFollowups(raw: string): string[] {
     const seen = new Set<string>()
 
@@ -80,5 +83,4 @@ export function parseFollowups(raw: string): string[] {
             return true
         })
         .slice(0, FOLLOWUP_LIMITS.max)
-        .map(clamp)
 }

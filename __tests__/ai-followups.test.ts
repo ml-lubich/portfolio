@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import { FollowupStream, parseFollowups, FOLLOWUP_LIMITS } from "@/lib/ai/followups"
+import { FollowupStream, parseFollowups, clampFollowup, FOLLOWUP_LIMITS } from "@/lib/ai/followups"
 
 /** Feeds a full reply through the filter one chunk at a time, as SSE would. */
 function stream(chunks: string[]) {
@@ -20,9 +20,22 @@ describe("parseFollowups", () => {
         expect(parseFollowups(raw)).toHaveLength(FOLLOWUP_LIMITS.max)
     })
 
-    it("truncates an over-long suggestion instead of shipping it whole", () => {
-        const [only] = parseFollowups("x".repeat(500))
-        expect(only.length).toBeLessThanOrEqual(FOLLOWUP_LIMITS.maxChars + 1)
+    /* Tapping a pill sends the pill's value. Clamping the value here meant the
+     * model's "How does the Case Triage Agent's evidence gates decide…" was
+     * sent as the fragment "How does the Case Triage Agent's evidence gates…".
+     * The value stays whole; only the LABEL is shortened (clampFollowup). */
+    it("keeps a long follow-up whole so the full question is what gets sent", () => {
+        const long = "How does the Case Triage Agent's evidence gates decide which findings are strong enough to escalate"
+        const [only] = parseFollowups(long)
+        expect(only).toBe(long)
+        expect(only.endsWith("escalate")).toBe(true)
+        expect(only).not.toContain("…")
+    })
+
+    it("survives the SSE round-trip un-truncated", () => {
+        const long = "How does the Case Triage Agent's evidence gates decide which findings are strong enough to escalate"
+        const { followups } = stream(["Answer.\n\nFOLLOW", "UPS: ", long, " | Short one?"])
+        expect(followups[0]).toBe(long)
     })
 
     it("strips list numbering the model adds anyway", () => {
@@ -36,6 +49,19 @@ describe("parseFollowups", () => {
     it("returns nothing for empty or whitespace-only input", () => {
         expect(parseFollowups("")).toEqual([])
         expect(parseFollowups("   |  | ")).toEqual([])
+    })
+})
+
+describe("clampFollowup (display only)", () => {
+    it("shortens a label to maxChars on a word boundary with an ellipsis", () => {
+        const label = clampFollowup("How does the Case Triage Agent's evidence gates decide which findings escalate")
+        expect(label.length).toBeLessThanOrEqual(FOLLOWUP_LIMITS.maxChars + 1)
+        expect(label).toMatch(/[a-z]…$/)
+        expect(label).not.toMatch(/ …$/)
+    })
+
+    it("leaves a short label alone", () => {
+        expect(clampFollowup("Where has he worked?")).toBe("Where has he worked?")
     })
 })
 

@@ -431,10 +431,13 @@ describe("follow-up prompt", () => {
  * than a short one. Trim at a word boundary, and let the pill wrap instead of
  * hiding the tail behind an ellipsis. */
 describe("follow-up text is never cut mid-word", () => {
-    it("trims at a word boundary", async () => {
-        const { parseFollowups } = await import("@/lib/ai/followups")
+    // The clamp is the pill LABEL's, not the question's: parseFollowups keeps
+    // the model's text whole so tapping the pill sends the real question.
+    it("trims the label at a word boundary", async () => {
+        const { parseFollowups, clampFollowup } = await import("@/lib/ai/followups")
         const long = "What is inside the SynthData Forge multi agent pipeline exactly and why?"
-        const [only] = parseFollowups(long)
+        expect(parseFollowups(long)).toEqual([long])
+        const only = clampFollowup(long)
         expect(only.endsWith("…")).toBe(true)
         // The character before the ellipsis must end a word, not split one.
         // Whatever survives must be a whole-word prefix of the original —
