@@ -15,11 +15,11 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from "react"
-import { X, ArrowUp, ArrowUpToLine, Maximize2, Minimize2, Copy, Check, RotateCcw, Pencil, Square, MessageSquarePlus } from "lucide-react"
+import { X, ArrowUp, ArrowUpToLine, Maximize2, Minimize2, Copy, Check, RotateCcw, Pencil, Square, MessageSquarePlus, Loader2 } from "lucide-react"
 import { SiteLogoMark } from "@/components/site-logo-mark"
 import { BlogChart } from "@/components/blog/charts/blog-chart"
 import { splitChatSegments } from "@/lib/ai/chat-segments"
-import { clampFollowup } from "@/lib/ai/followups"
+import { clampFollowup, splitFollowup, type Followup } from "@/lib/ai/followups"
 import { isPinnedToBottom } from "@/lib/ai/chat-scroll"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
@@ -28,13 +28,19 @@ import { ChatChart, type ChartSpec } from "./chat-chart"
 import { BookingCard } from "./booking-card"
 import { BOOKING_URL, type BookingSpec } from "@/lib/ai/profile-tools"
 
+/** One tool call, as a step the reader can watch: it runs, then it settles. */
+interface ToolStep {
+    name: string
+    done: boolean
+}
+
 interface Turn {
     role: "user" | "assistant"
     content: string
     charts?: ChartSpec[]
-    tools?: string[]
+    tools?: ToolStep[]
     /** Model-suggested next questions, extracted from the same reply. */
-    followups?: string[]
+    followups?: Followup[]
     /** Calendar hand-off, when the visitor asked about working together. */
     booking?: BookingSpec
 }
@@ -122,6 +128,44 @@ const TOOL_LABELS: Record<string, string> = {
     request_consultation: "Opening the calendar",
 }
 
+/* One tool call, drawn as a numbered step. A static line made the panel look
+ * hung mid-answer; a spinner says the lookup is running, a tick says it came
+ * back, and the number keeps three sequential lookups from reading as one
+ * repeated sentence.
+ *
+ * Reduced motion stops the spin and says "running" in words instead — a still
+ * spinner on its own is exactly the frozen state this replaces. */
+function ToolStepRow({ name, done, index }: ToolStep & { index: number }) {
+    return (
+        <p
+            data-mlbot-tool
+            className={`mlbot-tool-in flex items-center gap-2 text-[13px] sm:text-[12px] ${done ? "text-muted-foreground/60" : "text-foreground/80"}`}
+        >
+            <span
+                className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border text-[10px] leading-none tabular-nums ${
+                    done ? "border-white/10 text-muted-foreground/50" : "border-[color:var(--accent-glow)] text-[color:var(--accent-glow)]"
+                }`}
+                aria-hidden
+            >
+                {index + 1}
+            </span>
+
+            {done ? (
+                <Check data-mlbot-tool-state="done" className="h-3.5 w-3.5 shrink-0 text-[color:var(--accent-glow)]/70" aria-hidden />
+            ) : (
+                <Loader2
+                    data-mlbot-tool-state="running"
+                    className="h-3.5 w-3.5 shrink-0 animate-spin text-[color:var(--accent-glow)] motion-reduce:animate-none"
+                    aria-hidden
+                />
+            )}
+
+            <span>{TOOL_LABELS[name]}</span>
+            {!done && <span className="hidden text-muted-foreground/70 motion-reduce:inline">— running</span>}
+        </p>
+    )
+}
+
 /* Shared chrome for the small per-message controls. Muted until hovered so
  * the row reads as metadata, not a toolbar. */
 /* Phone-first: 44px tall and 14px so a thumb can hit it and an eye can read
@@ -167,6 +211,15 @@ export function MLBot() {
     const scrollRef = useRef<HTMLDivElement>(null)
     const inputRef = useRef<HTMLTextAreaElement>(null)
     const abortRef = useRef<AbortController | null>(null)
+    /* `busy` is state, so two pills tapped in the same tick both read the
+     * pre-render `false` and both fire — which is how two answers ended up
+     * being written at once. The ref flips synchronously, so the second tap
+     * has nothing to do. It is a gate, not a queue: the tap is dropped. */
+    const busyRef = useRef(false)
+    /* Which conversation a stream belongs to. Closing the panel or starting a
+     * new chat bumps it, so a late frame from the old request can never write
+     * into what is on screen now. */
+    const runRef = useRef(0)
 
     // The launcher replaces the old back-to-top button, so it takes over that job
     // as a secondary control that appears once you've scrolled away from the hero.
@@ -204,10 +257,19 @@ export function MLBot() {
         return () => window.removeEventListener("keydown", onKey)
     }, [open])
 
+    // Closing the panel ends the answer it was writing. Without this the
+    // stream keeps arriving and lands in whatever conversation is open next.
+    useEffect(() => {
+        if (open) return
+        runRef.current++
+        abortRef.current?.abort()
+    }, [open])
+
     /** Aborts the in-flight stream; whatever has arrived stays on screen. */
     const stop = useCallback(() => abortRef.current?.abort(), [])
 
     const newChat = useCallback(() => {
+        runRef.current++
         stop()
         setTurns([])
         setInput("")
@@ -220,7 +282,11 @@ export function MLBot() {
     const send = useCallback(
         async (text: string, from?: number) => {
             const question = text.trim()
-            if (!question || busy) return
+            // One question at a time. A tap while an answer is streaming is
+            // dropped on the spot — nothing is queued behind it.
+            if (!question || busyRef.current) return
+            busyRef.current = true
+            const run = ++runRef.current
 
             setInput("")
             setEditing(null)
@@ -229,9 +295,16 @@ export function MLBot() {
             const history = [...turns.slice(0, from ?? turns.length), { role: "user" as const, content: question }]
             setTurns([...history, { role: "assistant", content: "", charts: [], tools: [] }])
 
-            /** Mutates only the in-flight assistant turn (always the last one). */
-            const patch = (fn: (t: Turn) => Turn) =>
+            /** Mutates only the in-flight assistant turn (always the last one),
+             *  and only while this run still owns the transcript. */
+            const patch = (fn: (t: Turn) => Turn) => {
+                if (runRef.current !== run) return
                 setTurns((prev) => prev.map((t, i) => (i === prev.length - 1 ? fn(t) : t)))
+            }
+
+            /** A lookup has returned once anything follows it. */
+            const settle = (t: Turn): Turn =>
+                t.tools?.some((s) => !s.done) ? { ...t, tools: t.tools.map((s) => ({ ...s, done: true })) } : t
 
             const controller = new AbortController()
             abortRef.current = controller
@@ -278,16 +351,26 @@ export function MLBot() {
                         }
 
                         if (event === "text") {
-                            patch((t) => ({ ...t, content: t.content + String(data) }))
+                            patch((t) => ({ ...settle(t), content: t.content + String(data) }))
                         } else if (event === "chart") {
-                            patch((t) => ({ ...t, charts: [...(t.charts ?? []), data as ChartSpec] }))
+                            patch((t) => ({ ...settle(t), charts: [...(t.charts ?? []), data as ChartSpec] }))
                         } else if (event === "tool") {
                             const name = (data as { name: string }).name
-                            patch((t) => ({ ...t, tools: [...(t.tools ?? []), name] }))
+                            // Settle FIRST, then append: the new step is the only
+                            // one still running.
+                            patch((t) => {
+                                const prev = settle(t)
+                                return { ...prev, tools: [...(prev.tools ?? []), { name, done: false }] }
+                            })
                         } else if (event === "booking") {
                             patch((t) => ({ ...t, booking: data as BookingSpec }))
                         } else if (event === "followups") {
-                            patch((t) => ({ ...t, followups: data as string[] }))
+                            // Wire form is a plain string, optionally `label :: question`.
+                            // An object pair is accepted too, so either server works.
+                            patch((t) => ({
+                                ...t,
+                                followups: (data as (string | Followup)[]).map((f) => (typeof f === "string" ? splitFollowup(f) : f)),
+                            }))
                         } else if (event === "error") {
                             patch((t) => ({ ...t, content: (data as { message: string }).message }))
                         }
@@ -304,10 +387,14 @@ export function MLBot() {
                 }
             } finally {
                 if (abortRef.current === controller) abortRef.current = null
+                // No lookup is still running once the stream is over, however
+                // it ended.
+                patch(settle)
+                busyRef.current = false
                 setBusy(false)
             }
         },
-        [busy, turns],
+        [turns],
     )
 
     /** Re-runs the last question, replacing its answer. */
@@ -423,8 +510,9 @@ export function MLBot() {
                                         <button
                                             key={s}
                                             type="button"
+                                            disabled={busy}
                                             onClick={() => send(s)}
-                                            className="min-h-11 max-w-full truncate rounded-full border border-white/[0.1] bg-white/[0.04] px-4 py-2 text-left text-[14px] text-muted-foreground transition-colors hover:border-white/20 hover:text-foreground sm:min-h-0 sm:px-3 sm:py-1.5 sm:text-[13px]"
+                                            className="min-h-11 max-w-full truncate rounded-full border border-white/[0.1] bg-white/[0.04] px-4 py-2 text-left text-[14px] text-muted-foreground transition-colors hover:border-white/20 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40 sm:min-h-0 sm:px-3 sm:py-1.5 sm:text-[13px]"
                                         >
                                             {s}
                                         </button>
@@ -476,7 +564,7 @@ export function MLBot() {
                                         </form>
                                     ) : (
                                         <>
-                                            <p className="max-w-[85%] overflow-hidden break-words rounded-2xl rounded-br-sm bg-white/[0.08] px-4 py-3 text-[16px] leading-[1.6] text-foreground sm:px-3.5 sm:py-2.5 sm:text-[15.5px]">
+                                            <p data-mlbot-role="user" className="max-w-[85%] overflow-hidden break-words rounded-2xl rounded-br-sm bg-white/[0.08] px-4 py-3 text-[16px] leading-[1.6] text-foreground sm:px-3.5 sm:py-2.5 sm:text-[15.5px]">
                                                 {turn.content}
                                             </p>
                                             {!busy && (
@@ -497,13 +585,8 @@ export function MLBot() {
                                     )
                                 ) : (
                                     <>
-                                        {turn.tools?.map((name, j) =>
-                                            TOOL_LABELS[name] ? (
-                                                <p key={j} className="mlbot-tool-in flex items-center gap-2 text-[13px] text-muted-foreground/70 sm:text-[12px]">
-                                                    <span className="mlbot-tick" aria-hidden />
-                                                    {TOOL_LABELS[name]}
-                                                </p>
-                                            ) : null,
+                                        {turn.tools?.map(({ name, done }, j) =>
+                                            TOOL_LABELS[name] ? <ToolStepRow key={j} name={name} done={done} index={j} /> : null,
                                         )}
 
                                         {turn.charts?.map((spec, j) => <ChatChart key={j} spec={spec} />)}
@@ -540,21 +623,27 @@ export function MLBot() {
                                             </div>
                                         ) : null}
 
-                                        {/* `q` is the model's whole question and is what gets sent.
-                                            Only the label is shortened — clamping the value used to
-                                            send "…evidence gates…" as the prompt. */}
-                                        {!busy && turn.followups?.length ? (
+                                        {/* A follow-up is a pair: the pill wears the short label,
+                                            tapping it asks `q.question` — the whole, well-formed
+                                            question, which is what lands in the transcript.
+
+                                            They stay mounted while an answer streams, disabled
+                                            rather than hidden: a pill that vanishes under a
+                                            thumb is why two of them got tapped at once. */}
+                                        {turn.followups?.length ? (
                                             <div className="flex flex-col items-start gap-1.5 pt-1">
                                                 {turn.followups.map((q) => (
                                                     <button
-                                                        key={q}
+                                                        key={q.question}
                                                         type="button"
-                                                        onClick={() => send(q)}
-                                                        title={q}
-                                                        aria-label={q}
-                                                        className="min-h-11 max-w-full rounded-2xl border border-white/[0.1] bg-white/[0.04] px-4 py-2 text-left text-[14px] leading-snug text-muted-foreground transition-colors hover:border-white/20 hover:text-foreground sm:min-h-0 sm:px-3 sm:py-1.5 sm:text-[13px]"
+                                                        data-mlbot-followup
+                                                        disabled={busy}
+                                                        onClick={() => send(q.question)}
+                                                        title={q.question}
+                                                        aria-label={q.question}
+                                                        className="min-h-11 max-w-full rounded-2xl border border-white/[0.1] bg-white/[0.04] px-4 py-2 text-left text-[14px] leading-snug text-muted-foreground transition-colors hover:border-white/20 hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-white/[0.1] disabled:hover:text-muted-foreground sm:min-h-0 sm:px-3 sm:py-1.5 sm:text-[13px]"
                                                     >
-                                                        {clampFollowup(q)}
+                                                        {clampFollowup(q.label)}
                                                     </button>
                                                 ))}
                                             </div>
@@ -584,13 +673,17 @@ export function MLBot() {
                             }}
                             rows={1}
                             maxLength={1000}
-                            placeholder="Ask about Misha…"
+                            /* Disabled while an answer streams: one question at a
+                               time, and the greyed field says so before a second
+                               one gets typed. */
+                            disabled={busy}
+                            placeholder={busy ? "MLBot is answering…" : "Ask about Misha…"}
                             aria-label="Message MLBot"
                             /* 16px, not 13: iOS zooms the page on focus below that, and the zoom
                                shrinks the layout viewport under this inset-0 panel — which is
                                what read as horizontal and vertical overflow. Declining the zoom
                                any other way means user-scalable=no, which fails WCAG 1.4.4. */
-                            className="max-h-28 min-h-[44px] min-w-0 flex-1 resize-none overflow-y-auto bg-transparent py-2 text-[16px] text-foreground border-0 outline-none focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 placeholder:text-muted-foreground/60"
+                            className="max-h-28 min-h-[44px] min-w-0 flex-1 resize-none overflow-y-auto bg-transparent py-2 text-[16px] text-foreground border-0 outline-none focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 disabled:cursor-not-allowed disabled:opacity-50 placeholder:text-muted-foreground/60"
                         />
                         {busy ? (
                             /* Send becomes Stop while streaming — one slot, no

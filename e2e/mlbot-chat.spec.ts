@@ -1,0 +1,245 @@
+import { test, expect, type Page } from "@playwright/test"
+
+/**
+ * ─── MLBot: one question at a time ────────────────────────────────────
+ *
+ * Two follow-up pills tapped in the same tick used to fire two requests:
+ * both handlers read the same pre-render `busy`, so two answers streamed
+ * into the transcript at once, tool lines interleaved. These are behaviour
+ * assertions against the real widget in a real browser — request COUNT and
+ * transcript CONTENT, not the presence of a guard.
+ *
+ * `/api/chat` is stubbed in the page before the app boots, so the run needs
+ * no API key and the stream's timing is scripted rather than hoped for.
+ */
+
+/** Frames the stub streams, as [delay from request start (ms), event, data]. */
+type Frame = [number, string, unknown]
+
+const FOLLOWUPS = [
+    "MCP architecture :: How is AigisQuery's MCP server laid out?",
+    "Eval gates :: What evidence gates does he put in front of a release?",
+]
+
+/** Long enough for a mid-stream tap to land, short enough to keep the suite quick. */
+const SCRIPT: Frame[] = [
+    [120, "tool", { name: "search_profile" }],
+    // A wide gap: the first step stays visibly running long enough to be
+    // sampled twice without the sampling racing the second step's mount.
+    [1500, "tool", { name: "get_projects" }],
+    [1900, "text", "He has shipped several agent systems. "],
+    [2100, "text", "AigisQuery is the one with an MCP server."],
+    [2200, "followups", FOLLOWUPS],
+]
+const SCRIPT_END = 2400
+
+async function stubChat(page: Page): Promise<void> {
+    await page.addInitScript(
+        ([script, end]: [Frame[], number]) => {
+            const w = window as unknown as { __chatCalls: string[][] }
+            w.__chatCalls = []
+            const realFetch = window.fetch.bind(window)
+
+            window.fetch = ((input: RequestInfo | URL, init?: RequestInit) => {
+                const url = typeof input === "string" ? input : input instanceof URL ? input.href : input.url
+                if (!url.includes("/api/chat")) return realFetch(input as RequestInfo, init)
+
+                const body = JSON.parse(String(init?.body ?? "{}")) as { messages: { content: string }[] }
+                w.__chatCalls.push(body.messages.map((m) => m.content))
+
+                const timers: number[] = []
+                const stream = new ReadableStream<Uint8Array>({
+                    start(controller) {
+                        const enc = new TextEncoder()
+                        let closed = false
+                        const stop = () => {
+                            closed = true
+                            timers.forEach(clearTimeout)
+                        }
+                        init?.signal?.addEventListener("abort", () => {
+                            if (closed) return
+                            stop()
+                            controller.error(new DOMException("Aborted", "AbortError"))
+                        })
+                        for (const [at, event, data] of script) {
+                            timers.push(
+                                window.setTimeout(() => {
+                                    if (closed) return
+                                    controller.enqueue(enc.encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`))
+                                }, at),
+                            )
+                        }
+                        timers.push(
+                            window.setTimeout(() => {
+                                if (closed) return
+                                stop()
+                                controller.close()
+                            }, end),
+                        )
+                    },
+                })
+
+                return Promise.resolve(new Response(stream, { status: 200, headers: { "Content-Type": "text/event-stream" } }))
+            }) as typeof window.fetch
+        },
+        [SCRIPT, SCRIPT_END] as [Frame[], number],
+    )
+}
+
+const calls = (page: Page) => page.evaluate(() => (window as unknown as { __chatCalls: string[][] }).__chatCalls.length)
+
+async function openPanel(page: Page): Promise<void> {
+    await page.goto("/")
+    await page.getByRole("button", { name: "Chat with MLBot" }).click()
+    await expect(page.getByRole("dialog", { name: "Chat with MLBot" })).toBeVisible()
+}
+
+async function ask(page: Page, question: string): Promise<void> {
+    await page.getByLabel("Message MLBot").fill(question)
+    await page.getByLabel("Send").click()
+}
+
+const userBubbles = (page: Page) => page.locator('[data-mlbot-role="user"]')
+const pills = (page: Page) => page.locator("[data-mlbot-followup]")
+const steps = (page: Page) => page.locator("[data-mlbot-tool]")
+
+test.describe("MLBot answers one question at a time", () => {
+    test.beforeEach(async ({ page }) => {
+        await stubChat(page)
+        await openPanel(page)
+    })
+
+    test("two follow-up pills tapped in the same tick fire exactly one request", async ({ page }) => {
+        await ask(page, "What has Misha built with agents?")
+        await expect(pills(page)).toHaveCount(2)
+        // The answer has landed: both pills are live, which is the state Misha
+        // was in when he tapped two of them.
+        await expect(page.getByLabel("Message MLBot")).toBeEnabled({ timeout: 10_000 })
+        expect(await calls(page)).toBe(1)
+
+        // Misha's report: two taps in quick succession, before any re-render.
+        await page.evaluate(() => {
+            const all = [...document.querySelectorAll<HTMLButtonElement>("[data-mlbot-followup]")]
+            all[0].click()
+            all[1].click()
+        })
+
+        // One new request, one new user message — the second tap is dropped,
+        // never queued. Waits out the whole stream so a queued send would
+        // have had every chance to fire.
+        await expect(userBubbles(page)).toHaveCount(2)
+        await page.waitForTimeout(SCRIPT_END + 400)
+        expect(await calls(page)).toBe(2)
+        await expect(userBubbles(page)).toHaveCount(2)
+    })
+
+    test("disables the composer and every pill while a reply is streaming", async ({ page }) => {
+        await ask(page, "What has Misha built with agents?")
+        await expect(pills(page)).toHaveCount(2)
+
+        await pills(page).first().click()
+        await expect(page.getByLabel("Message MLBot")).toBeDisabled()
+        await expect(pills(page).first()).toBeDisabled()
+        // Visibly so, not just semantically.
+        expect(await pills(page).first().evaluate((el) => Number(getComputedStyle(el).opacity))).toBeLessThan(1)
+
+        await expect(page.getByLabel("Message MLBot")).toBeEnabled({ timeout: 10_000 })
+    })
+
+    test("a stream started before the panel closed never writes into the next chat", async ({ page }) => {
+        await ask(page, "What has Misha built with agents?")
+        await expect(steps(page).first()).toBeVisible()
+
+        // The header control, not the launcher: on a phone the panel is
+        // inset-0 and covers the launcher entirely.
+        await page.getByRole("dialog", { name: "Chat with MLBot" }).getByLabel("Close MLBot").click()
+        await page.waitForTimeout(SCRIPT_END + 400)
+        await page.getByRole("button", { name: "Chat with MLBot" }).click()
+
+        // Whatever the closed conversation was doing, it is not still typing here.
+        await expect(page.getByText("Stopped.")).toHaveCount(0)
+        await expect(page.getByText("AigisQuery is the one with an MCP server.")).toHaveCount(0)
+    })
+})
+
+test.describe("MLBot tool calls animate", () => {
+    test.beforeEach(async ({ page }) => {
+        await stubChat(page)
+        await openPanel(page)
+    })
+
+    test("the running step moves, and each call reads as its own step", async ({ page }) => {
+        await ask(page, "What has Misha built with agents?")
+
+        const running = steps(page).nth(0)
+        const spinner = running.locator('[data-mlbot-tool-state="running"]')
+        await expect(spinner).toBeVisible()
+
+        // Animation, not just presence: ONE pinned element, sampled at two
+        // moments inside its own running window, must render differently.
+        const [a, b, ticked] = await spinner.evaluate(
+            (el) =>
+                new Promise<[string, string, boolean]>((resolve) => {
+                    const first = getComputedStyle(el).transform
+                    const clock = el.getAnimations()[0]
+                    const t0 = Number(clock?.currentTime ?? 0)
+                    setTimeout(() => {
+                        const later = el.getAnimations()[0]
+                        resolve([first, getComputedStyle(el).transform, Number(later?.currentTime ?? 0) > t0])
+                    }, 250)
+                }),
+        )
+        expect(a).not.toBe("none")
+        expect(a).not.toBe(b)
+        expect(ticked).toBe(true)
+
+        // Two sequential calls, each numbered, so progress is readable — and
+        // sampled at the instant the second appears, the first has already
+        // settled. Two spinners at once is the "wall of identical lines" this
+        // replaces.
+        const pair = await page
+            .waitForFunction(() => {
+                const rows = [...document.querySelectorAll("[data-mlbot-tool]")]
+                if (rows.length < 2) return null
+                return rows.map((r) => r.querySelector("[data-mlbot-tool-state]")?.getAttribute("data-mlbot-tool-state"))
+            }, null, { timeout: 10_000 })
+            .then((h) => h.jsonValue())
+        expect(pair).toEqual(["done", "running"])
+
+        await expect(steps(page)).toHaveCount(2, { timeout: 5_000 })
+        await expect(steps(page).nth(0)).toContainText("Searching the profile")
+        await expect(steps(page).nth(1)).toContainText("Pulling up projects")
+
+        // …and both settle when the answer lands.
+        await expect(page.locator('[data-mlbot-tool-state="running"]')).toHaveCount(0, { timeout: 10_000 })
+        await expect(page.locator('[data-mlbot-tool-state="done"]')).toHaveCount(2)
+    })
+
+    test("reduced motion keeps the step legible and explicitly running, never frozen", async ({ page }) => {
+        await page.emulateMedia({ reducedMotion: "reduce" })
+        await ask(page, "What has Misha built with agents?")
+
+        const running = steps(page).filter({ has: page.locator('[data-mlbot-tool-state="running"]') }).first()
+        await expect(running).toBeVisible()
+        await expect(running).toContainText(/running/i)
+        await expect(page.locator('[data-mlbot-tool-state="done"]').first()).toBeVisible({ timeout: 10_000 })
+    })
+})
+
+test.describe("MLBot follow-up pills", () => {
+    test.beforeEach(async ({ page }) => {
+        await stubChat(page)
+        await openPanel(page)
+    })
+
+    test("shows a short label but asks the full question", async ({ page }) => {
+        await ask(page, "What has Misha built with agents?")
+        await expect(pills(page)).toHaveCount(2)
+
+        const label = (await pills(page).first().innerText()).trim()
+        expect(label).toBe("MCP architecture")
+
+        await pills(page).first().click()
+        await expect(userBubbles(page).nth(1)).toHaveText("How is AigisQuery's MCP server laid out?")
+    })
+})
