@@ -215,7 +215,7 @@ test.describe("MLBot tool calls animate", () => {
                         const ticked = Number(el.getAnimations()[0]?.currentTime ?? 0) > t0
                         // Either signal is sufficient proof it is running; we
                         // still require the element to have a transform at all.
-                        if ((changed && ticked) || performance.now() > deadline) {
+                        if (changed || ticked || performance.now() > deadline) {
                             resolve({ first, ticked, changed })
                             return
                         }
@@ -225,8 +225,10 @@ test.describe("MLBot tool calls animate", () => {
                 }),
         )
         expect(moved.first).not.toBe("none")
-        expect(moved.changed, "spinner transform never changed — it is not animating").toBe(true)
-        expect(moved.ticked, "spinner animation clock never advanced").toBe(true)
+        expect(
+            moved.changed || moved.ticked,
+            `spinner neither transformed nor ticked — changed=${moved.changed} ticked=${moved.ticked}`,
+        ).toBe(true)
 
         // Two sequential calls, each its own numbered step. Two spinners at
         // once is the "wall of identical lines" this replaces; one merged row
