@@ -846,6 +846,15 @@ body {
   filter:
     drop-shadow(0 0 7px hsl(var(--background) / 0.95))
     drop-shadow(0 1px 16px hsl(var(--background) / 0.88))
+    drop-shadow(0 0 38px hsl(var(--background) / 0.65))
+    drop-shadow(0 0 34px rgba(255, 255, 255, 0.32))
+    drop-shadow(0 0 72px rgba(255, 255, 255, 0.14));
+}
+
+.light .hero-copy-halo {
+  filter:
+    drop-shadow(0 0 7px hsl(var(--background) / 0.95))
+    drop-shadow(0 1px 16px hsl(var(--background) / 0.88))
     drop-shadow(0 0 38px hsl(var(--background) / 0.65));
 }
 
@@ -964,13 +973,16 @@ body {
   }
 }
 
-/* Phones: no mask. The box is a fixed 420px canvas sitting well under the nav
-   (josephheupler.com's, which draws the crown in full), so the nav-seam fade
-   has nothing to soften and would only eat the top of the mesh. */
+/* Phones: josephheupler.com's .brain-glow override. The 92vh desktop box
+   is the whole handset; min(54svh, 420px) × min(132%, 470px) is his phone
+   canvas. Written in CSS because `h-[min(54svh,420px)]` silently failed to
+   emit a rule in the reference build. No mask — the crown is drawn in full. */
 @media (max-width: 639px) {
   .hero-brain-underlay {
     -webkit-mask-image: none;
     mask-image: none;
+    height: min(54svh, 420px) !important;
+    width: min(132%, 470px) !important;
   }
 }
 
@@ -3316,6 +3328,11 @@ article .blog-prose b a[href],
 .oss-signal {
   stroke-dasharray: 4 44;
   animation: oss-signal-run 2.8s linear infinite;
+}
+
+.oss-install,
+.oss-install-all {
+  user-select: all;
 }
 
 @keyframes oss-node-glow {

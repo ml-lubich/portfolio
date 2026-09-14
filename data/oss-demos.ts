@@ -166,7 +166,7 @@ export const ossDemos: OssDemo[] = [
     {
         id: "twig",
         repoUrl: "https://github.com/ml-lubich/twig",
-        install: "git clone https://github.com/ml-lubich/twig",
+        install: "pipx install twig-cli",
         tagline: "Agent-first Git worktree CLI with a Rust hot path",
         badge: "Rust core",
         demo: [
@@ -200,6 +200,7 @@ export const ossDemos: OssDemo[] = [
     {
         id: "like-fable",
         repoUrl: "https://github.com/ml-lubich/like-fable",
+        install: "git clone https://github.com/ml-lubich/like-fable",
         tagline: "Portable, model-agnostic prompt library for agent operating behavior",
         demo: [
             { t: "cmd", s: "ls modules/" },
@@ -212,4 +213,84 @@ export const ossDemos: OssDemo[] = [
             { label: "Models supported", value: "Any" },
         ],
     },
+    {
+        id: "jenkins-mcp",
+        repoUrl: "https://github.com/ml-lubich/jenkins-mcp",
+        packageUrl: "https://pypi.org/project/jenkins-mcp-cli/",
+        install: "pip install jenkins-mcp-cli",
+        tagline: "Jenkins CLI + MCP so an agent can triage CI without a Jenkins shell",
+        demo: [
+            { t: "cmd", s: "jenkins-mcp jenkins_list_jobs" },
+            { t: "out", s: "ingest-worker  #96 FAILURE   4m ago" },
+            { t: "cmd", s: "jenkins-mcp jenkins_build_log_tail --job ingest-worker" },
+            { t: "out", s: "pytest tests/test_backfill.py::test_resume — FAILED" },
+        ],
+        stats: [
+            { label: "Surfaces", value: "CLI + MCP" },
+            { label: "Distribution", value: "PyPI" },
+        ],
+    },
+    {
+        id: "pdfify-md",
+        repoUrl: "https://github.com/ml-lubich/pdfify-md",
+        install: "npm i -g pdfify-md",
+        tagline: "Markdown and Mermaid to a print-ready PDF, no native compile step",
+        demo: [
+            { t: "cmd", s: "pdfify-md README.md --out README.pdf" },
+            { t: "out", s: "wrote README.pdf  ·  6 pages  ·  2 mermaid diagrams" },
+        ],
+        stats: [
+            { label: "Install", value: "npm i -g" },
+            { label: "Type", value: "CLI" },
+        ],
+    },
 ]
+
+/** One copy-pasteable block: brew / pip / pipx / npm / git, derived from the cards. */
+export function ossInstallAll(): string {
+    const lines: string[] = []
+
+    const brewPkgs = packagesOf("brew install ")
+    if (brewPkgs.length) {
+        const tap = brewPkgs.filter((p) => p.startsWith("ml-lubich/tap/"))
+        const rest = brewPkgs.filter((p) => !p.startsWith("ml-lubich/tap/"))
+        if (tap.length) {
+            const short = tap.map((p) => p.slice("ml-lubich/tap/".length))
+            lines.push(
+                short.length === 1
+                    ? `brew install ml-lubich/tap/${short[0]}`
+                    : `brew install ml-lubich/tap/{${short.join(",")}}`,
+            )
+        }
+        if (rest.length) lines.push(`brew install ${rest.join(" ")}`)
+    }
+
+    const pipPkgs = packagesOf("pip install ")
+    if (pipPkgs.length) lines.push(`pip install ${pipPkgs.join(" ")}`)
+
+    const pipxPkgs = packagesOf("pipx install ")
+    if (pipxPkgs.length) lines.push(`pipx install ${pipxPkgs.join(" ")}`)
+
+    const npmPkgs = [
+        ...packagesOf("npm i -g "),
+        ...packagesOf("npm install -g "),
+    ]
+    if (npmPkgs.length) lines.push(`npm i -g ${npmPkgs.join(" ")}`)
+
+    for (const demo of ossDemos) {
+        if (demo.install?.startsWith("git clone ")) lines.push(demo.install)
+    }
+
+    return lines.join("\n")
+}
+
+function packagesOf(prefix: string): string[] {
+    const pkgs: string[] = []
+    for (const demo of ossDemos) {
+        if (!demo.install?.startsWith(prefix)) continue
+        for (const pkg of demo.install.slice(prefix.length).split(/\s+/).filter(Boolean)) {
+            if (!pkgs.includes(pkg)) pkgs.push(pkg)
+        }
+    }
+    return pkgs
+}

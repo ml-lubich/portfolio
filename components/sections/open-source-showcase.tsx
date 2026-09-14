@@ -19,7 +19,11 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import {
   BookOpen,
+  Check,
+  Copy,
+  Factory,
   FileStack,
+  FileText,
   GitBranch,
   GitPullRequest,
   Mail,
@@ -32,7 +36,7 @@ import { DetailPanel } from "../detail-panel"
 import { SectionHeader } from "../layout/section-header"
 import { OssDemoCard } from "./oss-demo-card"
 import { ossAccent } from "@/lib/theme"
-import { ossDemos } from "@/data/oss-demos"
+import { ossDemos, ossInstallAll } from "@/data/oss-demos"
 import { projects } from "@/data/projects"
 
 /** Seconds each tool holds the panel before the rail advances on its own */
@@ -47,6 +51,8 @@ const TOOL_ICON: Record<string, typeof Terminal> = {
   twig: GitBranch,
   "confluence-cli": FileStack,
   "like-fable": BookOpen,
+  "jenkins-mcp": Factory,
+  "pdfify-md": FileText,
 }
 
 export function OpenSourceShowcase() {
@@ -54,8 +60,10 @@ export function OpenSourceShowcase() {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   /** Set once the visitor picks a tool — the rail then stops auto-advancing. */
   const [pinned, setPinned] = useState(false)
+  const [copiedAll, setCopiedAll] = useState(false)
   const sectionRef = useRef<HTMLElement>(null)
   const onScreenRef = useRef(false)
+  const installAll = ossInstallAll()
 
   const selected = projects.find((p) => p.id === selectedId) ?? null
   const isOpen = selected !== null
@@ -100,6 +108,13 @@ export function OpenSourceShowcase() {
     setActiveId(id)
   }, [])
 
+  const copyAll = useCallback(() => {
+    navigator.clipboard.writeText(installAll).then(() => {
+      setCopiedAll(true)
+      window.setTimeout(() => setCopiedAll(false), 1600)
+    })
+  }, [installAll])
+
   return (
     <section ref={sectionRef} id="open-source" className="relative scroll-mt-24 section-y">
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
@@ -123,6 +138,26 @@ export function OpenSourceShowcase() {
           <span className="gradient-text">tokenmaxxing</span>
         </p>
 
+        <div className="oss-install-all mb-6 overflow-hidden rounded-2xl border border-white/[0.12] bg-black/40">
+          <div className="flex items-center justify-between gap-3 border-b border-white/[0.08] px-3 py-2 sm:px-4">
+            <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground/70">
+              Copy-paste install
+            </p>
+            <button
+              type="button"
+              onClick={copyAll}
+              aria-label={`Copy all install commands: ${installAll}`}
+              className="inline-flex items-center gap-1.5 rounded-md border border-white/[0.12] bg-white/[0.04] px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-foreground/80 transition-colors hover:border-primary/40 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary/60"
+            >
+              {copiedAll ? <Check className="h-3 w-3 text-emerald-400" aria-hidden /> : <Copy className="h-3 w-3" aria-hidden />}
+              {copiedAll ? "Copied" : "Copy all"}
+            </button>
+          </div>
+          <pre className="oss-install-all select-all overflow-x-auto px-3 py-3 sm:px-4">
+            <code className="font-mono text-[12px] leading-6 text-foreground/90 sm:text-[13px]">{installAll}</code>
+          </pre>
+        </div>
+
         {/* Tool rail — glyph tiles, one active */}
         <ul
           className="mb-5 flex flex-wrap justify-center gap-2"
@@ -141,10 +176,10 @@ export function OpenSourceShowcase() {
                   type="button"
                   onClick={() => pick(demo.id)}
                   aria-pressed={isActive}
-                  className={`relative inline-flex items-center gap-1.5 overflow-hidden rounded-lg border px-2.5 py-1.5 font-mono text-[10px] uppercase tracking-[0.12em] transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary/60 ${
+                  className={`relative inline-flex items-center gap-1.5 overflow-hidden rounded-lg border px-3 py-2 font-mono text-[11px] uppercase tracking-[0.12em] transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary/60 ${
                     isActive
-                      ? "border-white/35 bg-white/[0.10] text-foreground"
-                      : "border-white/[0.08] bg-white/[0.02] text-muted-foreground/55 hover:border-white/25 hover:text-foreground/85"
+                      ? "border-white/40 bg-white/[0.12] text-foreground"
+                      : "border-white/[0.10] bg-white/[0.03] text-muted-foreground/70 hover:border-white/30 hover:text-foreground"
                   }`}
                 >
                   <Icon className="h-3.5 w-3.5 shrink-0" aria-hidden />

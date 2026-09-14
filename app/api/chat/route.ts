@@ -13,6 +13,13 @@ import { runTool, TOOL_SCHEMAS, SYSTEM_PROMPT } from "@/lib/ai/profile-tools"
 import { checkRateLimit, clientIp, buildCookie, acquireSlot, COOKIE_NAME } from "@/lib/ai/rate-limit"
 import { FollowupStream } from "@/lib/ai/followups"
 import { ToolMemo } from "@/lib/ai/tool-memo"
+import {
+    emptyStreamState,
+    finalizeAssistantTurn,
+    formatCascadeFailure,
+    ingestCompletionChunk,
+    type CascadeAttempt,
+} from "@/lib/ai/chat-stream"
 
 export const runtime = "nodejs"
 export const maxDuration = 60
@@ -132,12 +139,20 @@ function runAgent(history: ChatMessage[], apiKey: string, release: () => void): 
                 /* Scoped to this request: one conversation's lookups, so a
                    later question still gets fresh data. */
                 const memo = new ToolMemo()
+                const toolPayloads: string[] = []
 
                 for (let round = 0; round < LIMITS.maxToolRounds; round++) {
                     const reply = await callModel(messages, apiKey, send)
+                    const decision = finalizeAssistantTurn(
+                        { content: reply.content, tool_calls: reply.tool_calls, followups: reply.followups },
+                        toolPayloads,
+                    )
 
-                    // No tool calls means the model produced its final answer.
-                    if (!reply.tool_calls?.length) {
+                    // Tools keep the loop going. A silent final after a lookup
+                    // is not success — write a grounded fallback instead of
+                    // `done` with an empty bubble (live 2026-09-14).
+                    if (decision.kind !== "tools") {
+                        if (decision.kind === "fallback") send("text", decision.text)
                         if (reply.followups?.length) send("followups", reply.followups)
                         send("done", {})
                         controller.close()
@@ -146,7 +161,7 @@ function runAgent(history: ChatMessage[], apiKey: string, release: () => void): 
 
                     messages.push(reply)
 
-                    for (const call of reply.tool_calls) {
+                    for (const call of reply.tool_calls ?? []) {
                         const args = safeParseArgs(call.function.arguments)
 
                         /* A repeat is served from memory. maxToolRounds caps
@@ -181,6 +196,7 @@ function runAgent(history: ChatMessage[], apiKey: string, release: () => void): 
 
                         const serialized = JSON.stringify(result).slice(0, 6000)
                         memo.remember(call.function.name, args, serialized)
+                        toolPayloads.push(serialized)
                         messages.push({
                             role: "tool",
                             tool_call_id: call.id,
@@ -218,10 +234,9 @@ async function callModel(
 
     const decoder = new TextDecoder()
     let buffer = ""
-    let content = ""
     // Strips the trailing FOLLOWUPS: line before any of it reaches the client.
     const followupFilter = new FollowupStream()
-    const toolCalls = new Map<number, ToolCall>()
+    const state = emptyStreamState()
 
     for (;;) {
         const { done, value } = await reader.read()
@@ -236,31 +251,19 @@ async function callModel(
             const payload = line.slice(6).trim()
             if (payload === "[DONE]") continue
 
-            let delta: Record<string, unknown>
+            let parsed: unknown
             try {
-                const parsed = JSON.parse(payload)
-                delta = parsed?.choices?.[0]?.delta ?? {}
+                parsed = JSON.parse(payload)
             } catch {
                 continue
             }
 
-            if (typeof delta.content === "string" && delta.content) {
-                content += delta.content
-                const visible = followupFilter.push(delta.content)
+            const before = state.content
+            ingestCompletionChunk(state, parsed)
+            const added = state.content.slice(before.length)
+            if (added) {
+                const visible = followupFilter.push(added)
                 if (visible) send("text", visible)
-            }
-
-            // Tool calls stream in fragments keyed by index; stitch them back together.
-            for (const frag of (delta.tool_calls as ToolCallFragment[] | undefined) ?? []) {
-                const existing = toolCalls.get(frag.index) ?? {
-                    id: "",
-                    type: "function" as const,
-                    function: { name: "", arguments: "" },
-                }
-                if (frag.id) existing.id = frag.id
-                if (frag.function?.name) existing.function.name = frag.function.name
-                if (frag.function?.arguments) existing.function.arguments += frag.function.arguments
-                toolCalls.set(frag.index, existing)
             }
         }
     }
@@ -268,25 +271,19 @@ async function callModel(
     const { tail, followups } = followupFilter.finish()
     if (tail) send("text", tail)
 
-    const calls = [...toolCalls.values()].filter((c) => c.function.name)
+    const calls = [...state.toolCalls.values()].filter((c) => c.function.name)
     return {
         role: "assistant",
         // The model's own transcript keeps the raw text; only the user's view is filtered.
-        content,
+        content: state.content,
         ...(calls.length ? { tool_calls: calls } : {}),
         ...(followups.length ? { followups } : {}),
     }
 }
 
-interface ToolCallFragment {
-    index: number
-    id?: string
-    function?: { name?: string; arguments?: string }
-}
-
 /** Tries each model in order; a model being down or rate-limited moves to the next. */
 async function fetchWithFallback(messages: ChatMessage[], apiKey: string): Promise<Response> {
-    let lastError = "No model responded."
+    const attempts: CascadeAttempt[] = []
 
     for (const model of MODELS) {
         const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -312,10 +309,10 @@ async function fetchWithFallback(messages: ChatMessage[], apiKey: string): Promi
         })
 
         if (res.ok && res.body) return res
-        lastError = `${model}: ${res.status} ${(await res.text()).slice(0, 200)}`
+        attempts.push({ model, status: res.status, body: (await res.text()).slice(0, 200) })
     }
 
-    throw new Error(lastError)
+    throw new Error(formatCascadeFailure(attempts))
 }
 
 /* ── Input handling ──────────────────────────────────────────────────── */

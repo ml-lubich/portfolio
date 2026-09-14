@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import { runTool, TOOL_SCHEMAS, SYSTEM_PROMPT, type ChartSpec } from "@/lib/ai/profile-tools"
+import { runTool, TOOL_SCHEMAS, SYSTEM_PROMPT, searchTerms, type ChartSpec } from "@/lib/ai/profile-tools"
 
 /* The model can only answer as well as these tools resolve. If a tool returns
  * nothing, MLBot's fallback is to invent — so empty results are the failure. */
@@ -81,6 +81,40 @@ describe("search", () => {
         expect(matches.length).toBeGreaterThan(0)
     })
 
+    it("strips question words so the visitor question searches as 'agent'", () => {
+        expect(searchTerms("What has Misha built with agents?")).toEqual(["agents", "agent"])
+    })
+
+    it("answers the visitor question about agents without needing the exact plural", () => {
+        /* Production 2026-09-14: "What has Misha built with agents?" called
+         * search_profile then get_projects and streamed `done` with no text.
+         * Part of that is the empty-final path; part is the lookup itself.
+         * "agents" is not a substring of "agent" or "agentic", so Case Triage
+         * Agent / AI Invoice Agent never ranked. Stopwords must not drown the
+         * one useful term, and the stem must hit those names. */
+        const { matches } = runTool("search_profile", {
+            query: "What has Misha built with agents?",
+        }) as { matches: { kind: string; name?: string; role?: string; title?: string }[] }
+        expect(matches.length).toBeGreaterThan(0)
+        const haystack = JSON.stringify(matches).toLowerCase()
+        expect(haystack).toMatch(/agent/)
+        expect(
+            matches.some((m) => /agent|mcp|imsg|imail|aigis/i.test(`${m.name ?? ""} ${m.role ?? ""} ${m.title ?? ""}`)),
+            `agent work missing from ${JSON.stringify(matches.map((m) => m.name ?? m.role ?? m.title))}`,
+        ).toBe(true)
+    })
+
+    it("get_projects('agents') still returns agent-named work, not an empty tech-tag miss", () => {
+        /* Production 2026-09-14: the model called get_projects with tag
+         * "agents". Tech tags say "Agentic AI" / "AI-agents", and
+         * "agentic ai".includes("agents") is false, so the lookup came back
+         * empty and the cascade had nothing to say. Stem the tag and search
+         * name + summary, not just the tag list. */
+        const { projects } = runTool("get_projects", { tag: "agents" }) as { projects: { name: string }[] }
+        expect(projects.length).toBeGreaterThan(0)
+        expect(projects.some((p) => /agent/i.test(p.name))).toBe(true)
+    })
+
     it("returns empty rather than everything for a nonsense query", () => {
         const { matches } = runTool("search_profile", { query: "zzzzqqqxyzzy" }) as { matches: unknown[] }
         expect(matches).toHaveLength(0)
@@ -139,5 +173,11 @@ describe("system prompt", () => {
     it("instructs the model to ground answers in tools rather than invent", () => {
         expect(SYSTEM_PROMPT).toMatch(/never invent/i)
         expect(SYSTEM_PROMPT).toMatch(/tool/i)
+    })
+
+    it("tells the model to write the answer after the first lookup, not loop tools into silence", () => {
+        expect(SYSTEM_PROMPT).toMatch(/after a tool returns/i)
+        expect(SYSTEM_PROMPT).toMatch(/do not call the same tool twice/i)
+        expect(SYSTEM_PROMPT).toMatch(/empty reply after tools is a failure/i)
     })
 })

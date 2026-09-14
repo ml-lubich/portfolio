@@ -7,7 +7,7 @@
 import { describe, it, expect } from "vitest"
 import https from "https"
 import http from "http"
-import { ossDemos } from "@/data/oss-demos"
+import { ossDemos, ossInstallAll } from "@/data/oss-demos"
 import { projects } from "@/data/projects"
 
 // Mirrors the spec's "Public OSS set" — the only ids eligible for the showcase.
@@ -20,6 +20,8 @@ const ALLOWED_PUBLIC_IDS = new Set([
   "twig",
   "confluence-cli",
   "like-fable",
+  "jenkins-mcp",
+  "pdfify-md",
   "imessage-exporter",
   "synthdata-forge",
   "multimodal-captcha-solver",
@@ -163,12 +165,47 @@ const INSTALL_COMMAND_RE =
   /^(brew install |pip install |pipx install |npm (?:i|install) -g |git clone )\S/
 
 describe("oss-demos install commands + package links", () => {
+  it("every entry ships a copy-pasteable install — no card without a command", () => {
+    for (const demo of ossDemos) {
+      expect(demo.install, `'${demo.id}' is missing an install command`).toBeTruthy()
+      expect(demo.install!.trim().length).toBeGreaterThan(0)
+      expect(
+        INSTALL_COMMAND_RE.test(demo.install!),
+        `install command '${demo.install}' in '${demo.id}' doesn't match a real package-manager syntax`,
+      ).toBe(true)
+    }
+  })
+
+  it("twig installs from PyPI, not a git clone", () => {
+    const twig = ossDemos.find((d) => d.id === "twig")
+    expect(twig?.install).toBe("pipx install twig-cli")
+  })
+
+  it("covers the GitHub-profile tool set: jenkins-mcp and pdfify-md", () => {
+    const ids = new Set(ossDemos.map((d) => d.id))
+    expect(ids.has("jenkins-mcp")).toBe(true)
+    expect(ids.has("pdfify-md")).toBe(true)
+    expect(ossDemos.find((d) => d.id === "jenkins-mcp")?.install).toBe("pip install jenkins-mcp-cli")
+    expect(ossDemos.find((d) => d.id === "pdfify-md")?.install).toBe("npm i -g pdfify-md")
+  })
+
+  it("ossInstallAll is a copy-pasteable block of the real per-tool commands", () => {
+    const block = ossInstallAll()
+    expect(block).toMatch(/^brew install /m)
+    expect(block).toMatch(/^pip install /m)
+    expect(block).toMatch(/ml-lubich\/tap\/(?:\{)?imsg/)
+    expect(block).toContain("jenkins-mcp-cli")
+    expect(block).toContain("twig-cli")
+    expect(block).toContain("pdfify-md")
+    expect(block).not.toMatch(/undefined/)
+  })
+
   it("every install command matches a real package-manager syntax", () => {
     for (const demo of ossDemos) {
-      if (demo.install === undefined) continue
-      expect(demo.install.trim().length, `empty install command in '${demo.id}'`).toBeGreaterThan(0)
+      expect(demo.install, `'${demo.id}' is missing an install command`).toBeTruthy()
+      expect(demo.install!.trim().length, `empty install command in '${demo.id}'`).toBeGreaterThan(0)
       expect(
-        INSTALL_COMMAND_RE.test(demo.install),
+        INSTALL_COMMAND_RE.test(demo.install!),
         `install command '${demo.install}' in '${demo.id}' doesn't match a real package-manager syntax`,
       ).toBe(true)
     }

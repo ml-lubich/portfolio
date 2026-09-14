@@ -18,7 +18,8 @@ Append new constraints or decisions as new bullets or dated subsections; do not 
 ### 2026-07-24 — Agent OSS family, denser storm, valuemaxxing
 
 - Skill Storm must remain dense (target ≥110 unique skill pills), tuned toward theodouwes-site layout constants (`PILL_SPACING≈88`, denser ring tiers).
-- Featured open-source projects include the agent family: `imsg-mcp`, `imail-mcp`, `inotes-mcp`, `wa-mcp`, plus `bitbucket-cli` (CLI-named exception — not `*-mcp`), and related tools (`twig`, `confluence-cli`, `like-fable` as applicable).
+- Featured open-source projects include the agent family: `imsg-mcp`, `imail-mcp`, `inotes-mcp`, `wa-mcp`, plus `bitbucket-cli` (CLI-named exception — not `*-mcp`), and related tools (`twig`, `confluence-cli`, `like-fable`, `jenkins-mcp`, `pdfify-md` as applicable).
+- Every showcase card ships a real, selectable install command (`brew` / `pip` / `pipx` / `npm i -g` / `git clone`). No card without one. The section also exposes `ossInstallAll()` as a copy-pasteable block of those same commands.
 - Homepage includes `#value-maxxing` (valuemaxxing ≠ tokenmaxxing) and `#tool-matrix` (honest CLI/MCP comparison).
 - Do not invent coverage % or market claims; keep matrix cells conservative (`partial` when incomplete).
 
@@ -27,3 +28,18 @@ Append new constraints or decisions as new bullets or dated subsections; do not 
 - The Open-Source Showcase (`#projects`, `components/sections/open-source-showcase.tsx`) covers public `ml-lubich` repos only — no proprietary, internal, or employer content.
 - Each demo's terminal script (`data/oss-demos.ts`) must use real, documented commands for that tool with plausible, representative output — not fabricated benchmark numbers or invented flags.
 - `stats` values shown per card must be real (e.g. published test coverage, measured speedups) or omitted; do not invent metrics to fill a stat slot.
+
+### 2026-09-14 — Hero brain 1:1 with josephheupler.com
+
+- Desktop box is exactly `h-[min(92vh,860px)] w-[min(120%,980px)]` (jheupler-site `Brain3D` class).
+- Phone box is exactly CSS `height: min(54svh, 420px)` / `width: min(132%, 470px)` on `.hero-brain-underlay`.
+- Camera tiers are exactly `{z:1.38,fov:48}` / `{1.48,47}` / `{1.62,46}` / desktop `{1.55,44}`.
+- Stage is absolute `inset-0` (Joseph's `.brain-stage`). Do not reintroduce a 50svh / 64svh band to "clear" the CTAs — that is how the mesh became a thumbnail. CTAs overlay the mesh and stay the topmost hit target.
+- Mesh scale (`useInitialScale`) stays on the existing breakpoints; do not shrink the asset to fake a smaller box.
+- Hero type is ink-haloed **and** light-bloomed (white drop-shadow on `.hero-copy-halo`) so the metallic fill reads shiny over the mesh. Do not dim the type to make the brain pop.
+
+### 2026-09-14 — MLBot must answer after tools
+
+- A chat turn that called a tool and then streamed `event: done` with no text is a failure. Recover with `finalizeAssistantTurn` + a grounded fallback from the tool JSON.
+- `searchTerms` strips punctuation and question stopwords; `agents` stems to `agent`. `get_projects` matches name + summary + tags, not tags alone.
+- After a tool returns, the model writes the answer. It does not call the same tool twice. An empty reply after tools is a failure.

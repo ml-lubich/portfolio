@@ -101,17 +101,19 @@ for (const vp of VIEWPORTS) {
     const share = h / vp.height
     const centreOffset = Math.abs((box.l + box.r) / 2 - vp.width / 2) / vp.width
 
-    /* 0.78–0.94 while the mesh was a full-bleed backdrop and the whole copy
-       stack — CTA pills included — was drawn on top of it. The hero is banded
-       now (components/hero/index.tsx): the brain owns the upper band outright
-       and the CTA row has its own strip underneath, which caps the mesh at
-       the height that still leaves that strip above the fold. Measured 0.54
-       at all four viewports; the band is the measurement ±0.06, and it still
-       rejects both the "brain shrank to a thumbnail" and the "brain went
-       full-bleed again" ships. e2e/hero-cta-clearance.spec.ts is the guard
-       that stops the mesh growing back over the buttons. */
-    expect(share, `mesh height share of viewport (${h.toFixed(0)}px)`).toBeGreaterThanOrEqual(0.48)
-    expect(share, `mesh height share of viewport (${h.toFixed(0)}px)`).toBeLessThanOrEqual(0.6)
+    /* 1:1 with josephheupler.com: the canvas is min(92vh, 860px) tall and
+       the mesh fills most of that box. Viewport share therefore varies with
+       the 860px cap (taller on 720p, a smaller fraction of 1440p). Assert
+       the box and the fill, not a single viewport-share band that only
+       described the old 64svh thumbnail. */
+    const canvas = (await page.locator(".hero-brain-underlay").first().boundingBox())!
+    const expectedH = Math.min(0.92 * vp.height, 860)
+    expect(canvas.height, `Joseph desktop box height at ${vp.width}×${vp.height}`).toBeGreaterThanOrEqual(expectedH - 8)
+    expect(canvas.height, `Joseph desktop box height at ${vp.width}×${vp.height}`).toBeLessThanOrEqual(expectedH + 8)
+    const fill = h / canvas.height
+    expect(fill, `mesh must fill Joseph's box (${h.toFixed(0)}px of ${canvas.height.toFixed(0)}px)`).toBeGreaterThanOrEqual(0.65)
+    expect(fill, "mesh must stay inside Joseph's box").toBeLessThanOrEqual(1.05)
+    expect(share, "a thumbnail mesh is how the 64svh band shipped").toBeGreaterThanOrEqual(0.42)
     // The brain is not symmetric, so its silhouette centre wanders ±3% of the
     // viewport as it orbits; 5% still catches the "shifted left" ship.
     expect(centreOffset, "mesh centred horizontally").toBeLessThanOrEqual(0.05)
@@ -217,14 +219,18 @@ test.describe(`phone ${vp.width}x${vp.height}`, () => {
     const box = await readBbox(page)
     const share = (box.b - box.t) / vp.height
 
-    // ~0.40 when the phone inherited the desktop box; ~0.80 after the first
-    // phone tier — which the owner, on a real handset, could not scroll past
-    // ("brain is too big"); 0.48 at the 120vw square. Now josephheupler.com's
-    // phone mesh, measured with Playwright: ~300px tall = 0.355 of 844, 0.32
-    // of 932, 0.45 of 667. The band brackets those three and rejects both the
-    // inherited-desktop read and the old square.
+    // josephheupler.com phone box: min(54svh, 420px). Mesh fills most of it
+    // (~300px on an 844-tall handset = 0.355 of the viewport). The 50svh
+    // band was smaller than this; the 88svh first phone tier was the
+    // scroll-trap. Bracket Joseph's box, then the fill.
+    const canvas = (await page.locator(".hero-brain-underlay").first().boundingBox())!
+    const expectedH = Math.min(0.54 * vp.height, 420)
+    expect(canvas.height, `Joseph phone box height at ${vp.width}×${vp.height}`).toBeGreaterThanOrEqual(expectedH - 8)
+    expect(canvas.height, `Joseph phone box height at ${vp.width}×${vp.height}`).toBeLessThanOrEqual(expectedH + 8)
+    const fill = (box.b - box.t) / canvas.height
+    expect(fill, `phone mesh must fill Joseph's box (${(box.b - box.t).toFixed(0)}px of ${canvas.height.toFixed(0)}px)`).toBeGreaterThanOrEqual(0.6)
     expect(share, `mesh height share of viewport (${(box.b - box.t).toFixed(0)}px)`).toBeGreaterThanOrEqual(0.3)
-    expect(share, "taller than this and it is no longer the reference's ~300px mesh").toBeLessThanOrEqual(0.48)
+    expect(share, "taller than Joseph's 54svh phone box and it is the scroll-trap again").toBeLessThanOrEqual(0.54)
 
     // Touches never reach the canvas on a coarse pointer — what's under a
     // finger on the brain is the page, so a swipe scrolls it. This is the

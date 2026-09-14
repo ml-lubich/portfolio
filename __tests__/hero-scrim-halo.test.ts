@@ -40,6 +40,19 @@ describe("hero copy halo", () => {
         const rule = css.match(/\.hero-copy-halo \{[^}]*\}/)?.[0] ?? ""
         expect(rule.match(/text-shadow:([^;]*);/)?.[1]?.split(",").length ?? 0).toBeGreaterThanOrEqual(3)
     })
+
+    it("adds a white light bloom so the type reads shiny, not just ink-backed", () => {
+        /* josephheupler.com's skill titles use `0 0 34px rgba(255,255,255,0.22)`.
+         * The dark halo keeps glyphs sharp over the mesh; without a light
+         * bloom the metallic fill still reads dull. The shine lives on the
+         * halo wrapper so `.gradient-text` stays token-only (light-mode gate). */
+        const start = css.indexOf(".hero-copy-halo {")
+        expect(start, ".hero-copy-halo rule").toBeGreaterThan(-1)
+        const filterAt = css.indexOf("filter:", start)
+        const filter = css.slice(filterAt, css.indexOf(";", filterAt + 8) + 1)
+        expect(filter).toMatch(/rgba\(\s*255\s*,\s*255\s*,\s*255/)
+        expect(filter).toMatch(/0 0 3[0-9]px/)
+    })
 })
 
 describe("hero washes", () => {

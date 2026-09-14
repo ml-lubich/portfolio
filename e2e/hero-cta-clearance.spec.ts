@@ -11,7 +11,8 @@ import { test, expect, type Page } from "@playwright/test"
  *
  * Everything here is geometry and rendered pixels, never class names:
  *
- *  - CTA rects must not intersect the <canvas> rect, at desktop and phone.
+ *  - josephheupler.com draws CTAs over the lower mesh (1:1 mapping). Overlap
+ *    is allowed; the buttons must stay the topmost hit target.
  *  - elementFromPoint at each CTA's centre must return that CTA (or a child),
  *    i.e. the button is genuinely on top and clickable, not under the canvas.
  *  - The canvas must actually re-render between two samples — the same region
@@ -80,14 +81,14 @@ for (const vp of [
     expect(ctas.length, "the hero CTA row must render").toBeGreaterThanOrEqual(5)
 
     for (const cta of ctas) {
-      expect(
-        intersects(cta.rect, canvas!),
-        `CTA "${cta.label}" (${JSON.stringify(cta.rect)}) must not overlap the brain canvas (${JSON.stringify(canvas)})`,
-      ).toBe(false)
       expect(cta.hitsSelf, `CTA "${cta.label}" must be the topmost element at its own centre, got <${cta.hitTag}>`).toBe(
         true,
       )
     }
+    // Joseph overlays CTAs on the mesh. A zero-overlap rule is what forced
+    // the 64svh thumbnail band. Keep the helper so a future "no overlap"
+    // ship can reuse it; do not assert it here.
+    void intersects
   })
 }
 

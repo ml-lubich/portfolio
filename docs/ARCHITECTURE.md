@@ -6,7 +6,8 @@
 |--------|----------------|--------------|
 | **Whole brain size** (mesh + lines + hit sphere) | `components/brain/brain-wireframe.tsx` — `useInitialScale()` | Breakpoints `0.46` / `0.48` / `0.54` by initial `innerWidth` (frozen after first read). |
 | **Neural orb sprites** (glowing dots only) | `components/brain/constants.ts` — `getBrainOrbViewportTier()` controls active count, `sizeBase` / `sizeAmp`, `uSizeMul`, `trailGlowMul`, and `pointGlowMul`. `brain-wireframe.tsx` applies `uSizeMul` + `uPointGlowMul`; `neural-orbs.tsx` fills point buffers and applies active count + trail glow. |
-| **Camera framing** | `components/brain/index.tsx` — `getInitialCam()` | Initial `z` / `fov` (set on mount). |
+| **Camera framing** | `components/brain/index.tsx` — `getInitialCam()` | 1:1 with josephheupler.com: `{1.38,48}` / `{1.48,47}` / `{1.62,46}` / desktop `{1.55,44}`. |
+| **Hero box** | `components/hero/index.tsx` `.hero-brain-underlay` + phone CSS | `h-[min(92vh,860px)] w-[min(120%,980px)]`; phone `min(54svh,420px)` × `min(132%,470px)`. |
 | **Orb motion / graph** | `components/brain/constants.ts` | `ORB_COUNT`, `ORB_SPEED`, `CHAIN_*`, `TRAIL_LENGTH`. |
 
 ## Invariant
@@ -90,7 +91,8 @@ The terminal section has three modes: **live** (day-in-the-life playback), **sna
 | **Scheduler** | `lib/demo-terminal.ts` | Pure, no DOM — `Line[]` + a "characters revealed" count in, a render-ready frame out. `cmd`/`code` lines type character-by-character; `out`/`hdr`/`gap` render instantly. |
 | **Primitive** | `components/terminal/demo-terminal.tsx` | `"use client"`. Wraps the scheduler with an IntersectionObserver (starts typing once in view) + rAF loop gated by an `active` prop. Under `prefers-reduced-motion: reduce`, skips the scroll gate and typing loop entirely and renders the fully-revealed frame on first paint. |
 | **Card** | `components/sections/oss-demo-card.tsx` | Glass card matching `MarqueeCard`'s visual language; header (repo link + install copy), a `DemoTerminal`, and a stats/tags footer. Takes `active` and forwards it straight through — does not own any typing state itself. |
-| **Container** | `components/sections/open-source-showcase.tsx` | Renders one `OssDemoCard` per `oss-demos` entry. An IntersectionObserver tracks the card nearest viewport center and is the single source of truth for which card's `active` prop is `true`; every other card renders its static final frame. Reuses `DetailPanel` in the same fixed-overlay modal pattern as `projects.tsx`. |
+| **Container** | `components/sections/open-source-showcase.tsx` | Features one `OssDemoCard` at a time from a glyph rail. `ossInstallAll()` renders above the rail as a selectable `<pre><code>` block. Reuses `DetailPanel` in the same fixed-overlay modal pattern as `projects.tsx`. |
+| **Install strings** | `data/oss-demos.ts` `install` + `ossInstallAll()` | Per-card command is the source of truth; the family block is derived from it. |
 | **Integration** | `components/sections/projects.tsx` | `<OpenSourceShowcase />` renders at the top of `#projects`, above the existing marquee. |
 
 ### Invariant

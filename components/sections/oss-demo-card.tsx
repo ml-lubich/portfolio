@@ -227,15 +227,22 @@ export function OssDemoCard({ demo, index = 0, active = true, onExplore }: OssDe
 
           <div className="mt-3 flex flex-wrap items-center gap-2">
             {demo.install && (
-              <button
-                type="button"
-                onClick={handleCopy}
-                aria-label={`Copy install command: ${demo.install}`}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-white/[0.10] bg-black/25 px-2.5 py-1 font-mono text-[11px] text-muted-foreground/70 transition-colors hover:border-primary/40 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary/60"
-              >
-                {copied ? <Check className="h-3 w-3 text-emerald-700 dark:text-emerald-400" aria-hidden /> : <Copy className="h-3 w-3" aria-hidden />}
-                {copied ? "Copied" : demo.install}
-              </button>
+              <div className="oss-install flex min-w-0 flex-1 items-stretch overflow-hidden rounded-lg border border-white/[0.12] bg-black/45">
+                <pre className="oss-install min-w-0 flex-1 overflow-x-auto px-3 py-2">
+                  <code className="select-all font-mono text-[12px] leading-5 text-foreground/90 sm:text-[13px]">
+                    {demo.install}
+                  </code>
+                </pre>
+                <button
+                  type="button"
+                  onClick={handleCopy}
+                  aria-label={`Copy install command: ${demo.install}`}
+                  className="inline-flex shrink-0 items-center gap-1.5 border-l border-white/[0.10] px-3 font-mono text-[10px] uppercase tracking-wider text-foreground/75 transition-colors hover:bg-white/[0.06] hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary/60"
+                >
+                  {copied ? <Check className="h-3.5 w-3.5 text-emerald-400" aria-hidden /> : <Copy className="h-3.5 w-3.5" aria-hidden />}
+                  {copied ? "Copied" : "Copy"}
+                </button>
+              </div>
             )}
             {demo.packageUrl && (
               <a

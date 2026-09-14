@@ -86,6 +86,12 @@ describe("OpenSourceShowcase", () => {
     expect(src).toMatch(/import\s*\{\s*SectionHeader\s*\}/)
     expect(src).toMatch(/<SectionHeader/)
   })
+
+  it("ships a copy-pasteable install-all <pre><code> block above the rail", () => {
+    expect(src).toMatch(/ossInstallAll/)
+    expect(src).toMatch(/<pre[\s\S]{0,200}<code/)
+    expect(src).toMatch(/select-all|user-select:\s*all|oss-install-all/)
+  })
 })
 
 describe("OssDemoCard visual signature", () => {
@@ -99,6 +105,11 @@ describe("OssDemoCard visual signature", () => {
 
   it("still renders the tool's terminal demo", () => {
     expect(cardSrc).toMatch(/<DemoTerminal lines=\{demo\.demo\} active=\{active\}/)
+  })
+
+  it("renders the install as selectable <pre><code>, not a truncated button label", () => {
+    expect(cardSrc).toMatch(/<pre[\s\S]*<code[\s\S]*demo\.install/)
+    expect(cardSrc).toMatch(/user-select:\s*all|select-all|oss-install/)
   })
 })
 

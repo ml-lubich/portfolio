@@ -82,7 +82,7 @@ showcase). That would replace the portfolio's own sections rather than restyle t
 
 ## Open-Source Showcase & chrome fixes (2026-07-25)
 
-- `#open-source` leads the projects section: curated public CLI/MCP projects (`data/oss-demos.ts`) as glass demo cards — an animated terminal demo per card (`DemoTerminal`: IntersectionObserver-gated typing; `prefers-reduced-motion` renders the final frame immediately), stats via `AnimatedCounter` (numeric values only; text stats render plain), tags, GitHub link, and a copyable install string. **One terminal types at a time** — the container activates only the highest-intersection card. The marquee below is retitled "Selected Work" and reads as the breadth tier.
+- `#open-source` leads the projects section: curated public CLI/MCP projects (`data/oss-demos.ts`) as glass demo cards — an animated terminal demo per card (`DemoTerminal`: IntersectionObserver-gated typing; `prefers-reduced-motion` renders the final frame immediately), stats via `AnimatedCounter` (numeric values only; text stats render plain), tags, GitHub link, and a **selectable** `<pre><code>` install line (click-to-copy is extra, not the only path). A copy-pasteable `ossInstallAll()` block sits above the rail so brew / pip / pipx / npm / git lines can be pasted as a family. **One terminal types at a time** — the featured card is the only typer. The marquee below is retitled "Selected Work" and reads as the breadth tier.
 - **Nav breakpoint policy:** the inline desktop link row requires ≥1280px (`xl:`); 768–1279px uses the mobile hamburger + overlay. The three gates (link row `xl:flex`, toggle `xl:hidden`, overlay `xl:hidden`) must always move together — splitting them re-introduces the iPad clipping bug.
 - **Logo mark:** `components/site-logo-mark.tsx` is an inline-SVG "ML" monogram on a dark backing tile — resolution-independent, no raster, no tech-blue; the nav tile carries a higher-contrast border/bg than the old liquid-glass treatment.
 - **Vertical rhythm:** a single spacing knob (`LAZY_SECTION_TOP` in `app/page.tsx`: `pt-4 md:pt-8 lg:pt-10`) governs every LazySection boundary; no per-section ad-hoc margins (guarded by `__tests__/section-rhythm.test.ts`).
@@ -232,6 +232,32 @@ Projects and Publications already run `ScrollStackSection`; the skill's rule
 is one stack per page and we are at three, so no fourth was added. Gates:
 `__tests__/hero-brain-size.test.ts`, `__tests__/scroll-craft.test.ts`,
 `e2e/hero-brain-fit.spec.ts`.
+
+## Hero brain: 1:1 josephheupler.com box + camera (2026-09-14)
+
+The 50svh / 64svh banded box and the further desktop camera (`z 1.82` / `fov 38`)
+made this brain a thumbnail next to josephheupler.com. The mapping is now
+literal, not "Heupler-scale":
+
+| Knob | josephheupler.com | This site |
+|------|-------------------|-----------|
+| Stage | `.brain-stage` absolute `inset-0` | `.hero-brain-stage` absolute `inset-0` |
+| Desktop box | `h-[min(92vh,860px)] w-[min(120%,980px)]` | same classes on `.hero-brain-underlay` |
+| Phone box | `min(54svh, 420px)` × `min(132%, 470px)` | same CSS on `.hero-brain-underlay` |
+| Camera | `1.38/48`, `1.48/47`, `1.62/46`, `1.55/44` | same literals in `getInitialCam` |
+| Copy / CTAs | overlaid on the mesh | overlaid; clickability is the gate, not zero overlap |
+
+`e2e/hero-brain-fit.spec.ts` asserts the canvas matches those box heights and
+that the projected mesh fills ≥65% of the box (desktop) / ≥60% (phone).
+`e2e/hero-cta-clearance.spec.ts` asserts each CTA is the topmost hit at its
+centre. Coarse-pointer `pointer-events: none` and `touch-action: pan-y` stay
+so a handset can scroll past the hero. Gates: `__tests__/hero-brain-size.test.ts`,
+`__tests__/hero-mobile-layout.test.ts`, `e2e/hero-brain-fit.spec.ts`.
+
+Hero type keeps the dark ink halo (glyphs stay sharp over the mesh) **and** a
+white light bloom (`0 0 34px rgba(255,255,255,0.32)` on `.hero-copy-halo`), the
+same shiny read josephheupler.com uses on skill titles. The bloom is dark-theme
+only — light mode drops it so the page does not fog. Gate: `__tests__/hero-scrim-halo.test.ts`.
 
 ## About section: leads with the current role, no dead space (2026-09-05)
 

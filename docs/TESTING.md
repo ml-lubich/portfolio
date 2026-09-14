@@ -19,6 +19,14 @@
 
 - `e2e/runtime-errors.spec.ts` — **the most important gate.** Loads every real route (`/`, `/blog`, `/tools`, `/llm-prices`, `/games`, `/demo`, `/privacy`, `/terms`) and fails on any uncaught `pageerror`, any un-allow-listed `console.error`, or the Next.js dev error overlay rendering. This is the only thing in the repo that catches a page throwing at runtime — e.g. a three.js `useFrame` loop touching a stale/undefined buffer geometry — since that class of bug only exists once real animation frames run in a real browser; no amount of unit or type-checking catches it. Keep `ALLOWED_CONSOLE_ERRORS` empty unless you can name a specific, justified, benign case in a comment next to it — an empty list means every `console.error` seen so far has been a real bug.
 - `e2e/api-routes.spec.ts` — hits the live routes via Playwright's `request` context (no browser). `/api/tokscale`, `/api/github`, `/api/llm-prices` are checked against their real upstreams (consistent with `media-references.test.ts`'s existing pattern of probing real URLs rather than mocking them) for a clean 200 or a typed failure, never a 500. `/api/prompt-lint` and `/api/chat` are checked for validation and rate-limiting behavior only — **no request in this file ever reaches the model**; `/api/chat`'s history validation runs before the OpenRouter call, so probing the burst limiter (`lib/ai/rate-limit.ts`) with empty-history requests exercises the real guard rail for free. The one guard rail this file cannot exercise against a live server is the missing-`OPENROUTER_API_KEY` → 503 path, since the running dev server has the key configured; that path is a one-line `if (!apiKey)` in `app/api/chat/route.ts` and is left to code review.
+
+## Automated: MLBot chat recovery
+
+- `__tests__/ai-chat-stream.test.ts` — OpenRouter chunk ingest (delta fragments, final `message.content`, array content parts), empty-final-after-tools fallback (must emit grounded text, never a bare `done`), cascade errors name every failed attempt, and `app/api/chat/route.ts` is wired to those helpers.
+- `__tests__/ai-profile-tools.test.ts` — `search_profile` on “What has Misha built with agents?” returns agent work; `searchTerms` stems `agents` → `agent` and drops question stopwords. `__tests__/ai-model-slugs.test.ts` still checks the cascade slugs exist upstream and advertise tools.
+- A chat is working only when one real lookup question produces at least one `event: tool`, non-empty `event: text`, and zero `event: error`. HTTP 200 plus `event: done` with no text is a fail — that was the 2026-09-14 production blank-bubble.
+- `__tests__/hero-scrim-halo.test.ts` — `.hero-copy-halo` filter includes a white light bloom (`0 0 34px`) as well as the dark ink halo.
+- `__tests__/oss-demos.test.ts` — every showcase entry has a real install command; `ossInstallAll()` is a copy-pasteable brew/pip/pipx/npm/git block. `__tests__/open-source-showcase.test.ts` — install lines render as selectable `<pre><code>`, not a truncated button label.
 - `e2e/visual-integrity.spec.ts` — no horizontal overflow at 390/834/1440px, every `<img>` loads (`naturalWidth > 0`), and no `bg-card`-styled panel resolves to the same computed background color as the page (the "ghosting"/"black cards" bug class) across all eight routes. Only dark mode is checked: light mode ships disabled (`lib/light-mode.ts`, `forcedTheme="dark"`, toggle not even rendered), so testing it here would just run dark mode twice. Once light mode is re-enabled by default, extend this file to cover it too.
 - `e2e/wide-layout.spec.ts`, `e2e/tablet-responsive.spec.ts`, `e2e/scroll-navigation.spec.ts` — pre-existing homepage-specific layout/motion regression specs (see file headers for what each guards).
 
@@ -64,7 +72,7 @@
 ## Manual: hero brain
 
 1. Open `/` on a **viewport width &lt; 1024px** and **≥ 1024px**.
-2. Confirm brain **overall size** matches expectations (driven by `useInitialScale`).
+2. Confirm brain **overall size** matches josephheupler.com 1:1 (`h-[min(92vh,860px)]` desktop, `min(54svh,420px)` phone; camera `1.55/44` desktop). Driven by the hero box + `getInitialCam`, not `useInitialScale`.
 3. Confirm **orb dots** are visible (driven by `uSizeMul` in `brain-wireframe.tsx` + `orbSizes` in `neural-orbs.tsx`).
 
 No automated visual regression for WebGL is required unless a dedicated snapshot pipeline is added.

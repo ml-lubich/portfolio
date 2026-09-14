@@ -256,8 +256,87 @@ const slimTestimonials = () =>
         rating: t.rating,
     }))
 
+/** Question words and the visitor's name drown the one useful term.
+ *  "What has Misha built with agents?" must search like "agents". */
+const SEARCH_STOPWORDS = new Set([
+    "a",
+    "an",
+    "the",
+    "and",
+    "or",
+    "of",
+    "to",
+    "in",
+    "on",
+    "for",
+    "from",
+    "with",
+    "about",
+    "what",
+    "whats",
+    "which",
+    "who",
+    "where",
+    "when",
+    "why",
+    "how",
+    "has",
+    "have",
+    "had",
+    "does",
+    "did",
+    "do",
+    "is",
+    "are",
+    "was",
+    "were",
+    "be",
+    "been",
+    "misha",
+    "lubich",
+    "his",
+    "he",
+    "him",
+    "this",
+    "that",
+    "these",
+    "those",
+    "built",
+    "build",
+    "made",
+    "make",
+    "using",
+    "use",
+    "used",
+    "can",
+    "could",
+    "would",
+    "should",
+    "your",
+    "my",
+    "me",
+    "you",
+    "we",
+])
+
+/** Tokens a visitor question actually means. "agents" also yields "agent"
+ *  so Case Triage Agent / agentic work rank; stopwords are dropped. */
+export function searchTerms(query: string): string[] {
+    const raw = query.toLowerCase().split(/[^a-z0-9+#.]+/).filter(Boolean)
+    const terms = new Set<string>()
+    for (const token of raw) {
+        if (SEARCH_STOPWORDS.has(token) || token.length < 2) continue
+        terms.add(token)
+        if (token.endsWith("s") && token.length > 4) {
+            const stem = token.slice(0, -1)
+            if (!SEARCH_STOPWORDS.has(stem) && stem.length >= 2) terms.add(stem)
+        }
+    }
+    return [...terms]
+}
+
 function searchProfile(query: string): ToolResult {
-    const terms = query.toLowerCase().split(/\s+/).filter(Boolean)
+    const terms = searchTerms(query)
     if (terms.length === 0) return { matches: [] }
 
     const hit = (haystack: string) => {
@@ -296,8 +375,14 @@ function searchProfile(query: string): ToolResult {
 function getProjects(tag?: string): ToolResult {
     const all = slimProjects()
     if (!tag) return { projects: all }
-    const t = tag.toLowerCase()
-    return { projects: all.filter((p) => p.tech.some((x) => x.toLowerCase().includes(t))) }
+    const terms = searchTerms(tag)
+    if (!terms.length) return { projects: all }
+    return {
+        projects: all.filter((p) => {
+            const hay = `${p.name} ${p.summary} ${p.tech.join(" ")}`.toLowerCase()
+            return terms.some((t) => hay.includes(t))
+        }),
+    }
 }
 
 function getSkills(category?: string): ToolResult {
@@ -417,6 +502,7 @@ You answer questions about Misha: his experience, projects, skills, research and
 Rules:
 - Ground every factual claim in a tool call. Never invent employers, dates, metrics or paper titles.
 - Call tools before answering questions about his background. search_profile is the best default.
+- After a tool returns, write the answer immediately in prose. Do not call the same tool twice. One or two lookups, then a real answer. An empty reply after tools is a failure.
 - Draw first, write second. If the answer is a list of three or more things, a comparison, a breakdown, a timeline, or how something is put together — show it as a chart or a diagram and keep the prose to two or three sentences around it. Do this without being asked: "visualise it" is not a precondition, it is what the visitor should not have to say. A list of four projects is a pie or a pipeline, not four paragraphs.
 - When a question is about comparison, strength, or "how much" — call a chart_* tool so the user sees it, then add one or two sentences of interpretation. Do not describe the chart's bars in prose; it is already on screen.
 - For a process, architecture or before/after — anything with steps rather than numbers — draw it in a \`\`\`chart fence holding one JSON object, the same renderer the blog posts use. No prose describing the boxes; the diagram is on screen. Four shapes:
