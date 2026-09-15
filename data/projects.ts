@@ -405,6 +405,45 @@ export const projects: Project[] = [
         },
     },
     {
+        id: "nick-pardini",
+        name: "Nicholas Pardini",
+        metric: "Global macro research & wealth management",
+        coverImage: "/images/projects/nick-pardini-hero.jpg",
+        summary:
+            "Personal brand site for Nicholas Pardini — co-founder of Spearhead Advisors, founder of Davos Macro Research, and host of Analyzing Finance with Nick. Composed hero, live YouTube feed, and consultation funnels at nickpardini.vercel.app.",
+        tags: ["Web", "Next.js", "Finance"],
+        gradient: g.primaryViaSkyToAccent,
+        accent: accentCycle[4],
+        number: "11",
+        detail: {
+            title: "Nicholas Pardini",
+            subtitle: "Global macro research · wealth management · nickpardini.vercel.app",
+            description:
+                "End-to-end personal brand site for a Newport Beach macro researcher and keynote speaker: warm ivory stationery aesthetic, composed full-viewport hero over harbor photography, auto-synced Analyzing Finance with Nick uploads, and separate doors for consultation, research, media, and speaking.",
+            highlights: [
+                "Composed hero — copy, gold headline, and pill CTAs over a faded Newport harbor scene with Nick centered",
+                "YouTube Atom RSS keeps the media rail current without manual edits",
+                "Press marquee, count-up stats, speaking embed, and Substack newsletter capture",
+                "Calendly, contact form, and Google Forms inquiry paths for each engagement type",
+            ],
+            architecture: [
+                { label: "Marketing site", icon: "layers", description: "Next.js App Router homepage with composed hero and section funnel" },
+                { label: "Media sync", icon: "server", description: "RSS-first YouTube feed with ISR and daily cron revalidation" },
+                { label: "Brand", icon: "zap", description: "Warm ivory + gold private-bank stationery system" },
+                { label: "Conversion", icon: "git", description: "Consultation, research, wealth, and speaking inquiry doors" },
+            ],
+            techStack: ["TypeScript", "Next.js", "React", "Tailwind CSS"],
+            metrics: [
+                { label: "Channel", value: "125K+ subs" },
+                { label: "Status", value: "Live preview" },
+            ],
+            diagramType: "fullstack",
+            gradient: g.primaryViaSkyToAccent,
+            accent: accentCycle[4],
+            link: { label: "nickpardini.vercel.app", url: "https://nickpardini.vercel.app/" },
+        },
+    },
+    {
         id: "reviewly",
         name: "Reviewly",
         metric: "AI Google Review automation",
@@ -415,7 +454,7 @@ export const projects: Project[] = [
         tags: ["Claude API", "Next.js", "Supabase"],
         gradient: g.primaryToAccent,
         accent: accentCycle[0],
-        number: "11",
+        number: "12",
         detail: {
             title: "Reviewly",
             subtitle: "AI Google Review management (live prototype)",

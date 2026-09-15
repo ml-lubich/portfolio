@@ -110,4 +110,25 @@ export const consultingClients: ConsultingClient[] = [
         gradient: g.primaryToRose,
         accent: accentCycle[3],
     },
+    {
+        id: "nick-pardini",
+        name: "Nicholas Pardini",
+        href: "https://nickpardini.vercel.app/",
+        coverImage: "/images/projects/nick-pardini-hero.jpg",
+        summary:
+            "Personal brand site for a global macro researcher, wealth-management co-founder, and host of Analyzing Finance with Nick — composed hero, live YouTube feed, speaking funnel, and consultation doors.",
+        sector: "Finance / Macro",
+        impact: [
+            "125K+ YouTube subscribers",
+            "Keynote speaking · Newport Beach",
+        ],
+        deliverables: [
+            "Composed full-viewport hero with harbor photography",
+            "Auto-synced Analyzing Finance with Nick video rail",
+            "Consultation, research, and speaking inquiry funnels",
+        ],
+        tags: ["Web", "Next.js", "Finance"],
+        gradient: g.primaryViaSkyToAccent,
+        accent: accentCycle[4],
+    },
 ]
