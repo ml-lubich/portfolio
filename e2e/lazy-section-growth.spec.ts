@@ -37,7 +37,9 @@ test("mounting every section grows the document by at most a few hundred px", as
   // Floors are trimmed 2% under the measured wrapper height (~28k px of
   // sections on a phone), so ~600px of growth is the designed residue; it
   // was +15.9k / +23.8k before the per-section floors.
-  expect(after - before, `document grew ${before} -> ${after}`).toBeLessThanOrEqual(800)
+  /* Nick Pardini showcase + hero ambient wash added ~500px of honest floor
+     residue; 800 was the pre-2026-09-15 cap. Still rejects the +15k walks. */
+  expect(after - before, `document grew ${before} -> ${after}`).toBeLessThanOrEqual(1400)
 })
 
 test("sitting still mid-page, the content under the reader does not drift", async ({ page }) => {
