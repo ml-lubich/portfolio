@@ -434,3 +434,18 @@ exactly `{ JetBrains_Mono, Oxanium }`, no retired family or `--font-*` variable
 is referenced anywhere under `app/`, `components/`, `lib/` or the Tailwind
 config, and every `var(--font-*)` any stylesheet reads is one `layout.tsx`
 actually defines.
+
+## 3D Chrome Metallic Text & Scroll Performance (2026-09-15)
+
+1. **Metallic text palette — 3D chrome/steel facet stops**:
+   Previously, metallic text was flattened to stops between 88% and 100% lightness (`--metal-mid: hsl(220 8% 92%)`), washing out text into flat bright white. The updated palette extracts facet tones from the beveled 3D chrome "ML" mark:
+   - `--metal-low`: Dark charcoal steel/gunmetal facet (`hsl(220 16% 50%)` dark / `hsl(220 16% 28%)` light)
+   - `--metal-mid`: Polished platinum/silver steel (`hsl(220 12% 78%)` dark / `hsl(220 14% 42%)` light)
+   - `--metal-hi`: Specular chrome white highlight (`hsl(0 0% 100%)` dark / `hsl(220 16% 58%)` light)
+   The multi-stop linear gradient (`0% foreground`, `14% metal-low`, `24% metal-mid`, `30% metal-hi`, `38% metal-mid`, `48% metal-low`, etc.) restores sharp bevel reflections, chrome specular highlights, and dimensional contrast on all bold text, hero headers, and `.gradient-text` elements without flat pure white or pure black.
+
+2. **Scroll performance — WebGL idle pause & DOM write elimination**:
+   - `Brain3D` (`components/brain/index.tsx`): Integrates an `IntersectionObserver` that toggles `<Canvas frameloop={inView ? "always" : "never"}>` (with a 150px buffer). When the reader scrolls past the hero into the rest of the site, Three.js ceases all frame loop processing, vector projections, and WebGL renders, freeing GPU/CPU for smooth 60/120fps scrolling.
+   - `HeroScrollLayer` (`components/hero/hero-scroll-release.tsx`): Tracks previously applied transform and opacity strings, dropping redundant DOM style updates on every scroll frame once the hero is past or transforms are steady.
+   - `ScrollStackCardsDesktop` (`components/cards/index.tsx`): Avoids traversing cards and rewriting DOM properties on every scroll tick when a card stack is resting outside the viewport (at `totalProgress === 0` or `1`).
+

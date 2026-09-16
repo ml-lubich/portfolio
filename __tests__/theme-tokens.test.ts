@@ -43,6 +43,7 @@ const THEMED_TOKENS = [
     "--glass-fill",
     "--glass-shadow",
     "--hero-stage-scrim",
+    "--metal-low",
     "--metal-mid",
     "--metal-hi",
     "--line-soft",

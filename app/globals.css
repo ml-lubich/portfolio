@@ -17,8 +17,9 @@
     --white-rgb: 255 255 255;
     --card-fill: rgb(10 12 20 / 0.72);
     --card-fill-hover: rgb(14 17 26 / 0.86);
-    /* Metallic text shine: bright stops read as sheen on a dark page. */
-    --metal-mid: hsl(220 8% 92%);
+    /* Metallic text shine: 3D chrome facet colors matching the beveled ML mark */
+    --metal-low: hsl(220 16% 50%);
+    --metal-mid: hsl(220 12% 78%);
     --metal-hi: hsl(0 0% 100%);
     --surface-0: #07080a;
     --surface-1: #0a0c10;
@@ -153,6 +154,7 @@
     --card-fill-hover: #ffffff;
     /* On a light page the shine must go DARKER than the base, or bold text
        dissolves into the card. */
+    --metal-low: hsl(220 16% 28%);
     --metal-mid: hsl(220 14% 42%);
     --metal-hi: hsl(220 16% 58%);
     --surface-0: #ffffff;
@@ -785,13 +787,17 @@ body {
      .animated-text-word variant below uses — one shimmer, both themes. */
   background-image: linear-gradient(120deg,
       hsl(var(--foreground)) 0%,
-      var(--metal-mid) 16%,
-      hsl(var(--foreground)) 28%,
-      var(--metal-mid) 40%,
-      hsl(var(--foreground)) 52%,
-      var(--metal-mid) 66%,
-      var(--metal-hi) 78%,
-      var(--metal-mid) 90%,
+      var(--metal-low) 14%,
+      var(--metal-mid) 24%,
+      var(--metal-hi) 30%,
+      var(--metal-mid) 38%,
+      var(--metal-low) 48%,
+      hsl(var(--foreground)) 56%,
+      var(--metal-low) 66%,
+      var(--metal-mid) 74%,
+      var(--metal-hi) 80%,
+      var(--metal-mid) 86%,
+      var(--metal-low) 94%,
       hsl(var(--foreground)) 100%);
   background-size: 250% 100%;
   -webkit-background-clip: text;
@@ -1865,13 +1871,17 @@ nav[data-nav-scrolled="true"] .nav-shell {
 .animated-name-metallic .animated-name-char {
   background: linear-gradient(120deg,
       hsl(var(--foreground)) 0%,
-      hsl(220 10% 88%) 18%,
-      hsl(0 0% 100%) 28%,
-      hsl(220 10% 92%) 40%,
-      hsl(var(--foreground)) 52%,
-      hsl(220 10% 88%) 68%,
-      hsl(0 0% 100%) 78%,
-      hsl(220 10% 92%) 90%,
+      var(--metal-low) 14%,
+      var(--metal-mid) 24%,
+      var(--metal-hi) 30%,
+      var(--metal-mid) 38%,
+      var(--metal-low) 48%,
+      hsl(var(--foreground)) 56%,
+      var(--metal-low) 66%,
+      var(--metal-mid) 74%,
+      var(--metal-hi) 80%,
+      var(--metal-mid) 86%,
+      var(--metal-low) 94%,
       hsl(var(--foreground)) 100%);
   background-size: 250% 100%;
   -webkit-background-clip: text;
@@ -1915,13 +1925,17 @@ nav[data-nav-scrolled="true"] .nav-shell {
   .metallic-text {
     background-image: linear-gradient(120deg,
         hsl(var(--foreground)) 0%,
-        var(--metal-mid) 18%,
+        var(--metal-low) 14%,
+        var(--metal-mid) 24%,
         var(--metal-hi) 30%,
-        var(--metal-mid) 40%,
-        hsl(var(--foreground)) 54%,
-        var(--metal-mid) 68%,
-        var(--metal-hi) 78%,
-        var(--metal-mid) 88%,
+        var(--metal-mid) 38%,
+        var(--metal-low) 48%,
+        hsl(var(--foreground)) 56%,
+        var(--metal-low) 66%,
+        var(--metal-mid) 74%,
+        var(--metal-hi) 80%,
+        var(--metal-mid) 86%,
+        var(--metal-low) 94%,
         hsl(var(--foreground)) 100%);
     background-size: 250% 100%;
     -webkit-background-clip: text;
@@ -1944,13 +1958,17 @@ b:not(.no-metallic),
 strong:not(.no-metallic) {
   background-image: linear-gradient(120deg,
       hsl(var(--foreground)) 0%,
-      var(--metal-mid) 18%,
+      var(--metal-low) 14%,
+      var(--metal-mid) 24%,
       var(--metal-hi) 30%,
-      var(--metal-mid) 40%,
-      hsl(var(--foreground)) 54%,
-      var(--metal-mid) 68%,
-      var(--metal-hi) 78%,
-      var(--metal-mid) 88%,
+      var(--metal-mid) 38%,
+      var(--metal-low) 48%,
+      hsl(var(--foreground)) 56%,
+      var(--metal-low) 66%,
+      var(--metal-mid) 74%,
+      var(--metal-hi) 80%,
+      var(--metal-mid) 86%,
+      var(--metal-low) 94%,
       hsl(var(--foreground)) 100%);
   background-size: 250% 100%;
   -webkit-background-clip: text;
@@ -1967,13 +1985,17 @@ strong:not(.no-metallic) {
 .gradient-text:not(.no-metallic) .animated-text-word {
   background-image: linear-gradient(120deg,
       hsl(var(--foreground)) 0%,
-      var(--metal-mid) 18%,
+      var(--metal-low) 14%,
+      var(--metal-mid) 24%,
       var(--metal-hi) 30%,
-      var(--metal-mid) 40%,
-      hsl(var(--foreground)) 54%,
-      var(--metal-mid) 68%,
-      var(--metal-hi) 78%,
-      var(--metal-mid) 88%,
+      var(--metal-mid) 38%,
+      var(--metal-low) 48%,
+      hsl(var(--foreground)) 56%,
+      var(--metal-low) 66%,
+      var(--metal-mid) 74%,
+      var(--metal-hi) 80%,
+      var(--metal-mid) 86%,
+      var(--metal-low) 94%,
       hsl(var(--foreground)) 100%);
   background-size: 250% 100%;
   -webkit-background-clip: text;
@@ -1991,13 +2013,17 @@ strong:not(.no-metallic) {
 .blog-prose h4 {
   background-image: linear-gradient(120deg,
       hsl(var(--foreground)) 0%,
-      var(--metal-mid) 18%,
+      var(--metal-low) 14%,
+      var(--metal-mid) 24%,
       var(--metal-hi) 30%,
-      var(--metal-mid) 40%,
-      hsl(var(--foreground)) 54%,
-      var(--metal-mid) 68%,
-      var(--metal-hi) 78%,
-      var(--metal-mid) 88%,
+      var(--metal-mid) 38%,
+      var(--metal-low) 48%,
+      hsl(var(--foreground)) 56%,
+      var(--metal-low) 66%,
+      var(--metal-mid) 74%,
+      var(--metal-hi) 80%,
+      var(--metal-mid) 86%,
+      var(--metal-low) 94%,
       hsl(var(--foreground)) 100%);
   background-size: 250% 100%;
   -webkit-background-clip: text;

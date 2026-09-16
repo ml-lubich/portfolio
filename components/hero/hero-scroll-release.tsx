@@ -70,15 +70,29 @@ export function HeroScrollLayer({ layer, className, children, ...rest }: HeroScr
     if (!el || isStaticHero()) return
 
     let raf = 0
+    let lastTransform = ""
+    let lastOpacity = ""
     const apply = () => {
       raf = 0
       const y = window.scrollY
       if (layer === "brain") {
         const { scale, opacity } = heroReleaseAt(y, window.innerHeight)
-        el.style.transform = `scale(${scale.toFixed(4)})`
-        el.style.opacity = opacity.toFixed(3)
+        const nextTransform = `scale(${scale.toFixed(4)})`
+        const nextOpacity = opacity.toFixed(3)
+        if (nextTransform !== lastTransform) {
+          el.style.transform = nextTransform
+          lastTransform = nextTransform
+        }
+        if (nextOpacity !== lastOpacity) {
+          el.style.opacity = nextOpacity
+          lastOpacity = nextOpacity
+        }
       } else {
-        el.style.transform = `translate3d(0, ${heroStatsParallaxAt(y).toFixed(1)}px, 0)`
+        const nextTransform = `translate3d(0, ${heroStatsParallaxAt(y).toFixed(1)}px, 0)`
+        if (nextTransform !== lastTransform) {
+          el.style.transform = nextTransform
+          lastTransform = nextTransform
+        }
       }
     }
     const onScroll = () => {

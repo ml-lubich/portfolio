@@ -242,6 +242,8 @@ function ScrollStackCardsDesktop({
     enter: new Float64Array(0),
     cover: new Float64Array(0),
   })
+  /** Last processed totalProgress — avoids recalculating cards when fully before or past viewport */
+  const lastProgressRef = useRef<number>(-1)
 
   // Drag state per card
   const drags = useRef<DragState[]>([])
@@ -292,6 +294,18 @@ function ScrollStackCardsDesktop({
       maxScroll <= 0
         ? 1
         : Math.max(0, Math.min(scrolled / maxScroll, 1))
+
+    // When the stack is completely outside the viewport and already in its
+    // resting state (0 or 1), skip iterating and touching all card DOM styles.
+    if (
+      !activeCardIdRef.current &&
+      ((totalProgress === 0 && lastProgressRef.current === 0) ||
+       (totalProgress === 1 && lastProgressRef.current === 1))
+    ) {
+      return
+    }
+    lastProgressRef.current = totalProgress
+
     const step = n > 1 ? 1 / (n - 1) : 1
 
     let { enter: enterBuf, cover: coverBuf } = scrollMetricsRef.current

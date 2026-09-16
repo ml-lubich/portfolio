@@ -170,9 +170,24 @@ export function Brain3D({
   revealGate = true,
   fadeDurationMs = 2350,
 }: Brain3DProps) {
+  const containerRef = React.useRef<HTMLDivElement>(null)
   const initCam = React.useMemo(() => getInitialCam(), [])
   const [geometryCommitted, setGeometryCommitted] = React.useState(false)
   const [visible, setVisible] = React.useState(false)
+  const [inView, setInView] = React.useState(true)
+
+  React.useEffect(() => {
+    const el = containerRef.current
+    if (!el || typeof IntersectionObserver === "undefined") return
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setInView(entry.isIntersecting)
+      },
+      { threshold: 0, rootMargin: "150px" }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
 
   React.useEffect(() => {
     let cancelled = false
@@ -207,6 +222,7 @@ export function Brain3D({
   return (
     <WebGLErrorBoundary>
       <div
+        ref={containerRef}
         className={`w-full h-full cursor-grab active:cursor-grabbing ${className}`}
         style={{
           opacity: visible ? 1 : 0,
@@ -215,6 +231,7 @@ export function Brain3D({
         }}
       >
         <Canvas
+          frameloop={inView ? "always" : "never"}
           camera={{ position: [0, 0, initCam.z], fov: initCam.fov }}
           dpr={[1, 2]}
           gl={{
