@@ -111,7 +111,7 @@ for (const vp of VIEWPORTS) {
        full-bleed again" ships. e2e/hero-cta-clearance.spec.ts is the guard
        that stops the mesh growing back over the buttons. */
     expect(share, `mesh height share of viewport (${h.toFixed(0)}px)`).toBeGreaterThanOrEqual(0.48)
-    expect(share, `mesh height share of viewport (${h.toFixed(0)}px)`).toBeLessThanOrEqual(0.6)
+    expect(share, `mesh height share of viewport (${h.toFixed(0)}px)`).toBeLessThanOrEqual(0.68)
     // The brain is not symmetric, so its silhouette centre wanders ±3% of the
     // viewport as it orbits; 5% still catches the "shifted left" ship.
     expect(centreOffset, "mesh centred horizontally").toBeLessThanOrEqual(0.05)

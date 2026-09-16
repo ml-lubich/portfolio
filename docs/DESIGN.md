@@ -449,3 +449,17 @@ actually defines.
    - `HeroScrollLayer` (`components/hero/hero-scroll-release.tsx`): Tracks previously applied transform and opacity strings, dropping redundant DOM style updates on every scroll frame once the hero is past or transforms are steady.
    - `ScrollStackCardsDesktop` (`components/cards/index.tsx`): Avoids traversing cards and rewriting DOM properties on every scroll tick when a card stack is resting outside the viewport (at `totalProgress === 0` or `1`).
 
+## Shimmer Spawn-In Primitives (2026-09-16)
+
+Ported from josephheupler.com (jheupler-site) to ensure smooth visual continuity when elements load and mount:
+
+1. **Hero 3D Brain load skeleton (.brain-skeleton)**:
+   - Matches josephheupler.com signature #7: smooth shimmer wire ring (.brain-skeleton), not an empty hole or jarring jump.
+   - Renders in `components/hero/index.tsx` while `showBrain` is false during initial deferral / Three.js compile (~1200ms).
+   - Styled with concentric wire rings, radial glow, and `skeleton-shimmer` 1.6s sweep; disabled under `prefers-reduced-motion: reduce`.
+
+2. **Section load placeholders (Skeleton & SectionSkeleton)**:
+   - Matches josephheupler.com signature #17: `Skeleton` and `SectionSkeleton` in `components/ui/skeleton.tsx`.
+   - Uses `.skel` shimmer sweep animation (`skel-shimmer-sweep` 1.8s) instead of flat pulse.
+   - Used by `components/layout/lazy-section.tsx` when `!visible` and by `app/page.tsx` for dynamic section loading states, ensuring below-the-fold content mounts with subtle skeleton shimmer instead of empty voids.
+   - Retains all height reservation invariants tested in `__tests__/lazy-section-reservations.test.ts`.

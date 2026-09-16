@@ -26,7 +26,7 @@ const TERTIARY =
 export function HeroCTAs() {
   return (
     <div
-      className="mt-10 flex animate-fade-in-up flex-col items-center gap-5 pointer-events-auto"
+      className="mt-6 flex animate-fade-in-up flex-col items-center gap-4 pointer-events-auto sm:mt-8 sm:gap-5"
       style={{ animationDelay: heroBeatDelay("ctas"), opacity: 0 }}
     >
       {/* Phones: the two pills split one row edge to edge; sm+ they hug. */}

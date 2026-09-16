@@ -987,6 +987,11 @@ body {
     filter: none;
   }
 
+  .brain-skeleton::after,
+  .skel::after {
+    animation: none !important;
+  }
+
   /* `animation: none` would leave a permanent hairline ruled across the hero,
      which is worse than the sweep. It must not render at all. */
   .hero-scanline {
@@ -1416,6 +1421,75 @@ nav[data-nav-scrolled="true"] .nav-shell {
   background-size: 1000px 100%;
   animation: shimmer 4.5s infinite;
 }
+/* Brain load skeleton — smooth shimmer wire ring (josephheupler.com signature) */
+.brain-skeleton {
+  position: relative;
+  width: min(42vw, 280px);
+  height: min(42vw, 280px);
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, rgba(255, 255, 255, 0.07), transparent 55%);
+  overflow: hidden;
+}
+
+.brain-skeleton::before {
+  content: "";
+  position: absolute;
+  inset: 18%;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 0 0 28px rgba(255, 255, 255, 0.03),
+    inset 0 0 40px rgba(255, 255, 255, 0.04);
+}
+
+.brain-skeleton::after {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.14) 50%,
+    transparent 60%
+  );
+  animation: skeleton-shimmer 1.6s ease-in-out infinite;
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    transform: translateX(-30%) rotate(12deg);
+  }
+  100% {
+    transform: translateX(30%) rotate(12deg);
+  }
+}
+
+/* Skeleton placeholder blocks with shimmer sweep */
+.skel {
+  position: relative;
+  overflow: hidden;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.skel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, 0.09) 50%, transparent 65%);
+  background-size: 250% 100%;
+  animation: skel-shimmer-sweep 1.8s ease-in-out infinite;
+}
+
+@keyframes skel-shimmer-sweep {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -50% 0;
+  }
+}
+
 
 /* ── About holo plinths — rotating hairline rings ── */
 @keyframes holo-spin {
@@ -2812,6 +2886,8 @@ article .blog-prose b a[href],
   .translucent-glow,
   .skill-tag-shine,
   .shimmer,
+  .skel::after,
+  .brain-skeleton::after,
   .pulse-ring,
   .scan-sweep::after,
   .client-carousel-track,

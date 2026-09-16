@@ -4,16 +4,8 @@ import { Navigation } from "@/components/nav"
 import { Hero } from "@/components/hero"
 import { ProfileIntro, LogoScroll, WorkMarquee } from "@/components/sections"
 import { LazySection } from "@/components/layout"
+import { SectionSkeleton } from "@/components/ui/skeleton"
 
-/* ── Skeleton placeholder while chunks load ─────────────────────────────
- *  Deliberately empty. A spinner here fires for a chunk that is loading
- *  400px+ below the fold — the reader never sees it resolve, only the flash
- *  as it is replaced. The div exists purely to hold the height its
- *  `LazySection` already reserved, so the swap moves nothing.
- * ─────────────────────────────────────────────────────────────────────── */
-function SectionSkeleton({ height = "30vh" }: { height?: string }) {
-  return <div style={{ minHeight: height }} aria-hidden="true" />
-}
 
 /* ── Below-fold sections: code-split & deferred ─────────────────────── */
 const LiveTerminal = dynamic(() => import("@/components/terminal").then(m => m.LiveTerminal), {

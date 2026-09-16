@@ -59,3 +59,54 @@ describe("shared ShimmerOverlay component", () => {
     })
   })
 })
+
+describe("shimmer spawn-in primitives (matching josephheupler.com)", () => {
+  it("hero renders .brain-skeleton when brain is not yet mounted", () => {
+    const hero = source("components/hero/index.tsx")
+    expect(hero).toContain("brain-skeleton")
+    expect(hero).toMatch(/showBrain\s*\?\s*\(?[\s\S]*?<Brain3D[\s\S]*?\)?\s*:\s*\(?[\s\S]*?brain-skeleton/)
+  })
+
+  it("globals.css defines .brain-skeleton with smooth wire ring and shimmer sweep", () => {
+    const css = source("app/globals.css")
+    expect(css).toContain(".brain-skeleton")
+    expect(css).toContain(".brain-skeleton::before")
+    expect(css).toContain(".brain-skeleton::after")
+    expect(css).toMatch(/@keyframes\s+skeleton-shimmer/)
+  })
+
+  it("globals.css disables brain-skeleton shimmer on prefers-reduced-motion", () => {
+    const css = source("app/globals.css")
+    const reduceBlocks = [...css.matchAll(/@media\s*\(\s*prefers-reduced-motion:\s*reduce\s*\)\s*\{[\s\S]*?\n\}/g)].map(m => m[0]).join("\n")
+    expect(reduceBlocks).toContain(".brain-skeleton::after")
+  })
+
+  it("components/ui/skeleton.tsx exports Skeleton and SectionSkeleton using .skel shimmer", () => {
+    const skel = source("components/ui/skeleton.tsx")
+    expect(skel).toContain("export function Skeleton")
+    expect(skel).toContain("export function SectionSkeleton")
+    expect(skel).toContain("skel")
+  })
+
+  it("globals.css defines .skel shimmer placeholders with reduced-motion guard", () => {
+    const css = source("app/globals.css")
+    expect(css).toContain(".skel")
+    expect(css).toContain(".skel::after")
+    const reduceBlocks = [...css.matchAll(/@media\s*\(\s*prefers-reduced-motion:\s*reduce\s*\)\s*\{[\s\S]*?\n\}/g)].map(m => m[0]).join("\n")
+    expect(reduceBlocks).toContain(".skel::after")
+  })
+
+  it("components/layout/lazy-section.tsx renders SectionSkeleton placeholder when not yet visible", () => {
+    const lazy = source("components/layout/lazy-section.tsx")
+    expect(lazy).toContain("SectionSkeleton")
+    expect(lazy).toMatch(/visible\s*\?\s*children\s*:\s*<SectionSkeleton/)
+    // Must NOT violate the height reservation rules
+    expect(lazy).not.toMatch(/38dvh|minHeight/)
+  })
+
+  it("app/page.tsx dynamic sections use SectionSkeleton with shimmer", () => {
+    const page = source("app/page.tsx")
+    expect(page).toContain("SectionSkeleton")
+    expect(page).toContain("import { SectionSkeleton }")
+  })
+})

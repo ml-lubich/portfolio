@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState, type ReactNode } from "react"
+import { SectionSkeleton } from "@/components/ui/skeleton"
 
 interface LazySectionProps {
   children: ReactNode
@@ -82,7 +83,7 @@ export function LazySection({
          instant the IO fires collapses the wrapper to 0 for the frame or two
          before the dynamic chunk paints, which is itself a jump. */
     >
-      {visible ? children : null}
+      {visible ? children : <SectionSkeleton className="h-full py-12" />}
     </div>
   )
 }

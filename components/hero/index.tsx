@@ -193,13 +193,17 @@ export function Hero() {
                   the viewport — the reference's ratio — on both tall and
                   short handsets instead of drifting 0.31→0.44. */}
               <div className="hero-brain-underlay h-full shrink-0 max-sm:w-full sm:aspect-[6/5]">
-                {showBrain && (
+                {showBrain ? (
                   <div className="h-full w-full">
                     <Brain3D
                       className="h-full w-full pointer-events-auto"
                       revealGate={brainRevealGate}
                       fadeDurationMs={BRAIN_FADE_MS}
                     />
+                  </div>
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center" aria-hidden="true">
+                    <div className="brain-skeleton" />
                   </div>
                 )}
               </div>
