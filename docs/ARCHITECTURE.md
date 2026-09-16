@@ -59,6 +59,17 @@ Logical coordinate space: 1000×700px. Canvas applies `ctx.scale(clientW/1000, c
 | **Post body** (MDX) | `content/blog/<slug>.mdx` | Frontmatter: title, excerpt, date, category, tags. |
 | **Listing metadata** | `data/blog/post-meta.json` | Per-slug `coverImage` and `views` (display strings). Loaded in `lib/mdx.ts` and merged when posts are read. |
 
+## MLBot (`/api/chat`)
+
+| Layer | Location | Notes |
+|--------|----------|--------|
+| **Route** | `app/api/chat/route.ts` | Node runtime, 60s cap. Rate-limit, then agent loop over OpenRouter SSE. |
+| **Cascade** | `MODELS` in the route + `formatCascadeFailure` | Free-first, one lab per slug, paid open-weight backstop. Every failed attempt is kept. |
+| **Stream ingest** | `lib/ai/chat-stream.ts` | Stitches `delta` fragments and a terminal `choices[0].message`. |
+| **Empty-final recovery** | `finalizeAssistantTurn` | Tools with no following text → grounded fallback from tool JSON. Fallback lists project names, not job titles, when both are present. |
+| **Tools** | `lib/ai/profile-tools.ts` | Structured lookups over `data/*`. `searchTerms` stems plurals; a name hit outranks a body hit so “agents” surfaces Case Triage Agent over a role that merely mentions agents. |
+| **Panel** | `components/ai-chat/mlbot.tsx` | Renders `event: tool` labels and streamed `text`. |
+
 ## AI tools
 
 | Layer | Location | Notes |

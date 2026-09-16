@@ -343,28 +343,34 @@ function searchProfile(query: string): ToolResult {
         const h = haystack.toLowerCase()
         return terms.filter((t) => h.includes(t)).length
     }
+    /* A name hit beats a mention in the body. "agents" in Case Triage Agent
+     * outranks a role whose summary merely says "agent orchestration". */
+    const score = (title: string, body: string) => {
+        const s = hit(title) * 2 + hit(body)
+        return s
+    }
 
     type Scored = { score: number; kind: string; item: unknown }
     const scored: Scored[] = []
 
     for (const e of slimExperience()) {
-        const s = hit(`${e.role} ${e.company} ${e.summary} ${e.tech.join(" ")}`)
+        const s = score(e.role, `${e.company} ${e.summary} ${e.tech.join(" ")}`)
         if (s) scored.push({ score: s, kind: "experience", item: e })
     }
     for (const p of slimProjects()) {
-        const s = hit(`${p.name} ${p.summary} ${p.metric} ${p.tech.join(" ")}`)
+        const s = score(p.name, `${p.summary} ${p.metric} ${p.tech.join(" ")}`)
         if (s) scored.push({ score: s, kind: "project", item: p })
     }
     for (const c of skillCategories) {
-        const s = hit(`${c.category} ${c.items.join(" ")} ${c.backDetails.join(" ")}`)
+        const s = score(c.category, `${c.items.join(" ")} ${c.backDetails.join(" ")}`)
         if (s) scored.push({ score: s, kind: "skill", item: { category: c.category, items: c.items } })
     }
     for (const p of slimPapers()) {
-        const s = hit(`${p.title} ${p.venue} ${p.summary}`)
+        const s = score(p.title, `${p.venue} ${p.summary}`)
         if (s) scored.push({ score: s, kind: "publication", item: p })
     }
     for (const t of slimTestimonials()) {
-        const s = hit(`${t.quote} ${t.name} ${t.organization}`)
+        const s = score(t.name, `${t.quote} ${t.organization}`)
         if (s) scored.push({ score: s, kind: "testimonial", item: t })
     }
 

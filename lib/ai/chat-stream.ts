@@ -111,8 +111,8 @@ export function finalizeAssistantTurn(reply: AssistantTurn, toolPayloads: string
 }
 
 export function fallbackFromToolPayloads(payloads: string[]): string {
-    const matchNames = collectNames(payloads, "matches")
-    const names = matchNames.length ? matchNames : collectNames(payloads, "projects")
+    const fromMatchProjects = collectMatchProjects(payloads)
+    const names = fromMatchProjects.length ? fromMatchProjects : collectNames(payloads, "projects")
     if (!names.length) {
         const roles = collectExperience(payloads)
         if (roles.length) {
@@ -121,6 +121,22 @@ export function fallbackFromToolPayloads(payloads: string[]): string {
         return "I looked that up but the write-up did not come back. Ask again, or name a project."
     }
     return `Here is what is in the profile:\n${names.map((n) => `• ${n}`).join("\n")}`
+}
+
+function collectMatchProjects(payloads: string[]): string[] {
+    const names: string[] = []
+    for (const raw of payloads) {
+        const data = parseJson(raw)
+        const rows = data?.matches
+        if (!Array.isArray(rows)) continue
+        for (const row of rows) {
+            if (typeof row !== "object" || row === null) continue
+            const rec = row as Record<string, unknown>
+            if (rec.kind !== "project") continue
+            if (typeof rec.name === "string" && rec.name.trim()) names.push(rec.name.trim())
+        }
+    }
+    return [...new Set(names)].slice(0, 8)
 }
 
 function collectNames(payloads: string[], key: "matches" | "projects"): string[] {

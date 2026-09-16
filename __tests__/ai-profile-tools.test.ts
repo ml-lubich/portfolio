@@ -102,6 +102,10 @@ describe("search", () => {
             matches.some((m) => /agent|mcp|imsg|imail|aigis/i.test(`${m.name ?? ""} ${m.role ?? ""} ${m.title ?? ""}`)),
             `agent work missing from ${JSON.stringify(matches.map((m) => m.name ?? m.role ?? m.title))}`,
         ).toBe(true)
+        expect(
+            matches.some((m) => m.kind === "project" && /agent/i.test(m.name ?? "")),
+            `named agent project missing from ${JSON.stringify(matches.map((m) => m.name ?? m.role))}`,
+        ).toBe(true)
     })
 
     it("get_projects('agents') still returns agent-named work, not an empty tech-tag miss", () => {

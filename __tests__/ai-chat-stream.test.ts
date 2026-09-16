@@ -100,6 +100,18 @@ describe("empty reply after tools", () => {
         expect(text).toMatch(/imsg-mcp/)
         expect(text).not.toMatch(/Equiverse/)
     })
+
+    it("lists built projects, not job titles, when both came back from tools", () => {
+        /* Live 2026-09-15: search ranked EchoStar / consultant first, so the
+         * fallback printed "Staff AI Engineer" and skipped Case Triage Agent
+         * even though get_projects({tag:"agents"}) had it. */
+        const text = fallbackFromToolPayloads([
+            '{"matches":[{"kind":"experience","role":"Staff AI Engineer"},{"kind":"project","name":"confluence-cli"}]}',
+            '{"projects":[{"name":"Case Triage Agent"},{"name":"AI Invoice Agent"}]}',
+        ])
+        expect(text).toMatch(/Case Triage Agent|confluence-cli/)
+        expect(text).not.toMatch(/Staff AI Engineer/)
+    })
 })
 
 describe("route wiring", () => {

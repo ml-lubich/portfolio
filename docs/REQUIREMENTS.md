@@ -41,5 +41,5 @@ Append new constraints or decisions as new bullets or dated subsections; do not 
 ### 2026-09-14 — MLBot must answer after tools
 
 - A chat turn that called a tool and then streamed `event: done` with no text is a failure. Recover with `finalizeAssistantTurn` + a grounded fallback from the tool JSON.
-- `searchTerms` strips punctuation and question stopwords; `agents` stems to `agent`. `get_projects` matches name + summary + tags, not tags alone.
+- `searchTerms` strips punctuation and question stopwords; `agents` stems to `agent`. A name hit outranks a body mention. `get_projects` matches name + summary + tags, not tags alone. A silent-final fallback lists project names, not job titles, when both came back.
 - After a tool returns, the model writes the answer. It does not call the same tool twice. An empty reply after tools is a failure.

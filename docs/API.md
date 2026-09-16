@@ -28,7 +28,7 @@ The homepage navigation is exported from `components/nav/index.tsx` as `Navigati
 
 ## Environment variables
 
-No runtime secrets are required for local development. Deployment hosts may provide standard Next.js environment variables. `HUGGINGFACE_API_TOKEN` is optional and enables the `/tools` prompt linter AI critique. `HUGGINGFACE_PROMPT_LINTER_MODEL` optionally overrides the default free/serverless Hugging Face model. Do not commit `.env` values.
+No runtime secrets are required for local development. Deployment hosts may provide standard Next.js environment variables. `OPENROUTER_API_KEY` enables MLBot (`POST /api/chat`); without it the route returns `503 {"error":"Chat is not configured."}`. `CHAT_RATE_SECRET` signs the visitor cookie. `HUGGINGFACE_API_TOKEN` is optional and enables the `/tools` prompt linter AI critique. `HUGGINGFACE_PROMPT_LINTER_MODEL` optionally overrides the default free/serverless Hugging Face model. Do not commit `.env` values.
 
 ## Package scripts
 

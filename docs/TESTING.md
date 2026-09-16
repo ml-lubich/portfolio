@@ -23,7 +23,7 @@
 ## Automated: MLBot chat recovery
 
 - `__tests__/ai-chat-stream.test.ts` — OpenRouter chunk ingest (delta fragments, final `message.content`, array content parts), empty-final-after-tools fallback (must emit grounded text, never a bare `done`), cascade errors name every failed attempt, and `app/api/chat/route.ts` is wired to those helpers.
-- `__tests__/ai-profile-tools.test.ts` — `search_profile` on “What has Misha built with agents?” returns agent work; `searchTerms` stems `agents` → `agent` and drops question stopwords. `__tests__/ai-model-slugs.test.ts` still checks the cascade slugs exist upstream and advertise tools.
+- `__tests__/ai-profile-tools.test.ts` — `search_profile` on “What has Misha built with agents?” returns a named agent project (name hit outranks a body mention); `searchTerms` stems `agents` → `agent` and drops question stopwords. `__tests__/ai-model-slugs.test.ts` still checks the cascade slugs exist upstream and advertise tools.
 - A chat is working only when one real lookup question produces at least one `event: tool`, non-empty `event: text`, and zero `event: error`. HTTP 200 plus `event: done` with no text is a fail — that was the 2026-09-14 production blank-bubble.
 - `__tests__/hero-scrim-halo.test.ts` — `.hero-copy-halo` filter includes a white light bloom (`0 0 34px`) as well as the dark ink halo.
 - `__tests__/oss-demos.test.ts` — every showcase entry has a real install command; `ossInstallAll()` is a copy-pasteable brew/pip/pipx/npm/git block. `__tests__/open-source-showcase.test.ts` — install lines render as selectable `<pre><code>`, not a truncated button label.
