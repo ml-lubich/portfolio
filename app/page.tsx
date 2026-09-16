@@ -114,7 +114,7 @@ export default function Home() {
         >
           <Projects />
         </LazySection>
-        <LazySection sectionId="open-source" className={`min-h-[1500px] md:min-h-[1060px] ${LAZY_SECTION_TOP}`}>
+        <LazySection sectionId="open-source" className={`min-h-[3600px] md:min-h-[2000px] ${LAZY_SECTION_TOP}`}>
           <OpenSourceShowcase />
         </LazySection>
         <LazySection sectionId="mac-demos" className={`min-h-[850px] md:min-h-[750px] ${LAZY_SECTION_TOP}`}>
