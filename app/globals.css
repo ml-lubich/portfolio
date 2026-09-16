@@ -3352,8 +3352,38 @@ article .blog-prose b a[href],
 }
 
 .oss-install,
-.oss-install-all {
+.oss-install-all,
+.oss-install-fork,
+.oss-copy-command code {
   user-select: all;
+}
+
+/* ── OSS agent tool grid — profile-card glow on mishalubich.com ───── */
+.oss-tool-grid {
+  isolation: isolate;
+}
+
+.oss-tool-card {
+  animation: oss-tool-border-pulse 6s ease-in-out infinite;
+}
+
+.oss-tool-card:nth-child(2n) {
+  animation-delay: 1.2s;
+}
+
+.oss-tool-card:nth-child(3n) {
+  animation-delay: 2.4s;
+}
+
+@keyframes oss-tool-border-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 1px hsl(var(--primary) / 0.12), 0 0 24px -8px hsl(var(--primary) / 0.2);
+  }
+
+  50% {
+    box-shadow: 0 0 0 1px hsl(var(--primary) / 0.45), 0 0 32px -6px hsl(var(--accent-glow) / 0.35);
+  }
 }
 
 @keyframes oss-node-glow {
@@ -3393,6 +3423,10 @@ article .blog-prose b a[href],
   .oss-signal {
     stroke-dasharray: none;
     opacity: 0.4;
+  }
+
+  .oss-tool-card {
+    animation: none !important;
   }
 }
 

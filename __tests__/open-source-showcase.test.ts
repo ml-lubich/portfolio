@@ -92,6 +92,13 @@ describe("OpenSourceShowcase", () => {
     expect(src).toMatch(/<pre[\s\S]{0,200}<code/)
     expect(src).toMatch(/select-all|user-select:\s*all|oss-install-all/)
   })
+
+  it("renders the OSS agent tool grid with click-to-copy install rows", () => {
+    expect(src).toMatch(/OssToolGrid/)
+    const grid = fs.readFileSync(path.join(ROOT, "components/sections/oss-tool-grid.tsx"), "utf8")
+    expect(grid).toMatch(/CopyCommand/)
+    expect(grid).toMatch(/Open-Source Agent Tools/)
+  })
 })
 
 describe("OssDemoCard visual signature", () => {

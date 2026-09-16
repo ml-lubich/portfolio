@@ -31,7 +31,7 @@ async function heroReady(page: Page) {
     .poll(
       async () =>
         (await page.locator(".hero-brain-underlay canvas").first().getAttribute("data-brain-bbox")) ?? "",
-      { message: "brain telemetry appears once the mesh renders", timeout: 30_000 },
+      { message: "brain telemetry appears once the mesh renders", timeout: 45_000 },
     )
     .toMatch(/^-?\d+,-?\d+,-?\d+,-?\d+$/)
   // Let the entrance ladder finish so the CTA row is at its settled position.

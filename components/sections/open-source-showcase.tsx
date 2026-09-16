@@ -35,6 +35,7 @@ import {
 import { DetailPanel } from "../detail-panel"
 import { SectionHeader } from "../layout/section-header"
 import { OssDemoCard } from "./oss-demo-card"
+import { OssToolGrid } from "./oss-tool-grid"
 import { ossAccent } from "@/lib/theme"
 import { ossDemos, ossInstallAll } from "@/data/oss-demos"
 import { projects } from "@/data/projects"
@@ -137,6 +138,10 @@ export function OpenSourceShowcase() {
           Value-maxxing<span className="text-muted-foreground/60">,</span> not{" "}
           <span className="gradient-text">tokenmaxxing</span>
         </p>
+
+        <div className="mb-8">
+          <OssToolGrid />
+        </div>
 
         <div className="oss-install-all mb-6 overflow-hidden rounded-2xl border border-white/[0.12] bg-black/40">
           <div className="flex items-center justify-between gap-3 border-b border-white/[0.08] px-3 py-2 sm:px-4">
