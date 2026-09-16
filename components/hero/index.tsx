@@ -111,7 +111,7 @@ export function Hero() {
          stats) rather than one centred stack, so the 144px pad was 32px the
          CTA row could not spare — it pushed the row down onto the scroll cue
          at 1440×900. */
-      className="relative flex min-h-[90svh] flex-col items-center justify-center overflow-hidden pb-16 max-sm:min-h-[100svh] max-sm:justify-center max-sm:pt-32 sm:pt-28 md:min-h-screen md:pb-24 md:pt-28"
+      className="relative flex min-h-[90svh] flex-col items-center overflow-hidden pb-16 max-sm:min-h-[100svh] max-sm:justify-center max-sm:pt-32 sm:pt-28 md:min-h-screen md:pb-24 md:pt-28"
     >
       {/* Spectrum lives only in this section (not fixed to viewport) — avoids mobile scroll seam / mask repaint */}
       <BackgroundOrbs />
@@ -121,6 +121,13 @@ export function Hero() {
       <div className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[100svh]" aria-hidden>
         <CircuitField />
       </div>
+
+      {/* Ambient wash — page gradient + cool top bloom (Client Work read). */}
+      <div
+        className="hero-ambient-wash pointer-events-none absolute inset-0 z-[1]"
+        aria-hidden="true"
+        style={{ background: "var(--hero-ambient-wash)", backgroundSize: "100% 100%" }}
+      />
 
       {/* Vignette */}
       <div
@@ -143,51 +150,93 @@ export function Hero() {
           than under it: at z-[5] the brain's own canvas hid it. */}
       <div className="hero-scanline z-20" aria-hidden="true" style={{ top: 0 }} />
 
-      {/* Brain stage — 1:1 with josephheupler.com's `.brain-stage`:
-          absolute inset-0, box `h-[min(92vh,860px)] w-[min(120%,980px)]`.
-          Phone size is the CSS override on `.hero-brain-underlay`
-          (54svh / 420px). Copy and CTAs overlay the mesh the way his do. */}
-      <div
-        className="hero-brain-stage pointer-events-none absolute inset-0 z-[1] flex items-center justify-center"
-        aria-hidden
-      >
-        <HeroScrollLayer
-          layer="brain"
-          className="pointer-events-none flex h-full w-full items-center justify-center"
-        >
-          <div className="hero-brain-underlay h-[min(92vh,860px)] w-[min(120%,980px)] shrink-0">
-            {showBrain && (
-              <div className="h-full w-full">
-                <Brain3D
-                  className="h-full w-full pointer-events-auto"
-                  revealGate={brainRevealGate}
-                  fadeDurationMs={BRAIN_FADE_MS}
-                />
-              </div>
-            )}
-          </div>
-        </HeroScrollLayer>
-      </div>
-
-      {/* Centre wash — light, because type carries its own ink halo. */}
-      <div
-        className="pointer-events-none absolute inset-0 z-[2]"
-        style={{ background: "var(--hero-stage-scrim)" }}
-        aria-hidden="true"
-      />
-
-      {/* Copy + CTAs + stats sit over the mesh, josephheupler.com's read. */}
+      {/* Content — three stacked bands:
+          1. the brain band, where the mesh sits behind the name / role /
+             tagline and NOTHING else (josephheupler.com's read: type over the
+             wireframe, no chrome on it);
+          2. the CTA band, which owns its own strip of the hero *underneath*
+             the mesh — the pills and the tertiary row used to land dead centre
+             on the brain, which is what "the buttons are obscuring it" meant,
+             and what forced the centre wash up to ~0.96 combined opacity just
+             to keep 13px text legible on top of them;
+          3. everything else — the Tokscale card and stat row. */}
       <div className="relative z-10 mx-auto w-full max-w-6xl px-3 text-center pointer-events-none md:px-6">
-        <div className="hero-copy-halo relative z-[3] w-full">
-          <HeroTagline />
-          <RoleRotator />
-          <HeroSubtitle />
-        </div>
-        <div className="relative z-[3] w-full">
-          <HeroCTAs />
+        <div className="relative flex w-full flex-col items-center">
+          {/* Brain band. Its height IS the brain box's height — the box below
+              is `h-full`, so the canvas can never reach past this band into
+              the CTA strip. That invariant is what e2e/hero-cta-clearance.spec.ts
+              asserts with getBoundingClientRect at three viewports; sizing the
+              box independently of the band (`h-[min(100svh,70vw)]`, as it was)
+              is exactly how the canvas came to cover the whole hero.
+
+              The band never shrinks below the copy it holds, so a long role
+              line grows the band and the mesh with it rather than clipping. */}
+          <div className="relative flex w-full items-center justify-center min-h-[min(420px,50svh)] sm:min-h-[min(64svh,52vw)]">
+            {/* HeroScrollLayer adds the scroll-out "release" (desktop only). */}
+            <HeroScrollLayer
+              layer="brain"
+              className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center"
+              aria-hidden
+            >
+              {/* The mask lives on the box, not the underlay: a mask clips to
+                  its own border box.
+
+                  `h-full` ties the box to the band (see above). sm+ keeps the
+                  landscape 6:5 aspect so the auto-rotating long axis has
+                  horizontal headroom and the tighter desktop camera never
+                  slices it. Phones stay full-width at the band's height —
+                  josephheupler.com's 420px canvas, mesh ~300px inside it
+                  (camera tiers in components/brain/index.tsx), but capped at
+                  half the viewport: a flat 420px is 64% of a 659px-tall
+                  screen, which pushed the CTA row down onto the floating
+                  chat button. min(420px,50svh) holds the mesh at ~0.345 of
+                  the viewport — the reference's ratio — on both tall and
+                  short handsets instead of drifting 0.31→0.44. */}
+              <div className="hero-brain-underlay h-full shrink-0 max-sm:w-full sm:aspect-[6/5]">
+                {showBrain && (
+                  <div className="h-full w-full">
+                    <Brain3D
+                      className="h-full w-full pointer-events-auto"
+                      revealGate={brainRevealGate}
+                      fadeDurationMs={BRAIN_FADE_MS}
+                    />
+                  </div>
+                )}
+              </div>
+            </HeroScrollLayer>
+
+            {/* Centre wash — only the name / role / tagline are drawn over the
+                mesh now, and those carry their own ink halo (.hero-copy-halo
+                in app/globals.css, josephheupler.com's technique), so this can
+                be a light touch instead of the near-opaque disc that made the
+                brain read as a grey blob. Run out to the screen edges (past
+                the wrapper's px-3) or the ellipse clips into a visible
+                vertical seam at the band's sides. */}
+            <div
+              className="pointer-events-none absolute inset-0 z-[1] max-sm:-inset-x-3"
+              style={{ background: "var(--hero-stage-scrim)" }}
+              aria-hidden="true"
+            />
+
+            {/* josephheupler.com's vertical rhythm: eyebrow, name, role,
+                lede. Ours had the eyebrow third, between the role and the
+                lede, which buried it. Same elements, reordered — nothing
+                dropped. */}
+            <div className="hero-copy-halo relative z-[2] w-full">
+              <HeroTagline />
+              <RoleRotator />
+              <HeroSubtitle />
+            </div>
+          </div>
+
+          {/* CTA band — below the mesh, never on it. */}
+          <div className="relative z-[2] w-full">
+            <HeroCTAs />
+          </div>
         </div>
 
-        <HeroScrollLayer layer="stats" className="relative z-[3]">
+        {/* Below the brain — lags the page slightly on desktop (parallax). */}
+        <HeroScrollLayer layer="stats" className="relative z-[2]">
           <TokscaleHeroBadge />
           <SocialLinks />
           <RotatingStats />

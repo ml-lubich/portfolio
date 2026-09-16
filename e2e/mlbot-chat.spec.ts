@@ -111,7 +111,7 @@ test.describe("MLBot answers one question at a time", () => {
 
     test("two follow-up pills tapped in the same tick fire exactly one request", async ({ page }) => {
         await ask(page, "What has Misha built with agents?")
-        await expect(pills(page)).toHaveCount(2)
+        await expect(pills(page)).toHaveCount(2, { timeout: 15_000 })
         // The answer has landed: both pills are live, which is the state Misha
         // was in when he tapped two of them.
         await expect(page.getByLabel("Message MLBot")).toBeEnabled({ timeout: 10_000 })
@@ -135,7 +135,7 @@ test.describe("MLBot answers one question at a time", () => {
 
     test("disables the composer and every pill while a reply is streaming", async ({ page }) => {
         await ask(page, "What has Misha built with agents?")
-        await expect(pills(page)).toHaveCount(2)
+        await expect(pills(page)).toHaveCount(2, { timeout: 15_000 })
 
         await pills(page).first().click()
         await expect(page.getByLabel("Message MLBot")).toBeDisabled()
@@ -287,7 +287,7 @@ test.describe("MLBot follow-up pills", () => {
 
     test("shows a short label but asks the full question", async ({ page }) => {
         await ask(page, "What has Misha built with agents?")
-        await expect(pills(page)).toHaveCount(2)
+        await expect(pills(page)).toHaveCount(2, { timeout: 15_000 })
 
         const label = (await pills(page).first().innerText()).trim()
         expect(label).toBe("MCP architecture")

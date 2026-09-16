@@ -233,31 +233,29 @@ is one stack per page and we are at three, so no fourth was added. Gates:
 `__tests__/hero-brain-size.test.ts`, `__tests__/scroll-craft.test.ts`,
 `e2e/hero-brain-fit.spec.ts`.
 
-## Hero brain: 1:1 josephheupler.com box + camera (2026-09-14)
+## Hero: three-band layout + ambient wash (2026-09-15)
 
-The 50svh / 64svh banded box and the further desktop camera (`z 1.82` / `fov 38`)
-made this brain a thumbnail next to josephheupler.com. The mapping is now
-literal, not "Heupler-scale":
+The hero is **three stacked bands**, not one absolute overlay on a full-viewport
+brain box:
 
-| Knob | josephheupler.com | This site |
-|------|-------------------|-----------|
-| Stage | `.brain-stage` absolute `inset-0` | `.hero-brain-stage` absolute `inset-0` |
-| Desktop box | `h-[min(92vh,860px)] w-[min(120%,980px)]` | same classes on `.hero-brain-underlay` |
-| Phone box | `min(54svh, 420px)` × `min(132%, 470px)` | same CSS on `.hero-brain-underlay` |
-| Camera | `1.38/48`, `1.48/47`, `1.62/46`, `1.55/44` | same literals in `getInitialCam` |
-| Copy / CTAs | overlaid on the mesh | overlaid; clickability is the gate, not zero overlap |
+1. **Brain band** — mesh behind name / role / tagline only. Box is `h-full` inside
+   `min-h-[min(420px,50svh)] sm:min-h-[min(64svh,52vw)]`, `sm:aspect-[6/5]`.
+2. **CTA band** — pills and tertiary row sit **below** the mesh, never on it.
+3. **Stats band** — Tokscale badge, social row, rotating stats.
 
-`e2e/hero-brain-fit.spec.ts` asserts the canvas matches those box heights and
-that the projected mesh fills ≥65% of the box (desktop) / ≥60% (phone).
-`e2e/hero-cta-clearance.spec.ts` asserts each CTA is the topmost hit at its
-centre. Coarse-pointer `pointer-events: none` and `touch-action: pan-y` stay
-so a handset can scroll past the hero. Gates: `__tests__/hero-brain-size.test.ts`,
-`__tests__/hero-mobile-layout.test.ts`, `e2e/hero-brain-fit.spec.ts`.
+Desktop camera: `z 1.82` / `fov 38` (measured fit inside the band). Phone tiers
+in `getInitialCam` target ~71% mesh fill in the 420px canvas. The Joseph-scale
+absolute `inset-0` stage (`92vh` box with CTAs overlaid) shipped 2026-09-14 and
+was reverted — it read as a thumbnail on desktop and put buttons on the brain.
 
-Hero type keeps the dark ink halo (glyphs stay sharp over the mesh) **and** a
-white light bloom (`0 0 34px rgba(255,255,255,0.32)` on `.hero-copy-halo`), the
-same shiny read josephheupler.com uses on skill titles. The bloom is dark-theme
-only — light mode drops it so the page does not fog. Gate: `__tests__/hero-scrim-halo.test.ts`.
+**Ambient gradient:** `--hero-ambient-wash` layers a cool top bloom over
+`--page-wash` on `.hero-ambient-wash` inside `#hero` (same read as Client Work).
+Gate: `__tests__/hero-scrim-halo.test.ts`.
+
+Hero type keeps the dark ink halo **and** a white light bloom on `.hero-copy-halo`
+(dark theme only). Gates: `__tests__/hero-brain-size.test.ts`,
+`__tests__/hero-mobile-layout.test.ts`, `e2e/hero-brain-fit.spec.ts`,
+`e2e/hero-cta-clearance.spec.ts`.
 
 ## About section: leads with the current role, no dead space (2026-09-05)
 

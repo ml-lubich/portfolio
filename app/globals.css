@@ -74,6 +74,10 @@
       radial-gradient(ellipse 95% 55% at 50% -12%, rgba(96, 124, 200, 0.16), transparent 66%),
       radial-gradient(ellipse 60% 45% at 8% 26%, rgba(84, 52, 126, 0.13), transparent 72%),
       radial-gradient(ellipse 60% 45% at 92% 74%, rgba(28, 78, 120, 0.14), transparent 72%);
+    /* Hero-only ambient: cool top bloom over the page wash, like Client Work. */
+    --hero-ambient-wash:
+      radial-gradient(ellipse 90% 60% at 50% 20%, color-mix(in srgb, var(--accent-glow) 18%, transparent), transparent 72%),
+      var(--page-wash);
 
     /* surfaces */
     --background: 220 20% 4%;
@@ -172,6 +176,9 @@
       radial-gradient(ellipse 95% 55% at 50% -12%, rgba(96, 124, 200, 0.14), transparent 66%),
       radial-gradient(ellipse 60% 45% at 8% 26%, rgba(126, 104, 178, 0.10), transparent 72%),
       radial-gradient(ellipse 60% 45% at 92% 74%, rgba(74, 140, 186, 0.12), transparent 72%);
+    --hero-ambient-wash:
+      radial-gradient(ellipse 90% 60% at 50% 20%, color-mix(in srgb, var(--accent-glow) 14%, transparent), transparent 72%),
+      var(--page-wash);
     /* Glass surfaces on a light page: a translucent white fill with a real
        border, instead of the dark-glass gradient the cards were hard-coding. */
     --glass-fill: linear-gradient(135deg, hsla(0, 0%, 100%, 0.92) 0%, hsla(220, 30%, 97%, 0.78) 100%);
@@ -973,16 +980,13 @@ body {
   }
 }
 
-/* Phones: josephheupler.com's .brain-glow override. The 92vh desktop box
-   is the whole handset; min(54svh, 420px) × min(132%, 470px) is his phone
-   canvas. Written in CSS because `h-[min(54svh,420px)]` silently failed to
-   emit a rule in the reference build. No mask — the crown is drawn in full. */
+/* Phones: no mask. The box is a fixed 420px canvas sitting well under the nav
+   (josephheupler.com's, which draws the crown in full), so the nav-seam fade
+   has nothing to soften and would only eat the top of the mesh. */
 @media (max-width: 639px) {
   .hero-brain-underlay {
     -webkit-mask-image: none;
     mask-image: none;
-    height: min(54svh, 420px) !important;
-    width: min(132%, 470px) !important;
   }
 }
 

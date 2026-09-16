@@ -34,13 +34,31 @@ class WebGLErrorBoundary extends Component<
 
 function getInitialCam() {
   const w = typeof window !== "undefined" ? window.innerWidth : 1200
-  /* 1:1 with josephheupler.com (jheupler-site/components/brain/index.tsx).
-     Closer camera = larger mesh. A further/narrower desk framing (z 1.82 /
-     fov 38) is what made this brain a thumbnail next to his. */
-  if (w < 480) return { z: 1.38, fov: 48 }
-  if (w < 640) return { z: 1.48, fov: 47 }
-  if (w < 1024) return { z: 1.62, fov: 46 }
-  return { z: 1.55, fov: 44 }
+  /* Phones: the box is josephheupler.com's 100vw × 420px canvas
+     (components/hero/index.tsx) and the target is his mesh — ~300px tall,
+     ~71% of the box, 35% of an 844px viewport. At z 1.15 / 1.22 ours filled
+     86% of a 468px square (404px, 48% of the viewport). The two tiers differ
+     because getBrainMeshViewportScale steps 0.42 → 0.46 at 480px. Measured
+     via BrainTelemetry; e2e/hero-brain-fit.spec.ts asserts the share. */
+  if (w < 480) return { z: 1.4, fov: 46 }
+  if (w < 640) return { z: 1.56, fov: 45 }
+  if (w < 1024) return { z: 1.58, fov: 44 }
+  /* Desktop: the box is one viewport tall (components/hero/index.tsx), so the
+     mesh's share of the viewport is set here. Target: the projected mesh
+     spans 82–88% of the viewport height at 1440×900 and 1920×1080 — the
+     josephheupler.com read — and stays inside the box on every side while
+     it auto-rotates (the 6:5 landscape box gives the long axis its room).
+     The narrower FOV at this distance keeps the near side from ballooning
+     the way a close camera at 42° did. Measured, not guessed: BrainTelemetry
+     writes the projected extent to the canvas and e2e/hero-brain-fit.spec.ts
+     asserts it at four viewports. */
+  /* 1.82, not 1.9: flattening the mesh pitch to josephheupler.com's 0.08π
+     (components/brain/brain-wireframe.tsx) foreshortens the crown-to-stem
+     axis, and the projected height fell to 80.3% of the viewport — inside the
+     e2e tolerance but under the 82–88% target. The pose is the look; the
+     camera distance is the knob that serves the fit, so the knob moved.
+     Measured back to ~84% at all four widths. */
+  return { z: 1.82, fov: 38 }
 }
 
 function prefersReducedMotion(): boolean {
@@ -240,9 +258,21 @@ export function Brain3D({
               autoRotate
               autoRotateSpeed={0.9}
               enableRotate
-              /* Joseph clamps nothing. Our floating nav pill still needs a
-                 pitch stop or the crown slices under it. ±0.9 is the loosest
-                 clamp that still fits the 92vh / 860px box. */
+              /* Joseph clamps nothing, and at ±0.22 (±12.6°) a vertical drag
+                 here moved the mesh 3px — the "not rotatable fully"
+                 complaint. His camera is wider than ours (fov 44 @ z 1.55 vs
+                 our desktop 38 @ 1.82), so a truly free pitch does not fit:
+                 measured, it runs 88px past the canvas top near the poles and
+                 the crown is sliced off.
+
+                 ±0.9 (±51.6°) is the loosest clamp that still fits. Measured
+                 worst case — pitched to the stop, then swept a full azimuth
+                 turn, since the mesh is not axisymmetric and its projected
+                 height depends on both angles: 37px of margin at 1440×900,
+                 52px at 390×844. ±1.1 left only 13px, which is inside the
+                 noise. The camera is the knob that would buy a free pitch,
+                 and it is tuned to the hero fit (see getInitialCam), so the
+                 clamp gives way instead. */
               minPolarAngle={Math.PI / 2 - 0.9}
               maxPolarAngle={Math.PI / 2 + 0.9}
               enableZoom={false}

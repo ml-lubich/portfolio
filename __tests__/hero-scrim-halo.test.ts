@@ -55,6 +55,20 @@ describe("hero copy halo", () => {
     })
 })
 
+describe("hero ambient wash", () => {
+    it("defines a hero ambient gradient token for the restored three-band stage", () => {
+        expect(css).toMatch(/--hero-ambient-wash:/)
+        const decl = declarations("--hero-ambient-wash")[0] ?? ""
+        expect(decl).toMatch(/radial-gradient/)
+        expect(decl).toMatch(/var\(--page-wash\)|var\(--body-wash\)/)
+    })
+
+    it("renders the ambient wash inside #hero", () => {
+        const hero = readFileSync(resolve(__dirname, "../components/hero/index.tsx"), "utf8")
+        expect(hero).toMatch(/hero-ambient-wash|--hero-ambient-wash/)
+    })
+})
+
 describe("hero washes", () => {
     it("never lets the stage wash dim the mesh into a grey blob", () => {
         const decls = declarations("--hero-stage-scrim")
