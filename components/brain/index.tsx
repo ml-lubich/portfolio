@@ -40,9 +40,9 @@ function getInitialCam() {
      86% of a 468px square (404px, 48% of the viewport). The two tiers differ
      because getBrainMeshViewportScale steps 0.42 → 0.46 at 480px. Measured
      via BrainTelemetry; e2e/hero-brain-fit.spec.ts asserts the share. */
-  if (w < 480) return { z: 1.4, fov: 46 }
-  if (w < 640) return { z: 1.56, fov: 45 }
-  if (w < 1024) return { z: 1.58, fov: 44 }
+  if (w < 480) return { z: 1.52, fov: 46 }
+  if (w < 640) return { z: 1.68, fov: 45 }
+  if (w < 1024) return { z: 1.72, fov: 44 }
   /* Desktop: the box is one viewport tall (components/hero/index.tsx), so the
      mesh's share of the viewport is set here. Target: the projected mesh
      spans 82–88% of the viewport height at 1440×900 and 1920×1080 — the
@@ -58,7 +58,7 @@ function getInitialCam() {
      e2e tolerance but under the 82–88% target. The pose is the look; the
      camera distance is the knob that serves the fit, so the knob moved.
      Measured back to ~84% at all four widths. */
-  return { z: 1.82, fov: 38 }
+  return { z: 1.98, fov: 38 }
 }
 
 function prefersReducedMotion(): boolean {

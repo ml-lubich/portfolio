@@ -60,7 +60,7 @@ describe("hero brain stage sizing", () => {
     // mesh ~300px inside. Capped at half the viewport so a short handset
     // (659px of usable height in a browser) doesn't get a 64%-tall mesh that
     // shoves the CTA row onto the floating chat button.
-    expect(bandLine).toContain("min-h-[min(420px,50svh)]")
+    expect(bandLine).toContain("min-h-[min(480px,58svh)]")
     expect(boxLine).toContain("max-sm:w-full")
     expect(boxLine, "vw-wide boxes are how the scroll trap shipped").not.toMatch(/max-sm:w-\[min\(\d+vw/)
   })
@@ -81,7 +81,7 @@ describe("hero brain stage sizing", () => {
     // The structural half of the "buttons are obscuring the brain" fix. The
     // pixel half is e2e/hero-cta-clearance.spec.ts; this catches a refactor
     // that folds HeroCTAs back into the copy stack without running a browser.
-    const band = /min-h-\[min\(420px,50svh\)\][\s\S]*?<\/div>\s*\n\s*\{\/\* CTA band/.exec(hero)?.[0] ?? ""
+    const band = /min-h-\[min\(480px,58svh\)\][\s\S]*?<\/div>\s*\n\s*\{\/\* CTA band/.exec(hero)?.[0] ?? ""
     expect(band, "brain band must be followed by a separate CTA band").not.toBe("")
     expect(band, "HeroCTAs must not render inside the brain band").not.toContain("<HeroCTAs")
   })

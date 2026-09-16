@@ -18,7 +18,7 @@
     --card-fill: rgb(10 12 20 / 0.72);
     --card-fill-hover: rgb(14 17 26 / 0.86);
     /* Metallic text shine: bright stops read as sheen on a dark page. */
-    --metal-mid: hsl(220 15% 84%);
+    --metal-mid: hsl(220 8% 92%);
     --metal-hi: hsl(0 0% 100%);
     --surface-0: #07080a;
     --surface-1: #0a0c10;
@@ -31,8 +31,8 @@
     --accent-glow-soft: #61bcff57;
 
     /* Hero washes — applied as inline styles, so they must be vars to theme. */
-    --hero-overlay: linear-gradient(rgba(4,5,10,0.80), rgba(4,5,10,0.80)), radial-gradient(ellipse 60% 50% at 50% 45%, rgba(8,10,18,0.35) 0%, transparent 100%);
-    --hero-scrim: radial-gradient(ellipse 48% 32% at 50% 40%, rgba(6,8,14,0.52) 0%, rgba(6,8,14,0.34) 52%, transparent 82%), linear-gradient(to bottom, rgba(6,8,14,0.30) 0%, rgba(6,8,14,0.28) 30%, rgba(6,8,14,0.18) 46%, rgba(6,8,14,0.06) 60%, transparent 76%);
+    --hero-overlay: linear-gradient(rgba(4,5,10,0.38), rgba(4,5,10,0.38)), radial-gradient(ellipse 60% 50% at 50% 45%, rgba(8,10,18,0.18) 0%, transparent 100%);
+    --hero-scrim: radial-gradient(ellipse 48% 32% at 50% 40%, rgba(6,8,14,0.30) 0%, rgba(6,8,14,0.20) 52%, transparent 82%), linear-gradient(to bottom, rgba(6,8,14,0.18) 0%, rgba(6,8,14,0.16) 30%, rgba(6,8,14,0.10) 46%, rgba(6,8,14,0.03) 60%, transparent 76%);
     /* Centre wash behind the hero copy — the only layer that dims the mesh
        (`--hero-scrim` is painted at z-[4], underneath the whole content
        wrapper, so it never touches the brain). It is now a haze, not a disc.
@@ -43,7 +43,7 @@
        follows the glyphs instead of forming a shape. This is kept at a third
        of its old strength only to take the edge off the densest wires, and
        spread wider so its own falloff has no visible rim. */
-    --hero-stage-scrim: radial-gradient(ellipse 62% 52% at 50% 50%, rgba(5,6,12,0.34) 0%, rgba(5,6,12,0.22) 46%, rgba(5,6,12,0.05) 72%, transparent 88%);
+    --hero-stage-scrim: radial-gradient(ellipse 62% 52% at 50% 50%, rgba(5,6,12,0.20) 0%, rgba(5,6,12,0.13) 46%, rgba(5,6,12,0.03) 72%, transparent 88%);
 
     /* Page-wide washes. These used to be hard-coded dark radials applied to
        <body> and .page-texture regardless of theme, which is what smeared the
@@ -896,6 +896,27 @@ body {
   background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
   animation: hero-scan-sweep 2.8s ease-out 0.4s both;
   pointer-events: none;
+}
+
+/* ── Hero-to-section gradient transition ─────────────────────────
+   A subtle glow emanates from the hero bottom, softening the seam
+   between the wireframe and the sections below. */
+#hero::after {
+  content: "";
+  position: absolute;
+  inset-x: 0;
+  bottom: 0;
+  height: 160px;
+  pointer-events: none;
+  z-index: 5;
+  background: linear-gradient(
+    to top,
+    hsl(var(--background)) 0%,
+    hsl(var(--background) / 0.85) 20%,
+    hsl(var(--background) / 0.5) 45%,
+    hsl(var(--background) / 0.15) 70%,
+    transparent 100%
+  );
 }
 
 /* Role rotator — one line in the DOM at a time (components/hero/role-rotator.tsx).
@@ -1844,13 +1865,13 @@ nav[data-nav-scrolled="true"] .nav-shell {
 .animated-name-metallic .animated-name-char {
   background: linear-gradient(120deg,
       hsl(var(--foreground)) 0%,
-      hsl(220 15% 75%) 20%,
-      var(--metal-hi) 30%,
-      hsl(220 15% 86%) 40%,
-      hsl(var(--foreground)) 55%,
-      hsl(220 15% 75%) 70%,
-      hsl(0 0% 100%) 80%,
-      hsl(220 15% 86%) 90%,
+      hsl(220 10% 88%) 18%,
+      hsl(0 0% 100%) 28%,
+      hsl(220 10% 92%) 40%,
+      hsl(var(--foreground)) 52%,
+      hsl(220 10% 88%) 68%,
+      hsl(0 0% 100%) 78%,
+      hsl(220 10% 92%) 90%,
       hsl(var(--foreground)) 100%);
   background-size: 250% 100%;
   -webkit-background-clip: text;

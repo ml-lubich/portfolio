@@ -171,7 +171,7 @@ export function Hero() {
 
               The band never shrinks below the copy it holds, so a long role
               line grows the band and the mesh with it rather than clipping. */}
-          <div className="relative flex w-full items-center justify-center min-h-[min(420px,50svh)] sm:min-h-[min(64svh,52vw)]">
+          <div className="relative flex w-full items-center justify-center min-h-[min(480px,58svh)] sm:min-h-[min(72svh,60vw)]">
             {/* HeroScrollLayer adds the scroll-out "release" (desktop only). */}
             <HeroScrollLayer
               layer="brain"

@@ -46,13 +46,13 @@ describe("phone hero layout (josephheupler.com parity)", () => {
     expect(hero, "the forced-screenful stage must not come back").not.toContain("min-h-[calc(100svh-13rem)]")
   })
 
-  it("brain band is the reference canvas: full width, 420px tall, no square/vw sizing", () => {
-    expect(bandLine).toContain("min-h-[min(420px,50svh)]")
+  it("brain band is the reference canvas: full width, 480px tall, no square/vw sizing", () => {
+    expect(bandLine).toContain("min-h-[min(480px,58svh)]")
     expect(boxLine).toContain("max-sm:w-full")
     expect(boxLine).not.toMatch(/max-sm:aspect-square|max-sm:w-\[min\(/)
   })
 
-  it("phone camera tiers sit far enough back for a ~300px mesh in a 420px box", () => {
+  it("phone camera tiers sit far enough back for a ~300px mesh in a 480px box", () => {
     // Was z 1.15 / 1.22: the mesh filled 86% of its box. The reference mesh
     // fills ~71% of its canvas; the tiers below were measured to land there.
     const under480 = /if \(w < 480\) return \{ z: ([\d.]+), fov: (\d+) \}/.exec(brain)
@@ -72,9 +72,9 @@ describe("phone hero layout (josephheupler.com parity)", () => {
 
   it("desktop keeps its own tier", () => {
     expect(boxLine).toContain("sm:aspect-[6/5]")
-    expect(bandLine).toContain("sm:min-h-[min(64svh,52vw)]")
+    expect(bandLine).toContain("sm:min-h-[min(72svh,60vw)]")
     expect(sectionLine).toContain("sm:pt-28")
     expect(sectionLine).toContain("md:pt-28")
-    expect(/return \{ z: 1\.82, fov: 38 \}/.test(brain)).toBe(true)
+    expect(/return \{ z: 1\.98, fov: 38 \}/.test(brain)).toBe(true)
   })
 })
