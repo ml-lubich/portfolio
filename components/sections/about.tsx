@@ -73,7 +73,7 @@ const highlights = [
    wrapping lines this replaced read as a wall. The facts they carried that
    aren't here are in the tiles below (6 papers, the agent-tool family). */
 const bio = [
-  "EchoStar — AI pipelines for consumer-scale telecom.",
+  "EchoStar — Staff AI in under 3 years · consumer telecom.",
   "Before: Polaris Wireless, Apple, Walmart, LBNL, Honda Innovations.",
   "Multi-agent orchestration, RAG, ML inference — serving millions.",
   "Co-founded Equiverse.ml — tooling for 5,000+ underrepresented students.",
@@ -110,7 +110,7 @@ export function About() {
         <SectionHeader
           label="About Me"
           title={<>Building at the intersection of{" "}<span className="gradient-text">AI and Engineering</span></>}
-          subtitle="Staff AI Engineer at EchoStar, chosen over offers and final rounds at Anduril and Mach Industries — consumer-scale telecom puts the same agent and RAG work in front of millions."
+          subtitle="Staff AI Engineer at EchoStar — reached staff level in under 3 years. Consumer-scale telecom puts the same agent and RAG work in front of millions."
         />
 
         {/* Bio — portrait alongside the terminal (OpenClaw + claw live under #consulting) */}

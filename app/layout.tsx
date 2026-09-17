@@ -6,6 +6,7 @@ import './globals.css'
 import { JsonLd } from '@/components/seo/json-ld'
 import { LiquidGooFilter } from '@/components/glass-blob-field'
 import { MLBot } from "@/components/ai-chat/mlbot"
+import { AgentsBuildEgg } from "@/components/easter/agents-build"
 import { ThemeProvider } from "@/components/theme-provider"
 import { LIGHT_MODE_ENABLED } from "@/lib/light-mode"
 
@@ -182,6 +183,7 @@ export default function RootLayout({
           <LiquidGooFilter />
           {children}
           <MLBot />
+          <AgentsBuildEgg />
         </ThemeProvider>
       </body>
     </html>

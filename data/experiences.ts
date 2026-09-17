@@ -43,11 +43,11 @@ export const experiences: Experience[] = [
             period: "September 2026 – Present",
             location: "SF Bay Area",
             description:
-                "Chose EchoStar over offers and final-round outcomes at defense-tech companies including Anduril and Mach Industries. The draw was blast radius: consumer-scale telecom puts AI in front of millions of ordinary customers rather than a narrow mission set, so the same pipeline work reaches far more people.",
+                "Reached Staff AI Engineer in under 3 years. At EchoStar, builds the retrieval, agent-orchestration, and evaluation pipelines behind consumer-scale telecom — the same agent and RAG work in front of millions of ordinary customers.",
             highlights: [
+                "Reached Staff AI Engineer in under 3 years",
                 "Builds production AI pipelines — retrieval, agent orchestration, and evaluation — against consumer telecom systems serving millions of subscribers",
-                "Received offers from and passed final rounds at top defense and frontier-tech companies including Anduril and Mach Industries",
-                "Chose consumer-scale impact over defense: the same agent and RAG work reaches millions of everyday customers",
+                "Consumer-scale blast radius: the same agent and RAG work reaches millions of everyday customers",
             ],
             architecture: [
                 { label: "Retrieval", icon: "database", description: "Grounded retrieval over operational and customer-facing corpora" },

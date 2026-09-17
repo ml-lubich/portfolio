@@ -4,8 +4,13 @@ All notable changes to this project are documented here.
 
 ## [Unreleased]
 
+### Changed
+
+- Staff AI copy reframed: drop Anduril/Mach “chosen over / offers & final rounds” flex; emphasize **Staff in under 3 years** at EchoStar + consumer-scale agent/RAG for millions (`about`, `profile-intro`, `experiences`, partners strip). GitHub profile README/timeline SVGs match.
+
 ### Added
 
+- Agents-build easter egg: type `agents` (or open `#agents`) to spawn predetermined UI “builds” with shuffled order/timing; Esc dismisses. Idle = no DOM. Resume download CTA gated in `__tests__/agents-build-egg.test.ts`.
 - Open-Source Showcase leading `#projects`: animated terminal demos of the public CLI/MCP tool family (imsg-mcp, imail-mcp, inotes-mcp, wa-mcp, bitbucket-cli, twig, confluence-cli, like-fable) using real documented commands with plausible output, per-project stats, copyable install strings, and DetailPanel architecture deep-dives. Only one demo types at a time (highest-intersection card); `prefers-reduced-motion` renders finished frames with no typing loop. New layers: `data/oss-demos.ts` → `lib/demo-terminal.ts` (pure scheduler) → `components/terminal/demo-terminal.tsx` → `oss-demo-card.tsx` → `open-source-showcase.tsx`; the existing marquee remains below as "Selected Work".
 - Three July 2026 blog posts on the local-first agent tool family: building CLI+MCP adapters for Messages/Mail/Notes/WhatsApp, `imail` account walls, and valuemaxxing (CLI-first) vs tokenmaxxing.
 

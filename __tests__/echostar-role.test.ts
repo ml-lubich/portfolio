@@ -25,25 +25,24 @@ describe("current role", () => {
         )
     })
 
-    it("says why he chose EchoStar over the defence offers", () => {
+    it("frames Staff in under 3 years — never Anduril/Mach chosen-over", () => {
         const blob = read("data/experiences.ts")
-        expect(blob).toMatch(/Anduril/)
-        expect(blob).toMatch(/Mach Industries/)
+        expect(blob).toMatch(/under 3 years/i)
         expect(blob).toMatch(/consumer/i)
+        expect(blob).not.toMatch(/Anduril/)
+        expect(blob).not.toMatch(/Mach Industries/)
+        expect(blob).not.toMatch(/chosen over|picked it over|chose .+ over/i)
     })
 })
 
-describe("offers strip", () => {
+describe("partners strip", () => {
     const source = read("components/sections/logo-scroll.tsx")
 
-    it("labels the offers row honestly, apart from the partners row", () => {
-        expect(source).toMatch(/Offers & final rounds/i)
+    it("keeps the partners row and drops the offers strip", () => {
         expect(source).toMatch(/Trusted & partnered with/i)
-    })
-
-    it("draws both marks from real asset files", () => {
-        expect(source).toContain("/logos/anduril.svg")
-        expect(source).toContain("/logos/mach-industries.svg")
+        expect(source).not.toMatch(/Offers & final rounds/i)
+        expect(source).not.toContain("/logos/anduril.svg")
+        expect(source).not.toContain("/logos/mach-industries.svg")
     })
 })
 

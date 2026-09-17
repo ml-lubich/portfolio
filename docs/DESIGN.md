@@ -260,18 +260,26 @@ Hero type keeps the dark ink halo **and** a white light bloom on `.hero-copy-hal
 ## About section: leads with the current role, no dead space (2026-09-05)
 
 `components/sections/about.tsx` opens on EchoStar: the intro names the Staff
-AI Engineer role, the Anduril/Mach offers it was chosen over, and why
-(consumer-scale telecom). The `~/about — misha.bio` terminal types six lines
-(EchoStar → prior employers → shipped systems → 6 papers → the agent-tool
-family → Equiverse) and is sized to its content; a NOW / WHERE / SINCE /
-BUILDING strip sits under it so the card never shows a blank lower half while
-typing. The six tiles are token-based (`bg-card`, `border-border`) and
-current: EXPERIENCE reads "EchoStar, Apple, Walmart", OPEN SOURCE reads "MCP
-Servers + CLIs · imsg · imail · inotes · wa-mcp · jenkins-mcp" (was
-"LangChain, CrewAI, Spring"). Grid is 1/2/3 columns at <640/640–1023/≥1024;
-the portrait caps at 20rem when stacked. Typing and count-ups render their
-final state immediately under `prefers-reduced-motion`. Gate:
-`__tests__/about-section.test.ts`.
+AI Engineer role, staff level in under 3 years, and consumer-scale telecom
+(agent + RAG in front of millions). Do **not** name Anduril/Mach or a
+"chosen over" frame. The `~/about — misha.bio` terminal types short lines
+(EchoStar → prior employers → shipped systems → Equiverse) and is sized to
+its content; a NOW / WHERE / SINCE / BUILDING strip sits under it so the
+card never shows a blank lower half while typing. The six tiles are
+token-based (`bg-card`, `border-border`) and current: EXPERIENCE reads
+"EchoStar, Apple, Walmart", OPEN SOURCE reads "MCP Servers + CLIs · imsg ·
+imail · inotes · wa-mcp · jenkins-mcp". Grid is 1/2/3 columns at
+<640/640–1023/≥1024; the portrait caps at 20rem when stacked. Typing and
+count-ups render their final state immediately under
+`prefers-reduced-motion`. Gate: `__tests__/about-section.test.ts`.
+
+## Agents-build easter egg (2026-09-16)
+
+Opt-in overlay (`components/easter/agents-build.tsx`): type `agents` when
+focus is not in an input, or open `/#agents`. Predetermined build sequences
+from `lib/agents-build.ts` spawn with shuffled order/timing; Esc or the
+dismiss control clears them. When idle the component returns `null` — no
+layout cost for ordinary visitors. Gate: `__tests__/agents-build-egg.test.ts`.
 
 ## Scroll devices below the hero (2026-09-05)
 

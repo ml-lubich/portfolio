@@ -13,6 +13,13 @@ describe("about — content", () => {
         expect(firstLine).toMatch(/EchoStar/)
     })
 
+    it("says staff in under 3 years — never Anduril/Mach chosen-over", () => {
+        expect(source).toMatch(/under 3 years/i)
+        expect(source).not.toMatch(/Anduril/)
+        expect(source).not.toMatch(/Mach Industries/)
+        expect(source).not.toMatch(/chosen over|picked it over/i)
+    })
+
     it("never uses the retired titles", () => {
         expect(source).not.toMatch(/Senior Software Engineer/)
         expect(source).not.toMatch(/Vibe Coder/i)
