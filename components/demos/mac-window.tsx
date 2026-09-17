@@ -1,41 +1,90 @@
 "use client"
 
 /**
- * A macOS-chrome window rendering one `MacDemo` step.
- *
- * Messages, Mail and Notes are all list/detail, so one component covers all
- * three from data — the only branch is bubbles vs. body copy in the detail
- * pane. Presentational: the parent owns which step is showing.
+ * Mini app window for one `MacDemo` step — each skin mimics the real UI
+ * (Messages blue bubbles, Notes yellow paper, Jenkins console, etc.).
  */
 
 import type { CSSProperties } from "react"
-import type { MacDemo, MacDemoStep } from "@/data/mac-demos"
+import type { MacDemo, MacDemoStep, MacRow } from "@/data/mac-demos"
 
 const TRAFFIC = ["#ff5f56", "#ffbd2e", "#27c93f"] as const
 
-export function MacWindow({ demo, step }: { demo: MacDemo; step: MacDemoStep }) {
-    return (
-        <div className="mac-window overflow-hidden rounded-xl">
-            {/* Title bar */}
-            <div className="mac-titlebar flex items-center gap-2 px-3 py-2.5">
-                <div className="flex items-center gap-1.5">
-                    {TRAFFIC.map((c) => (
-                        <span key={c} className="h-3 w-3 rounded-full" style={{ background: c }} />
-                    ))}
-                </div>
-                <p className="flex-1 text-center text-[12px] font-medium text-foreground/70">{demo.app}</p>
-                {/* Balances the traffic lights so the title stays optically centred. */}
-                <div className="w-[52px]" aria-hidden />
+function JenkinsOrb({ status }: { status: MacRow["status"] }) {
+    if (!status) return null
+    return <span className={`mac-jenkins-orb mac-jenkins-orb--${status}`} aria-hidden />
+}
+
+function MetaBadge({ meta, skin }: { meta: string; skin: MacDemo["skin"] }) {
+    if (skin !== "bitbucket") {
+        return <span className="mac-row-meta">{meta}</span>
+    }
+    const tone =
+        meta === "OPEN" ? "mac-bb-badge--open" : meta === "DONE" ? "mac-bb-badge--done" : "mac-bb-badge--neutral"
+    return <span className={`mac-bb-badge ${tone}`}>{meta}</span>
+}
+
+function MacTitleBar({ demo, step }: { demo: MacDemo; step: MacDemoStep }) {
+    if (demo.skin === "whatsapp") {
+        const chatTitle = step.detail.bubbles ? step.detail.title : demo.app
+        return (
+            <div className="mac-wa-header">
+                <span className="mac-wa-back" aria-hidden>
+                    ‹
+                </span>
+                <span className="mac-wa-avatar" aria-hidden>
+                    {chatTitle.charAt(0)}
+                </span>
+                <p className="mac-wa-title">{chatTitle}</p>
             </div>
+        )
+    }
+
+    if (demo.skin === "jenkins") {
+        return (
+            <div className="mac-jenkins-header">
+                <span className="mac-jenkins-logo">Jenkins</span>
+                <span className="mac-jenkins-crumb">{step.detail.title}</span>
+            </div>
+        )
+    }
+
+    if (demo.skin === "bitbucket") {
+        return (
+            <div className="mac-bb-header">
+                <span className="mac-bb-logo">◆</span>
+                <span className="mac-bb-title">Bitbucket</span>
+                <span className="mac-bb-crumb">{demo.sidebarTitle}</span>
+            </div>
+        )
+    }
+
+    return (
+        <div className="mac-titlebar flex items-center gap-2 px-3 py-2.5">
+            <div className="flex items-center gap-1.5">
+                {TRAFFIC.map((c) => (
+                    <span key={c} className="h-3 w-3 rounded-full" style={{ background: c }} />
+                ))}
+            </div>
+            <p className="mac-titlebar-label flex-1 text-center text-[12px] font-medium">{demo.app}</p>
+            <div className="w-[52px]" aria-hidden />
+        </div>
+    )
+}
+
+export function MacWindow({ demo, step }: { demo: MacDemo; step: MacDemoStep }) {
+    const isChat = Boolean(step.detail.bubbles)
+    const isConsole = demo.skin === "jenkins" && Boolean(step.detail.body)
+
+    return (
+        <div className={`mac-window mac-skin-${demo.skin} overflow-hidden rounded-xl`}>
+            <MacTitleBar demo={demo} step={step} />
 
             <div className="flex min-h-[15rem]">
-                {/* Sidebar */}
                 <div className="mac-sidebar w-[38%] shrink-0 py-2 sm:w-[40%]">
-                    <p className="px-3 pb-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                    <p className="mac-sidebar-label px-3 pb-1.5 text-[10px] font-semibold uppercase tracking-wider">
                         {demo.sidebarTitle}
                     </p>
-                    {/* Keyed on the command so a step change replays the entrance
-                        rather than mutating rows in place. */}
                     <ul key={`rows-${step.command}`}>
                         {step.rows.map((row, i) => (
                             <li
@@ -46,32 +95,34 @@ export function MacWindow({ demo, step }: { demo: MacDemo; step: MacDemoStep }) 
                                 }`}
                             >
                                 <div className="flex items-center gap-1.5">
-                                    {row.unread && <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--accent-glow)]" />}
-                                    <p className="min-w-0 flex-1 truncate text-[11.5px] font-medium text-foreground/90">
+                                    {demo.skin === "jenkins" ? (
+                                        <JenkinsOrb status={row.status} />
+                                    ) : (
+                                        row.unread && <span className="mac-unread-dot h-1.5 w-1.5 shrink-0 rounded-full" />
+                                    )}
+                                    <p className="mac-row-title min-w-0 flex-1 truncate text-[11.5px] font-medium">
                                         {row.title}
                                     </p>
-                                    {row.meta && <span className="shrink-0 text-[10px] text-muted-foreground">{row.meta}</span>}
+                                    {row.meta && <MetaBadge meta={row.meta} skin={demo.skin} />}
                                 </div>
-                                <p className="truncate pl-0 text-[10.5px] text-muted-foreground">{row.preview}</p>
-                                {row.tag && (
-                                    <span className="mt-1 inline-block rounded border border-[var(--line-soft)] px-1 py-px text-[9px] uppercase tracking-wide text-muted-foreground">
-                                        {row.tag}
-                                    </span>
-                                )}
+                                <p className="mac-row-preview truncate pl-0 text-[10.5px]">{row.preview}</p>
+                                {row.tag && <span className="mac-mail-tag mt-1 inline-block rounded px-1 py-px text-[9px] uppercase tracking-wide">{row.tag}</span>}
                             </li>
                         ))}
                     </ul>
                 </div>
 
-                {/* Detail */}
-                <div key={`detail-${step.command}`} className="mac-pane mac-detail min-w-0 flex-1 px-3.5 py-3">
-                    <p className="truncate text-[12.5px] font-semibold text-foreground">{step.detail.title}</p>
+                <div
+                    key={`detail-${step.command}`}
+                    className={`mac-pane mac-detail min-w-0 flex-1 px-3.5 py-3 ${isConsole ? "mac-jenkins-console" : ""} ${demo.skin === "notes" ? "mac-notes-paper" : ""}`}
+                >
+                    <p className="mac-detail-title truncate text-[12.5px] font-semibold">{step.detail.title}</p>
                     {step.detail.subtitle && (
-                        <p className="mb-2.5 truncate text-[10.5px] text-muted-foreground">{step.detail.subtitle}</p>
+                        <p className="mac-detail-subtitle mb-2.5 truncate text-[10.5px]">{step.detail.subtitle}</p>
                     )}
 
                     {step.detail.bubbles && (
-                        <div className="space-y-1.5 pt-1">
+                        <div className="mac-chat-thread space-y-1.5 pt-1">
                             {step.detail.bubbles.map((b, i) => (
                                 <div key={i} className={b.from === "me" ? "flex justify-end" : "flex justify-start"}>
                                     <p
@@ -88,13 +139,15 @@ export function MacWindow({ demo, step }: { demo: MacDemo; step: MacDemoStep }) 
                     )}
 
                     {step.detail.body && (
-                        <div className="space-y-0.5 pt-0.5">
+                        <div className={`space-y-0.5 pt-0.5 ${isConsole ? "mac-jenkins-log" : ""}`}>
                             {step.detail.body.map((line, i) => (
                                 <p
                                     key={i}
-                                    className="whitespace-pre-wrap font-mono text-[10.5px] leading-relaxed text-foreground/75"
+                                    className={`mac-detail-line whitespace-pre-wrap font-mono text-[10.5px] leading-relaxed ${
+                                        isConsole && line.includes("FAILED") ? "mac-jenkins-log--fail" : ""
+                                    } ${isConsole && line.includes("AssertionError") ? "mac-jenkins-log--error" : ""}`}
                                 >
-                                    {line || " "}
+                                    {line || " "}
                                 </p>
                             ))}
                         </div>

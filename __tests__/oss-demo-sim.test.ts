@@ -22,6 +22,11 @@ describe("OSS demo simulations — data", () => {
         }
     })
 
+    it("gives WhatsApp its own skin instead of reusing iMessage chrome", () => {
+        const wa = withSim.find((d) => d.id === "wa-mcp")!
+        expect(wa.sim!.kind).toBe("whatsapp")
+    })
+
     it("shows the MCP round-trip as a flow of at least three stages", () => {
         for (const demo of withSim) {
             expect(demo.sim!.flow.length).toBeGreaterThanOrEqual(3)
@@ -49,6 +54,14 @@ describe("OSS demo simulations — data", () => {
 describe("OSS demo simulations — renderer", () => {
     it("staggers each row instead of dropping them in at once", () => {
         expect(source).toMatch(/animationDelay/)
+    })
+
+    it("applies per-kind skin classes for authentic app chrome", () => {
+        expect(source).toContain("oss-sim-skin-")
+        const css = readFileSync(join(process.cwd(), "app/globals.css"), "utf8")
+        for (const kind of SIM_KINDS) {
+            expect(css).toContain(`.oss-sim-skin-${kind}`)
+        }
     })
 
     it("only animates the featured tool, matching the terminal's gate", () => {

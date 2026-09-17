@@ -7,7 +7,7 @@
 import type { Line } from "@/components/terminal/types"
 
 /** Simulated app windows the renderer can draw. */
-export const SIM_KINDS = ["imessage", "mail", "notes"] as const
+export const SIM_KINDS = ["imessage", "mail", "notes", "whatsapp"] as const
 export type SimKind = (typeof SIM_KINDS)[number]
 
 export interface SimRow {
@@ -133,7 +133,7 @@ export const ossDemos: OssDemo[] = [
             { t: "out", s: "MCP server: running  |  local SQLite store: reachable" },
         ],
         sim: {
-            kind: "imessage",
+            kind: "whatsapp",
             app: "WhatsApp",
             flow: ["Agent", "wa-mcp", "whatsmeow bridge", "Reply"],
             rows: [

@@ -14,6 +14,9 @@
  * message history — fictional correspondents throughout.
  */
 
+/** Visual skin for the mini app window — each maps to authentic app chrome in CSS. */
+export type MacDemoSkin = "messages" | "mail" | "notes" | "whatsapp" | "bitbucket" | "jenkins"
+
 export interface MacRow {
     title: string
     preview: string
@@ -22,6 +25,8 @@ export interface MacRow {
     unread?: boolean
     /** Coloured tag chip, used by the Mail triage demo. */
     tag?: string
+    /** Jenkins job status orb. */
+    status?: "success" | "failure" | "idle" | "running"
 }
 
 export interface MacBubble {
@@ -55,6 +60,8 @@ export interface MacDemo {
     app: string
     /** CLI that drives it. */
     tool: string
+    /** Authentic mini-demo chrome (Messages blue bubbles, Notes yellow paper, etc.). */
+    skin: MacDemoSkin
     repoUrl: string
     tagline: string
     /** Sidebar heading inside the window. */
@@ -67,6 +74,7 @@ export const macDemos: MacDemo[] = [
         id: "imsg-mcp",
         app: "Messages",
         tool: "imsg",
+        skin: "messages",
         repoUrl: "https://github.com/ml-lubich/imsg",
         tagline: "Search and send iMessage from the terminal — local chat.db, no cloud relay.",
         sidebarTitle: "Conversations",
@@ -133,6 +141,7 @@ export const macDemos: MacDemo[] = [
         id: "imail-mcp",
         app: "Mail",
         tool: "imail",
+        skin: "mail",
         repoUrl: "https://github.com/ml-lubich/imail",
         tagline: "Triage Apple Mail from the CLI, with hard walls between accounts.",
         sidebarTitle: "Inbox",
@@ -203,6 +212,7 @@ export const macDemos: MacDemo[] = [
         id: "inotes-mcp",
         app: "Notes",
         tool: "inotes",
+        skin: "notes",
         repoUrl: "https://github.com/ml-lubich/inotes",
         tagline: "Read and write Apple Notes as Markdown, straight from the shell.",
         sidebarTitle: "Folders",
@@ -275,6 +285,7 @@ export const macDemos: MacDemo[] = [
         id: "wa-mcp",
         app: "WhatsApp",
         tool: "wa",
+        skin: "whatsapp",
         repoUrl: "https://github.com/ml-lubich/whatsapp-mcp",
         tagline: "Ops CLI for the open-source WhatsApp MCP bridge — Go/whatsmeow under it.",
         sidebarTitle: "Chats",
@@ -322,6 +333,7 @@ export const macDemos: MacDemo[] = [
         id: "bitbucket-cli",
         app: "Bitbucket",
         tool: "bb",
+        skin: "bitbucket",
         repoUrl: "https://github.com/ml-lubich/bitbucket-cli",
         tagline: "gh-style Bitbucket CLI with a built-in read-only MCP server for agents.",
         sidebarTitle: "Pull requests",
@@ -369,6 +381,7 @@ export const macDemos: MacDemo[] = [
         id: "jenkins-mcp",
         app: "Jenkins",
         tool: "jenkins-mcp",
+        skin: "jenkins",
         repoUrl: "https://github.com/ml-lubich/jenkins-mcp",
         tagline: "Drive Jenkins from an agent: trigger builds, tail logs, manage nodes.",
         sidebarTitle: "Jobs",
@@ -378,9 +391,9 @@ export const macDemos: MacDemo[] = [
                 caption: "Job inventory in one call, so the agent picks a target instead of guessing.",
                 activeRow: 1,
                 rows: [
-                    { title: "api-service", preview: "last build #418 · green", meta: "12m" },
-                    { title: "ingest-worker", preview: "last build #96 · red", meta: "4m", unread: true },
-                    { title: "nightly-e2e", preview: "scheduled 02:00", meta: "8h" },
+                    { title: "api-service", preview: "last build #418", meta: "12m", status: "success" },
+                    { title: "ingest-worker", preview: "last build #96", meta: "4m", unread: true, status: "failure" },
+                    { title: "nightly-e2e", preview: "scheduled 02:00", meta: "8h", status: "idle" },
                 ],
                 detail: {
                     title: "ingest-worker",
@@ -397,9 +410,9 @@ export const macDemos: MacDemo[] = [
                 caption: "Tails the failing build so the failure text lands in context, not a browser tab.",
                 activeRow: 1,
                 rows: [
-                    { title: "api-service", preview: "last build #418 · green", meta: "12m" },
-                    { title: "ingest-worker", preview: "last build #96 · red", meta: "4m" },
-                    { title: "nightly-e2e", preview: "scheduled 02:00", meta: "8h" },
+                    { title: "api-service", preview: "last build #418", meta: "12m", status: "success" },
+                    { title: "ingest-worker", preview: "last build #96", meta: "4m", status: "failure" },
+                    { title: "nightly-e2e", preview: "scheduled 02:00", meta: "8h", status: "idle" },
                 ],
                 detail: {
                     title: "ingest-worker #96",

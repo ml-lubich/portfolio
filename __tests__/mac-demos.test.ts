@@ -19,13 +19,20 @@ describe("mac demo data", () => {
         ])
     })
 
-    it("gives every demo steps and a repo link", () => {
+    it("gives every demo steps, a skin, and a repo link", () => {
         for (const d of macDemos) {
             expect(d.steps.length, `${d.app} has no steps`).toBeGreaterThan(1)
+            expect(d.skin, `${d.app} missing skin`).toBeTruthy()
             expect(d.repoUrl).toMatch(/^https:\/\/github\.com\/ml-lubich\//)
             expect(d.tagline.length).toBeGreaterThan(20)
             expect(d.sidebarTitle).toBeTruthy()
         }
+    })
+
+    it("maps each app to a distinct authentic mini-demo skin", () => {
+        expect(macDemos.map((d) => d.skin)).toEqual([
+            "messages", "mail", "notes", "whatsapp", "bitbucket", "jenkins",
+        ])
     })
 
     it("pairs every step with the command that caused it", () => {
@@ -96,13 +103,24 @@ describe("mac demo section", () => {
         expect(section).toContain("clearInterval")
     })
 
-    it("renders macOS traffic lights", () => {
+    it("renders macOS traffic lights for native Mac apps only", () => {
         expect(window).toContain("#ff5f56")
         expect(window).toContain("#ffbd2e")
         expect(window).toContain("#27c93f")
+        expect(window).toContain("mac-wa-header")
+        expect(window).toContain("mac-jenkins-header")
+        expect(window).toContain("mac-bb-header")
     })
 
-    it("themes from the shared surface stack rather than hardcoded darks", () => {
+    it("applies per-app skin classes for authentic mini-demo chrome", () => {
+        expect(window).toContain("mac-skin-${demo.skin}")
+        const css = read("app/globals.css")
+        for (const skin of ["messages", "mail", "notes", "whatsapp", "bitbucket", "jenkins"]) {
+            expect(css).toContain(`.mac-skin-${skin}`)
+        }
+    })
+
+    it("keeps a shared base window stack for unskinned fallbacks", () => {
         const css = read("app/globals.css")
         const block = css.slice(css.indexOf(".mac-window {"))
         expect(block).toContain("var(--surface-1)")

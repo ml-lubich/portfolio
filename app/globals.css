@@ -3553,6 +3553,124 @@ article .blog-prose b a[href],
   }
 }
 
+/* ── OSS mini-demo skins (compact sim panel) ─────────────────────────── */
+
+.oss-sim-window {
+  border: 1px solid var(--line-soft);
+  background: var(--surface-1);
+}
+
+.oss-sim-skin-imessage {
+  border-color: hsl(0 0% 22%);
+  background: #2c2c2e;
+}
+
+.oss-sim-skin-imessage .oss-sim-titlebar {
+  background: #1c1c1e;
+  border-color: hsl(0 0% 24%);
+  color: hsl(0 0% 88%);
+}
+
+.oss-sim-skin-imessage .oss-sim-flow {
+  border-color: hsl(0 0% 24%);
+}
+
+.oss-sim-skin-imessage .oss-sim-flow-stage {
+  border: 1px solid hsl(0 0% 28%);
+  background: hsl(0 0% 100% / 0.05);
+  color: hsl(0 0% 72%);
+}
+
+.oss-sim-skin-imessage .oss-sim-bubble-in {
+  background: #3a3a3c;
+  color: hsl(0 0% 96%);
+}
+
+.oss-sim-skin-imessage .oss-sim-bubble-out {
+  background: #0a84ff;
+  color: #ffffff;
+}
+
+.oss-sim-skin-mail {
+  border-color: hsl(220 12% 82%);
+  background: #ffffff;
+}
+
+.oss-sim-skin-mail .oss-sim-titlebar {
+  background: #f5f5f7;
+  border-color: hsl(220 10% 86%);
+  color: hsl(220 10% 28%);
+}
+
+.oss-sim-skin-mail .oss-sim-list-row {
+  border-left: 2px solid #007aff;
+  background: hsl(220 20% 97%);
+}
+
+.oss-sim-skin-mail .oss-sim-list-from {
+  color: hsl(220 15% 18%);
+}
+
+.oss-sim-skin-mail .oss-sim-list-text {
+  color: hsl(220 8% 44%);
+}
+
+.oss-sim-skin-mail .oss-sim-list-meta {
+  border: 1px solid hsl(220 10% 84%);
+  background: #ffffff;
+  color: hsl(220 8% 40%);
+}
+
+.oss-sim-skin-notes {
+  border-color: hsl(48 30% 72%);
+  background: #fff9b1;
+}
+
+.oss-sim-skin-notes .oss-sim-titlebar {
+  background: #f2f1eb;
+  border-color: hsl(48 14% 82%);
+  color: hsl(48 12% 22%);
+}
+
+.oss-sim-skin-notes .oss-sim-list-row {
+  border-left: 2px solid hsl(48 70% 48%);
+  background: hsl(48 90% 88% / 0.55);
+}
+
+.oss-sim-skin-notes .oss-sim-list-from {
+  color: hsl(48 20% 14%);
+}
+
+.oss-sim-skin-notes .oss-sim-list-text {
+  color: hsl(48 12% 26%);
+}
+
+.oss-sim-skin-whatsapp {
+  border-color: hsl(168 52% 22%);
+  background: #0b141a;
+}
+
+.oss-sim-skin-whatsapp .oss-sim-titlebar {
+  background: #128c7e;
+  border-color: hsl(168 48% 28%);
+  color: #ffffff;
+}
+
+.oss-sim-skin-whatsapp .oss-sim-bubble-in {
+  background: #1f2c34;
+  color: #e9edef;
+}
+
+.oss-sim-skin-whatsapp .oss-sim-bubble-out {
+  background: #005c4b;
+  color: #e9edef;
+}
+
+.oss-sim-skin-whatsapp .oss-sim-from,
+.oss-sim-skin-whatsapp .oss-sim-meta {
+  color: hsl(200 6% 58%);
+}
+
 /* ── OSS demo simulation rows ────────────────────────────────────
  *  Rows and flow stages fade up in sequence; the inline animationDelay the
  *  component sets is what staggers them. `forwards` holds the end state, so a
@@ -3627,6 +3745,465 @@ article .blog-prose b a[href],
 
 .light .mac-bubble-me {
   color: #ffffff;
+}
+
+/* ── Mini-demo skins — authentic app chrome per tool ───────────────────
+   Fixed palette inside each window; the portfolio theme stays dark/light. */
+
+/* Messages — macOS dark sidebar + iMessage blue */
+.mac-skin-messages {
+  border-color: hsl(0 0% 18%);
+  background: #1c1c1e;
+}
+
+.mac-skin-messages .mac-titlebar {
+  background: #2c2c2e;
+  border-bottom-color: hsl(0 0% 22%);
+}
+
+.mac-skin-messages .mac-titlebar-label {
+  color: hsl(0 0% 88%);
+}
+
+.mac-skin-messages .mac-sidebar {
+  background: #1c1c1e;
+  border-right-color: hsl(0 0% 22%);
+}
+
+.mac-skin-messages .mac-sidebar-label {
+  color: hsl(0 0% 52%);
+}
+
+.mac-skin-messages .mac-row-title {
+  color: hsl(0 0% 92%);
+}
+
+.mac-skin-messages .mac-row-preview,
+.mac-skin-messages .mac-row-meta {
+  color: hsl(0 0% 55%);
+}
+
+.mac-skin-messages .mac-row-active {
+  background: hsl(0 0% 100% / 0.08);
+}
+
+.mac-skin-messages .mac-unread-dot {
+  background: #0a84ff;
+}
+
+.mac-skin-messages .mac-detail {
+  background: #2c2c2e;
+}
+
+.mac-skin-messages .mac-detail-title {
+  color: hsl(0 0% 94%);
+}
+
+.mac-skin-messages .mac-detail-subtitle {
+  color: hsl(0 0% 58%);
+}
+
+.mac-skin-messages .mac-bubble-them {
+  background: #3a3a3c;
+  color: hsl(0 0% 96%);
+}
+
+.mac-skin-messages .mac-bubble-me {
+  background: #0a84ff;
+  color: #ffffff;
+}
+
+/* Mail — light Apple Mail */
+.mac-skin-mail {
+  border-color: hsl(220 12% 82%);
+  background: #ffffff;
+}
+
+.mac-skin-mail .mac-titlebar {
+  background: linear-gradient(180deg, #f6f6f8 0%, #ececef 100%);
+  border-bottom-color: hsl(220 10% 84%);
+}
+
+.mac-skin-mail .mac-titlebar-label {
+  color: hsl(220 10% 28%);
+}
+
+.mac-skin-mail .mac-sidebar {
+  background: #f5f5f7;
+  border-right-color: hsl(220 10% 86%);
+}
+
+.mac-skin-mail .mac-sidebar-label {
+  color: hsl(220 8% 46%);
+}
+
+.mac-skin-mail .mac-row-title {
+  color: hsl(220 15% 18%);
+}
+
+.mac-skin-mail .mac-row-preview,
+.mac-skin-mail .mac-row-meta {
+  color: hsl(220 8% 46%);
+}
+
+.mac-skin-mail .mac-row-active {
+  background: hsl(211 100% 50% / 0.12);
+}
+
+.mac-skin-mail .mac-unread-dot {
+  background: #007aff;
+}
+
+.mac-skin-mail .mac-detail {
+  background: #ffffff;
+}
+
+.mac-skin-mail .mac-detail-title {
+  color: hsl(220 15% 14%);
+}
+
+.mac-skin-mail .mac-detail-subtitle,
+.mac-skin-mail .mac-detail-line {
+  color: hsl(220 8% 38%);
+}
+
+.mac-skin-mail .mac-mail-tag {
+  border: 1px solid hsl(220 10% 82%);
+  color: hsl(220 8% 40%);
+  background: hsl(220 20% 97%);
+}
+
+/* Notes — yellow paper + folder sidebar */
+.mac-skin-notes {
+  border-color: hsl(48 30% 72%);
+  background: #fffef5;
+}
+
+.mac-skin-notes .mac-titlebar {
+  background: linear-gradient(180deg, #faf9f4 0%, #f0efe8 100%);
+  border-bottom-color: hsl(48 18% 80%);
+}
+
+.mac-skin-notes .mac-titlebar-label {
+  color: hsl(48 10% 28%);
+}
+
+.mac-skin-notes .mac-sidebar {
+  background: #f2f1eb;
+  border-right-color: hsl(48 14% 82%);
+}
+
+.mac-skin-notes .mac-sidebar-label {
+  color: hsl(48 8% 42%);
+}
+
+.mac-skin-notes .mac-row-title {
+  color: hsl(48 12% 18%);
+}
+
+.mac-skin-notes .mac-row-preview {
+  color: hsl(48 8% 40%);
+}
+
+.mac-skin-notes .mac-row-active {
+  background: hsl(48 80% 68% / 0.35);
+}
+
+.mac-skin-notes .mac-detail.mac-notes-paper {
+  background: linear-gradient(180deg, #fff9b1 0%, #fff7a8 100%);
+  box-shadow: inset 0 1px 0 hsl(48 60% 88%);
+}
+
+.mac-skin-notes .mac-detail-title {
+  color: hsl(48 20% 12%);
+}
+
+.mac-skin-notes .mac-detail-subtitle,
+.mac-skin-notes .mac-detail-line {
+  color: hsl(48 12% 22%);
+}
+
+/* WhatsApp — teal header + chat wallpaper */
+.mac-skin-whatsapp {
+  border-color: hsl(168 52% 22%);
+  background: #0b141a;
+}
+
+.mac-wa-header {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  background: #128c7e;
+  padding: 0.55rem 0.85rem;
+  border-bottom: 1px solid hsl(168 48% 28%);
+}
+
+.mac-wa-back {
+  font-size: 1.25rem;
+  line-height: 1;
+  color: hsl(0 0% 100% / 0.85);
+}
+
+.mac-wa-avatar {
+  display: grid;
+  place-items: center;
+  width: 1.65rem;
+  height: 1.65rem;
+  border-radius: 9999px;
+  background: hsl(168 40% 32%);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.mac-wa-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.mac-skin-whatsapp .mac-sidebar {
+  background: #111b21;
+  border-right-color: hsl(200 10% 18%);
+}
+
+.mac-skin-whatsapp .mac-sidebar-label {
+  color: hsl(200 8% 55%);
+}
+
+.mac-skin-whatsapp .mac-row-title {
+  color: hsl(0 0% 94%);
+}
+
+.mac-skin-whatsapp .mac-row-preview,
+.mac-skin-whatsapp .mac-row-meta {
+  color: hsl(200 6% 58%);
+}
+
+.mac-skin-whatsapp .mac-row-active {
+  background: hsl(168 40% 28% / 0.35);
+}
+
+.mac-skin-whatsapp .mac-unread-dot {
+  background: #25d366;
+}
+
+.mac-skin-whatsapp .mac-detail {
+  background: #0b141a url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='%23ffffff' fill-opacity='0.025'%3E%3Cpath d='M0 0h40v40H0zm40 40h40v40H40z'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+.mac-skin-whatsapp .mac-detail-title {
+  color: hsl(0 0% 92%);
+}
+
+.mac-skin-whatsapp .mac-detail-subtitle {
+  color: hsl(200 6% 58%);
+}
+
+.mac-skin-whatsapp .mac-bubble-them {
+  background: #1f2c34;
+  color: hsl(0 0% 96%);
+  border-bottom-left-radius: 0.25rem;
+}
+
+.mac-skin-whatsapp .mac-bubble-me {
+  background: #005c4b;
+  color: #e9edef;
+  border-bottom-right-radius: 0.25rem;
+}
+
+/* Bitbucket — Atlassian navy header */
+.mac-skin-bitbucket {
+  border-color: hsl(220 60% 18%);
+  background: #ffffff;
+}
+
+.mac-bb-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #091e42;
+  padding: 0.55rem 0.85rem;
+  border-bottom: 1px solid hsl(220 50% 22%);
+}
+
+.mac-bb-logo {
+  color: #2684ff;
+  font-size: 0.65rem;
+}
+
+.mac-bb-title {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.mac-bb-crumb {
+  margin-left: auto;
+  font-size: 0.62rem;
+  color: hsl(220 20% 72%);
+}
+
+.mac-skin-bitbucket .mac-sidebar {
+  background: #f4f5f7;
+  border-right-color: hsl(220 12% 88%);
+}
+
+.mac-skin-bitbucket .mac-sidebar-label {
+  color: hsl(220 8% 44%);
+}
+
+.mac-skin-bitbucket .mac-row-title {
+  color: hsl(220 20% 16%);
+}
+
+.mac-skin-bitbucket .mac-row-preview {
+  color: hsl(220 8% 44%);
+}
+
+.mac-skin-bitbucket .mac-row-active {
+  background: hsl(214 100% 50% / 0.1);
+}
+
+.mac-bb-badge {
+  flex-shrink: 0;
+  border-radius: 0.2rem;
+  padding: 0.05rem 0.35rem;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.mac-bb-badge--open {
+  background: hsl(214 100% 50% / 0.14);
+  color: #0052cc;
+}
+
+.mac-bb-badge--done {
+  background: hsl(145 60% 40% / 0.14);
+  color: #00875a;
+}
+
+.mac-bb-badge--neutral {
+  background: hsl(220 10% 90%);
+  color: hsl(220 8% 40%);
+}
+
+.mac-skin-bitbucket .mac-detail {
+  background: #ffffff;
+}
+
+.mac-skin-bitbucket .mac-detail-title {
+  color: #0052cc;
+}
+
+.mac-skin-bitbucket .mac-detail-subtitle,
+.mac-skin-bitbucket .mac-detail-line {
+  color: hsl(220 10% 32%);
+}
+
+/* Jenkins — classic blue header + build orbs + console */
+.mac-skin-jenkins {
+  border-color: hsl(210 18% 28%);
+  background: #ffffff;
+}
+
+.mac-jenkins-header {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  background: linear-gradient(180deg, #4a90c4 0%, #335061 100%);
+  padding: 0.5rem 0.85rem;
+  border-bottom: 1px solid hsl(210 22% 28%);
+}
+
+.mac-jenkins-logo {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #ffffff;
+}
+
+.mac-jenkins-crumb {
+  font-size: 0.62rem;
+  color: hsl(210 30% 88%);
+}
+
+.mac-skin-jenkins .mac-sidebar {
+  background: #f0f0f0;
+  border-right-color: hsl(0 0% 82%);
+}
+
+.mac-skin-jenkins .mac-sidebar-label {
+  color: hsl(0 0% 40%);
+}
+
+.mac-skin-jenkins .mac-row-title {
+  color: hsl(0 0% 16%);
+}
+
+.mac-skin-jenkins .mac-row-preview,
+.mac-skin-jenkins .mac-row-meta {
+  color: hsl(0 0% 44%);
+}
+
+.mac-skin-jenkins .mac-row-active {
+  background: hsl(211 100% 50% / 0.12);
+}
+
+.mac-jenkins-orb {
+  width: 0.55rem;
+  height: 0.55rem;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  box-shadow: inset 0 -1px 0 hsl(0 0% 0% / 0.2);
+}
+
+.mac-jenkins-orb--success {
+  background: #3fb950;
+}
+
+.mac-jenkins-orb--failure {
+  background: #e2483d;
+}
+
+.mac-jenkins-orb--idle {
+  background: #8b949e;
+}
+
+.mac-jenkins-orb--running {
+  background: #58a6ff;
+}
+
+.mac-skin-jenkins .mac-detail {
+  background: #ffffff;
+}
+
+.mac-skin-jenkins .mac-detail-title {
+  color: hsl(0 0% 14%);
+}
+
+.mac-skin-jenkins .mac-detail-subtitle {
+  color: hsl(0 0% 44%);
+}
+
+.mac-skin-jenkins .mac-jenkins-console {
+  background: #fafafa;
+}
+
+.mac-skin-jenkins .mac-jenkins-log .mac-detail-line {
+  color: hsl(0 0% 22%);
+}
+
+.mac-skin-jenkins .mac-jenkins-log--fail,
+.mac-skin-jenkins .mac-jenkins-log--error {
+  color: #cf222e;
 }
 
 /* ── macOS demo motion ─────────────────────────────────────────────────
