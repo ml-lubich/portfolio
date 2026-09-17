@@ -11,8 +11,8 @@ export const sessions: Session[] = [
     lines: [
       { t: "cmd", s: "cat ~/.bio" },
       { t: "out", s: "Experience at Apple, Walmart, LBNL, and Honda Innovations.", d: 60 },
-      { t: "out", s: "Built production AI platform with multi-agent orchestration serving millions.", d: 40 },
-      { t: "out", s: "Deploying real-time ML inference and RAG pipelines at scale.", d: 40 },
+      { t: "out", s: "Engineering there reached 300M+ customers — $100M+ revenue on Walmart ad-tech.", d: 40 },
+      { t: "out", s: "Now at EchoStar: real-time ML inference, RAG, and agent pipelines at scale.", d: 40 },
       { t: "out", s: "Published 6 peer-reviewed papers in ML for hydrology & environmental science.", d: 40 },
       { t: "out", s: "Co-founded Equiverse.ml — AI-driven solutions for 5,000+ underrepresented students.", d: 40, c: "text-emerald-400" },
     ],

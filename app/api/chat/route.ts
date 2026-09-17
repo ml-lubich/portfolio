@@ -15,6 +15,7 @@ import { FollowupStream } from "@/lib/ai/followups"
 import { ToolMemo } from "@/lib/ai/tool-memo"
 import {
     emptyStreamState,
+    fallbackFromToolPayloads,
     finalizeAssistantTurn,
     formatCascadeFailure,
     ingestCompletionChunk,
@@ -142,7 +143,14 @@ function runAgent(history: ChatMessage[], apiKey: string, release: () => void): 
                 const toolPayloads: string[] = []
 
                 for (let round = 0; round < LIMITS.maxToolRounds; round++) {
-                    const reply = await callModel(messages, apiKey, send)
+                    /* The last round is asked WITHOUT tools. A model that keeps
+                       reaching for another lookup burns the budget and the
+                       visitor gets an apology while the payloads that answered
+                       the question sit in `messages` ("What has Misha built
+                       with agents?" — live 2026-09-17). Withholding the tools
+                       makes the final round produce prose, not a fifth call. */
+                    const lastRound = round === LIMITS.maxToolRounds - 1
+                    const reply = await callModel(messages, apiKey, send, !lastRound)
                     const decision = finalizeAssistantTurn(
                         { content: reply.content, tool_calls: reply.tool_calls, followups: reply.followups },
                         toolPayloads,
@@ -205,8 +213,15 @@ function runAgent(history: ChatMessage[], apiKey: string, release: () => void): 
                     }
                 }
 
-                // Tool budget exhausted — say so rather than looping forever.
-                send("text", "I looked that up a few different ways but couldn't land on a clean answer. Try asking more specifically?")
+                /* Only reachable if the last (tool-free) round returned nothing
+                   at all: answer from what the lookups already returned rather
+                   than apologising on top of good data. */
+                send(
+                    "text",
+                    toolPayloads.length
+                        ? fallbackFromToolPayloads(toolPayloads)
+                        : "I looked that up a few different ways but couldn't land on a clean answer. Try asking more specifically?",
+                )
                 send("done", {})
                 controller.close()
             } catch (err) {
@@ -226,8 +241,9 @@ async function callModel(
     messages: ChatMessage[],
     apiKey: string,
     send: (event: string, data: unknown) => void,
+    withTools = true,
 ): Promise<ChatMessage & { followups?: string[] }> {
-    const res = await fetchWithFallback(messages, apiKey)
+    const res = await fetchWithFallback(messages, apiKey, withTools)
 
     const reader = res.body?.getReader()
     if (!reader) throw new Error("No response body from the model.")
@@ -282,7 +298,7 @@ async function callModel(
 }
 
 /** Tries each model in order; a model being down or rate-limited moves to the next. */
-async function fetchWithFallback(messages: ChatMessage[], apiKey: string): Promise<Response> {
+async function fetchWithFallback(messages: ChatMessage[], apiKey: string, withTools = true): Promise<Response> {
     const attempts: CascadeAttempt[] = []
 
     for (const model of MODELS) {
@@ -297,8 +313,7 @@ async function fetchWithFallback(messages: ChatMessage[], apiKey: string): Promi
             body: JSON.stringify({
                 model,
                 messages,
-                tools: TOOL_SCHEMAS,
-                tool_choice: "auto",
+                ...(withTools ? { tools: TOOL_SCHEMAS, tool_choice: "auto" } : {}),
                 stream: true,
                 // Honoured by providers that separate reasoning tokens; models
                 // that ignore it are kept out of MODELS entirely.

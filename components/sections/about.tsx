@@ -75,7 +75,7 @@ const highlights = [
 const bio = [
   "EchoStar — Staff AI in under 3 years · consumer telecom.",
   "Before: Polaris Wireless, Apple, Walmart, LBNL, Honda Innovations.",
-  "Multi-agent orchestration, RAG, ML inference — serving millions.",
+  "300M+ customers reached · $100M+ Walmart ad-tech revenue · 6 papers.",
   "Co-founded Equiverse.ml — tooling for 5,000+ underrepresented students.",
 ]
 /* Non-string lines skip TerminalReveal's per-character loop, so this reveals
