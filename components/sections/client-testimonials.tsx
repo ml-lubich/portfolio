@@ -205,12 +205,12 @@ export function ClientTestimonials() {
   return (
     <AnimatedSection
       id="testimonials"
-      className="relative scroll-mt-28 section-y px-3 md:px-6"
+      className="relative scroll-mt-28 section-y overflow-x-clip"
     >
       <div
         ref={groundRef}
         data-sc-verify-state="ground:0"
-        className="pointer-events-none absolute inset-0 rounded-[2rem]"
+        className="pointer-events-none absolute inset-0"
         style={{
           opacity: 0,
           background:
@@ -221,7 +221,7 @@ export function ClientTestimonials() {
       <div className="pointer-events-none absolute left-1/3 top-1/4 h-72 w-72 rounded-full bg-primary/[0.05] blur-[90px]" aria-hidden />
       <div className="pointer-events-none absolute bottom-1/4 right-1/4 h-64 w-64 rounded-full bg-accent/[0.05] blur-[80px]" aria-hidden />
 
-      <div className="relative mx-auto max-w-6xl">
+      <div className="relative mx-auto max-w-6xl px-4 md:px-6">
         <SectionHeader
           icon={<Quote className="h-4 w-4 text-primary" aria-hidden />}
           label="Client work"
@@ -233,16 +233,28 @@ export function ClientTestimonials() {
           }
           subtitle="Short notes from people I’ve actually shipped with—sites, product web, pragmatic AI where it earns its place, and workflow automation. Direct relationships, not paid review widgets; no fabricated dollar figures."
         />
+      </div>
 
+      {/* Full-bleed carousel — cards run edge to edge like the consulting rail */}
+      <div
+        className="relative left-1/2 mt-10 w-screen max-w-[100vw] -translate-x-1/2 md:mt-12"
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+        onFocusCapture={() => setPaused(true)}
+        onBlurCapture={(e) => {
+          if (!e.currentTarget.contains(e.relatedTarget)) setPaused(false)
+        }}
+      >
         <div
-          className="relative px-4 sm:px-14 md:px-16"
-          onMouseEnter={() => setPaused(true)}
-          onMouseLeave={() => setPaused(false)}
-          onFocusCapture={() => setPaused(true)}
-          onBlurCapture={(e) => {
-            if (!e.currentTarget.contains(e.relatedTarget)) setPaused(false)
-          }}
-        >
+          className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-background to-transparent sm:w-20 md:w-28"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-background to-transparent sm:w-20 md:w-28"
+          aria-hidden
+        />
+
+        <div className="relative overflow-hidden px-1 sm:px-6 md:px-10">
           <Carousel
             setApi={setApi}
             opts={{
@@ -254,13 +266,13 @@ export function ClientTestimonials() {
             }}
             className="w-full"
           >
-            <CarouselContent className="-ml-3 sm:-ml-4">
+            <CarouselContent className="-ml-3 sm:-ml-5 md:-ml-6">
               {clientTestimonials.map((t) => (
                 <CarouselItem
                   key={t.id}
                   className={cn(
-                    "pl-3 sm:pl-4",
-                    "basis-[88%] sm:basis-[82%] md:basis-[72%] lg:basis-[58%]",
+                    "pl-3 sm:pl-5 md:pl-6",
+                    "basis-[92%] sm:basis-[86%] md:basis-[74%] lg:basis-[62%] xl:basis-[52%]",
                   )}
                 >
                   <figure
@@ -305,36 +317,36 @@ export function ClientTestimonials() {
             </CarouselContent>
             <CarouselPrevious
               variant="outline"
-              className="left-0 border-[var(--line-strong)] bg-background/80 text-foreground shadow-md backdrop-blur-md hover:bg-background hover:text-primary disabled:opacity-40"
+              className="left-2 border-[var(--line-strong)] bg-background/80 text-foreground shadow-md backdrop-blur-md hover:bg-background hover:text-primary disabled:opacity-40 sm:left-4 md:left-6"
             />
             <CarouselNext
               variant="outline"
-              className="right-0 border-[var(--line-strong)] bg-background/80 text-foreground shadow-md backdrop-blur-md hover:bg-background hover:text-primary disabled:opacity-40"
+              className="right-2 border-[var(--line-strong)] bg-background/80 text-foreground shadow-md backdrop-blur-md hover:bg-background hover:text-primary disabled:opacity-40 sm:right-4 md:right-6"
             />
           </Carousel>
+        </div>
 
-          <div
-            className="mt-8 flex justify-center gap-2"
-            role="tablist"
-            aria-label="Choose testimonial"
-          >
-            {clientTestimonials.map((t, i) => (
-              <button
-                key={t.id}
-                type="button"
-                role="tab"
-                aria-selected={selected === i}
-                aria-label={`Show review ${i + 1}: ${t.name}`}
-                className={cn(
-                  "h-2 rounded-full transition-all duration-300 ease-out",
-                  selected === i
-                    ? "w-8 bg-primary"
-                    : "w-2 bg-muted-foreground/30 hover:bg-muted-foreground/50",
-                )}
-                onClick={() => api?.scrollTo(i)}
-              />
-            ))}
-          </div>
+        <div
+          className="mt-8 flex justify-center gap-2 px-4"
+          role="tablist"
+          aria-label="Choose testimonial"
+        >
+          {clientTestimonials.map((t, i) => (
+            <button
+              key={t.id}
+              type="button"
+              role="tab"
+              aria-selected={selected === i}
+              aria-label={`Show review ${i + 1}: ${t.name}`}
+              className={cn(
+                "h-2 rounded-full transition-all duration-300 ease-out",
+                selected === i
+                  ? "w-8 bg-primary"
+                  : "w-2 bg-muted-foreground/30 hover:bg-muted-foreground/50",
+              )}
+              onClick={() => api?.scrollTo(i)}
+            />
+          ))}
         </div>
       </div>
     </AnimatedSection>

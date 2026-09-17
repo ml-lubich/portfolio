@@ -87,6 +87,11 @@ describe("three different device families, each publishing rendered state", () =
     expect(testimonials).toContain("var(--accent-glow)")
   })
 
+  it("testimonials: carousel breaks out full-bleed edge to edge", () => {
+    expect(testimonials).toContain("w-screen max-w-[100vw] -translate-x-1/2")
+    expect(testimonials).toContain("Full-bleed carousel")
+  })
+
   it("no device uses the same family as its neighbour (scrub → pan → ground)", () => {
     // Guard against the lazy refactor that makes all three "just parallax".
     expect(neural).not.toContain("translate3d(")
