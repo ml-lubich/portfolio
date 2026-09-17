@@ -25,20 +25,18 @@ function peakAlpha(value: string): number {
 }
 
 describe("hero copy halo", () => {
-    it("gives the h1 a multi-layer diffuse shadow, not a box", () => {
+    it("gives the h1 a tight chrome bloom, not a box", () => {
         const rule = css.match(/\.hero-copy-halo h1,[\s\S]*?\}/)?.[0] ?? ""
         expect(rule, ".hero-copy-halo h1 rule not found").not.toBe("")
-        const shadow = rule.match(/text-shadow:([^;]*);/)?.[1] ?? ""
-        // Three offsets at widening blur radii — the halo follows the glyphs.
-        expect(shadow.split(",").length).toBeGreaterThanOrEqual(3)
-        expect(shadow).toMatch(/\d+px/)
-        // A background/box-shadow here would be the rectangle we are removing.
+        const filter = rule.match(/filter:([^;]*);/)?.[1] ?? ""
+        expect(filter.split("drop-shadow").length).toBeGreaterThanOrEqual(3)
+        expect(filter).toMatch(/rgba\(\s*255\s*,\s*255\s*,\s*255/)
         expect(rule).not.toMatch(/(?:^|[\s;{])(?:box-shadow|background)\s*:/)
     })
 
     it("halos the rest of the hero copy too", () => {
         const rule = css.match(/\.hero-copy-halo \{[^}]*\}/)?.[0] ?? ""
-        expect(rule.match(/text-shadow:([^;]*);/)?.[1]?.split(",").length ?? 0).toBeGreaterThanOrEqual(3)
+        expect(rule.match(/filter:([^;]*);/)?.[1]?.split("drop-shadow").length ?? 0).toBeGreaterThanOrEqual(3)
     })
 
     it("adds a white light bloom so the type reads shiny, not just ink-backed", () => {
@@ -51,7 +49,7 @@ describe("hero copy halo", () => {
         const filterAt = css.indexOf("filter:", start)
         const filter = css.slice(filterAt, css.indexOf(";", filterAt + 8) + 1)
         expect(filter).toMatch(/rgba\(\s*255\s*,\s*255\s*,\s*255/)
-        expect(filter).toMatch(/0 0 3[0-9]px/)
+        expect(filter).toMatch(/0 0 1[0-9]px/)
     })
 })
 

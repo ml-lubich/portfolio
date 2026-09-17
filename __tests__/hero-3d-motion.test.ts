@@ -69,7 +69,8 @@ describe("Hero heading — stable layout", () => {
     expect(src).toMatch(/min-h-\[/)
     expect(src, "every role rendered at once is the stacking bug").not.toMatch(/roles\.map/)
     expect(src, "a duplicated copy is why a role could be read twice").not.toMatch(/className="[^"]*sr-only/)
-    expect(src, "one keyed element, remounted per swap").toMatch(/key=\{`\$\{roleIndex\}-\$\{phase\}`\}/)
+    expect(src, "crossfade keeps at most two lines during a swap").toMatch(/prevIndex/)
+    expect(src, "holds each role long enough to read").toMatch(/ROLE_HOLD_MS/)
     expect(src, "aria-live replaces the sr-only twin").toMatch(/aria-live="polite"/)
   })
 
