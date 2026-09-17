@@ -25,6 +25,7 @@ import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import { wooshScrollTo } from "@/components/nav/woosh-scroll"
 import { ChatChart, type ChartSpec } from "./chat-chart"
+import { MermaidFlowDiagram } from "./mermaid-flow-diagram"
 import { BookingCard } from "./booking-card"
 import { ContactCard, ResumeCard } from "./handoff-cards"
 import { TOOL_LABELS, collapseToolSteps, type ToolStep } from "@/lib/ai/tool-labels"
@@ -588,6 +589,8 @@ export function MLBot() {
                                                 <div key={j} className="my-2 max-w-full overflow-x-auto">
                                                     <BlogChart json={seg.json} />
                                                 </div>
+                                            ) : seg.kind === "mermaid" ? (
+                                                <MermaidFlowDiagram key={j} source={seg.source} />
                                             ) : (
                                                 <div key={j} className="mlbot-md min-w-0 text-[16px] leading-[1.7] text-foreground/90 sm:text-[15.5px]">
                                                     <ReactMarkdown remarkPlugins={[remarkGfm]}>{seg.value}</ReactMarkdown>

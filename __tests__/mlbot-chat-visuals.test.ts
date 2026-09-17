@@ -74,6 +74,15 @@ describe("splitChatSegments", () => {
         expect(segments.every((s) => s.kind === "text")).toBe(true)
     })
 
+    it("renders native Mermaid DSL in a ```mermaid fence as a diagram segment", () => {
+        const mermaid = `graph TD
+  A["Portfolio"] --> B["Case Triage Agent"]`
+        const segments = splitChatSegments(`Overview:\n\n\`\`\`mermaid\n${mermaid}\n\`\`\``)
+
+        expect(segments.map((s) => s.kind)).toEqual(["text", "mermaid"])
+        expect(segments[1]).toEqual({ kind: "mermaid", source: mermaid })
+    })
+
     it("drops segments that are empty after trimming", () => {
         expect(splitChatSegments("   \n  ")).toEqual([])
     })
@@ -179,6 +188,11 @@ describe("MLBot panel", () => {
     it("renders diagram segments through the blog's chart renderer", () => {
         expect(source).toContain("splitChatSegments")
         expect(source).toMatch(/from "@\/components\/blog\/(charts\/blog-chart|mermaid-diagram)"/)
+    })
+
+    it("renders native Mermaid segments through MermaidFlowDiagram", () => {
+        expect(source).toContain("MermaidFlowDiagram")
+        expect(source).toMatch(/seg\.kind === "mermaid"/)
     })
 })
 

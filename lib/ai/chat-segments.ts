@@ -1,10 +1,12 @@
 /**
  * Splits an MLBot reply into prose and diagram segments.
  *
- * The model draws flows the same way blog posts do: a ```chart fence holding
- * the BlogChart JSON schema (pipeline | comparison | tree | pie). The panel
- * streams tokens, so a fence is routinely half-written — an unclosed fence is
- * withheld until its closing backticks arrive rather than shown as raw JSON.
+ * The model draws flows two ways:
+ * 1. ```chart / ```json fences with BlogChart JSON (pipeline | comparison | tree | pie)
+ * 2. ```mermaid fences with native Mermaid DSL (graph TD, flowchart LR, …)
+ *
+ * The panel streams tokens, so a fence is routinely half-written — an unclosed
+ * fence is withheld until its closing backticks arrive rather than shown as raw JSON.
  *
  * Models also print JSON with no fence at all, most often the chart *tool's*
  * own spec (`{"type":"bar",…}`) tacked onto the end of an answer. That chart
@@ -12,13 +14,16 @@
  * it is dropped, not shown.
  */
 
+import { isMermaidDsl } from "@/lib/ai/mermaid-dsl"
+
 export type ChatSegment =
     | { kind: "text"; value: string }
     | { kind: "diagram"; json: string }
+    | { kind: "mermaid"; source: string }
 
 /** Any fenced block. The label is a hint the model gets wrong (```json is
  *  common), so the payload decides whether it is a diagram. */
-const FENCE = /```[a-z]*\s*\n([\s\S]*?)```/gi
+const FENCE = /```([a-z]*)\s*\n([\s\S]*?)```/gi
 
 /** The shapes `BlogChart` knows how to draw. */
 const CHART_TYPES = new Set(["pipeline", "comparison", "tree", "pie"])
@@ -30,18 +35,26 @@ const TOOL_CHART_TYPES = new Set(["bar", "line", "radar"])
  *  out as prose. */
 const BARE_OBJECT = /(?:^|\n)[ \t]*\{"/g
 
-type Verdict = "diagram" | "drop" | "text"
+type Verdict = "diagram" | "mermaid" | "drop" | "text"
 
-function classify(json: string): Verdict {
+function classifyJson(json: string): Verdict {
     let type: unknown
     try {
         type = (JSON.parse(json) as { type?: unknown }).type
     } catch {
-        return "text"
+        return isMermaidDsl(json) ? "mermaid" : "text"
     }
     if (typeof type !== "string") return "text"
     if (CHART_TYPES.has(type)) return "diagram"
     if (TOOL_CHART_TYPES.has(type)) return "drop"
+    return "text"
+}
+
+function classifyFence(_lang: string, body: string): Verdict {
+    const trimmed = body.trim()
+    const jsonVerdict = classifyJson(trimmed)
+    if (jsonVerdict === "diagram" || jsonVerdict === "drop") return jsonVerdict
+    if (isMermaidDsl(trimmed)) return "mermaid"
     return "text"
 }
 
@@ -72,6 +85,12 @@ function pushText(out: ChatSegment[], raw: string) {
     if (value) out.push({ kind: "text", value })
 }
 
+function pushSegment(out: ChatSegment[], verdict: Verdict, payload: string, fence?: string) {
+    if (verdict === "diagram") out.push({ kind: "diagram", json: payload })
+    else if (verdict === "mermaid") out.push({ kind: "mermaid", source: payload })
+    else if (verdict === "text" && fence) pushText(out, fence)
+}
+
 /** Prose, minus any bare chart object hiding in it. */
 function pushProse(out: ChatSegment[], raw: string) {
     let cursor = 0
@@ -87,10 +106,10 @@ function pushProse(out: ChatSegment[], raw: string) {
             return
         }
 
-        const verdict = classify(raw.slice(start, end))
+        const verdict = classifyJson(raw.slice(start, end))
         if (verdict !== "text") {
             pushText(out, raw.slice(cursor, start))
-            if (verdict === "diagram") out.push({ kind: "diagram", json: raw.slice(start, end) })
+            pushSegment(out, verdict, raw.slice(start, end))
             cursor = end
         }
         BARE_OBJECT.lastIndex = end
@@ -104,13 +123,11 @@ export function splitChatSegments(content: string): ChatSegment[] {
     let cursor = 0
 
     for (const match of content.matchAll(FENCE)) {
-        const json = match[1].trim()
+        const lang = (match[1] ?? "").toLowerCase()
+        const body = match[2].trim()
         pushProse(out, content.slice(cursor, match.index))
-        const verdict = classify(json)
-        // Bad JSON stays prose: BlogChart would throw on it, and showing what
-        // the model actually said beats rendering nothing.
-        if (verdict === "diagram") out.push({ kind: "diagram", json })
-        else if (verdict === "text") pushText(out, match[0])
+        const verdict = classifyFence(lang, body)
+        pushSegment(out, verdict, body, match[0])
         cursor = match.index + match[0].length
     }
 
