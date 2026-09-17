@@ -170,8 +170,12 @@ export function Hero() {
               is exactly how the canvas came to cover the whole hero.
 
               The band never shrinks below the copy it holds, so a long role
-              line grows the band and the mesh with it rather than clipping. */}
-          <div className="relative flex w-full items-center justify-center min-h-[min(480px,58svh)] sm:min-h-[min(72svh,60vw)]">
+              line grows the band and the mesh with it rather than clipping.
+
+              Third term: 260px = the 112px top pad + the 132px CTA block +
+              16px slack. Without it a 1280×720 laptop put the quiet CTA row
+              at y≈746, under the fold — 72svh is fine at 900 tall, not 720. */}
+          <div className="relative flex w-full items-center justify-center min-h-[min(480px,58svh)] sm:min-h-[min(72svh,60vw,calc(100svh_-_260px))]">
             {/* HeroScrollLayer adds the scroll-out "release" (desktop only). */}
             <HeroScrollLayer
               layer="brain"

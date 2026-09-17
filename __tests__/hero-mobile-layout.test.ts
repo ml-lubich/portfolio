@@ -72,7 +72,7 @@ describe("phone hero layout (josephheupler.com parity)", () => {
 
   it("desktop keeps its own tier", () => {
     expect(boxLine).toContain("sm:aspect-[6/5]")
-    expect(bandLine).toContain("sm:min-h-[min(72svh,60vw)]")
+    expect(bandLine).toContain("sm:min-h-[min(72svh,60vw,calc(100svh_-_260px))]")
     expect(sectionLine).toContain("sm:pt-28")
     expect(sectionLine).toContain("md:pt-28")
     expect(/return \{ z: 1\.98, fov: 38 \}/.test(brain)).toBe(true)

@@ -34,8 +34,8 @@ describe("hero brain stage sizing", () => {
   })
 
   it("sm+ band is at most one viewport tall and bound by viewport width", () => {
-    const m = /sm:min-h-\[min\((\d+)svh,(\d+)vw\)\]/.exec(bandLine)
-    expect(m, "sm+ brain band must be `sm:min-h-[min(<N>svh,<M>vw)]`").not.toBeNull()
+    const m = /sm:min-h-\[min\((\d+)svh,(\d+)vw(?:,calc\(100svh_-_\d+px\))?\)\]/.exec(bandLine)
+    expect(m, "sm+ brain band must be `sm:min-h-[min(<N>svh,<M>vw[,calc(100svh_-_<K>px)])]`").not.toBeNull()
     expect(Number(m![1]), "taller than the section → hard-clipped foot").toBeLessThanOrEqual(100)
     expect(Number(m![2]), "must be bound by width or it runs off the sides").toBeLessThanOrEqual(75)
   })
