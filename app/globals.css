@@ -841,11 +841,9 @@ body {
    not just behind the glyphs. A per-glyph shadow is local, so the wireframe
    keeps reading between the words. */
 .hero-copy-halo {
-  /* Tight ink + chrome bloom on the glyphs — wide blurry halos read as a hazy
-     box over the mesh instead of a clean fade behind the letterforms. */
+  /* Dark ink only, no white bloom — a white glow reads as a hazy box over the
+     mesh; the near-black haze is what josephheupler.com does. */
   filter:
-    drop-shadow(0 0 1px rgba(255, 255, 255, 0.72))
-    drop-shadow(0 0 10px rgba(255, 255, 255, 0.28))
     drop-shadow(0 1px 6px hsl(var(--background) / 0.92))
     drop-shadow(0 0 18px hsl(var(--background) / 0.55));
 }
@@ -868,8 +866,6 @@ body {
 .hero-copy-halo h1,
 .hero-copy-halo .no-metallic {
   filter:
-    drop-shadow(0 0 1px rgba(255, 255, 255, 0.78))
-    drop-shadow(0 0 14px rgba(255, 255, 255, 0.32))
     drop-shadow(0 2px 10px hsl(var(--background) / 0.94))
     drop-shadow(0 0 24px hsl(var(--background) / 0.62));
 }
@@ -918,12 +914,20 @@ body {
   will-change: opacity, transform, filter;
 }
 
-.role-line--in {
-  animation: role-in var(--role-fade-ms, 1050ms) cubic-bezier(0.4, 0, 0.2, 1) both;
+/* Triple selector on purpose: `.hero-metallic.gradient-text` sets
+   `animation: metallic-idle-pulse` later in the cascade, and at equal
+   specificity it silently replaced the crossfade — the outgoing role sat
+   fully opaque on top of the incoming one. Keep the shimmer, add the fade. */
+.role-line.hero-metallic.role-line--in {
+  animation:
+    metallic-idle-pulse 5.5s ease-in-out infinite,
+    role-in var(--role-fade-ms, 1050ms) cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 
-.role-line--out {
-  animation: role-out var(--role-fade-ms, 1050ms) cubic-bezier(0.4, 0, 0.2, 1) both;
+.role-line.hero-metallic.role-line--out {
+  animation:
+    metallic-idle-pulse 5.5s ease-in-out infinite,
+    role-out var(--role-fade-ms, 1050ms) cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 
 @keyframes role-in {
