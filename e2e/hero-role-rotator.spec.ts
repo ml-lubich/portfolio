@@ -53,12 +53,17 @@ test("the outgoing role is gone before the next one is readable", async ({ page 
   const first = (await lines(page))[0]
   expect(first, "a role line should be mounted").toBeTruthy()
 
+  // A sub-frame sample can be empty; that is not an advance.
   await expect
-    .poll(async () => (await lines(page))[0] ?? "", { message: "role advances", timeout: 16_000 })
+    .poll(async () => (await lines(page))[0] ?? first, { message: "role advances", timeout: 16_000 })
     .not.toBe(first)
 
-  // Not merely "the new one exists" — the old one must be absent.
-  expect(await lines(page)).not.toContain(first)
+  // Not merely "the new one exists" — the old one must be absent. The crossfade
+  // overlaps outgoing + incoming for ROLE_CROSSFADE_MS (~1s), so give it that
+  // long to leave rather than sampling once mid-fade.
+  await expect
+    .poll(async () => lines(page), { message: "outgoing role unmounts", timeout: 4_000 })
+    .not.toContain(first)
 })
 
 test("reduced motion still swaps the role, and never leaves the slot blank", async ({ page }) => {
