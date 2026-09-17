@@ -1192,6 +1192,59 @@ nav[data-nav-scrolled="true"] .nav-shell {
   }
 }
 
+/* ── Island nav ────────────────────────────────────────────────────
+   Below xl (1280px, where the link row turns on) there is no bar at all:
+   the shell keeps its box so the logo sits top-left and the hamburger
+   top-right, but paints nothing — the page runs straight under them.
+   At xl+ the shell is a Dynamic-Island-style capsule: translucent over the
+   hero (the mesh reads through it), opaque once past the hero (the scrolled
+   state above re-declares its own base), and it clip-reveals from the
+   centre on first paint. No backdrop-filter anywhere — see the notes on
+   .nav-shell for why. */
+@media (max-width: 1279.98px) {
+  .nav-shell,
+  nav[data-nav-scrolled="true"] .nav-shell,
+  .light .nav-shell,
+  .light nav[data-nav-scrolled="true"] .nav-shell {
+    background: none;
+    border-color: transparent;
+    box-shadow: none;
+  }
+
+  .nav-shell::before {
+    display: none;
+  }
+}
+
+@media (min-width: 1280px) {
+  .nav-shell {
+    background: linear-gradient(180deg, color-mix(in srgb, var(--surface-2) 72%, transparent) 0%, color-mix(in srgb, var(--surface-1) 60%, transparent) 100%);
+    border-color: hsl(0 0% 100% / 0.06);
+  }
+
+  .light .nav-shell {
+    background: linear-gradient(180deg, color-mix(in srgb, var(--surface-0) 80%, transparent) 0%, color-mix(in srgb, var(--surface-1) 70%, transparent) 100%);
+  }
+}
+
+@keyframes nav-island-in {
+  from {
+    clip-path: inset(0 50% 0 50% round 1.75rem);
+    opacity: 0;
+  }
+
+  to {
+    clip-path: inset(0 0 0 0 round 1.75rem);
+    opacity: 1;
+  }
+}
+
+@media (min-width: 1280px) and (prefers-reduced-motion: no-preference) {
+  .nav-shell {
+    animation: nav-island-in 0.75s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+}
+
 @keyframes nav-pill-in {
   from {
     opacity: 0;
