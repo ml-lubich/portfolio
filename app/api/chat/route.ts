@@ -90,9 +90,6 @@ interface ToolCall {
 }
 
 export async function POST(req: NextRequest) {
-    const apiKey = process.env.OPENROUTER_API_KEY
-    if (!apiKey) return json({ error: UNAVAILABLE }, 503)
-
     const gate = checkRateLimit(clientIp(req.headers), req.cookies.get(COOKIE_NAME)?.value)
     if (!gate.ok) {
         return json(
@@ -102,6 +99,14 @@ export async function POST(req: NextRequest) {
         )
     }
 
+    const history = parseHistory(await readJson(req))
+    if (history.length === 0) {
+        return json({ error: "Send a message." }, 400)
+    }
+
+    const apiKey = process.env.OPENROUTER_API_KEY
+    if (!apiKey) return json({ error: UNAVAILABLE }, 503)
+
     // Request counts alone do not bound concurrent work: one client can hold
     // many streams open at once. Take a slot or refuse.
     const release = acquireSlot(clientIp(req.headers))
@@ -109,12 +114,6 @@ export async function POST(req: NextRequest) {
         return json({ error: "You already have a message in flight. Wait for it to finish." }, 429, {
             "Retry-After": "5",
         })
-    }
-
-    const history = parseHistory(await readJson(req))
-    if (history.length === 0) {
-        release()
-        return json({ error: "Send a message." }, 400)
     }
 
     const stream = runAgent(history, apiKey, release)
