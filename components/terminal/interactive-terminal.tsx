@@ -4,6 +4,7 @@ import { useRef, useState, useEffect } from "react"
 import { createShellState, runCommand } from "@/lib/shell-interpreter"
 import type { OutputLine, ShellState } from "@/lib/shell-interpreter"
 import { cwdString, listDir } from "@/lib/virtual-fs"
+import { AUTOPILOT_COMMANDS, AUTOPILOT_IDLE_MS } from "@/lib/terminal-autopilot"
 
 interface InteractiveTerminalProps {
   onSnakeMode: () => void
@@ -84,6 +85,16 @@ export default function InteractiveTerminal({ onSnakeMode }: InteractiveTerminal
   const inputRef = useRef<HTMLInputElement>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
 
+  // Autopilot: the shell keeps typing on its own while idle, so the prompt is
+  // never a dead `❯`. Refs, not state, so the interval closure stays current.
+  const stateRef = useRef(shellState)
+  stateRef.current = shellState
+  const snakeRef = useRef(onSnakeMode)
+  snakeRef.current = onSnakeMode
+  const lastUserRef = useRef(Date.now())
+  const pilotingRef = useRef(false)
+  const stepRef = useRef(0)
+
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight
@@ -94,14 +105,48 @@ export default function InteractiveTerminal({ onSnakeMode }: InteractiveTerminal
     setOutputLines(prev => [...prev, ...lines])
   }
 
-  function handleEnter() {
-    const { state: next, lines, action } = runCommand(shellState, input)
+  function execute(command: string) {
+    const { state: next, lines, action } = runCommand(stateRef.current, command)
+    stateRef.current = next
     setShellState(next)
     setInput("")
-    if (action === "snake") { onSnakeMode(); return }
+    if (action === "snake") { snakeRef.current(); return }
     if (action === "clear") { setOutputLines([]); return }
     appendLines(lines)
   }
+
+  function handleEnter() {
+    lastUserRef.current = Date.now()
+    execute(input)
+  }
+
+  useEffect(() => {
+    let timer = 0
+    const idle = () => Date.now() - lastUserRef.current >= AUTOPILOT_IDLE_MS
+    const iv = window.setInterval(() => {
+      if (pilotingRef.current || !idle() || document.hidden) return
+      pilotingRef.current = true
+      const command = AUTOPILOT_COMMANDS[stepRef.current++ % AUTOPILOT_COMMANDS.length]
+      let typed = 0
+      const step = () => {
+        // The visitor touched the keyboard mid-line: hand it back at once.
+        if (!idle()) { pilotingRef.current = false; setInput(""); return }
+        typed += 1
+        setInput(command.slice(0, typed))
+        if (typed < command.length) {
+          timer = window.setTimeout(step, 38 + Math.random() * 55)
+        } else {
+          timer = window.setTimeout(() => {
+            if (idle()) execute(command)
+            pilotingRef.current = false
+          }, 320)
+        }
+      }
+      timer = window.setTimeout(step, 240)
+    }, 1000)
+    return () => { window.clearInterval(iv); window.clearTimeout(timer) }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const keyHandlers: Record<string, () => void> = {
     Enter:     handleEnter,
@@ -135,8 +180,8 @@ export default function InteractiveTerminal({ onSnakeMode }: InteractiveTerminal
           <input
             ref={inputRef}
             value={input}
-            onChange={e => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
+            onChange={e => { lastUserRef.current = Date.now(); setInput(e.target.value) }}
+            onKeyDown={e => { lastUserRef.current = Date.now(); handleKeyDown(e) }}
             className="absolute inset-0 w-full h-full opacity-0 cursor-text"
             style={{ fontSize: 16 }}
             autoComplete="off"

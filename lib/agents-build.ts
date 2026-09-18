@@ -49,3 +49,47 @@ export function flatBuildQueue(seed: number): BuildPiece[] {
 }
 
 export const AGENTS_TRIGGER = "agents"
+
+/* ── Agent storm ──────────────────────────────────────────────────
+   The bigger sibling of the build egg: a whole fleet lands at once and keeps
+   spawning. Typed anywhere ("storm"), via #storm, or from MLBot ("agent
+   storm"), which fires AGENT_STORM_EVENT on window. */
+export const STORM_TRIGGER = "storm"
+export const AGENT_STORM_EVENT = "mlubich:agent-storm"
+export const STORM_AGENT_COUNT = 28
+
+export function isAgentStormAsk(text: string): boolean {
+  return /^\s*(?:unleash\s+|start\s+|run\s+)?(?:an?\s+)?agent[\s-]*storm\s*[!.?]*\s*$/i.test(text)
+}
+
+const STORM_AGENTS = [
+  "agent-nav", "agent-cta", "agent-stats", "agent-ui", "agent-data", "agent-3d",
+  "agent-cli", "agent-copy", "agent-motion", "agent-media", "agent-eval", "agent-rag",
+  "agent-infra", "agent-tests", "agent-a11y", "agent-seo", "agent-perf", "agent-ship",
+] as const
+
+const STORM_LABELS = [
+  "Nav pill", "CTA row", "Stat tile", "Card shell", "Metric", "Tag chip", "Tech orbit",
+  "Terminal", "Role badge", "Logo rail", "Portrait frame", "Accent rule", "Eval harness",
+  "Vector index", "MCP server", "Retry policy", "Rate limiter", "Trace span", "Cron job",
+  "Webhook", "Prompt cache", "Type guard", "Skeleton loader", "Focus ring", "Sitemap",
+  "OG image", "Deploy gate", "Feature flag",
+] as const
+
+/** A shuffled fleet: every label once, agents cycling, positions spread over
+ *  the viewport with a margin so nothing lands under the nav or the chat FAB. */
+export function stormQueue(seed: number, count = STORM_AGENT_COUNT): BuildPiece[] {
+  let s = seed >>> 0
+  const rnd = () => {
+    s = (Math.imul(s, 1664525) + 1013904223) >>> 0
+    return s / 0x1_0000_0000
+  }
+  const labels = shuffleOrder(STORM_LABELS, seed)
+  return Array.from({ length: Math.min(count, labels.length) }, (_, i) => ({
+    id: `storm-${i}-${labels[i].toLowerCase().replace(/\s+/g, "-")}`,
+    label: labels[i],
+    agent: STORM_AGENTS[(i + (seed % STORM_AGENTS.length)) % STORM_AGENTS.length],
+    x: 8 + Math.round(rnd() * 84),
+    y: 14 + Math.round(rnd() * 70),
+  }))
+}

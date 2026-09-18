@@ -240,4 +240,73 @@ export const sessions: Session[] = [
       { t: "out", s: "✨ shipped.", d: 40, c: "text-primary" },
     ],
   },
+  /* 11 ── agent storm */
+  {
+    time: "08:05 PM", label: "Agent Storm", icon: "zap",
+    lines: [
+      { t: "cmd", s: "storm launch --fleet 28 --goal 'ship the redesign' --observe" },
+      { t: "out", s: "spawning agent-nav agent-cta agent-stats agent-ui agent-data agent-3d …", d: 60 },
+      { t: "out", s: "28/28 agents online — one worktree each, manager holds the diff", d: 40, c: "text-emerald-400" },
+      { t: "out", s: "[agent-ui]    built Card shell         (+118 −34)", d: 30 },
+      { t: "out", s: "[agent-tests] wrote 14 specs, 14 green", d: 30 },
+      { t: "out", s: "[agent-a11y]  focus ring restored on 6 controls", d: 30 },
+      { t: "out", s: "[agent-perf]  LCP 2.4s → 1.1s (hero image preload)", d: 30 },
+      { t: "out", s: "[agent-ship]  gate: lint ✓ unit ✓ e2e ✓ — pushed main", d: 40, c: "text-emerald-400" },
+      { t: "cmd", s: "storm status" },
+      { t: "out", s: "done in 6m12s · 28 agents · 0 conflicts · $4.10", d: 50 },
+    ],
+  },
+  /* 12 ── eval harness */
+  {
+    time: "08:40 PM", label: "Eval Harness", icon: "brain",
+    lines: [
+      { t: "cmd", s: "python -m evals.run --suite support-rag --model claude-sonnet-5 --n 400" },
+      { t: "out", s: "loading 400 golden cases · 12 categories", d: 60 },
+      { t: "out", s: "faithfulness   0.94   (+0.06 vs last week)", d: 40 },
+      { t: "out", s: "answer-recall  0.91   (+0.03)", d: 30 },
+      { t: "out", s: "refusal-rate   0.02   (−0.01)", d: 30 },
+      { t: "out", s: "p50 latency    1.8s · p95 4.1s", d: 30 },
+      { t: "out", s: "12 regressions flagged → evals/regressions/2026-09-18.md", d: 40, c: "text-amber-400" },
+      { t: "cmd", s: "git commit -am 'evals: weekly run, 12 regressions triaged'" },
+    ],
+  },
+  /* 13 ── mcp server */
+  {
+    time: "09:10 PM", label: "MCP Server", icon: "wrench",
+    lines: [
+      { t: "cmd", s: "bun run mcp:dev --server imail" },
+      { t: "out", s: "imail-mcp listening on stdio · 7 tools registered", d: 60 },
+      { t: "code", s: "server.tool('list_messages', { account: z.string(), limit: z.number().max(200) }, list)" },
+      { t: "out", s: "→ claude: list_messages(account='google', limit=50)", d: 40 },
+      { t: "out", s: "← 50 messages · 3 need action · 2 meetings", d: 30 },
+      { t: "out", s: "→ claude: organize(account='google')", d: 40 },
+      { t: "out", s: "← moved 41 · flagged 3 · 0 errors", d: 30, c: "text-emerald-400" },
+    ],
+  },
+  /* 14 ── vector reindex */
+  {
+    time: "09:45 PM", label: "Vector Reindex", icon: "refresh",
+    lines: [
+      { t: "cmd", s: "python reindex.py --collection docs --embed text-embedding-3-large --batch 512" },
+      { t: "out", s: "chunking 18,402 documents · 512 tokens · 64 overlap", d: 60 },
+      { t: "out", s: "embedding  ███████████████░░░░░  74%   2.1k/s", d: 40 },
+      { t: "out", s: "embedding  ████████████████████ 100%   done in 3m40s", d: 40 },
+      { t: "out", s: "upserted 96,318 vectors · HNSW m=16 ef=200", d: 30 },
+      { t: "out", s: "recall@10 on holdout: 0.97", d: 40, c: "text-emerald-400" },
+    ],
+  },
+  /* 15 ── incident triage */
+  {
+    time: "10:30 PM", label: "Incident Triage", icon: "target",
+    lines: [
+      { t: "cmd", s: "kubectl logs deploy/inference-api --since=10m | grep -c 'status=5'" },
+      { t: "out", s: "212", d: 60, c: "text-rose-400" },
+      { t: "cmd", s: "triage-agent investigate --service inference-api --window 10m" },
+      { t: "out", s: "correlating 212 errors with deploys, traces, and config changes…", d: 60 },
+      { t: "out", s: "root cause: model warm-pool shrank to 0 after 21:58 config push", d: 40, c: "text-amber-400" },
+      { t: "cmd", s: "kubectl rollout undo deploy/inference-api" },
+      { t: "out", s: "deployment.apps/inference-api rolled back", d: 40 },
+      { t: "out", s: "5xx rate 4.1% → 0.0% over the next 2m", d: 40, c: "text-emerald-400" },
+    ],
+  },
 ]

@@ -103,7 +103,7 @@ describe("splitChatSegments — no re-drawn charts in text", () => {
     it("strips a malformed markdown image whose URL contains raw spaces", () => {
         const segments = splitChatSegments("As shown above: ![Skills chart](chart rendered above) — that's the breakdown.")
         expect(segments).toEqual([{ kind: "text", value: "As shown above: — that's the breakdown." }])
-        expect(segments.map((s) => s.value).join("")).not.toContain("![")
+        expect(segments.map((s) => (s.kind === "text" ? s.value : "")).join("")).not.toContain("![")
     })
 
     it("strips a raw <img> tag entirely", () => {
@@ -121,7 +121,7 @@ describe("splitChatSegments — no re-drawn charts in text", () => {
         expect(segments.map((s) => s.kind)).toEqual(["text", "text"])
         expect(segments[0]).toEqual({ kind: "text", value: "Here's the breakdown:" })
         expect(segments[1]).toEqual({ kind: "text", value: "Python leads." })
-        const joined = segments.map((s) => s.value).join(" ")
+        const joined = segments.map((s) => (s.kind === "text" ? s.value : "")).join(" ")
         expect(joined).not.toContain("xychart-beta")
         expect(joined).not.toContain("x-axis")
     })
@@ -381,10 +381,15 @@ describe("splitChatSegments — bare JSON leaks", () => {
         expect(segments).toEqual([{ kind: "text", value: "Here are his stats." }])
     })
 
-    it("drops a fenced chart-tool spec too", () => {
-        expect(splitChatSegments("Stats:\n\n```json\n" + BAR + "\n```")).toEqual([
-            { kind: "text", value: "Stats:" },
-        ])
+    it("renders a fenced chart-tool spec the model typed itself (no tool call behind it)", () => {
+        const segments = splitChatSegments("Stats:\n\n```chart\n" + BAR + "\n```")
+        expect(segments[0]).toEqual({ kind: "text", value: "Stats:" })
+        expect(segments[1]).toMatchObject({ kind: "chart", spec: { kind: "bar" } })
+        expect((segments[1] as { spec: { data: unknown[] } }).spec.data.length).toBeGreaterThan(0)
+    })
+
+    it("still drops a fenced spec whose shape ChatChart cannot draw", () => {
+        expect(splitChatSegments('```chart\n{"type":"bar","title":"x","data":"nope"}\n```')).toEqual([])
     })
 
     it("renders an unfenced diagram object rather than dropping it", () => {
@@ -602,7 +607,7 @@ describe("Pie readout lives in the legend, not a floating tooltip", () => {
 
 describe("markdown image with parentheses in its target (live 2026-09-18)", () => {
     it("removes the whole image, not just up to the first ')'", () => {
-        const text = splitChatSegments("Here is the chart. ![Skills by category](chart above: Analytics & BI (14), Engineering & Platform (12), and Business Systems (7).) Ask about any of them.").map((s) => s.value).join("")
+        const text = splitChatSegments("Here is the chart. ![Skills by category](chart above: Analytics & BI (14), Engineering & Platform (12), and Business Systems (7).) Ask about any of them.").map((s) => (s.kind === "text" ? s.value : "")).join("")
         expect(text).not.toContain("![")
         expect(text).not.toContain("(12)")
         expect(text).toContain("Here is the chart.")
@@ -613,7 +618,7 @@ describe("markdown image with parentheses in its target (live 2026-09-18)", () =
 describe("many unclosed image targets in a streamed reply", () => {
     it("stays linear — was ~1.4s at this size before the scan cap", () => {
         const start = performance.now()
-        const text = splitChatSegments("![x](y".repeat(16000)).map((s) => s.value).join("")
+        const text = splitChatSegments("![x](y".repeat(16000)).map((s) => (s.kind === "text" ? s.value : "")).join("")
         expect(performance.now() - start).toBeLessThan(500)
         expect(text).toContain("![x](y")
     })

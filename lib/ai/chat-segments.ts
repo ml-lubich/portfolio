@@ -15,11 +15,16 @@
  */
 
 import { isMermaidDsl } from "@/lib/ai/mermaid-dsl"
+import type { ChartSpec } from "@/lib/ai/profile-tools"
 
 export type ChatSegment =
     | { kind: "text"; value: string }
     | { kind: "diagram"; json: string }
     | { kind: "mermaid"; source: string }
+    /** A fenced bar/line/radar spec the model typed itself. Rendered with the
+     *  same `ChatChart` as a tool chart; the panel skips it when a tool chart
+     *  with the same title already arrived. */
+    | { kind: "chart"; spec: ChartSpec }
 
 /** Any fenced block. The label is a hint the model gets wrong (```json is
  *  common), so the payload decides whether it is a diagram. */
@@ -28,14 +33,16 @@ const FENCE = /```([a-z]*)\s*\n([\s\S]*?)```/gi
 /** The shapes `BlogChart` knows how to draw. */
 const CHART_TYPES = new Set(["pipeline", "comparison", "tree", "pie"])
 
-/** The shapes the `chart` event already rendered — printing them duplicates. */
+/** The shapes the `chart` tool draws. Bare (unfenced) copies are duplicates
+ *  of a tool chart and are dropped; a *fenced* one is the model drawing the
+ *  chart itself, with no tool call behind it, so it renders. */
 const TOOL_CHART_TYPES = new Set(["bar", "line", "radar"])
 
 /** A JSON object opening at the start of a line, e.g. a spec the model typed
  *  out as prose. */
 const BARE_OBJECT = /(?:^|\n)[ \t]*\{"/g
 
-type Verdict = "diagram" | "mermaid" | "drop" | "text"
+type Verdict = "diagram" | "mermaid" | "chart" | "drop" | "text"
 
 function classifyJson(json: string): Verdict {
     let type: unknown
@@ -53,7 +60,8 @@ function classifyJson(json: string): Verdict {
 function classifyFence(lang: string, body: string): Verdict {
     const trimmed = body.trim()
     const jsonVerdict = classifyJson(trimmed)
-    if (jsonVerdict === "diagram" || jsonVerdict === "drop") return jsonVerdict
+    if (jsonVerdict === "diagram") return "diagram"
+    if (jsonVerdict === "drop") return parseChartSpec(trimmed) ? "chart" : "drop"
     if (isMermaidDsl(trimmed)) return "mermaid"
     // An explicit ```mermaid fence the client cannot render — e.g.
     // xychart-beta's `title`/`x-axis`/`bar` DSL, which MermaidFlowDiagram
@@ -142,9 +150,39 @@ function pushText(out: ChatSegment[], raw: string) {
     if (value) out.push({ kind: "text", value })
 }
 
+/** `{"type":"bar","title":…,"data":[{label,value}]}` → ChartSpec, or null
+ *  when the shape is not something ChatChart can draw. */
+export function parseChartSpec(json: string): ChartSpec | null {
+    let obj: unknown
+    try {
+        obj = JSON.parse(json)
+    } catch {
+        return null
+    }
+    if (!obj || typeof obj !== "object") return null
+    const { type, title, unit, data } = obj as Record<string, unknown>
+    if (typeof type !== "string" || !TOOL_CHART_TYPES.has(type)) return null
+    if (!Array.isArray(data)) return null
+    const rows = data.filter(
+        (d): d is { label: string; value: number } =>
+            !!d && typeof d === "object" && typeof (d as { label?: unknown }).label === "string" && typeof (d as { value?: unknown }).value === "number",
+    )
+    if (!rows.length) return null
+    return {
+        kind: type as ChartSpec["kind"],
+        title: typeof title === "string" ? title : "",
+        ...(typeof unit === "string" ? { unit } : {}),
+        data: rows,
+    }
+}
+
 function pushSegment(out: ChatSegment[], verdict: Verdict, payload: string, fence?: string) {
     if (verdict === "diagram") out.push({ kind: "diagram", json: payload })
     else if (verdict === "mermaid") out.push({ kind: "mermaid", source: payload })
+    else if (verdict === "chart") {
+        const spec = parseChartSpec(payload)
+        if (spec) out.push({ kind: "chart", spec })
+    }
     else if (verdict === "text" && fence) pushText(out, fence)
 }
 

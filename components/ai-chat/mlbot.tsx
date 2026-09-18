@@ -25,6 +25,7 @@ import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import { wooshScrollTo } from "@/components/nav/woosh-scroll"
 import { ChatChart, type ChartSpec } from "./chat-chart"
+import { AGENT_STORM_EVENT, isAgentStormAsk } from "@/lib/agents-build"
 import { MermaidFlowDiagram } from "./mermaid-flow-diagram"
 import { BookingCard } from "./booking-card"
 import { ContactCard, ResumeCard } from "./handoff-cards"
@@ -61,6 +62,14 @@ const PANEL_SIZES = [
     "sm:h-[min(56rem,90dvh,calc(100dvh-8rem))] sm:w-[min(42rem,calc(100vw-2rem))]",
     "sm:h-[min(60rem,calc(100dvh-7.5rem))] sm:w-[min(80rem,calc(100vw-3rem))]",
 ] as const
+
+/** A fenced chart the model typed is skipped when the `chart` tool already
+ *  drew the same one (matched by title) — otherwise it would render twice. */
+function hasToolChart(turn: { charts?: ChartSpec[] }, spec: ChartSpec): boolean {
+    const key = spec.title.trim().toLowerCase()
+    return !!key && !!turn.charts?.some((c) => c.title.trim().toLowerCase() === key)
+}
+
 
 const SUGGESTIONS = [
     "What has Misha built with agents?",
@@ -268,6 +277,25 @@ export function MLBot() {
             // One question at a time. A tap while an answer is streaming is
             // dropped on the spot — nothing is queued behind it.
             if (!question || busyRef.current) return
+
+            // Easter egg: "agent storm" never reaches the model. The overlay
+            // (components/easter/agents-build.tsx) listens for the event.
+            if (isAgentStormAsk(question)) {
+                window.dispatchEvent(new CustomEvent(AGENT_STORM_EVENT))
+                setInput("")
+                setEditing(null)
+                setTurns([
+                    ...turns.slice(0, from ?? turns.length),
+                    { role: "user", content: question },
+                    {
+                        role: "assistant",
+                        content: "⚡ Agent storm unleashed — a fleet of agents is building across the page. Press Esc (or the dismiss pill) to call them off.",
+                        charts: [],
+                        tools: [],
+                    },
+                ])
+                return
+            }
             busyRef.current = true
             const run = ++runRef.current
 
@@ -591,6 +619,8 @@ export function MLBot() {
                                                 </div>
                                             ) : seg.kind === "mermaid" ? (
                                                 <MermaidFlowDiagram key={j} source={seg.source} />
+                                            ) : seg.kind === "chart" ? (
+                                                hasToolChart(turn, seg.spec) ? null : <ChatChart key={j} spec={seg.spec} />
                                             ) : (
                                                 <div key={j} className="mlbot-md min-w-0 text-[16px] leading-[1.7] text-foreground/90 sm:text-[15.5px]">
                                                     {/* No raw-HTML plugin is loaded, so raw HTML never passes
