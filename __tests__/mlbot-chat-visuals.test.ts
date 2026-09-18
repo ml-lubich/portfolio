@@ -599,3 +599,13 @@ describe("Pie readout lives in the legend, not a floating tooltip", () => {
         expect(chart).toMatch(/activeIndex === i/)
     })
 })
+
+describe("markdown image with parentheses in its target (live 2026-09-18)", () => {
+    it("removes the whole image, not just up to the first ')'", () => {
+        const text = splitChatSegments("Here is the chart. ![Skills by category](chart above: Analytics & BI (14), Engineering & Platform (12), and Business Systems (7).) Ask about any of them.").map((s) => s.value).join("")
+        expect(text).not.toContain("![")
+        expect(text).not.toContain("(12)")
+        expect(text).toContain("Here is the chart.")
+        expect(text).toContain("Ask about any of them.")
+    })
+})

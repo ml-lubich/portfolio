@@ -91,7 +91,36 @@ function endOfObject(s: string, start: number): number {
  *  model emits when it tries to "re-draw" a chart that already rendered,
  *  where the "url" is unescaped prose with raw spaces in it. Stripped
  *  wholesale: the alt text is not a caption worth keeping either. */
-const MD_IMAGE = /!\[[^\]]*\]\([^)]*\)/g
+/** Removes `![alt](target)`, matching the target's parentheses so a model
+ *  that writes a whole sentence there — "![Skills](chart above: BI (14),
+ *  Platform (12))" — loses all of it, not just up to the first ")". An
+ *  unclosed target is left alone. */
+function stripMdImages(s: string): string {
+    let out = ""
+    let i = 0
+    for (let start = s.indexOf("![", i); start !== -1; start = s.indexOf("![", i)) {
+        const mid = s.indexOf("](", start + 2)
+        if (mid === -1 || s.slice(start + 2, mid).includes("]")) {
+            out += s.slice(i, start + 2)
+            i = start + 2
+            continue
+        }
+        let depth = 0
+        let end = mid + 1
+        for (; end < s.length; end++) {
+            if (s[end] === "(") depth++
+            else if (s[end] === ")" && --depth === 0) break
+        }
+        if (end >= s.length) {
+            out += s.slice(i, start + 2)
+            i = start + 2
+            continue
+        }
+        out += s.slice(i, start)
+        i = end + 1
+    }
+    return out + s.slice(i)
+}
 
 /** A raw HTML `<img>` tag typed straight into the reply. ReactMarkdown
  *  never turns this into an element (no rehype-raw), but left in place it
@@ -103,7 +132,7 @@ const HTML_IMG = /<img\b[^>]*>/gi
  *  horizontal runs collapse — newlines are left alone so paragraph and
  *  list structure survives. */
 function stripImages(s: string): string {
-    return s.replace(MD_IMAGE, "").replace(HTML_IMG, "").replace(/[ \t]{2,}/g, " ")
+    return stripMdImages(s).replace(HTML_IMG, "").replace(/[ \t]{2,}/g, " ")
 }
 
 function pushText(out: ChatSegment[], raw: string) {
