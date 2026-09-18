@@ -37,7 +37,9 @@ function install(responses: Response[]) {
         "fetch",
         vi.fn(async (_url: string, init: RequestInit) => {
             bodies.push(JSON.parse(String(init.body)))
-            return responses[Math.min(bodies.length - 1, responses.length - 1)]
+            // A clone per call: the cascade reads each failed body, and a
+            // shared Response would throw "already read" on the second model.
+            return responses[Math.min(bodies.length - 1, responses.length - 1)].clone()
         }),
     )
     return bodies
