@@ -34,12 +34,24 @@ export async function checkModelStatus(model: string, apiKey: string): Promise<M
     })
     const latencyMs = Date.now() - start
     if (res.ok) return { model, ok: true, status: res.status, latencyMs }
-    const body = (await res.text().catch(() => "")).slice(0, 200)
-    return { model, ok: false, status: res.status, error: body || res.statusText, latencyMs }
+    return { model, ok: false, status: res.status, error: publicError(await res.text().catch(() => "")) || res.statusText, latencyMs }
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
     return { model, ok: false, error: message.slice(0, 200), latencyMs: Date.now() - start }
   }
+}
+
+/** /status is public: keep OpenRouter's `error.message` only and drop URLs,
+ *  which can carry account/key-management identifiers. */
+export function publicError(body: string): string {
+  let message = body
+  try {
+    message = JSON.parse(body)?.error?.message ?? body
+  } catch {}
+  // Cut at the first URL, back to the end of the last whole sentence before it.
+  const [beforeUrl] = message.split(/https?:\/\//)
+  const cut = beforeUrl.length < message.length && beforeUrl.includes(".") ? beforeUrl.slice(0, beforeUrl.lastIndexOf(".") + 1) : beforeUrl
+  return cut.replace(/\s+/g, " ").trim().slice(0, 200)
 }
 
 /** Checks every model in parallel; one slow/failing model never blocks another. */

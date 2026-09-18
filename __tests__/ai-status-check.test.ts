@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest"
-import { checkAllModels, checkModelStatus } from "@/lib/ai/status-check"
+import { checkAllModels, checkModelStatus, publicError } from "@/lib/ai/status-check"
 
 afterEach(() => {
     vi.unstubAllGlobals()
@@ -58,5 +58,15 @@ describe("checkAllModels", () => {
         expect(results).toHaveLength(2)
         expect(results.find((r) => r.model === "good/model")).toMatchObject({ ok: true })
         expect(results.find((r) => r.model === "bad/model")).toMatchObject({ ok: false, status: 503 })
+    })
+})
+
+describe("publicError", () => {
+    it("keeps OpenRouter's message and drops key-management URLs", () => {
+        const body = JSON.stringify({ error: { message: "Key limit exceeded (monthly limit). Manage it using https://openrouter.ai/workspaces/default/keys/abc123", code: 403 } })
+        expect(publicError(body)).toBe("Key limit exceeded (monthly limit).")
+    })
+    it("falls back to the raw text when the body is not JSON", () => {
+        expect(publicError("Bad gateway")).toBe("Bad gateway")
     })
 })
