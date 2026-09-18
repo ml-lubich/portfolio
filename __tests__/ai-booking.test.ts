@@ -76,6 +76,7 @@ describe("no fabricated appointments", () => {
 
 describe("model cascade", () => {
     const route = read("app/api/chat/route.ts")
+    const modelsSrc = read("lib/ai/models.ts")
 
     /* Was ordered by measured latency, leading with a paid model. Now free
      * first: a portfolio chat should cost nothing to run by default, and the
@@ -83,13 +84,13 @@ describe("model cascade", () => {
      * the slow ones — and it is written out on the MODELS comment. Ordering
      * and lab diversity live in __tests__/ai-model-slugs.test.ts. */
     it("leads with a free model", () => {
-        const block = route.slice(route.indexOf("const MODELS"), route.indexOf("] as const"))
+        const block = modelsSrc.slice(modelsSrc.indexOf("const MODELS"), modelsSrc.indexOf("] as const"))
         const models = [...block.matchAll(/"([^"]+)"/g)].map((m) => m[1])
         expect(models[0].endsWith(":free"), `leads with ${models[0]}`).toBe(true)
     })
 
     it("keeps a free model in the cascade as a cost/outage net", () => {
-        const block = route.slice(route.indexOf("const MODELS"), route.indexOf("] as const"))
+        const block = modelsSrc.slice(modelsSrc.indexOf("const MODELS"), modelsSrc.indexOf("] as const"))
         const models = [...block.matchAll(/"([^"]+)"/g)].map((m) => m[1])
         expect(models.some((m) => m.endsWith(":free"))).toBe(true)
     })
@@ -98,7 +99,7 @@ describe("model cascade", () => {
         // Verified against the live API: these leak "I need to follow the
         // rules..." straight into the panel, even with reasoning.exclude set.
         // Scoped to the array — they are named in the comment above it on purpose.
-        const block = route.slice(route.indexOf("const MODELS"), route.indexOf("] as const"))
+        const block = modelsSrc.slice(modelsSrc.indexOf("const MODELS"), modelsSrc.indexOf("] as const"))
         expect(block).not.toContain("nemotron-3.5-lightning")
         expect(block).not.toContain("nemotron-3-super-120b")
     })
@@ -108,7 +109,7 @@ describe("model cascade", () => {
     })
 
     it("has a paid fallback so a free-tier outage does not take chat down", () => {
-        const block = route.slice(route.indexOf("const MODELS"), route.indexOf("] as const"))
+        const block = modelsSrc.slice(modelsSrc.indexOf("const MODELS"), modelsSrc.indexOf("] as const"))
         const models = [...block.matchAll(/"([^"]+)"/g)].map((m) => m[1])
         expect(models.filter((m) => !m.endsWith(":free")).length).toBeGreaterThan(0)
     })

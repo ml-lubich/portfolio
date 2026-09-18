@@ -1,6 +1,5 @@
-import { readFileSync } from "node:fs"
-import { resolve } from "node:path"
 import { describe, expect, it } from "vitest"
+import { MODELS } from "@/lib/ai/models"
 
 /**
  * MLBot went dead in production with:
@@ -20,22 +19,8 @@ import { describe, expect, it } from "vitest"
  */
 const NETWORK_GATED = Boolean(process.env.VERCEL)
 
-const ROUTE = resolve(__dirname, "../app/api/chat/route.ts")
-
-/** Parse the MODELS array out of the route rather than importing it: the route
- *  pulls in next/server and the whole tool surface just to read four strings. */
-function declaredModels(): string[] {
-  const src = readFileSync(ROUTE, "utf8")
-  const block = src.match(/const MODELS = \[([\s\S]*?)\] as const/)
-  if (!block) throw new Error("MODELS array not found in app/api/chat/route.ts")
-  // Strip comments first: the array carries prose that itself quotes an
-  // upstream error string, and a bare string match reads that as a model id.
-  const body = block[1].replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/[^\n]*/g, "")
-  return [...body.matchAll(/"([^"]+)"/g)].map((m) => m[1])
-}
-
 describe("chat model cascade", () => {
-  const models = declaredModels()
+  const models: string[] = [...MODELS]
 
   it("declares a cascade, not a single point of failure", () => {
     expect(models.length).toBeGreaterThanOrEqual(2)

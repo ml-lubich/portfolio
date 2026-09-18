@@ -229,9 +229,9 @@ describe("MLBot spend governor", () => {
     })
 
     it("keeps more than one lab in the roster so an outage is not an outage", () => {
-        const route = read("app/api/chat/route.ts")
+        const modelsSrc = read("lib/ai/models.ts")
         const models = stripComments(
-            route.slice(route.indexOf("const MODELS"), route.indexOf("] as const")),
+            modelsSrc.slice(modelsSrc.indexOf("const MODELS"), modelsSrc.indexOf("] as const")),
         )
         const labs = new Set([...models.matchAll(/"([^"]+)\//g)].map((m) => m[1]))
 
@@ -277,8 +277,9 @@ describe("isPinnedToBottom", () => {
 
 describe("MLBot model roster", () => {
     const route = read("app/api/chat/route.ts")
+    const modelsSrc = read("lib/ai/models.ts")
     const models = stripComments(
-        route.slice(route.indexOf("const MODELS"), route.indexOf("] as const")),
+        modelsSrc.slice(modelsSrc.indexOf("const MODELS"), modelsSrc.indexOf("] as const")),
     )
 
     /* Free-first, replacing a fastest-first order that led with a paid model:
