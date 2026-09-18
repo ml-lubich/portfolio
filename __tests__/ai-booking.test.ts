@@ -68,8 +68,10 @@ describe("no fabricated appointments", () => {
         const panel = read("components/ai-chat/mlbot.tsx")
         expect(panel).toContain("stripCardLinks")
         // Stripped before the answer is rendered, not only before it is copied —
-        // the card and a pasted URL used to sit one above the other.
-        expect(panel).toContain("splitChatSegments(stripCardLinks(turn.content))")
+        // the card and a pasted URL used to sit one above the other. `shown` is
+        // the streamed-reveal slice of `turn.content` (see AssistantSegments /
+        // useSmoothText), so the composition is on `shown`, not the raw turn.
+        expect(panel).toContain("splitChatSegments(stripCardLinks(shown))")
         expect(read("lib/ai/card-links.ts")).toContain("BOOKING_URL")
     })
 })

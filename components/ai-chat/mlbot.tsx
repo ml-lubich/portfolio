@@ -21,9 +21,11 @@ import { BlogChart } from "@/components/blog/charts/blog-chart"
 import { splitChatSegments } from "@/lib/ai/chat-segments"
 import { clampFollowup, splitFollowup, type Followup } from "@/lib/ai/followups"
 import { isPinnedToBottom } from "@/lib/ai/chat-scroll"
+import { rehypeStreamWords } from "@/lib/ai/stream-reveal"
 import ReactMarkdown from "react-markdown"
 import remarkGfm from "remark-gfm"
 import { wooshScrollTo } from "@/components/nav/woosh-scroll"
+import { useSmoothText } from "./use-smooth-text"
 import { ChatChart, type ChartSpec } from "./chat-chart"
 import { AGENT_STORM_EVENT, isAgentStormAsk } from "@/lib/agents-build"
 import { MermaidFlowDiagram } from "./mermaid-flow-diagram"
@@ -190,6 +192,60 @@ function CopyButton({ text, label }: { text: string; label: string }) {
     )
 }
 
+interface AssistantSegmentsProps {
+    content: string
+    charts?: ChartSpec[]
+    busy: boolean
+    isLast: boolean
+    onReveal: () => void
+}
+
+/* Gemini-style reveal: `useSmoothText` runs on the full answer before it is
+ * split into segments, so a fenced chart or diagram only renders once its
+ * closing fence has actually been revealed — never half-drawn.
+ *
+ * Only a turn that mounted mid-stream animates (`animate` is locked at
+ * mount, not recomputed as `busy` flips off) — a completed or previous turn
+ * renders straight through with no plugin. */
+function AssistantSegments({ content, charts, busy, isLast, onReveal }: AssistantSegmentsProps) {
+    const [animate] = useState(busy && isLast)
+    const shown = useSmoothText(content, animate)
+
+    useEffect(() => {
+        if (animate) onReveal()
+    }, [shown, animate, onReveal])
+
+    const rehypePlugins = animate ? [rehypeStreamWords] : []
+
+    return (
+        <>
+            {splitChatSegments(stripCardLinks(shown)).map((seg, j) =>
+                seg.kind === "diagram" ? (
+                    <div key={j} className="my-2 max-w-full overflow-x-auto">
+                        <BlogChart json={seg.json} />
+                    </div>
+                ) : seg.kind === "mermaid" ? (
+                    <MermaidFlowDiagram key={j} source={seg.source} />
+                ) : seg.kind === "chart" ? (
+                    hasToolChart({ charts }, seg.spec) ? null : <ChatChart key={j} spec={seg.spec} />
+                ) : (
+                    <div key={j} className="mlbot-md min-w-0 text-[16px] leading-[1.7] text-foreground/90 sm:text-[15.5px]">
+                        {/* No raw-HTML plugin is loaded, so raw HTML never passes
+                            through as elements — and disallowedElements is the belt
+                            on top: a model that "re-draws" an already-rendered chart
+                            as a markdown image must never get one on screen
+                            (chat-segments.ts strips the syntax already; this is the
+                            renderer's own refusal). */}
+                        <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={rehypePlugins} disallowedElements={["img"]} unwrapDisallowed>
+                            {seg.value}
+                        </ReactMarkdown>
+                    </div>
+                ),
+            )}
+        </>
+    )
+}
+
 export function MLBot() {
     const [open, setOpen] = useState(false)
     const [turns, setTurns] = useState<Turn[]>([])
@@ -241,6 +297,12 @@ export function MLBot() {
         if (!el || !isPinnedToBottom(el)) return
         el.scrollTo({ top: el.scrollHeight, behavior: busy ? "auto" : "smooth" })
     }, [turns, busy])
+
+    // The reveal grows the text between network chunks, so follow it down too.
+    const followBottom = useCallback(() => {
+        const el = scrollRef.current
+        if (el && isPinnedToBottom(el)) el.scrollTop = el.scrollHeight
+    }, [])
 
     useEffect(() => {
         if (!open) return
@@ -612,29 +674,13 @@ export function MLBot() {
 
                                         {turn.contact && <ContactCard contact={turn.contact} />}
 
-                                        {splitChatSegments(stripCardLinks(turn.content)).map((seg, j) =>
-                                            seg.kind === "diagram" ? (
-                                                <div key={j} className="my-2 max-w-full overflow-x-auto">
-                                                    <BlogChart json={seg.json} />
-                                                </div>
-                                            ) : seg.kind === "mermaid" ? (
-                                                <MermaidFlowDiagram key={j} source={seg.source} />
-                                            ) : seg.kind === "chart" ? (
-                                                hasToolChart(turn, seg.spec) ? null : <ChatChart key={j} spec={seg.spec} />
-                                            ) : (
-                                                <div key={j} className="mlbot-md min-w-0 text-[16px] leading-[1.7] text-foreground/90 sm:text-[15.5px]">
-                                                    {/* No raw-HTML plugin is loaded, so raw HTML never passes
-                                                        through as elements — and disallowedElements is the belt
-                                                        on top: a model that "re-draws" an already-rendered chart
-                                                        as a markdown image must never get one on screen
-                                                        (chat-segments.ts strips the syntax already; this is the
-                                                        renderer's own refusal). */}
-                                                    <ReactMarkdown remarkPlugins={[remarkGfm]} disallowedElements={["img"]} unwrapDisallowed>
-                                                        {seg.value}
-                                                    </ReactMarkdown>
-                                                </div>
-                                            ),
-                                        )}
+                                        <AssistantSegments
+                                            content={turn.content}
+                                            charts={turn.charts}
+                                            busy={busy}
+                                            isLast={i === lastAssistant}
+                                            onReveal={followBottom}
+                                        />
 
                                         {busy && i === turns.length - 1 && !turn.content && !turn.tools?.length && (
                                             <ThinkingVerb />
