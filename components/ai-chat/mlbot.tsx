@@ -593,7 +593,15 @@ export function MLBot() {
                                                 <MermaidFlowDiagram key={j} source={seg.source} />
                                             ) : (
                                                 <div key={j} className="mlbot-md min-w-0 text-[16px] leading-[1.7] text-foreground/90 sm:text-[15.5px]">
-                                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{seg.value}</ReactMarkdown>
+                                                    {/* No raw-HTML plugin is loaded, so raw HTML never passes
+                                                        through as elements — and disallowedElements is the belt
+                                                        on top: a model that "re-draws" an already-rendered chart
+                                                        as a markdown image must never get one on screen
+                                                        (chat-segments.ts strips the syntax already; this is the
+                                                        renderer's own refusal). */}
+                                                    <ReactMarkdown remarkPlugins={[remarkGfm]} disallowedElements={["img"]} unwrapDisallowed>
+                                                        {seg.value}
+                                                    </ReactMarkdown>
                                                 </div>
                                             ),
                                         )}

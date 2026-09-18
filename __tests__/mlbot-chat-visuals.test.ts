@@ -88,6 +88,45 @@ describe("splitChatSegments", () => {
     })
 })
 
+/* Live QA 2026-09-18: on the SECOND question of a session after a chart had
+ * already been drawn, models tried to "re-draw" it as text — a markdown
+ * image (often malformed, with raw spaces in the URL), a raw <img> tag, or
+ * an unsupported Mermaid DSL (xychart-beta's `bar`/`title`/`x-axis` lines)
+ * printed as a fenced code block. Charts only ever come from the chart SSE
+ * event; none of these must reach the transcript. */
+describe("splitChatSegments — no re-drawn charts in text", () => {
+    it("strips a well-formed markdown image and its alt text", () => {
+        const segments = splitChatSegments("Here it is: ![Skills chart](https://example.com/chart.png) as shown.")
+        expect(segments).toEqual([{ kind: "text", value: "Here it is: as shown." }])
+    })
+
+    it("strips a malformed markdown image whose URL contains raw spaces", () => {
+        const segments = splitChatSegments("As shown above: ![Skills chart](chart rendered above) — that's the breakdown.")
+        expect(segments).toEqual([{ kind: "text", value: "As shown above: — that's the breakdown." }])
+        expect(segments.map((s) => s.value).join("")).not.toContain("![")
+    })
+
+    it("strips a raw <img> tag entirely", () => {
+        const segments = splitChatSegments('Skills: <img src="chart.png" alt="Skills"> as above.')
+        expect(segments).toEqual([{ kind: "text", value: "Skills: as above." }])
+    })
+
+    it("drops an unsupported Mermaid DSL fence (xychart-beta) instead of printing it raw", () => {
+        const xychart = `xychart-beta
+    title "Skills"
+    x-axis [Python, Rust, Go]
+    bar [90, 80, 70]`
+        const segments = splitChatSegments(`Here's the breakdown:\n\n\`\`\`mermaid\n${xychart}\n\`\`\`\n\nPython leads.`)
+
+        expect(segments.map((s) => s.kind)).toEqual(["text", "text"])
+        expect(segments[0]).toEqual({ kind: "text", value: "Here's the breakdown:" })
+        expect(segments[1]).toEqual({ kind: "text", value: "Python leads." })
+        const joined = segments.map((s) => s.value).join(" ")
+        expect(joined).not.toContain("xychart-beta")
+        expect(joined).not.toContain("x-axis")
+    })
+})
+
 describe("MLBot panel", () => {
     const source = read("components/ai-chat/mlbot.tsx")
     const panel = source.slice(source.indexOf('role="dialog"'), source.indexOf('role="dialog"') + 700)
@@ -206,6 +245,12 @@ describe("MLBot system prompt", () => {
             expect(prompt).toContain(type)
         }
     })
+
+    it("tells the model charts only come from the chart tools, never re-drawn in text", () => {
+        expect(prompt).toMatch(/never draw a chart/i)
+        expect(prompt).toMatch(/markdown image/i)
+        expect(prompt).toMatch(/already shown/i)
+    })
 })
 
 describe("MLBot spend governor", () => {
@@ -245,6 +290,17 @@ describe("MLBot transcript", () => {
     it("renders replies as markdown, not raw asterisks", () => {
         expect(source).toMatch(/react-markdown/)
         expect(source).toMatch(/remark-gfm/)
+    })
+
+    it("never lets ReactMarkdown render an <img>, malformed or not", () => {
+        // Belt-and-suspenders on top of the text-level strip in chat-segments:
+        // the renderer itself must refuse to mount an <img>.
+        expect(source).toMatch(/disallowedElements=\{?\[[^\]]*"img"[^\]]*\]/)
+        expect(source).toMatch(/unwrapDisallowed/)
+    })
+
+    it("never enables raw HTML passthrough (rehype-raw) in the transcript", () => {
+        expect(source).not.toMatch(/rehype-raw|rehypeRaw/)
     })
 
     it("reuses the markdown stack the blog already depends on", async () => {

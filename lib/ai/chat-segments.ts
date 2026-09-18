@@ -50,11 +50,18 @@ function classifyJson(json: string): Verdict {
     return "text"
 }
 
-function classifyFence(_lang: string, body: string): Verdict {
+function classifyFence(lang: string, body: string): Verdict {
     const trimmed = body.trim()
     const jsonVerdict = classifyJson(trimmed)
     if (jsonVerdict === "diagram" || jsonVerdict === "drop") return jsonVerdict
     if (isMermaidDsl(trimmed)) return "mermaid"
+    // An explicit ```mermaid fence the client cannot render — e.g.
+    // xychart-beta's `title`/`x-axis`/`bar` DSL, which MermaidFlowDiagram
+    // does not support — must never leak as a raw code block. Unlike
+    // ```chart/```json, whose label the model gets wrong constantly, a
+    // ```mermaid label is a deliberate diagram attempt: drop it rather
+    // than print DSL lines the visitor cannot read.
+    if (lang === "mermaid") return "drop"
     return "text"
 }
 
@@ -80,8 +87,27 @@ function endOfObject(s: string, start: number): number {
     return -1
 }
 
+/** Markdown image syntax, `![alt](url)` — including the malformed form a
+ *  model emits when it tries to "re-draw" a chart that already rendered,
+ *  where the "url" is unescaped prose with raw spaces in it. Stripped
+ *  wholesale: the alt text is not a caption worth keeping either. */
+const MD_IMAGE = /!\[[^\]]*\]\([^)]*\)/g
+
+/** A raw HTML `<img>` tag typed straight into the reply. ReactMarkdown
+ *  never turns this into an element (no rehype-raw), but left in place it
+ *  still prints as literal tag text — so it is stripped at the source. */
+const HTML_IMG = /<img\b[^>]*>/gi
+
+/** Strips both forms, then collapses the double space a removed inline
+ *  image leaves behind ("Here: ␣␣as shown" → "Here: as shown"). Only
+ *  horizontal runs collapse — newlines are left alone so paragraph and
+ *  list structure survives. */
+function stripImages(s: string): string {
+    return s.replace(MD_IMAGE, "").replace(HTML_IMG, "").replace(/[ \t]{2,}/g, " ")
+}
+
 function pushText(out: ChatSegment[], raw: string) {
-    const value = raw.trim()
+    const value = stripImages(raw).trim()
     if (value) out.push({ kind: "text", value })
 }
 
