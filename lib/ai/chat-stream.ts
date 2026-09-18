@@ -101,26 +101,45 @@ export type TurnDecision =
     | { kind: "answer"; text: string }
     | { kind: "fallback"; text: string }
 
-/** After a model round: keep looping, accept the text, or recover from silence. */
-export function finalizeAssistantTurn(reply: AssistantTurn, toolPayloads: string[]): TurnDecision {
+/** After a model round: keep looping, accept the text, or recover from silence.
+ *
+ * `sawVisual` covers chart/booking/resume/contact cards: the client already
+ * rendered something real for the tool call that just ran, so a silent final
+ * reply is not a failure to recover from — it is a model that (correctly)
+ * had nothing left to say. Live 2026-09-18: "Show his skills as a chart"
+ * rendered the chart, then the fallback line printed underneath it anyway. */
+export function finalizeAssistantTurn(
+    reply: AssistantTurn,
+    toolPayloads: string[],
+    sawVisual = false,
+): TurnDecision {
     if (reply.tool_calls?.length) return { kind: "tools" }
     const text = reply.content.trim()
     if (text) return { kind: "answer", text: reply.content }
+    if (sawVisual) return { kind: "answer", text: "" }
     if (toolPayloads.length) return { kind: "fallback", text: fallbackFromToolPayloads(toolPayloads) }
     return { kind: "answer", text: "" }
 }
 
+/** A silent final after tools still needs a grounded reply, but never a raw
+ *  hit-list with typed bullets — that reads as an answer the model wrote,
+ *  when nothing actually wrote one. A short prose sentence instead, same
+ *  spirit as jheupler-site's fix: name what was found, point at a way
+ *  forward. */
 export function fallbackFromToolPayloads(payloads: string[]): string {
     const fromMatchProjects = collectMatchProjects(payloads)
     const names = fromMatchProjects.length ? fromMatchProjects : collectNames(payloads, "projects")
-    if (!names.length) {
-        const roles = collectExperience(payloads)
-        if (roles.length) {
-            return `Here is what is in the profile:\n${roles.map((n) => `• ${n}`).join("\n")}`
-        }
+    const items = names.length ? names : collectExperience(payloads)
+    if (!items.length) {
         return "I looked that up but the write-up did not come back. Ask again, or name a project."
     }
-    return `Here is what is in the profile:\n${names.map((n) => `• ${n}`).join("\n")}`
+    return `I found ${toProseList(items.slice(0, 3))} in the profile — ask about any of them.`
+}
+
+function toProseList(items: string[]): string {
+    if (items.length === 1) return items[0]
+    if (items.length === 2) return `${items[0]} and ${items[1]}`
+    return `${items.slice(0, -1).join(", ")}, and ${items[items.length - 1]}`
 }
 
 function collectMatchProjects(payloads: string[]): string[] {

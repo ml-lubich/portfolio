@@ -101,6 +101,28 @@ describe("empty reply after tools", () => {
         expect(text).not.toMatch(/Equiverse/)
     })
 
+    it("does not print the error line when a chart already answered the turn", () => {
+        /* Live mishalubich.com 2026-09-18: "Show his skills as a chart"
+         * rendered the chart, then "I looked that up but the write-up did
+         * not come back..." printed underneath it. A visual already
+         * delivered is a valid answer, not silence to recover from. */
+        const decision = finalizeAssistantTurn(
+            { content: "", tool_calls: [], followups: [] },
+            ['{"chart":{"type":"bar"}}'],
+            true,
+        )
+        expect(decision.kind).not.toBe("fallback")
+        expect(decision.text).toBe("")
+    })
+
+    it("fallback text never contains a raw bullet character", () => {
+        const text = fallbackFromToolPayloads([
+            '{"matches":[{"kind":"project","name":"Case Triage Agent"},{"kind":"project","name":"imsg-mcp"}]}',
+        ])
+        expect(text).not.toMatch(/•/)
+        expect(text).toMatch(/Case Triage Agent/)
+    })
+
     it("lists built projects, not job titles, when both came back from tools", () => {
         /* Live 2026-09-15: search ranked EchoStar / consultant first, so the
          * fallback printed "Staff AI Engineer" and skipped Case Triage Agent

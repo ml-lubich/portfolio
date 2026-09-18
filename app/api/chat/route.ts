@@ -109,6 +109,11 @@ function runAgent(history: ChatMessage[], apiKey: string, release: () => void): 
                    later question still gets fresh data. */
                 const memo = new ToolMemo()
                 const toolPayloads: string[] = []
+                // Chart/booking/resume/contact cards render client-side off the tool
+                // result — once one lands, an empty final reply is not a failure to
+                // recover from. Live 2026-09-18: the chart rendered, then the fallback
+                // line "I looked that up but..." printed underneath it anyway.
+                let sawVisual = false
 
                 for (let round = 0; round < LIMITS.maxToolRounds; round++) {
                     /* The last round is asked WITHOUT tools. A model that keeps
@@ -122,6 +127,7 @@ function runAgent(history: ChatMessage[], apiKey: string, release: () => void): 
                     const decision = finalizeAssistantTurn(
                         { content: reply.content, tool_calls: reply.tool_calls, followups: reply.followups },
                         toolPayloads,
+                        sawVisual,
                     )
 
                     // Tools keep the loop going. A silent final after a lookup
@@ -161,14 +167,26 @@ function runAgent(history: ChatMessage[], apiKey: string, release: () => void): 
                         const result = runTool(call.function.name, args)
                         // Charts render client-side; the model still sees the spec so it
                         // knows what the user is looking at and does not narrate the bars.
-                        if ("chart" in result) send("chart", result.chart)
+                        if ("chart" in result) {
+                            send("chart", result.chart)
+                            sawVisual = true
+                        }
                         // Booking card renders client-side; the model still sees the
                         // spec so it knows the card is on screen and does not paste a URL.
-                        if ("booking" in result) send("booking", result.booking)
+                        if ("booking" in result) {
+                            send("booking", result.booking)
+                            sawVisual = true
+                        }
                         // Same hand-off pattern: the card carries the file and the
                         // address, so the model has nothing left to paste.
-                        if ("resume" in result) send("resume", result.resume)
-                        if ("contact" in result) send("contact", result.contact)
+                        if ("resume" in result) {
+                            send("resume", result.resume)
+                            sawVisual = true
+                        }
+                        if ("contact" in result) {
+                            send("contact", result.contact)
+                            sawVisual = true
+                        }
 
                         const serialized = JSON.stringify(result).slice(0, 6000)
                         memo.remember(call.function.name, args, serialized)
@@ -183,8 +201,11 @@ function runAgent(history: ChatMessage[], apiKey: string, release: () => void): 
 
                 /* Only reachable if the last (tool-free) round returned nothing
                    at all: answer from what the lookups already returned rather
-                   than apologising on top of good data. */
-                send("text", toolPayloads.length ? fallbackFromToolPayloads(toolPayloads) : UNAVAILABLE)
+                   than apologising on top of good data — unless a visual already
+                   answered the question, in which case silence is the answer. */
+                if (!sawVisual) {
+                    send("text", toolPayloads.length ? fallbackFromToolPayloads(toolPayloads) : UNAVAILABLE)
+                }
                 send("done", {})
                 controller.close()
             } catch (err) {
