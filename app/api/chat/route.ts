@@ -73,7 +73,7 @@ const LIMITS = {
     maxMessageChars: 1000,
     maxHistory: 12,
     maxToolRounds: 4,
-    maxTokens: 800,
+    maxTokens: 1200,
 } as const
 
 interface ChatMessage {
