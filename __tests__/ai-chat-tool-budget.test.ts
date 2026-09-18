@@ -80,6 +80,17 @@ describe("tool-round budget", () => {
         expect(out).not.toContain("couldn't land on a clean answer")
     })
 
+    it("says chat is unavailable instead of pasting the dead cascade at the visitor", async () => {
+        /* Every model down or out of credit used to stream the cascade dump —
+           slugs, HTTP statuses, upstream body text — straight into the bubble. */
+        install([new Response("no credit", { status: 402 })])
+
+        const out = await ask("What has Misha built with agents?", "10.1.1.3")
+
+        expect(out).toMatch(/isn't available right now/)
+        expect(out).not.toMatch(/ling-3\.0|gpt-oss|402/)
+    })
+
     it("answers from the lookups when even the tool-free round is silent", async () => {
         install([
             toolCall("search_profile", '{"query":"agents"}'),

@@ -63,6 +63,12 @@ const MODELS = [
     "meta-llama/llama-3.1-8b-instruct",
 ] as const
 
+/* Every "it did not work" path says this one line. What actually broke —
+   which model 429'd, which slug is retired, how the cascade died — goes to the
+   server log; a visitor gets a plain "try later", not a dump of model slugs
+   and HTTP statuses. */
+const UNAVAILABLE = "AI chat isn't available right now — please try again in a few minutes."
+
 const LIMITS = {
     maxMessageChars: 1000,
     maxHistory: 12,
@@ -85,7 +91,7 @@ interface ToolCall {
 
 export async function POST(req: NextRequest) {
     const apiKey = process.env.OPENROUTER_API_KEY
-    if (!apiKey) return json({ error: "Chat is not configured." }, 503)
+    if (!apiKey) return json({ error: UNAVAILABLE }, 503)
 
     const gate = checkRateLimit(clientIp(req.headers), req.cookies.get(COOKIE_NAME)?.value)
     if (!gate.ok) {
@@ -216,16 +222,14 @@ function runAgent(history: ChatMessage[], apiKey: string, release: () => void): 
                 /* Only reachable if the last (tool-free) round returned nothing
                    at all: answer from what the lookups already returned rather
                    than apologising on top of good data. */
-                send(
-                    "text",
-                    toolPayloads.length
-                        ? fallbackFromToolPayloads(toolPayloads)
-                        : "I looked that up a few different ways but couldn't land on a clean answer. Try asking more specifically?",
-                )
+                send("text", toolPayloads.length ? fallbackFromToolPayloads(toolPayloads) : UNAVAILABLE)
                 send("done", {})
                 controller.close()
             } catch (err) {
-                send("error", { message: err instanceof Error ? err.message : "Chat failed." })
+                // The cascade failure names every model it tried — useful in the
+                // log, meaningless in a chat bubble.
+                console.error("[chat] stream failed:", err)
+                send("error", { message: UNAVAILABLE })
                 controller.close()
             } finally {
                 // Always give the concurrency slot back, including on error or
