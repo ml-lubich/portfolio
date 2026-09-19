@@ -4678,3 +4678,39 @@ article .blog-prose b a[href],
     opacity: 1 !important;
   }
 }
+
+/* Text glow-pass (desktop only): each paragraph picks up a soft accent glow
+   as it crosses the middle of the viewport, then lets it go on the way out.
+   Pure CSS scroll-driven animation: no scroll listener, no --scroll-y writes
+   (the old JS ScrollShimmer flickered for exactly that reason). text-shadow
+   is inherited, so AnimatedText's per-word spans glow with their paragraph.
+   Phones, tablets, coarse pointers and reduced motion never match; browsers
+   without animation-timeline just render plain text. */
+@supports (animation-timeline: view()) {
+  @media (min-width: 1024px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    /* overflow:hidden makes a section a (non-scrolling) scroll container, which
+       would pin view() to it and freeze the glow; clip paints the same but
+       leaves the page as the scroller. */
+    #main-content section.overflow-hidden,
+    #main-content section.animated-section {
+      overflow: clip;
+    }
+    /* Section body copy only: paragraphs inside cards, marquees and inner
+       scrollers sit under their own overflow box, so their timeline would be
+       frozen at an arbitrary point (possibly mid-glow). */
+    #main-content p:not(.sr-only):not([class*="animate-"]):not(section [class*="overflow-"] p):not(.sr-only p) {
+      animation: text-glow-pass linear both;
+      animation-timeline: view();
+      animation-range: cover;
+    }
+  }
+}
+@keyframes text-glow-pass {
+  0%, 25%, 75%, 100% { text-shadow: none; }
+  50% {
+    text-shadow:
+      0 0 1px hsl(var(--foreground) / 0.35),
+      0 0 14px var(--accent-glow-soft),
+      0 0 28px var(--accent-glow-soft);
+  }
+}

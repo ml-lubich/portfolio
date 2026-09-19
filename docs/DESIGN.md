@@ -471,3 +471,32 @@ Ported from josephheupler.com (jheupler-site) to ensure smooth visual continuity
    - Uses `.skel` shimmer sweep animation (`skel-shimmer-sweep` 1.8s) instead of flat pulse.
    - Used by `components/layout/lazy-section.tsx` when `!visible` and by `app/page.tsx` for dynamic section loading states, ensuring below-the-fold content mounts with subtle skeleton shimmer instead of empty voids.
    - Retains all height reservation invariants tested in `__tests__/lazy-section-reservations.test.ts`.
+
+## Text Glow-Pass on Scroll (2026-09-19)
+
+Owner ask: "as we are scrolling it shimmers … only for laptop not mobile …
+like a glow passing through", and it must stay subtle and cost nothing on scroll.
+
+- **What:** each section body paragraph (`#main-content p`) gets a soft
+  `text-shadow` halo in `--accent-glow-soft` that peaks as it crosses the
+  viewport centre and is gone by the top/bottom quarter (`@keyframes
+  text-glow-pass`, `animation-range: cover`). `text-shadow` is inherited, so
+  `AnimatedText`'s per-word spans glow with their paragraph.
+- **Why not a gradient sweep:** `background-clip: text` does not clip text
+  inside `AnimatedText`'s transformed inline-block words — with a transparent
+  fill they would vanish.
+- **Why CSS, not JS:** the old `ScrollShimmer` wrote `--scroll-y` on `<html>`
+  every step and was unmounted for flicker. This is a scroll-driven animation:
+  no listener, no custom-property writes. Browsers without
+  `animation-timeline` render plain text.
+- **Gate:** `@supports (animation-timeline: view())` + `(min-width: 1024px)
+  and (hover: hover) and (pointer: fine) and (prefers-reduced-motion:
+  no-preference)`. Phones, tablets and coarse pointers never match.
+- **Scroller trap:** `overflow: hidden` makes an element a (non-scrolling)
+  scroll container, and `view()` binds to the nearest one — a frozen timeline.
+  Inside the gate, `section.overflow-hidden` / `section.animated-section` use
+  `overflow: clip` (same paint, not a scroller; page height verified
+  unchanged). Paragraphs under any inner `overflow-*` box (cards, marquees,
+  inner scrollers) are excluded rather than left frozen mid-glow.
+
+Gate: `__tests__/text-glow-pass.test.ts`.
