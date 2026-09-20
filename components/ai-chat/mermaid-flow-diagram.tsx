@@ -2,6 +2,8 @@
 
 import { useEffect, useId, useRef, useState } from "react"
 
+import { renderMermaidInto } from "@/lib/ai/mermaid-diagram"
+
 /**
  * Renders real Mermaid DSL (graph TD, flowchart LR, …) inside MLBot.
  * BlogChart JSON fences stay on BlogChart — this is for when the model
@@ -21,21 +23,8 @@ export function MermaidFlowDiagram({ source }: { source: string }) {
         host.replaceChildren()
 
         void (async () => {
-            const mermaid = (await import("mermaid")).default
-            mermaid.initialize({
-                startOnLoad: false,
-                theme: "dark",
-                securityLevel: "strict",
-                fontFamily: "ui-sans-serif, system-ui, sans-serif",
-            })
-
-            try {
-                const { svg } = await mermaid.render(`mlbot-mermaid-${uid}-${Date.now()}`, source.trim())
-                if (cancelled || !hostRef.current) return
-                hostRef.current.innerHTML = svg
-            } catch {
-                if (!cancelled) setFailed(true)
-            }
+            const ok = await renderMermaidInto(host, `mlbot-mermaid-${uid}-${Date.now()}`, source)
+            if (!cancelled) setFailed(!ok)
         })()
 
         return () => {

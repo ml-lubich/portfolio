@@ -14,6 +14,7 @@
  * it is dropped, not shown.
  */
 
+import { isChartToolPayload, stripImageArtifacts, stripToolCallLeaks, endOfJsonValue } from "@/lib/ai/chart-leak"
 import { isMermaidDsl } from "@/lib/ai/mermaid-dsl"
 import type { ChartSpec } from "@/lib/ai/profile-tools"
 
@@ -40,20 +41,21 @@ const TOOL_CHART_TYPES = new Set(["bar", "line", "radar"])
 
 /** A JSON object opening at the start of a line, e.g. a spec the model typed
  *  out as prose. */
-const BARE_OBJECT = /(?:^|\n)[ \t]*\{"/g
+const BARE_JSON = /(?:^|\n)[ \t]*(\[)?\{"/g
+const INLINE_CODE = /`([^`\n]+)`/g
 
 type Verdict = "diagram" | "mermaid" | "chart" | "drop" | "text"
 
 function classifyJson(json: string): Verdict {
-    let type: unknown
+    let parsed: unknown
     try {
-        type = (JSON.parse(json) as { type?: unknown }).type
+        parsed = JSON.parse(json)
     } catch {
         return isMermaidDsl(json) ? "mermaid" : "text"
     }
-    if (typeof type !== "string") return "text"
-    if (CHART_TYPES.has(type)) return "diagram"
-    if (TOOL_CHART_TYPES.has(type)) return "drop"
+    if (isChartToolPayload(parsed)) return "drop"
+    const type = (parsed as { type?: unknown }).type
+    if (typeof type === "string" && CHART_TYPES.has(type)) return "diagram"
     return "text"
 }
 
@@ -63,86 +65,15 @@ function classifyFence(lang: string, body: string): Verdict {
     if (jsonVerdict === "diagram") return "diagram"
     if (jsonVerdict === "drop") return parseChartSpec(trimmed) ? "chart" : "drop"
     if (isMermaidDsl(trimmed)) return "mermaid"
-    // An explicit ```mermaid fence the client cannot render — e.g.
-    // xychart-beta's `title`/`x-axis`/`bar` DSL, which MermaidFlowDiagram
-    // does not support — must never leak as a raw code block. Unlike
-    // ```chart/```json, whose label the model gets wrong constantly, a
-    // ```mermaid label is a deliberate diagram attempt: drop it rather
-    // than print DSL lines the visitor cannot read.
     if (lang === "mermaid") return "drop"
+    if (lang === "chart" || lang === "json" || lang === "diagram") return "drop"
     return "text"
 }
 
 /** Index just past the object opening at `start`, or -1 while it is still
  *  streaming. Brace counting skips braces inside strings. */
-function endOfObject(s: string, start: number): number {
-    let depth = 0
-    let inString = false
-    let escaped = false
-
-    for (let i = start; i < s.length; i++) {
-        const c = s[i]
-        if (inString) {
-            if (escaped) escaped = false
-            else if (c === "\\") escaped = true
-            else if (c === '"') inString = false
-            continue
-        }
-        if (c === '"') inString = true
-        else if (c === "{") depth++
-        else if (c === "}" && --depth === 0) return i + 1
-    }
-    return -1
-}
-
-/** Markdown image syntax, `![alt](url)` — including the malformed form a
- *  model emits when it tries to "re-draw" a chart that already rendered,
- *  where the "url" is unescaped prose with raw spaces in it. Stripped
- *  wholesale: the alt text is not a caption worth keeping either. */
-/** Removes `![alt](target)`, matching the target's parentheses so a model
- *  that writes a whole sentence there — "![Skills](chart above: BI (14),
- *  Platform (12))" — loses all of it, not just up to the first ")". An
- *  unclosed target is left alone. */
-function stripMdImages(s: string): string {
-    let out = ""
-    let i = 0
-    for (let start = s.indexOf("![", i); start !== -1; start = s.indexOf("![", i)) {
-        const mid = s.indexOf("](", start + 2)
-        if (mid === -1 || s.slice(start + 2, mid).includes("]")) {
-            out += s.slice(i, start + 2)
-            i = start + 2
-            continue
-        }
-        let depth = 0
-        let end = mid + 1
-        // A real target is short; capping the scan keeps many unclosed "![x](" linear.
-        const limit = Math.min(s.length, mid + 500)
-        for (; end < limit; end++) {
-            if (s[end] === "(") depth++
-            else if (s[end] === ")" && --depth === 0) break
-        }
-        if (end >= limit) {
-            out += s.slice(i, start + 2)
-            i = start + 2
-            continue
-        }
-        out += s.slice(i, start)
-        i = end + 1
-    }
-    return out + s.slice(i)
-}
-
-/** A raw HTML `<img>` tag typed straight into the reply. ReactMarkdown
- *  never turns this into an element (no rehype-raw), but left in place it
- *  still prints as literal tag text — so it is stripped at the source. */
-const HTML_IMG = /<img\b[^>]*>/gi
-
-/** Strips both forms, then collapses the double space a removed inline
- *  image leaves behind ("Here: ␣␣as shown" → "Here: as shown"). Only
- *  horizontal runs collapse — newlines are left alone so paragraph and
- *  list structure survives. */
 function stripImages(s: string): string {
-    return stripMdImages(s).replace(HTML_IMG, "").replace(/[ \t]{2,}/g, " ")
+    return stripToolCallLeaks(stripImageArtifacts(s)).replace(/[ \t]{2,}/g, " ")
 }
 
 function pushText(out: ChatSegment[], raw: string) {
@@ -160,8 +91,9 @@ export function parseChartSpec(json: string): ChartSpec | null {
         return null
     }
     if (!obj || typeof obj !== "object") return null
-    const { type, title, unit, data } = obj as Record<string, unknown>
-    if (typeof type !== "string" || !TOOL_CHART_TYPES.has(type)) return null
+    const { kind, type, title, unit, data } = obj as Record<string, unknown>
+    const rawKind = kind ?? type
+    if (typeof rawKind !== "string" || !TOOL_CHART_TYPES.has(rawKind)) return null
     if (!Array.isArray(data)) return null
     const rows = data.filter(
         (d): d is { label: string; value: number } =>
@@ -169,7 +101,7 @@ export function parseChartSpec(json: string): ChartSpec | null {
     )
     if (!rows.length) return null
     return {
-        kind: type as ChartSpec["kind"],
+        kind: rawKind as ChartSpec["kind"],
         title: typeof title === "string" ? title : "",
         ...(typeof unit === "string" ? { unit } : {}),
         data: rows,
@@ -186,31 +118,41 @@ function pushSegment(out: ChatSegment[], verdict: Verdict, payload: string, fenc
     else if (verdict === "text" && fence) pushText(out, fence)
 }
 
+function stripInlineChartLeaks(raw: string): string {
+    return raw.replace(INLINE_CODE, (whole, body: string) => {
+        try {
+            return isChartToolPayload(JSON.parse(body)) ? "" : whole
+        } catch {
+            return whole
+        }
+    })
+}
+
 /** Prose, minus any bare chart object hiding in it. */
 function pushProse(out: ChatSegment[], raw: string) {
+    const cleaned = stripInlineChartLeaks(raw)
     let cursor = 0
-    BARE_OBJECT.lastIndex = 0
+    BARE_JSON.lastIndex = 0
 
-    for (let m = BARE_OBJECT.exec(raw); m; m = BARE_OBJECT.exec(raw)) {
-        const start = m.index + m[0].length - 2 // the `{` itself
-        const end = endOfObject(raw, start)
+    for (let m = BARE_JSON.exec(cleaned); m; m = BARE_JSON.exec(cleaned)) {
+        const start = m[1] ? m.index + m[0].indexOf("[") : m.index + m[0].length - 2
+        const end = endOfJsonValue(cleaned, start)
 
-        // Unterminated: the model is still typing it. Withhold the rest.
         if (end === -1) {
-            pushText(out, raw.slice(cursor, start))
+            pushText(out, cleaned.slice(cursor, start))
             return
         }
 
-        const verdict = classifyJson(raw.slice(start, end))
+        const verdict = classifyJson(cleaned.slice(start, end))
         if (verdict !== "text") {
-            pushText(out, raw.slice(cursor, start))
-            pushSegment(out, verdict, raw.slice(start, end))
+            pushText(out, cleaned.slice(cursor, start))
+            pushSegment(out, verdict, cleaned.slice(start, end))
             cursor = end
         }
-        BARE_OBJECT.lastIndex = end
+        BARE_JSON.lastIndex = end
     }
 
-    pushText(out, raw.slice(cursor))
+    pushText(out, cleaned.slice(cursor))
 }
 
 export function splitChatSegments(content: string): ChatSegment[] {

@@ -14,6 +14,8 @@
  * named the last slug and hid why the earlier ones died.
  */
 
+import { isRealAnswer, stripToolChartLeaks } from "@/lib/ai/chart-leak"
+
 export interface StreamToolCall {
     id: string
     type: "function"
@@ -114,8 +116,8 @@ export function finalizeAssistantTurn(
     sawVisual = false,
 ): TurnDecision {
     if (reply.tool_calls?.length) return { kind: "tools" }
-    const text = reply.content.trim()
-    if (text) return { kind: "answer", text: reply.content }
+    const text = stripToolChartLeaks(reply.content)
+    if (isRealAnswer(text)) return { kind: "answer", text }
     if (sawVisual) return { kind: "answer", text: "" }
     if (toolPayloads.length) return { kind: "fallback", text: fallbackFromToolPayloads(toolPayloads) }
     return { kind: "answer", text: "" }
