@@ -75,7 +75,7 @@ const FENCE = /```[a-z]*\n([\s\S]*?)```/gi
 const BARE_JSON = /(?:^|\n)[ \t]*(\[)?\{"/g
 const INLINE_CODE = /`([^`\n]+)`/g
 const TOOL_CALL_BLOCK =
-    /<\s*tool_call\s*>[\s\S]*?<\s*\/\s*tool_call\s*>|<\s*\/?\s*tool_call\s*>|<\|tool_call\|>/gi
+    /<\s*tool_call\b[^>]*>[\s\S]*?<\s*\/\s*tool_call\s*>|<\s*tool_call\b[^>]*>[\s\S]*$|<\s*\/?\s*tool_call\s*>|<\|tool_call\|>|<\s*\/?\s*arg_(?:key|value)\s*>/gi
 
 function isJsonChartPayload(candidate: string): boolean {
     try {
@@ -124,7 +124,8 @@ export function stripToolChartLeaks(text: string): string {
     return stripped.replace(/\n{3,}/g, "\n\n").trim()
 }
 
-const TOOL_CALL_LEAK = /<\s*\/?\s*tool_call\s*>|<\|tool_call\|>|^\s*\{\s*"name"\s*:\s*"[\w.-]+"\s*,\s*"(arguments|parameters)"\s*:/i
+const TOOL_CALL_LEAK =
+    /<\s*\/?\s*tool_call\b|<\|tool_call\|>|<\s*\/?\s*arg_(?:key|value)\b|^\s*\{\s*"name"\s*:\s*"[\w.-]+"\s*,\s*"(arguments|parameters)"\s*:/i
 
 export function isRealAnswer(text: string): boolean {
     return text.length > 0 && !TOOL_CALL_LEAK.test(text)
