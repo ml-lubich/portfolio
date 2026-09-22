@@ -1,0 +1,43 @@
+---
+title: "The Unix Way of Agent Tooling: Small Sharp Tools Over Fat Schemas"
+excerpt: "Why piping stdout between deterministic local tools beats bloated multi-modal JSON schemas when you actually need things to get done."
+date: "2026-09-20"
+category: "Engineering Culture"
+tags: ["Unix", "CLI", "Developer Tools", "Architecture", "Minimalism"]
+---
+
+Unix philosophy gave us a design principle half a century ago that software engineering repeatedly forgets and rediscovers every decade:
+
+> *Write programs that do one thing and do it well. Write programs to work together. Write programs to handle text streams, because that is a universal interface.*
+
+In modern AI agent architecture, the prevailing instinct has been the exact opposite. Frameworks invite developers to wrap entire REST and GraphQL monoliths into monolithic JSON schemas, passing megabytes of parameter descriptions to an LLM on every single turn.
+
+The result? Sluggish execution, hallucinated optional fields, high token bills, and fragile agents that get confused by their own capabilities.
+
+<Figure src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=1200&h=630&fit=crop" alt="Matrix green terminal code" caption="Simple pipes and clean streams outperform bloated schema registries." />
+
+## The Problem with Schema Bloat
+
+When an agent is handed 40 multi-nested tools:
+1. **Context Saturation:** 15,000 tokens of your prompt are eaten up just declaring what the tools *might* do before the user has even finished their sentence.
+2. **Ambiguity Multipliers:** When two tools overlap slightly in purpose, the model vacillates, guessing parameter nuances or retrying failed invocations.
+3. **Debugging Nightmares:** Tracing why a tool call failed requires sifting through hundreds of lines of serialized JSON rather than reading an exit code and a single stderr line.
+
+## Small, Composable CLI Primitives
+
+Instead of building massive bespoke MCP wrappers for every internal database query, design your tools as sharp command-line utilities.
+
+- A tool should accept standard arguments or flags.
+- Output should default to concise, human-and-model-readable lines (or compact NDJSON if structured data is mandatory).
+- Exit codes (`0` for success, non-zero for failure) provide deterministic signaling that doesn't require probabilistic interpretation.
+
+```bash
+# Clean, deterministic, zero schema overhead
+imail organize --account google --limit 100
+wa contacts search "Alex"
+bb pr list --repo core-api
+```
+
+When an agent needs to execute an operation, running a single concise command string with deterministic exit status is faster, cheaper, and vastly more reliable.
+
+Return to first principles: build small, sharp tools that do one thing well, and let the agent compose them.

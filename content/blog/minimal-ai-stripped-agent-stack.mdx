@@ -1,0 +1,36 @@
+---
+title: "Minimal AI: Why I Stripped 80% of the Agent Stack"
+excerpt: "Multi-agent frameworks, recursive prompts, and 200-line tool definitions look impressive in slide decks. In production, they are brittle liability sinks. Here is how I practice minimal AI."
+date: "2026-09-18"
+category: "Engineering Culture"
+tags: ["Minimal AI", "Architecture", "Agents", "CLI", "Philosophy"]
+---
+
+There is an unspoken rule in software engineering: the more moving parts you introduce, the more ways your system can fail at 2 AM.
+
+When teams rushed into building with LLMs over the past two years, they treated complexity as a proxy for sophistication. We saw 14-agent orchestration frameworks where agents scheduled meetings with other agents to write a database migration. We saw 30-step prompt chains that fell over if OpenAI returned an unexpected punctuation mark.
+
+I took the opposite path on my personal infrastructure and client engagements: **Minimal AI**.
+
+Strip away the speculative abstractions. Measure value in minutes recovered and deterministic outcomes, not tokens burned.
+
+<Figure src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=1200&h=630&fit=crop" alt="Clean computer chip circuit board" caption="Fewer components mean fewer points of silent failure." />
+
+## The Minimal AI Triad
+
+When I build or audit AI systems in 2026, every feature has to survive three tests before it gets to touch code:
+
+1. **Could this just be a bash script or a standard library call?**  
+   If a deterministic script or a simple regex can do the job with 100% reliability in 4ms, sending a prompt across the WAN to an LLM is architectural malpractice.
+
+2. **Is the interface conversational or functional?**  
+   If you need a human-in-the-loop review, conversational MCP interfaces make sense. If you are synchronizing 500 records or organizing mailbox folders, expose a sharp Unix CLI (`imail`, `wa`, `bb`). Stop wrapping batch routines in multi-turn dialogues.
+
+3. **Who owns the failure boundary?**  
+   Autonomous agents must never have ambient write access to unconstrained production surfaces. Strict, typed contracts and explicit human gates beat "trusting the model's intent" every single time.
+
+## Less Ceremony, More Output
+
+Minimal AI isn't about being anti-model—it's about respecting the boundaries of probabilistic systems. The engineers shipping real business value right now aren't the ones boasting about 50-step autonomous loops; they're the ones pairing rock-solid Unix tooling with surgical model calls.
+
+Do less. Constrain the scope. Let the results speak.
