@@ -45,10 +45,10 @@ export function ProfileIntro() {
     }, [])
 
     return (
-        <section id="profile" className="relative section-y overflow-hidden">
-            <div className="mx-auto max-w-5xl px-3 md:px-6">
+        <section id="profile" className="relative section-y overflow-hidden min-h-[730px] md:min-h-[870px]">
+            <div className="mx-auto max-w-5xl px-3 md:px-6 py-8 md:py-12 lg:py-16">
                 <AnimatedSection>
-                    {/* Sleek 3D pannable holographic glass card container */}
+                    {/* Sleek 3D pannable holographic glass card container — lengthened like terminal window */}
                     <div
                         ref={cardRef}
                         onMouseMove={handleMouseMove}
@@ -56,7 +56,7 @@ export function ProfileIntro() {
                         onMouseLeave={handleMouseLeave}
                         onTouchMove={handleTouchMove}
                         onTouchEnd={handleTouchEnd}
-                        className="group relative overflow-hidden rounded-3xl border border-white/30 bg-card/70 p-6 backdrop-blur-2xl transition-transform duration-200 ease-out sm:p-10 md:p-12 will-change-transform shadow-2xl shadow-black/50"
+                        className="group relative overflow-hidden rounded-3xl border border-white/30 bg-card/70 p-6 backdrop-blur-2xl transition-transform duration-200 ease-out sm:p-10 md:p-12 will-change-transform shadow-2xl shadow-black/50 h-full"
                         style={{
                             transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) translateY(${isHovered ? -8 : 0}px) scale3d(${isHovered ? 1.01 : 1}, ${isHovered ? 1.01 : 1}, 1)`,
                             background: "linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.03) 50%, rgba(255,255,255,0.08) 100%)",
@@ -83,38 +83,28 @@ export function ProfileIntro() {
                             aria-hidden="true"
                         />
 
-                        <div className="relative flex flex-col gap-10 lg:flex-row lg:items-center">
-                            {/* Portrait — one photo only. The rest of the set is
-                                spread down the page (About, Research, Contact)
-                                rather than piled into a thumbnail strip here.
-                                The frame's aspect tracks the source image so
-                                object-cover never crops the top of the head. */}
-                            <div className="mx-auto w-full max-w-[17rem] shrink-0 sm:max-w-[20rem] lg:mx-0 lg:w-[22rem] lg:max-w-none">
-                                {/* aspect-[4/5] matches the source exactly, so
-                                    object-cover has nothing to crop at ANY
-                                    width. A fixed height cannot do this: the
-                                    frame's ratio drifts as the column narrows
-                                    and the crop eats the top of the head. */}
-                                <div className="group/photo relative aspect-[4/5] w-full overflow-hidden rounded-2xl border border-white/20 shadow-2xl shadow-black/50">
+                        <div className="relative flex flex-col gap-10 lg:flex-row lg:items-start h-full">
+                            {/* Portrait — full body with laptop at desk. The frame's aspect tracks the source image so object-cover never crops. */}
+                            <div className="mx-auto w-full max-w-[17rem] shrink-0 sm:max-w-[20rem] lg:mx-0 lg:w-[22rem] lg:max-w-none lg:mt-4">
+                                {/* aspect-[3/4] matches the desk-laptop source (1093x1439 ≈ 0.76), so object-cover has nothing to crop at ANY width. */}
+                                <div className="group/photo relative aspect-[3/4] w-full overflow-hidden rounded-2xl border border-white/20 shadow-2xl shadow-black/50">
                                     <Image
-                                        src="/misha-headshot.png"
-                                        alt="Misha Lubich"
-                                        width={600}
-                                        height={750}
-                                        className="h-full w-full object-cover object-top transition-transform duration-700 group-hover/photo:scale-105"
+                                        src="/misha-desk-laptop.png"
+                                        alt="Misha Lubich at desk with laptop"
+                                        width={1093}
+                                        height={1439}
+                                        className="h-full w-full object-cover object-center transition-transform duration-700 group-hover/photo:scale-105"
                                         priority
-                                        placeholder="blur"
-                                        blurDataURL="data:image/jpeg;base64,/9j/2wBDACgcHiMeGSgjISMtKygwPGRBPDc3PHtYXUlkkYCZlo+AjIqgtObDoKrarYqMyP/L2u71////m8H////6/+b9//j/2wBDASstLTw1PHZBQXb4pYyl+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj/wAARCAAUABADASIAAhEBAxEB/8QAFwAAAwEAAAAAAAAAAAAAAAAAAAEDAv/EABcQAQEBAQAAAAAAAAAAAAAAAAABERL/xAAVAQEBAAAAAAAAAAAAAAAAAAAAAf/EABQRAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhEDEQA/AHoY6OVBCWqSgKP/2Q=="
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80" />
                                     <div className="absolute bottom-3 left-3 text-xs font-medium tracking-wide text-white/90">
-                                        Engineering &amp; Client Solutions
+                                        Engineering & Client Solutions
                                     </div>
                                 </div>
                             </div>
 
                             {/* Professional intro copy & stats */}
-                            <div className="flex-1 text-center lg:text-left">
+                            <div className="flex-1 text-center lg:text-left flex flex-col justify-center">
                                 <h2 className="section-title font-display text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
                                     <AnimatedText text="Hello, I'm Misha" variant="blur-slide" stagger={70} duration={800} />
                                 </h2>

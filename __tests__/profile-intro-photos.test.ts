@@ -16,18 +16,18 @@ describe("Profile photography", () => {
   it("uses a rectangular photography frame, not an oval ellipse", () => {
     expect(profile).not.toContain("borderRadius: \"50% / 46%\"")
     expect(profile).toContain("rounded-2xl")
-    expect(profile).toContain("misha-headshot.png")
+    expect(profile).toContain("misha-desk-laptop.png")
   })
 
-  it("never crops the top of the head", () => {
-    expect(profile).toMatch(/object-cover object-top/)
+  it("never crops the image — full body with laptop visible", () => {
+    expect(profile).toMatch(/object-cover object-center/)
   })
 
   it("carries exactly one photo — the thumbnail strip moved out", () => {
     expect(profile.match(/<Image/g)?.length).toBe(1)
     expect(profile).not.toContain("misha-office-window.png")
     expect(profile).not.toContain("misha-cafe-notebook.png")
-    expect(profile).not.toContain("misha-desk-laptop.png")
+    expect(profile).not.toContain("misha-headshot.png")
   })
 })
 
