@@ -103,6 +103,8 @@ export function ProfileIntro() {
                                         height={750}
                                         className="h-full w-full object-cover object-top transition-transform duration-700 group-hover/photo:scale-105"
                                         priority
+                                        placeholder="blur"
+                                        blurDataURL="data:image/jpeg;base64,/9j/2wBDACgcHiMeGSgjISMtKygwPGRBPDc3PHtYXUlkkYCZlo+AjIqgtObDoKrarYqMyP/L2u71////m8H////6/+b9//j/2wBDASstLTw1PHZBQXb4pYyl+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj/wAARCAAUABADASIAAhEBAxEB/8QAFwAAAwEAAAAAAAAAAAAAAAAAAAEDAv/EABcQAQEBAQAAAAAAAAAAAAAAAAABERL/xAAVAQEBAAAAAAAAAAAAAAAAAAAAAf/EABQRAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhEDEQA/AHoY6OVBCWqSgKP/2Q=="
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80" />
                                     <div className="absolute bottom-3 left-3 text-xs font-medium tracking-wide text-white/90">
