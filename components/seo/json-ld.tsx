@@ -21,9 +21,9 @@ const personSchema = {
   url: BASE_URL,
   image: {
     "@type": "ImageObject",
-    url: `${BASE_URL}/profile.jpg`,
-    width: 400,
-    height: 400,
+    url: `${BASE_URL}/misha-headshot.png`,
+    width: 1122,
+    height: 1402,
   },
   jobTitle: "Staff AI Engineer",
   description:
