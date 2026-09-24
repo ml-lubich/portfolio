@@ -502,3 +502,24 @@ like a glow passing through", and it must stay subtle and cost nothing on scroll
   inner scrollers) are excluded rather than left frozen mid-glow.
 
 Gate: `__tests__/text-glow-pass.test.ts`.
+
+## Writing section: Substack pointer (2026-09-24)
+
+`#writing` (nav "Writing", between Clients and Projects) is a small,
+non-intrusive section (`components/sections/substack.tsx`) reusing
+`AnimatedSection` + `SectionHeader`: one card linking the latest post, and a
+plain "Subscribe free" link to `mlubich.substack.com/subscribe`. No feed
+fetch, no popup, no modal.
+
+- `lib/substack.ts` holds the publication constants and `LATEST_POST` as a
+  hand-maintained pointer (title, url, one-line summary), not a live RSS
+  fetch — one post exists today, so a feed/cache layer is not earned yet.
+  Update `LATEST_POST` by hand when Misha publishes again.
+- Substack is also listed in `components/social-icons.tsx` (renders in both
+  hero and footer via the shared `SOCIAL_LINKS` array) and in the Person
+  schema's `sameAs` (`components/seo/json-ld.tsx`).
+- MLBot's system prompt (`lib/ai/profile-tools.ts`) names the publication and
+  its latest post so the assistant can point visitors to it when asked about
+  writing, blog posts, or opinions on AI/engineering.
+
+Gate: `__tests__/substack.test.ts`.

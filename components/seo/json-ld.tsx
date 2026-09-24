@@ -33,6 +33,7 @@ const personSchema = {
     "https://linkedin.com/in/mishalubich",
     "https://scholar.google.com/citations?hl=en&user=Be6ZA78AAAAJ",
     "https://orcid.org/0000-0003-2329-4454",
+    "https://mlubich.substack.com",
   ],
   knowsAbout: [
     "Artificial Intelligence",

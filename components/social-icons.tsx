@@ -1,4 +1,4 @@
-import { Github, GraduationCap, Linkedin } from "lucide-react"
+import { BookOpen, Github, GraduationCap, Linkedin } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 import type { ComponentType } from "react"
 
@@ -36,6 +36,11 @@ export const SOCIAL_LINKS: SocialLink[] = [
     href: "https://orcid.org/0000-0003-2329-4454",
     label: "ORCID",
     icon: OrcidIcon,
+  },
+  {
+    href: "https://mlubich.substack.com",
+    label: "Substack",
+    icon: BookOpen,
   },
 ]
 
