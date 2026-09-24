@@ -65,7 +65,7 @@ const highlights = [
     subtitleNum: "",
     subtitleText: "MCP Servers + CLIs",
     detail: "imsg · imail · inotes · wa-mcp · jenkins-mcp",
-    backDescription: "Maintains the agent-tool family — imsg, imail, inotes, wa-mcp, bitbucket-cli, confluence-cli, pdfify-md, jenkins-mcp — local-first CLIs that double as MCP servers for Claude, Cursor, and VS Code.",
+    backDescription: "Maintains the agent-tool family — imsg, imail, inotes, wa-mcp, bitbucket-cli, confluence-cli, pdfify-md, jenkins-mcp, ical, vgate — local-first CLIs that double as MCP servers for Claude, Cursor, and VS Code.",
   },
 ]
 

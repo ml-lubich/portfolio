@@ -22,6 +22,8 @@ const ALLOWED_PUBLIC_IDS = new Set([
   "like-fable",
   "jenkins-mcp",
   "pdfify-md",
+  "ical-cli",
+  "vgate",
   "imessage-exporter",
   "synthdata-forge",
   "multimodal-captcha-solver",
@@ -263,6 +265,14 @@ describe("oss-demos install commands + package links", () => {
     if (!demo.packageUrl) continue
     it.skipIf(NETWORK_GATED)(`packageUrl for '${demo.id}' resolves (${demo.packageUrl})`, async () => {
       const result = await headOk(demo.packageUrl!)
+      // npmjs.com answers 403 to this client. The registry document is the
+      // same package, and that is what proves the link is not a 404.
+      if (!result.ok && result.status === 403 && demo.packageUrl.includes("://www.npmjs.com/package/")) {
+        const name = demo.packageUrl.slice(demo.packageUrl.lastIndexOf("/") + 1)
+        const registry = await headOk(`https://registry.npmjs.org/${name}`)
+        expect(registry.ok, `registry.npmjs.org/${name} → HTTP ${registry.status}`).toBe(true)
+        return
+      }
       expect(result.ok, `${demo.packageUrl} → HTTP ${result.status}`).toBe(true)
     }, 20_000)
   }

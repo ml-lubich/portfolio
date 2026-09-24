@@ -19,7 +19,9 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import {
   BookOpen,
+  Calendar,
   Check,
+  Cloud,
   Copy,
   Factory,
   FileStack,
@@ -54,6 +56,8 @@ const TOOL_ICON: Record<string, typeof Terminal> = {
   "like-fable": BookOpen,
   "jenkins-mcp": Factory,
   "pdfify-md": FileText,
+  "ical-cli": Calendar,
+  vgate: Cloud,
 }
 
 export function OpenSourceShowcase() {

@@ -74,6 +74,16 @@ const META: Record<string, { displayName: string; description: string; tag: stri
     description: "portable prompt library for any AI",
     tag: "prompts",
   },
+  "ical-cli": {
+    displayName: "ical",
+    description: "Calendar.app CLI + MCP",
+    tag: "macOS",
+  },
+  vgate: {
+    displayName: "vgate",
+    description: "Switch Vercel CLI logins · CLI + MCP",
+    tag: "Py",
+  },
 }
 
 const ORDER = [
@@ -87,6 +97,8 @@ const ORDER = [
   "jenkins-mcp",
   "twig",
   "like-fable",
+  "ical-cli",
+  "vgate",
 ] as const
 
 export const ossAgentTools: OssAgentTool[] = ORDER.map((id) => {

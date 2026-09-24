@@ -108,7 +108,7 @@ export const toolMatrix: ToolMatrixRow[] = [
         mcp: false,
         agentSchema: true,
         tdd: "catalog + CLI tests",
-        distribution: "PyPI: pipx install twig-cli",
+        distribution: "PyPI: twig-cli + Homebrew tap",
         vsMarket: "vs raw `git worktree`: one-command create/jump/clean + JSON/agent schema on every call",
     },
     {

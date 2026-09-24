@@ -18,7 +18,7 @@ Append new constraints or decisions as new bullets or dated subsections; do not 
 ### 2026-07-24 — Agent OSS family, denser storm, valuemaxxing
 
 - Skill Storm must remain dense (target ≥110 unique skill pills), tuned toward theodouwes-site layout constants (`PILL_SPACING≈88`, denser ring tiers).
-- Featured open-source projects include the agent family: `imsg-mcp`, `imail-mcp`, `inotes-mcp`, `wa-mcp`, plus `bitbucket-cli` (CLI-named exception — not `*-mcp`), and related tools (`twig`, `confluence-cli`, `like-fable`, `jenkins-mcp`, `pdfify-md` as applicable).
+- Featured open-source projects include the agent family: `imsg-mcp`, `imail-mcp`, `inotes-mcp`, `wa-mcp`, plus `bitbucket-cli` (CLI-named exception — not `*-mcp`), and related tools (`twig`, `confluence-cli`, `like-fable`, `jenkins-mcp`, `pdfify-md`, `ical-cli`, `vgate` as applicable).
 - Every showcase card ships a real, selectable install command (`brew` / `pip` / `pipx` / `npm i -g` / `git clone`). No card without one. The section also exposes `ossInstallAll()` as a copy-pasteable block of those same commands.
 - Homepage includes `#value-maxxing` (valuemaxxing ≠ tokenmaxxing) and `#tool-matrix` (honest CLI/MCP comparison).
 - Do not invent coverage % or market claims; keep matrix cells conservative (`partial` when incomplete).
@@ -48,3 +48,9 @@ Append new constraints or decisions as new bullets or dated subsections; do not 
 - A chat turn that called a tool and then streamed `event: done` with no text is a failure. Recover with `finalizeAssistantTurn` + a grounded fallback from the tool JSON.
 - `searchTerms` strips punctuation and question stopwords; `agents` stems to `agent`. A name hit outranks a body mention. `get_projects` matches name + summary + tags, not tags alone. A silent-final fallback lists project names, not job titles, when both came back.
 - After a tool returns, the model writes the answer. It does not call the same tool twice. An empty reply after tools is a failure.
+
+### 2026-09-24 — Published CLI/MCP footprint
+
+- Showcase and the agent-tool grid include `ical-cli` (PyPI `mac-ical`, Homebrew `ml-lubich/tap/ical`) and `vgate` (PyPI `vercel-mcp`, Homebrew `ml-lubich/tap/vgate`).
+- `twig` install stays `pipx install twig-cli`, and that name resolves on PyPI. `pdfify-md` stays `npm i -g pdfify-md` and links the npm package page; Homebrew `ml-lubich/tap/pdfify-md` is the other install.
+- Install strings stay real package-manager commands. PyPI name `ical-cli` is rejected as too similar to the existing `ical` project, so the package is `mac-ical`.

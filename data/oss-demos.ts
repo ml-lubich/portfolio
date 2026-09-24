@@ -166,6 +166,7 @@ export const ossDemos: OssDemo[] = [
     {
         id: "twig",
         repoUrl: "https://github.com/ml-lubich/twig",
+        packageUrl: "https://pypi.org/project/twig-cli/",
         install: "pipx install twig-cli",
         tagline: "Agent-first Git worktree CLI with a Rust hot path",
         badge: "Rust core",
@@ -233,15 +234,47 @@ export const ossDemos: OssDemo[] = [
     {
         id: "pdfify-md",
         repoUrl: "https://github.com/ml-lubich/pdfify-md",
+        packageUrl: "https://www.npmjs.com/package/pdfify-md",
         install: "npm i -g pdfify-md",
-        tagline: "Markdown and Mermaid to a print-ready PDF, no native compile step",
+        tagline: "Markdown and Mermaid to a print-ready PDF, also on Homebrew",
         demo: [
             { t: "cmd", s: "pdfify-md README.md --out README.pdf" },
             { t: "out", s: "wrote README.pdf  ·  6 pages  ·  2 mermaid diagrams" },
         ],
         stats: [
-            { label: "Install", value: "npm i -g" },
+            { label: "Install", value: "npm + Homebrew" },
             { label: "Type", value: "CLI" },
+        ],
+    },
+    {
+        id: "ical-cli",
+        repoUrl: "https://github.com/ml-lubich/ical",
+        packageUrl: "https://pypi.org/project/mac-ical/",
+        install: "brew install ml-lubich/tap/ical",
+        tagline: "Local Calendar.app CLI and MCP server",
+        demo: [
+            { t: "cmd", s: "ical calendars" },
+            { t: "out", s: "Home" },
+            { t: "out", s: "Work" },
+        ],
+        stats: [
+            { label: "Surfaces", value: "CLI + MCP" },
+            { label: "Distribution", value: "PyPI" },
+        ],
+    },
+    {
+        id: "vgate",
+        repoUrl: "https://github.com/ml-lubich/vercel-mcp",
+        packageUrl: "https://pypi.org/project/vercel-mcp/",
+        install: "brew install ml-lubich/tap/vgate",
+        tagline: "Switch Vercel CLI logins without logging out",
+        demo: [
+            { t: "cmd", s: "vgate whoami" },
+            { t: "out", s: "you@personal.com  valid" },
+        ],
+        stats: [
+            { label: "Surfaces", value: "CLI + MCP" },
+            { label: "Distribution", value: "PyPI" },
         ],
     },
 ]
