@@ -523,3 +523,59 @@ fetch, no popup, no modal.
   writing, blog posts, or opinions on AI/engineering.
 
 Gate: `__tests__/substack.test.ts`.
+
+## Motion polish pass: blur reveal, breathing orbs, grain, glass terminal (2026-09-24)
+
+Four small, original effects (`~/.claude/skills/motion-showcase` recipes,
+reimplemented in this site's own palette — no natively.software assets/code
+copied), scoped to stay cheap and reuse what already existed rather than
+stacking a parallel motion system:
+
+- **AnimatedSection now blurs in, not just fades/slides.** `.animated-section`
+  starts at `filter: blur(6px)`, settles to `filter: none` alongside the
+  existing opacity/transform transition — one more property on an already
+  centralized reveal, not a new mechanism. Every per-section `delay` still
+  routes through the existing `reveal-delay-*` lookup.
+- **New pure stagger/distance module**, `lib/reveal-stagger.ts`:
+  `staggerDelayMs(index, opts)` (ascending, capped), `revealDistancePx(kind)`
+  (badge/body/visual travel table), and `revealMotion(kind, index,
+  reducedMotion)`, which returns `{delayMs: 0, distancePx: 0, blurPx: 0}`
+  outright under reduced motion. Powers the new hero glass card's own
+  reveal and its chrome-dot stagger. Gate: `__tests__/reveal-stagger.test.ts`.
+- **Hero ambient orbs now breathe.** Rather than add a second gradient-mesh
+  blob layer next to `BackgroundOrbs`' existing three orbs (`app/globals.css`
+  `.ambient-orb`), a second keyframe (`hero-blob-breathe`, opacity
+  0.72→1→0.72 over 4s) is layered onto the existing per-orb drift animation
+  via the multi-value `animation-name`/`animation-duration` properties it
+  already used — same reuse on the `(hover: none)` mobile override. Cheap
+  (opacity-only, no new composited layer) and already covered by the
+  sitewide `@media (prefers-reduced-motion)` block, which zeroes every
+  animation on `*`.
+- **Grain overlay, hero-scoped only.** `components/hero/grain-overlay.tsx` —
+  an inline `feTurbulence` SVG data URI at `opacity-[0.025]`,
+  `pointer-events-none aria-hidden`, sitting only behind the hero. The
+  page-wide texture pass rejected film grain outright (see the `.page-texture`
+  comment above, "read as dirt, not depth") — that verdict stands for the
+  page backdrop; at hero scale and this much lower opacity it reads as
+  texture instead, which is why this is scoped to `#hero` and not reapplied
+  site-wide.
+- **Hero floating glass terminal**, `components/hero/floating-terminal-card.tsx`:
+  faux window chrome (three staggered traffic-light dots) over a
+  `DemoTerminal` typing a **real** command — sourced from
+  `data/oss-demos.ts` via `lib/hero-floating-demo.ts`
+  (`getHeroFloatingDemo()`, id `imsg-mcp`), the same data the Open-Source
+  showcase types, never a hero-only fabricated script. Reuses the existing
+  `DemoTerminal`/`lib/demo-terminal.ts` typing engine rather than building a
+  second one. Sits in-flow at the bottom of the hero's existing "stats"
+  `HeroScrollLayer`, after `RotatingStats`. **Needed its own `mb-24
+  sm:mb-28`**: the hero's absolutely-positioned "Explore" scroll cue is
+  pinned a fixed offset above the section's own bottom padding edge, a
+  relationship that does not grow with the flow content above it — adding
+  the card without a dedicated bottom reserve made the cue's 72px-tall
+  hit-box sit on top of the card's last output line (measured ~64px overlap
+  at 1440×900, ~28px at 390×844 before the fix). Gates:
+  `__tests__/hero-floating-demo.test.ts`,
+  `__tests__/hero-motion-polish.test.ts`.
+
+**Skipped:** the hero background/demo video recipe (motion-showcase #1) —
+no source footage recorded yet. Follow-up, not done here.

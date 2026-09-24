@@ -518,13 +518,21 @@
       hsl(var(--orb-hue-next) 32% 46% / 0.03) 60%,
       hsl(var(--orb-hue-next) 30% 45% / 0) 75%);
   filter: blur(10vmax);
-  will-change: transform;
+  will-change: transform, opacity;
   transform: translate(-50%, -50%);
-  animation-name: var(--orb-animation);
-  animation-duration: var(--orb-duration);
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
+  /* Ambient breathing glow layered onto the existing drift animation — a
+     second keyframe on the same element rather than a duplicate blob layer
+     (motion-showcase recipe #3, opacity only, cheap on mobile). */
+  animation-name: var(--orb-animation), hero-blob-breathe;
+  animation-duration: var(--orb-duration), 4s;
+  animation-timing-function: ease-in-out, ease-in-out;
+  animation-iteration-count: infinite, infinite;
   animation-play-state: running;
+}
+
+@keyframes hero-blob-breathe {
+  0%, 100% { opacity: 0.72; }
+  50% { opacity: 1; }
 }
 
 .ambient-orbs-root[data-orbs-in-view="false"] .ambient-orb {
@@ -571,8 +579,8 @@
 (pointer: coarse),
 (hover: none) {
   [data-ambient-orb="true"] {
-    animation-duration: var(--orb-mobile-duration);
-    animation-name: var(--orb-mobile-animation);
+    animation-duration: var(--orb-mobile-duration), 4s;
+    animation-name: var(--orb-mobile-animation), hero-blob-breathe;
     filter: blur(36px);
   }
 }
@@ -581,11 +589,14 @@
   opacity: 0;
   transform: perspective(1200px) translateY(24px) rotateX(4deg) scale(0.985);
   transform-origin: center bottom;
+  /* Blur reveal: settles alongside opacity/transform below (motion-showcase
+     recipe #2) rather than a hard-focus pop-in. */
+  filter: blur(6px);
   transition-property: none;
   transition-duration: 0s;
   transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
   transition-delay: 0ms;
-  will-change: opacity, transform;
+  will-change: opacity, transform, filter;
 }
 
 .animated-section[data-reveal-3d="false"] {
@@ -595,8 +606,9 @@
 .animated-section[data-reveal-visible="true"] {
   opacity: 1;
   transform: perspective(1200px) translateY(0) rotateX(0deg) scale(1);
-  transition-property: opacity, transform;
-  transition-duration: 0.55s, 0.55s;
+  filter: none;
+  transition-property: opacity, transform, filter;
+  transition-duration: 0.55s, 0.55s, 0.55s;
 }
 
 .animated-section[data-reveal-settled="true"] {
@@ -665,6 +677,23 @@
 
 .reveal-delay-720 {
   transition-delay: 720ms;
+}
+
+/* ── Hero floating glass terminal callout ──────────────────────────
+ *  Own fade-up-blur reveal (staggered timing computed by
+ *  lib/reveal-stagger.ts, applied as inline transition-delay). Collapses
+ *  under the sitewide `@media (prefers-reduced-motion)` block below, which
+ *  already zeroes every transition-duration/-delay with `!important`. */
+.hero-floating-terminal {
+  transition-property: opacity, transform, filter;
+  transition-duration: 0.6s, 0.6s, 0.6s;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hero-floating-terminal-dot {
+  transition-property: opacity, transform;
+  transition-duration: 0.5s, 0.5s;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Rainbow gradient text */

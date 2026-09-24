@@ -13,6 +13,8 @@ import { RotatingStats } from "./rotating-stats"
 import { heroBeatDelay } from "./data"
 import { TokscaleHeroBadge } from "@/components/sections/tokscale-stats"
 import { HeroScrollLayer } from "./hero-scroll-release"
+import { HeroGrainOverlay } from "./grain-overlay"
+import { HeroFloatingTerminalCard } from "./floating-terminal-card"
 
 const MOBILE_PERFORMANCE_QUERY = "(max-width: 767px), (pointer: coarse), (hover: none)"
 
@@ -115,6 +117,7 @@ export function Hero() {
     >
       {/* Spectrum lives only in this section (not fixed to viewport) — avoids mobile scroll seam / mask repaint */}
       <BackgroundOrbs />
+      <HeroGrainOverlay />
       {!mobilePerformanceMode && <ParticleCanvas className="z-[1]" />}
 
       {/* Circuit backdrop — behind the brain and every content layer. */}
@@ -248,6 +251,9 @@ export function Hero() {
           <TokscaleHeroBadge />
           <SocialLinks />
           <RotatingStats />
+          <div className="pointer-events-auto">
+            <HeroFloatingTerminalCard />
+          </div>
         </HeroScrollLayer>
       </div>
 
