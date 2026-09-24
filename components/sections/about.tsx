@@ -113,21 +113,17 @@ export function About() {
           subtitle="Staff AI Engineer at EchoStar — reached staff level in under 3 years. Consumer-scale telecom puts the same agent and RAG work in front of millions."
         />
 
-        {/* Bio — portrait alongside the terminal (OpenClaw + claw live under #consulting) */}
-        <div className="relative mx-auto mb-10 flex max-w-5xl flex-col items-stretch gap-5 md:flex-row">
-          {/* Stacked (mobile): the source's own 4:5 ratio, so nothing crops.
-              Side-by-side (md+): fills the terminal's height, with min-h so the
-              row never collapses while the terminal is still typing itself out. */}
-          <div className="group/photo relative mx-auto aspect-[4/5] w-full max-w-[20rem] shrink-0 overflow-hidden rounded-2xl border border-border shadow-2xl shadow-black/40 md:mx-0 md:aspect-auto md:h-auto md:min-h-[17rem] md:w-72 md:max-w-none lg:w-80">
+        {/* Bio — portrait alongside the terminal (OpenClaw + claw live under #consulting).
+            The frame stays 3/4 at every width (source is 1093×1439). Stretching it
+            to the terminal made a wide face crop. */}
+        <div className="relative mx-auto mb-10 flex max-w-5xl flex-col items-stretch gap-5 md:flex-row md:items-stretch">
+          <div className="group/photo relative mx-auto aspect-[3/4] w-full max-w-[20rem] shrink-0 overflow-hidden rounded-2xl border border-border shadow-2xl shadow-black/40 md:mx-0 md:w-72 md:max-w-none lg:w-80">
             <Image
               src="/misha-desk-laptop.png"
               alt="Misha Lubich at his desk"
-              width={640}
-              height={800}
-              /* Absolute so the photo never drives the row height — it fills
-                 whatever height the terminal beside it sets. */
-              className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover/photo:scale-105"
-              style={{ objectPosition: "center 20%" }}
+              width={1093}
+              height={1439}
+              className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-700 group-hover/photo:scale-105"
               placeholder="blur"
               blurDataURL="data:image/jpeg;base64,/9j/2wBDACgcHiMeGSgjISMtKygwPGRBPDc3PHtYXUlkkYCZlo+AjIqgtObDoKrarYqMyP/L2u71////m8H////6/+b9//j/2wBDASstLTw1PHZBQXb4pYyl+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj/wAARCAAUAA8DASIAAhEBAxEB/8QAFwAAAwEAAAAAAAAAAAAAAAAAAAEDAv/EABYQAQEBAAAAAAAAAAAAAAAAAAABEf/EABUBAQEAAAAAAAAAAAAAAAAAAAEA/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAwDAQACEQMRAD8Appyp6coLAARf/9k="
             />
@@ -135,24 +131,21 @@ export function About() {
           </div>
 
           <div className="flex min-w-0 flex-1 flex-col gap-4">
-            {/* flex-1 + h-full: the terminal takes whatever height the row has
-                above the strip, so the card never stops short of the portrait. */}
-            <div className="flex-1">
-              <TerminalReveal
-                className="h-full"
-                bodyMinHeight="min-h-[140px]"
-                title="~/about — misha.bio"
-                prompt=">"
-                charSpeed={reduce ? 0 : 14}
-                linePause={reduce ? 0 : 320}
-                startDelay={reduce ? 0 : 400}
-                lines={reduce ? bioStatic : bio}
-              />
-            </div>
+            <TerminalReveal
+              bodyMinHeight="min-h-[140px]"
+              title="~/about — misha.bio"
+              prompt=">"
+              charSpeed={reduce ? 0 : 14}
+              linePause={reduce ? 0 : 320}
+              startDelay={reduce ? 0 : 400}
+              lines={reduce ? bioStatic : bio}
+            />
 
-            <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-border bg-border font-mono sm:grid-cols-4">
+            {/* Two columns, two rows — the strip grows with the taller portrait
+                instead of a single short row of four. */}
+            <dl className="grid flex-1 grid-cols-2 gap-px overflow-hidden rounded-xl border border-border bg-border font-mono">
               {now.map(([k, v]) => (
-                <div key={k} className="bg-card px-4 py-3">
+                <div key={k} className="flex h-full flex-col justify-center bg-card px-4 py-3">
                   <dt className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground/60">{k}</dt>
                   <dd className="mt-1 text-xs leading-snug text-foreground/90">{v}</dd>
                 </div>

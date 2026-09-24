@@ -264,8 +264,10 @@ AI Engineer role, staff level in under 3 years, and consumer-scale telecom
 (agent + RAG in front of millions). Do **not** name Anduril/Mach or a
 "chosen over" frame. The `~/about — misha.bio` terminal types short lines
 (EchoStar → prior employers → shipped systems → Equiverse) and is sized to
-its content; a NOW / WHERE / SINCE / BUILDING strip sits under it so the
-card never shows a blank lower half while typing. The six tiles are
+its content. The portrait stays `aspect-[3/4]` at every width (source
+1093×1439) so it does not stretch into a wide crop beside the terminal.
+NOW / WHERE / SINCE / BUILDING sits under the terminal as a 2×2 grid and
+grows with that portrait. The six tiles are
 token-based (`bg-card`, `border-border`) and current: EXPERIENCE reads
 "EchoStar, Apple, Walmart", OPEN SOURCE reads "MCP Servers + CLIs · imsg ·
 imail · inotes · wa-mcp · jenkins-mcp". Grid is 1/2/3 columns at

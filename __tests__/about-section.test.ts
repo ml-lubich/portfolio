@@ -65,6 +65,17 @@ describe("about — layout", () => {
     it("caps the portrait width when it stacks above the terminal", () => {
         expect(source).toMatch(/max-w-\[20rem\]/)
     })
+
+    it("keeps the portrait at the source 3/4 ratio beside the terminal", () => {
+        expect(source).toMatch(/aspect-\[3\/4\]/)
+        expect(source).not.toMatch(/aspect-auto/)
+    })
+
+    it("stacks the now facts in two columns so the strip grows with the portrait", () => {
+        const now = source.slice(source.indexOf("<dl"), source.indexOf("</dl>"))
+        expect(now).toMatch(/grid-cols-2/)
+        expect(now).not.toMatch(/grid-cols-4/)
+    })
 })
 
 describe("about — reduced motion", () => {
