@@ -53,6 +53,7 @@ const BOT_BLOCKED_DOMAINS = [
   "calendar.app.google",
   "scholar.google.com",
   "linkedin.com",
+  "orcid.org",
 ]
 
 /**

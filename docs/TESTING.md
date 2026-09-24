@@ -22,6 +22,7 @@
 
 ## Automated: MLBot chat recovery
 
+- `__tests__/coding-guard.test.ts` — coding asks ("write a python function", "fix my code", "leetcode", "source code") are refused before the model; "error code", "what languages", and "write me an email" are not.
 - `__tests__/ai-chat-stream.test.ts` — OpenRouter chunk ingest (delta fragments, final `message.content`, array content parts), empty-final-after-tools fallback (must emit grounded text, never a bare `done`), cascade errors name every failed attempt, and `app/api/chat/route.ts` is wired to those helpers.
 - `__tests__/ai-profile-tools.test.ts` — `search_profile` on “What has Misha built with agents?” returns a named agent project (name hit outranks a body mention); `searchTerms` stems `agents` → `agent` and drops question stopwords. `__tests__/ai-model-slugs.test.ts` still checks the cascade slugs exist upstream and advertise tools.
 - A chat is working only when one real lookup question produces at least one `event: tool`, non-empty `event: text`, and zero `event: error`. HTTP 200 plus `event: done` with no text is a fail — that was the 2026-09-14 production blank-bubble.

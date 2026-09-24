@@ -33,7 +33,7 @@
  * HTTP handlers and a small fixed set of config names) so /status can import
  * the same list instead of duplicating it. */
 export const MODELS = [
-    "inclusionai/ling-3.0-flash-vl:free",
+    "google/gemma-4-26b-a4b-it:free",
     "cohere/north-mini-code:free",
     "nex-agi/nex-n2.5-mini:free",
     "mistralai/mistral-nemo",

@@ -1,0 +1,16 @@
+node_modules
+.next
+.next-e2e
+.next-agent-layout
+.next-agent-*
+.claude
+.vercel
+*.log
+.DS_Store
+coverage
+test-results
+.shots
+.tmp
+*.tsbuildinfo
+.bun.lock
+bun.lockb

@@ -38,6 +38,11 @@ Append new constraints or decisions as new bullets or dated subsections; do not 
 - Mesh scale (`useInitialScale`) stays on the existing breakpoints; do not shrink the asset to fake a smaller box.
 - Hero type is ink-haloed **and** light-bloomed (white drop-shadow on `.hero-copy-halo`) so the metallic fill reads shiny over the mesh. Do not dim the type to make the brain pop.
 
+### 2026-09-23 — MLBot does not write code
+
+- A request for a program, function, script, bugfix, LeetCode problem, or this site's source is refused with one fixed sentence before OpenRouter is called. Error codes, languages he uses, and "write me an email" stay in bounds.
+- Covered by `__tests__/coding-guard.test.ts`.
+
 ### 2026-09-14 — MLBot must answer after tools
 
 - A chat turn that called a tool and then streamed `event: done` with no text is a failure. Recover with `finalizeAssistantTurn` + a grounded fallback from the tool JSON.

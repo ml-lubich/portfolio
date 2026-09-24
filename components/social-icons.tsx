@@ -1,12 +1,27 @@
 import { Github, GraduationCap, Linkedin } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
+import type { ComponentType } from "react"
+
+function OrcidIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      role="img"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={className}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M12 0C5.372 0 0 5.372 0 12s5.372 12 12 12 12-5.372 12-12S18.628 0 12 0zM7.369 4.378c.525 0 .947.431.947.947s-.422.947-.947.947a.95.95 0 0 1-.947-.947c0-.525.422-.947.947-.947zm-.722 3.038h1.444v10.041H6.647V7.416zm3.562 0h3.9c3.712 0 5.344 2.653 5.344 5.025 0 2.578-2.016 5.016-5.325 5.016h-3.919V7.416zm1.444 1.306v7.428h2.244c2.531 0 3.822-1.444 3.822-3.712 0-2.016-1.169-3.716-3.8-3.716h-2.266z" />
+    </svg>
+  )
+}
 
 /* ── Shared social link data (single source of truth) ────────────────── */
 
 export interface SocialLink {
   href: string
   label: string
-  icon: LucideIcon
+  icon: LucideIcon | ComponentType<{ className?: string }>
 }
 
 export const SOCIAL_LINKS: SocialLink[] = [
@@ -16,6 +31,11 @@ export const SOCIAL_LINKS: SocialLink[] = [
     href: "https://scholar.google.com/citations?hl=en&user=Be6ZA78AAAAJ",
     label: "Google Scholar",
     icon: GraduationCap,
+  },
+  {
+    href: "https://orcid.org/0000-0003-2329-4454",
+    label: "ORCID",
+    icon: OrcidIcon,
   },
 ]
 

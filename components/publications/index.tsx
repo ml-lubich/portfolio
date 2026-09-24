@@ -95,9 +95,9 @@ export function Publications() {
         }
       })}
     >
-      {/* Google Scholar link */}
+      {/* Research profile links */}
       <div className="relative mx-auto max-w-5xl px-4 sm:px-6">
-        <AnimatedSection delay={600} className="mt-10 text-center">
+        <AnimatedSection delay={600} className="mt-10 flex flex-wrap items-center justify-center gap-3">
           <a
             href="https://scholar.google.com/citations?hl=en&user=Be6ZA78AAAAJ"
             target="_blank"
@@ -106,6 +106,25 @@ export function Publications() {
           >
             View Google Scholar Profile
             <ExternalLink className="h-4 w-4" />
+          </a>
+          <a
+            id="cy-effective-orcid-url"
+            href="https://orcid.org/0000-0003-2329-4454"
+            target="orcid.widget"
+            rel="me noopener noreferrer"
+            className="group/orcid inline-flex items-center gap-2 rounded-[14px] border border-white/[0.06] bg-white/[0.03] px-5 py-3 text-sm font-medium text-foreground transition-all duration-200 hover:border-[#A6CE39]/50 hover:bg-white/[0.06] hover:text-[#A6CE39]"
+          >
+            <svg
+              role="img"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="h-4 w-4 text-[#A6CE39] transition-transform duration-200 group-hover/orcid:scale-110"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M12 0C5.372 0 0 5.372 0 12s5.372 12 12 12 12-5.372 12-12S18.628 0 12 0zM7.369 4.378c.525 0 .947.431.947.947s-.422.947-.947.947a.95.95 0 0 1-.947-.947c0-.525.422-.947.947-.947zm-.722 3.038h1.444v10.041H6.647V7.416zm3.562 0h3.9c3.712 0 5.344 2.653 5.344 5.025 0 2.578-2.016 5.016-5.325 5.016h-3.919V7.416zm1.444 1.306v7.428h2.244c2.531 0 3.822-1.444 3.822-3.712 0-2.016-1.169-3.716-3.8-3.716h-2.266z" />
+            </svg>
+            <span className="font-mono text-xs text-muted-foreground/80 group-hover/orcid:text-foreground">https://orcid.org/0000-0003-2329-4454</span>
+            <ExternalLink className="h-4 w-4 text-muted-foreground/70 transition-colors group-hover/orcid:text-[#A6CE39]" />
           </a>
         </AnimatedSection>
       </div>

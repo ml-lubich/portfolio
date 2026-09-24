@@ -10,6 +10,7 @@
 
 import { NextRequest } from "next/server"
 import { runTool, TOOL_SCHEMAS, SYSTEM_PROMPT } from "@/lib/ai/profile-tools"
+import { asksForCodingHelp, codingRefusal } from "@/lib/ai/coding-guard"
 import { checkRateLimit, clientIp, buildCookie, acquireSlot, COOKIE_NAME } from "@/lib/ai/rate-limit"
 import { FollowupStream } from "@/lib/ai/followups"
 import { ToolMemo } from "@/lib/ai/tool-memo"
@@ -65,6 +66,11 @@ export async function POST(req: NextRequest) {
     const history = parseHistory(await readJson(req))
     if (history.length === 0) {
         return json({ error: "Send a message." }, 400)
+    }
+
+    const latest = [...history].reverse().find((m) => m.role === "user")
+    if (latest && asksForCodingHelp(latest.content)) {
+        return sseText(codingRefusal("Misha's work — his projects, experience, and how to reach him"))
     }
 
     const apiKey = process.env.OPENROUTER_API_KEY
@@ -359,6 +365,17 @@ function rateLimitMessage(reason: "burst" | "cookie" | "ip" | "global" | "replay
     if (reason === "global") return "MLBot is at capacity right now. Try again later."
     if (reason === "replay") return "That session looks stale. Reload the page and try again."
     return "You've hit the hourly message limit. Try again a bit later, or email Misha directly."
+}
+
+function sseText(text: string): Response {
+    const body = `event: text\ndata: ${JSON.stringify(text)}\n\nevent: done\ndata: {}\n\n`
+    return new Response(body, {
+        headers: {
+            "Content-Type": "text/event-stream; charset=utf-8",
+            "Cache-Control": "no-store, no-transform",
+            Connection: "keep-alive",
+        },
+    })
 }
 
 function json(body: unknown, status: number, headers: Record<string, string> = {}) {
