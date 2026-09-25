@@ -6,7 +6,7 @@ import { AnimatedSection } from "../animations/animated-section"
 import { SectionHeader } from "../layout/section-header"
 import { useSectionProgress } from "@/lib/use-section-progress"
 import { depthOffset } from "@/lib/scroll-depth"
-import { LATEST_POST, SUBSTACK_SUBSCRIBE_URL, SUBSTACK_URL } from "@/lib/substack"
+import { LATEST_POST, SUBSTACK_EMBED_URL, SUBSTACK_SUBSCRIBE_URL, SUBSTACK_URL } from "@/lib/substack"
 
 /** Small, non-intrusive pointer to the Substack — one card for the latest
  *  post, and Substack's own subscribe-box embed. No feed fetch, no popup,
@@ -63,7 +63,7 @@ export function Writing() {
 
         <div ref={embedRef} className="mt-6 overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03]">
           <iframe
-            src={`${SUBSTACK_URL}/embed`}
+            src={SUBSTACK_EMBED_URL}
             title="Subscribe to Misha Lubich on Substack"
             loading="lazy"
             width="100%"

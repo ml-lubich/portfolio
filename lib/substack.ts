@@ -6,6 +6,7 @@
 
 export const SUBSTACK_URL = "https://mlubich.substack.com"
 export const SUBSTACK_SUBSCRIBE_URL = `${SUBSTACK_URL}/subscribe`
+export const SUBSTACK_EMBED_URL = `${SUBSTACK_URL}/embed`
 
 export interface SubstackPost {
   title: string

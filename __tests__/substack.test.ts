@@ -50,7 +50,7 @@ describe("wiring", () => {
     const section = read("components/sections/substack.tsx")
     expect(section).toContain("LATEST_POST.url")
     expect(section).toContain("SUBSTACK_SUBSCRIBE_URL")
-    expect(section).toContain('src={`${SUBSTACK_URL}/embed`}')
+    expect(section).toContain("src={SUBSTACK_EMBED_URL}")
     expect(section).toContain("Subscribe to Misha Lubich on Substack")
     expect(section).not.toMatch(/role=["']dialog["']/)
     expect(section).not.toContain("Dialog")
