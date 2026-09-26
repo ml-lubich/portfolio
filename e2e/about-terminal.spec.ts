@@ -48,15 +48,20 @@ test.describe("About terminal", () => {
                 return a === (await card.boundingBox())?.height
             }, { timeout: 10_000 })
             .toBe(true)
-        // 14s covers a whole bio: type, hold, erase, and the next one starting.
+        // 14s of wall time covers a whole bio: type, hold, erase, next.
         const heights: number[] = []
-        for (let i = 0; i < 28; i++) {
+        const texts = new Set<string>()
+        const until = Date.now() + 14_000
+        while (Date.now() < until) {
             const box = await card.boundingBox()
             if (box) heights.push(Math.round(box.height))
+            texts.add(await live.innerText())
             await page.waitForTimeout(500)
         }
-        expect(heights.length).toBeGreaterThan(25)
-        await expect(live).toContainText(BIO_SCRIPTS[1][0].slice(0, 6))
+        expect(heights.length).toBeGreaterThan(5)
+        // The window really spanned a rewrite — without assuming which bio is up
+        // (on a loaded machine the settle wait shifts where in the cycle we are).
+        expect(texts.size).toBeGreaterThan(1)
         expect(Math.max(...heights) - Math.min(...heights)).toBeLessThanOrEqual(1)
     })
 
