@@ -14,7 +14,6 @@ import { heroBeatDelay } from "./data"
 import { TokscaleHeroBadge } from "@/components/sections/tokscale-stats"
 import { HeroScrollLayer } from "./hero-scroll-release"
 import { HeroGrainOverlay } from "./grain-overlay"
-import { HeroFloatingTerminalCard } from "./floating-terminal-card"
 
 const MOBILE_PERFORMANCE_QUERY = "(max-width: 767px), (pointer: coarse), (hover: none)"
 
@@ -247,13 +246,10 @@ export function Hero() {
         </div>
 
         {/* Below the brain — lags the page slightly on desktop (parallax). */}
-        <HeroScrollLayer layer="stats" className="relative z-[2]">
+        <HeroScrollLayer layer="stats" className="relative z-[2] mb-24 sm:mb-28">
           <TokscaleHeroBadge />
           <SocialLinks />
           <RotatingStats />
-          <div className="pointer-events-auto">
-            <HeroFloatingTerminalCard />
-          </div>
         </HeroScrollLayer>
       </div>
 

@@ -35,7 +35,6 @@
 export const MODELS = [
     "google/gemma-4-26b-a4b-it:free",
     "cohere/north-mini-code:free",
-    "nex-agi/nex-n2.5-mini:free",
     "mistralai/mistral-nemo",
     "openai/gpt-oss-20b",
     "meta-llama/llama-3.1-8b-instruct",

@@ -559,23 +559,10 @@ stacking a parallel motion system:
   page backdrop; at hero scale and this much lower opacity it reads as
   texture instead, which is why this is scoped to `#hero` and not reapplied
   site-wide.
-- **Hero floating glass terminal**, `components/hero/floating-terminal-card.tsx`:
-  faux window chrome (three staggered traffic-light dots) over a
-  `DemoTerminal` typing a **real** command — sourced from
-  `data/oss-demos.ts` via `lib/hero-floating-demo.ts`
-  (`getHeroFloatingDemo()`, id `imsg-mcp`), the same data the Open-Source
-  showcase types, never a hero-only fabricated script. Reuses the existing
-  `DemoTerminal`/`lib/demo-terminal.ts` typing engine rather than building a
-  second one. Sits in-flow at the bottom of the hero's existing "stats"
-  `HeroScrollLayer`, after `RotatingStats`. **Needed its own `mb-24
-  sm:mb-28`**: the hero's absolutely-positioned "Explore" scroll cue is
-  pinned a fixed offset above the section's own bottom padding edge, a
-  relationship that does not grow with the flow content above it — adding
-  the card without a dedicated bottom reserve made the cue's 72px-tall
-  hit-box sit on top of the card's last output line (measured ~64px overlap
-  at 1440×900, ~28px at 390×844 before the fix). Gates:
-  `__tests__/hero-floating-demo.test.ts`,
-  `__tests__/hero-motion-polish.test.ts`.
+- **Hero floating glass terminal** — removed 2026-09-25: the OSS demo belongs in the
+  Open-Source section further down, not in the hero. Its `mb-24 sm:mb-28`
+  bottom reserve moved onto the stats `HeroScrollLayer` so the "Explore" cue
+  still clears the carousel dots.
 
 **Skipped:** the hero background/demo video recipe (motion-showcase #1) —
 no source footage recorded yet. Follow-up, not done here.

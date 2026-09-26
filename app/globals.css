@@ -679,23 +679,6 @@
   transition-delay: 720ms;
 }
 
-/* ── Hero floating glass terminal callout ──────────────────────────
- *  Own fade-up-blur reveal (staggered timing computed by
- *  lib/reveal-stagger.ts, applied as inline transition-delay). Collapses
- *  under the sitewide `@media (prefers-reduced-motion)` block below, which
- *  already zeroes every transition-duration/-delay with `!important`. */
-.hero-floating-terminal {
-  transition-property: opacity, transform, filter;
-  transition-duration: 0.6s, 0.6s, 0.6s;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.hero-floating-terminal-dot {
-  transition-property: opacity, transform;
-  transition-duration: 0.5s, 0.5s;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-}
-
 /* Rainbow gradient text */
 .rainbow-text {
   background: linear-gradient(90deg,
