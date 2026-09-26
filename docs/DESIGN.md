@@ -82,7 +82,7 @@ showcase). That would replace the portfolio's own sections rather than restyle t
 
 ## Open-Source Showcase & chrome fixes (2026-07-25)
 
-- `#open-source` leads the projects section: an **Open-Source Agent Tools** grid (`data/oss-agent-tools.ts`, `components/sections/oss-tool-grid.tsx`) — twelve cards in a two-column layout matching the GitHub profile TOOLS panel, each with a **click-to-copy** install row (`components/ui/copy-command.tsx`). `/fork` repeats the grid plus `ossInstallFork()` (explicit `brew tap ml-lubich/tap` first) for USB-agent / fork checkouts. Below that: curated public CLI/MCP projects (`data/oss-demos.ts`) as glass demo cards — an animated terminal demo per card (`DemoTerminal`: IntersectionObserver-gated typing; `prefers-reduced-motion` renders the final frame immediately), stats via `AnimatedCounter` (numeric values only; text stats render plain), tags, GitHub link, and a **selectable** `<pre><code>` install line (click-to-copy is extra, not the only path). A copy-pasteable `ossInstallAll()` block sits above the rail so brew / pip / pipx / npm / git lines can be pasted as a family. **One terminal types at a time** — the featured card is the only typer. The marquee below is retitled "Selected Work" and reads as the breadth tier.
+- `#open-source` leads the projects section: an **Open-Source Agent Tools** grid (`data/oss-agent-tools.ts`, `components/sections/oss-tool-grid.tsx`) — thirteen cards in a two-column layout matching the GitHub profile TOOLS panel, each with a **click-to-copy** install row (`components/ui/copy-command.tsx`). `/fork` repeats the grid plus `ossInstallFork()` (explicit `brew tap ml-lubich/tap` first) for USB-agent / fork checkouts. Below that: curated public CLI/MCP projects (`data/oss-demos.ts`) as glass demo cards — an animated terminal demo per card (`DemoTerminal`: IntersectionObserver-gated typing; `prefers-reduced-motion` renders the final frame immediately), stats via `AnimatedCounter` (numeric values only; text stats render plain), tags, GitHub link, and a **selectable** `<pre><code>` install line (click-to-copy is extra, not the only path). A copy-pasteable `ossInstallAll()` block sits above the rail so brew / pip / pipx / npm / git lines can be pasted as a family. **One terminal types at a time** — the featured card is the only typer. The marquee below is retitled "Selected Work" and reads as the breadth tier.
 - **Nav breakpoint policy:** the inline desktop link row requires ≥1280px (`xl:`); 768–1279px uses the mobile hamburger + overlay. The three gates (link row `xl:flex`, toggle `xl:hidden`, overlay `xl:hidden`) must always move together — splitting them re-introduces the iPad clipping bug.
 - **Logo mark:** `components/site-logo-mark.tsx` is an inline-SVG "ML" monogram on a dark backing tile — resolution-independent, no raster, no tech-blue; the nav tile carries a higher-contrast border/bg than the old liquid-glass treatment.
 - **Vertical rhythm:** a single spacing knob (`LAZY_SECTION_TOP` in `app/page.tsx`: `pt-4 md:pt-8 lg:pt-10`) governs every LazySection boundary; no per-section ad-hoc margins (guarded by `__tests__/section-rhythm.test.ts`).
@@ -274,6 +274,15 @@ imail · inotes · wa-mcp · jenkins-mcp". Grid is 1/2/3 columns at
 <640/640–1023/≥1024; the portrait caps at 20rem when stacked. Typing and
 count-ups render their final state immediately under
 `prefers-reduced-motion`. Gate: `__tests__/about-section.test.ts`.
+
+## Blog posts: one cover, then diagrams only when they earn it (2026-09-24)
+
+Each post has a single cover (`data/blog/post-meta.json`), rendered once above
+the body. The body does not repeat that photo. Extra figures are for a
+different image. Posts about something that was built use a chart fence
+(pipeline, comparison, or tree) instead of a second stock photo. Length stays
+uneven on purpose: short narrative essays next to longer build notes.
+Gate: `__tests__/data-integrity.test.ts`.
 
 ## Agents-build easter egg (2026-09-16)
 
@@ -502,6 +511,77 @@ like a glow passing through", and it must stay subtle and cost nothing on scroll
   inner scrollers) are excluded rather than left frozen mid-glow.
 
 Gate: `__tests__/text-glow-pass.test.ts`.
+
+## Cycling install marquee (2026-09-24)
+
+The Open-Source Agent Tools panel opened on a static install row, so the
+first thing a visitor read was whichever tool happened to sit in card one —
+`brew install ml-lubich/tap/imsg`.
+
+A single prompt now sits above the grid (`components/ui/cycling-install.tsx`)
+and types its way through **every** tool's install command in a loop: type,
+hold long enough to read and copy, erase, next. Mac-window chrome, a
+`ml-lubich/tap` title and a live tool-count counter frame it as one tap rather than
+a ticker; under the line a caption names the tool currently on screen and a row
+of dots marks the position in the roll-call. The count follows `ossAgentTools` (thirteen as of 2026-09-24, including ical, vgate, and claude-tiers).
+
+- Timing is a pure function of elapsed ms — `lib/install-cycle.ts`
+  (`installCycleFrame`, `stepDuration`, `cycleDuration`). The component is one
+  rAF loop plus gates; the schedule is unit-tested without a DOM.
+- The `ml-lubich` handle is accented wherever an install command is rendered —
+  in the marquee it takes the current tool's `ossAccent`, so the name changes
+  colour as the line cycles; in the static card rows (`copy-command.tsx`) it is
+  `text-primary/90`. `splitBrand()` also accents a half-typed handle, so the
+  name doesn't flicker plain-then-coloured as its last letters land.
+- Gates: off-screen (IntersectionObserver), `prefers-reduced-motion` (full
+  command, no typing, no cursor) and hover (pauses, so the command you reached
+  for is still there when the pointer lands). Frames only re-render when the
+  visible text actually changes — a character lands every ~48ms.
+- The animated line is `aria-hidden`; screen readers get a static `sr-only`
+  list of all commands instead of a churning one.
+
+Gate: `__tests__/install-cycle.test.ts`.
+
+## Open-Source Showcase: real-output proof, not just links (2026-09-24)
+
+The owner wanted pdfify-md and imail-mcp's OSS tool cards to show what the
+tool actually does, not just a repo link — "REAL output only, no mockups, no
+invented numbers." Both live under the existing featured-card slot
+(`OssDemoCard`), gated the same way as the terminal and app sim above them:
+an optional `OssMedia` union on `data/oss-demos.ts`'s `OssDemo.media`,
+rendered by the new `components/sections/oss-demo-media.tsx` (no new design
+tokens — reuses the card's `bg-black/*` / `border-white/[0.0x]` / font-mono
+language).
+
+- **pdfify-md (`kind: "pdf-compare"`)**: `public/demos/pdfify/sample.md` — a
+  heading, a Mermaid flowchart, a Mermaid sequence diagram, a table, and a
+  TypeScript code block — run through `pdfify-md`'s own CLI
+  (`node dist/cli.js sample.md`, headless Chrome via `--launch-options
+  executablePath`) to produce `sample.pdf`, then rasterized to
+  `sample-preview.png` (page 1, 150dpi, resized to 900px) with `pdftoppm`.
+  The card renders the exact source text beside the rendered page image, plus
+  "View sample.md" / "Download PDF" links — literally the input and output of
+  one real run, side by side.
+- **imail-mcp (`kind: "eval-table"`)**: the real `imail autodraft-eval`
+  output — 14 synthetic (`example.com`-only, no real inbox data) labeled
+  cases, PASS/FAIL per case, and the harness's own summary line
+  ("13/14 passed, 0 unsafe sends") — plus a guardrail list pulled from
+  `autodraft.py`'s actual gate: `auto_send_allowed()` requires confidence
+  ≥ 0.95, stakes = low, a known contact, a reply ≤ 400 chars, no
+  attachments, and non-recruiter intent, and `validate_decision()` fails
+  closed on the untrusted LLM JSON before any of that runs.
+- Fixing this surfaced two pre-existing inaccuracies, corrected in the same
+  pass: `imail`/`imsg` still linked their pre-rename GitHub slugs
+  (`imail` → `imail-mcp`, `imsg` → `imsg-mcp`; both still 302, this
+  points at the canonical URL), and the pdfify-md terminal demo showed a
+  `--out` flag the CLI doesn't have.
+- `claude-tiers` joins the tool family the same way imsg/imail/pdfify did:
+  entries in `data/projects.ts`, `data/oss-demos.ts` (`git clone` install —
+  it ships as a Claude Code plugin marketplace, not a package registry), and
+  `data/oss-agent-tools.ts` (13 cards now, was 12).
+
+Gates: `__tests__/oss-demos.test.ts` (`ALLOWED_PUBLIC_IDS` includes
+`claude-tiers`), `__tests__/oss-agent-tools.test.ts` (13-tool list).
 
 ## Writing section: Substack pointer + subscribe embed (2026-09-24, updated 2026-09-25)
 

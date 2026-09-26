@@ -24,6 +24,7 @@ const ALLOWED_PUBLIC_IDS = new Set([
   "pdfify-md",
   "ical-cli",
   "vgate",
+  "claude-tiers",
   "imessage-exporter",
   "synthdata-forge",
   "multimodal-captcha-solver",

@@ -28,13 +28,13 @@
 - A chat is working only when one real lookup question produces at least one `event: tool`, non-empty `event: text`, and zero `event: error`. HTTP 200 plus `event: done` with no text is a fail — that was the 2026-09-14 production blank-bubble.
 - `__tests__/hero-scrim-halo.test.ts` — `.hero-copy-halo` filter includes a white light bloom (`0 0 34px`) as well as the dark ink halo.
 - `__tests__/oss-demos.test.ts` — every showcase entry has a real install command; `ossInstallAll()` is a copy-pasteable brew/pip/pipx/npm/git block. `__tests__/open-source-showcase.test.ts` — install lines render as selectable `<pre><code>`, not a truncated button label.
-- `__tests__/oss-agent-tools.test.ts` — twelve grid tools with short display names; `ossInstallFork()` leads with `brew tap ml-lubich/tap`. `__tests__/fork-page.test.ts` — `/fork` ships the fork block + grid. `e2e/oss-tool-grid.spec.ts` — grid visible on `#open-source`, click-to-copy works, `/fork` shows tap line.
+- `__tests__/oss-agent-tools.test.ts` — thirteen grid tools with short display names; `ossInstallFork()` leads with `brew tap ml-lubich/tap`. `__tests__/fork-page.test.ts` — `/fork` ships the fork block + grid. `e2e/oss-tool-grid.spec.ts` — grid visible on `#open-source`, click-to-copy works, `/fork` shows tap line.
 - `e2e/visual-integrity.spec.ts` — no horizontal overflow at 390/834/1440px, every `<img>` loads (`naturalWidth > 0`), and no `bg-card`-styled panel resolves to the same computed background color as the page (the "ghosting"/"black cards" bug class) across all eight routes. Only dark mode is checked: light mode ships disabled (`lib/light-mode.ts`, `forcedTheme="dark"`, toggle not even rendered), so testing it here would just run dark mode twice. Once light mode is re-enabled by default, extend this file to cover it too.
 - `e2e/wide-layout.spec.ts`, `e2e/tablet-responsive.spec.ts`, `e2e/scroll-navigation.spec.ts` — pre-existing homepage-specific layout/motion regression specs (see file headers for what each guards).
 
 ## Automated: blog listing metadata
 
-- `__tests__/data-integrity.test.ts` — under "Blog posts data": every post has an HTTPS `coverImage`, and cover URLs are **pairwise distinct** (enforces `data/blog/post-meta.json` staying in sync with unique art per slug).
+- `__tests__/data-integrity.test.ts` — under "Blog posts data": every post has an HTTPS `coverImage`, cover URLs are **pairwise distinct**, and the cover photo id is not repeated inside the article body.
 
 ## Automated: media references
 

@@ -31,7 +31,7 @@ const META: Record<string, { displayName: string; description: string; tag: stri
   },
   "imail-mcp": {
     displayName: "imail",
-    description: "Apple Mail CLI + MCP · Mail.app, no IMAP",
+    description: "Apple Mail CLI + MCP · guarded LLM auto-reply agent",
     tag: "macOS",
   },
   "inotes-mcp": {
@@ -56,8 +56,8 @@ const META: Record<string, { displayName: string; description: string; tag: stri
   },
   "pdfify-md": {
     displayName: "pdfify-md",
-    description: "Markdown / Mermaid → clean PDF",
-    tag: "x-platform",
+    description: "Markdown / Mermaid → clean PDF · CLI + library",
+    tag: "TypeScript",
   },
   "jenkins-mcp": {
     displayName: "jenkins-mcp",
@@ -84,6 +84,11 @@ const META: Record<string, { displayName: string; description: string; tag: stri
     description: "Switch Vercel CLI logins · CLI + MCP",
     tag: "Py",
   },
+  "claude-tiers": {
+    displayName: "claude-tiers",
+    description: "Model-tiered ruleset · Claude Code plugin marketplace",
+    tag: "ruleset",
+  },
 }
 
 const ORDER = [
@@ -99,6 +104,7 @@ const ORDER = [
   "like-fable",
   "ical-cli",
   "vgate",
+  "claude-tiers",
 ] as const
 
 export const ossAgentTools: OssAgentTool[] = ORDER.map((id) => {

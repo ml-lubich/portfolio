@@ -4,6 +4,7 @@ import Link from "next/link"
 import { ossAccent } from "@/lib/theme"
 import { ossAgentTools } from "@/data/oss-agent-tools"
 import { CopyCommand } from "@/components/ui/copy-command"
+import { CyclingInstall } from "@/components/ui/cycling-install"
 
 export function OssToolGrid() {
   return (
@@ -32,6 +33,14 @@ export function OssToolGrid() {
           <span className="font-bold text-primary">+</span> MCP / agent surface
         </p>
       </header>
+
+      {/* One prompt that types through every tool — the panel opens on the whole
+          set instead of parking on whichever card happens to come first. */}
+      <CyclingInstall
+        className="relative mb-5 sm:mb-6"
+        items={ossAgentTools}
+        accentOf={ossAccent}
+      />
 
       <ul className="relative grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-3.5">
         {ossAgentTools.map((tool, i) => {

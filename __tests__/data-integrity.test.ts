@@ -270,6 +270,14 @@ describe("Blog posts data", () => {
         }
     })
 
+    it("does not repeat the cover photo inside the article", () => {
+        for (const post of blogPosts) {
+            const id = post.coverImage.match(/photo-([A-Za-z0-9_-]+)/)?.[1]
+            if (!id) continue
+            expect(post.content, `${post.slug} repeats cover ${id}`).not.toContain(id)
+        }
+    })
+
     for (const post of blogPosts) {
         describe(`post: ${post.slug}`, () => {
             it("has required fields", () => {

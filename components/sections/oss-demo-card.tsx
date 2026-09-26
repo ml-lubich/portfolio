@@ -20,6 +20,7 @@ import { AnimatedCounter } from "@/components/animations"
 import { ossAccent, terminalChrome } from "@/lib/theme"
 import { projects } from "@/data/projects"
 import type { OssDemo } from "@/data/oss-demos"
+import { OssDemoMedia } from "./oss-demo-media"
 
 interface OssDemoCardProps {
   demo: OssDemo
@@ -291,6 +292,12 @@ export function OssDemoCard({ demo, index = 0, active = true, onExplore }: OssDe
           {demo.sim && (
             <div className="mt-3">
               <OssDemoSim sim={demo.sim} active={active} />
+            </div>
+          )}
+
+          {demo.media && (
+            <div className="mt-3">
+              <OssDemoMedia media={demo.media} />
             </div>
           )}
 

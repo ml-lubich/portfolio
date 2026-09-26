@@ -32,6 +32,7 @@ import {
   MessageSquare,
   MessagesSquare,
   NotebookPen,
+  Puzzle,
   Terminal,
 } from "lucide-react"
 import { DetailPanel } from "../detail-panel"
@@ -58,6 +59,7 @@ const TOOL_ICON: Record<string, typeof Terminal> = {
   "pdfify-md": FileText,
   "ical-cli": Calendar,
   vgate: Cloud,
+  "claude-tiers": Puzzle,
 }
 
 export function OpenSourceShowcase() {

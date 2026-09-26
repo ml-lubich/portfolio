@@ -2,6 +2,7 @@
 
 import { useCallback, useState } from "react"
 import { Check, Copy } from "lucide-react"
+import { splitBrand } from "@/lib/install-cycle"
 
 interface CopyCommandProps {
   command: string
@@ -29,7 +30,17 @@ export function CopyCommand({ command, className = "" }: CopyCommandProps) {
       <span className="shrink-0 text-primary/90" aria-hidden>
         $
       </span>
-      <code className="min-w-0 flex-1 select-all truncate text-foreground/90">{command}</code>
+      <code className="min-w-0 flex-1 select-all truncate text-foreground/90">
+        {splitBrand(command).map((part, i) =>
+          part.brand ? (
+            <span key={i} className="font-semibold text-primary/90">
+              {part.text}
+            </span>
+          ) : (
+            <span key={i}>{part.text}</span>
+          ),
+        )}
+      </code>
       <span className="inline-flex shrink-0 items-center gap-1 font-mono text-[9px] uppercase tracking-wider text-muted-foreground/70 group-hover/cmd:text-primary/80">
         {copied ? (
           <>
