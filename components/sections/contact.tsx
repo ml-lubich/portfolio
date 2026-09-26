@@ -2,9 +2,10 @@
 
 import dynamic from "next/dynamic"
 import Image from "next/image"
-import { Mail, Phone, MapPin, Calendar, Linkedin, Github, GraduationCap } from "lucide-react"
+import { Mail, Phone, MapPin, Calendar, Linkedin, Github, GraduationCap, BookOpen } from "lucide-react"
 import { AnimatedSection } from "../animations/animated-section"
 import { SectionHeader } from "../layout/section-header"
+import { XIcon } from "../social-icons"
 
 const ParticleField = dynamic(
   () => import("../three/scene-backgrounds").then((mod) => mod.ParticleField),
@@ -49,6 +50,8 @@ function OrcidIcon({ className }: { className?: string }) {
 const socialLinks = [
   { icon: Calendar, label: "Schedule a Call", href: "https://calendar.app.google/T2VGkBsBAUzGABRB7" },
   { icon: Linkedin, label: "LinkedIn", href: "https://www.linkedin.com/in/misha-lubich/" },
+  { icon: XIcon, label: "X", href: "https://x.com/Machine_Lubich" },
+  { icon: BookOpen, label: "Substack", href: "https://mlubich.substack.com" },
   { icon: Github, label: "GitHub", href: "https://github.com/ml-lubich" },
   { icon: GraduationCap, label: "Google Scholar", href: "https://scholar.google.com/citations?hl=en&user=Be6ZA78AAAAJ" },
   { icon: OrcidIcon, label: "ORCID", href: "https://orcid.org/0000-0003-2329-4454" },

@@ -46,10 +46,12 @@ describe("wiring", () => {
     expect(read("components/seo/json-ld.tsx")).toContain("mlubich.substack.com")
   })
 
-  it("the section links the latest post and a plain subscribe link, no popup/modal", () => {
+  it("the section links the latest post and embeds Substack's subscribe box, no popup/modal", () => {
     const section = read("components/sections/substack.tsx")
     expect(section).toContain("LATEST_POST.url")
     expect(section).toContain("SUBSTACK_SUBSCRIBE_URL")
+    expect(section).toContain('src={`${SUBSTACK_URL}/embed`}')
+    expect(section).toContain("Subscribe to Misha Lubich on Substack")
     expect(section).not.toMatch(/role=["']dialog["']/)
     expect(section).not.toContain("Dialog")
   })
@@ -58,5 +60,52 @@ describe("wiring", () => {
     const prompt = read("lib/ai/profile-tools.ts")
     expect(prompt).toContain("mlubich.substack.com")
     expect(prompt).toContain(LATEST_POST.title)
+  })
+})
+
+describe("Follow section", () => {
+  it("Follow is a nav link pointing at #follow", () => {
+    expect(navLinks.some((l) => l.href === "#follow")).toBe(true)
+  })
+
+  it("the homepage mounts the follow section with a nav-reachable id", () => {
+    const page = read("app/page.tsx")
+    expect(page).toContain('sectionId="follow"')
+    expect(page).toContain("Follow")
+  })
+
+  it("cards X, LinkedIn, Substack, and GitHub, driven by one array", () => {
+    const section = read("components/sections/follow.tsx")
+    expect(section).toContain("FOLLOW_CARDS")
+    expect(section).toContain("x.com/Machine_Lubich")
+    expect(section).toContain("linkedin.com/in/misha-lubich")
+    expect(section).toContain("substack.com/@mlubich")
+    expect(section).toContain("github.com/ml-lubich")
+    expect(section).not.toContain("youtube")
+  })
+})
+
+describe("X (Twitter) presence", () => {
+  it("X is listed in SOCIAL_LINKS", () => {
+    expect(SOCIAL_LINKS.some((l) => l.href === "https://x.com/Machine_Lubich")).toBe(true)
+  })
+
+  it("X is in the Person schema's sameAs, alongside a fixed LinkedIn URL", () => {
+    const jsonLd = read("components/seo/json-ld.tsx")
+    expect(jsonLd).toContain("https://x.com/Machine_Lubich")
+    expect(jsonLd).toContain("https://substack.com/@mlubich")
+    expect(jsonLd).toContain("https://www.linkedin.com/in/misha-lubich/")
+    expect(jsonLd).not.toContain("https://linkedin.com/in/mishalubich")
+  })
+
+  it("the contact section lists X and Substack alongside the other profiles", () => {
+    const contact = read("components/sections/contact.tsx")
+    expect(contact).toContain("https://x.com/Machine_Lubich")
+    expect(contact).toContain("https://mlubich.substack.com")
+  })
+
+  it("MLBot's profile tools expose an X URL alongside LinkedIn and GitHub", () => {
+    const tools = read("lib/ai/profile-tools.ts")
+    expect(tools).toContain('X_URL = "https://x.com/Machine_Lubich"')
   })
 })

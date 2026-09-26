@@ -1,10 +1,11 @@
-import { ArrowUpRight, BookOpen, Mail } from "lucide-react"
+import { ArrowUpRight, BookOpen } from "lucide-react"
 import { AnimatedSection } from "../animations/animated-section"
 import { SectionHeader } from "../layout/section-header"
 import { LATEST_POST, SUBSTACK_SUBSCRIBE_URL, SUBSTACK_URL } from "@/lib/substack"
 
 /** Small, non-intrusive pointer to the Substack — one card for the latest
- *  post, one plain subscribe link. No feed fetch, no popup, no modal. */
+ *  post, and Substack's own subscribe-box embed. No feed fetch, no popup,
+ *  no modal. */
 export function Writing() {
   return (
     <AnimatedSection id="writing" className="py-16 md:py-24">
@@ -40,23 +41,34 @@ export function Writing() {
           </span>
         </a>
 
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+        <div className="mt-6 overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03]">
+          <iframe
+            src={`${SUBSTACK_URL}/embed`}
+            title="Subscribe to Misha Lubich on Substack"
+            loading="lazy"
+            width="100%"
+            height="200"
+            style={{ background: "transparent" }}
+            className="block"
+          />
+        </div>
+
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
           <a
             href={SUBSTACK_SUBSCRIBE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex min-h-[48px] items-center gap-2 rounded-xl bg-primary px-6 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
-          >
-            <Mail className="h-4 w-4" />
-            Subscribe free
-          </a>
-          <a
-            href={SUBSTACK_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex min-h-[48px] items-center gap-2 rounded-xl border border-white/[0.12] px-6 text-sm font-medium text-foreground transition-colors hover:border-primary/40"
           >
             mlubich.substack.com <ArrowUpRight className="h-3.5 w-3.5" />
+          </a>
+          <a
+            href="https://substack.com/@mlubich"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex min-h-[48px] items-center gap-2 rounded-xl border border-white/[0.12] px-6 text-sm font-medium text-foreground transition-colors hover:border-primary/40"
+          >
+            @mlubich on Substack <ArrowUpRight className="h-3.5 w-3.5" />
           </a>
         </div>
       </div>

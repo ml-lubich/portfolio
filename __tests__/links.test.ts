@@ -54,6 +54,7 @@ const BOT_BLOCKED_DOMAINS = [
   "scholar.google.com",
   "linkedin.com",
   "orcid.org",
+  "x.com", // blocks non-browser UAs / requires auth for most paths (profile, intent/follow)
 ]
 
 /**

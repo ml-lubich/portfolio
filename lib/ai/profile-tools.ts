@@ -56,6 +56,7 @@ export interface ContactSpec {
     mailto: string
     linkedin: string
     github: string
+    x: string
     summary: string
 }
 
@@ -77,6 +78,7 @@ export const RESUME_URL = "/resume_mlubich_swe.pdf"
 export const CONTACT_EMAIL = "michaelle.lubich@gmail.com"
 export const LINKEDIN_URL = "https://www.linkedin.com/in/misha-lubich/"
 export const GITHUB_URL = "https://github.com/ml-lubich"
+export const X_URL = "https://x.com/Machine_Lubich"
 
 /* ── Tool schemas (OpenAI/OpenRouter function-calling format) ─────────── */
 
@@ -455,6 +457,7 @@ function getContact(args: Record<string, unknown>): ToolResult {
             mailto: `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}`,
             linkedin: LINKEDIN_URL,
             github: GITHUB_URL,
+            x: X_URL,
             summary: "Email reaches him directly — the site does not send anything on your behalf.",
         },
     }
@@ -522,7 +525,7 @@ Rules:
 - If something genuinely is not in the profile, say so plainly and suggest contacting him directly.
 - If the visitor wants to book a call, hire him, discuss consulting, rates or availability — call request_consultation immediately. Then write ONE sentence, and nothing else, saying Misha would be glad to talk it through. A booking card with his real calendar is already on screen, so: never write a URL or a markdown link, and never say a slot has been opened, held, reserved or booked. Nothing is reserved until the visitor picks a time themselves.
 - If the visitor asks for a resume, CV or one-pager — call get_resume, then write ONE sentence and nothing else: Misha's resume is on screen and ready to download. The card carries the file, so never write the path or a markdown link yourself.
-- If the visitor asks how to reach him, email him, or send something over — call get_contact, then write ONE sentence and nothing else: email is the most direct way to reach him, and LinkedIn and GitHub are on the card too. The card carries the real address, so do not type it out yourself.
+- If the visitor asks how to reach him, email him, or send something over — call get_contact, then write ONE sentence and nothing else: email is the most direct way to reach him, and LinkedIn, GitHub, and X are on the card too. The card carries the real address, so do not type it out yourself.
 - If asked about his writing, blog, essays, or opinions on AI/engineering — he publishes on Substack at https://mlubich.substack.com. Latest post: "The Craft Did Not Die, It Got Repriced" (https://mlubich.substack.com/p/the-craft-did-not-die-it-got-repriced), on how AI code generation commoditized syntax work while craft moved to state design and architecture. Point to it and to the Writing section on this page (#writing). Never invent other post titles or topics.
 - Stay on topic: you are here to talk about Misha's work, not to be a general-purpose assistant.
 - Never write, debug, or explain code. If asked for a program, a function, a script, a bugfix, or this site's source code, refuse in one sentence and offer to talk about Misha's work instead.

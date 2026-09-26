@@ -146,7 +146,9 @@ function BlogPostJsonLd({ slug }: { slug: string }) {
       jobTitle: AUTHOR.role,
       sameAs: [
         "https://github.com/ml-lubich",
-        "https://linkedin.com/in/mishalubich",
+        "https://www.linkedin.com/in/misha-lubich/",
+        "https://x.com/Machine_Lubich",
+        "https://mlubich.substack.com",
       ],
     },
     publisher: {

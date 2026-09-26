@@ -30,10 +30,12 @@ const personSchema = {
     "Staff AI Engineer at EchoStar, previously Apple, Walmart, and Lawrence Berkeley National Lab. Specialising in machine learning, MLOps, LLMs, agents, and full-stack development.",
   sameAs: [
     "https://github.com/ml-lubich",
-    "https://linkedin.com/in/mishalubich",
+    "https://www.linkedin.com/in/misha-lubich/",
+    "https://x.com/Machine_Lubich",
     "https://scholar.google.com/citations?hl=en&user=Be6ZA78AAAAJ",
     "https://orcid.org/0000-0003-2329-4454",
     "https://mlubich.substack.com",
+    "https://substack.com/@mlubich",
   ],
   knowsAbout: [
     "Artificial Intelligence",

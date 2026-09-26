@@ -503,13 +503,17 @@ like a glow passing through", and it must stay subtle and cost nothing on scroll
 
 Gate: `__tests__/text-glow-pass.test.ts`.
 
-## Writing section: Substack pointer (2026-09-24)
+## Writing section: Substack pointer + subscribe embed (2026-09-24, updated 2026-09-25)
 
 `#writing` (nav "Writing", between Clients and Projects) is a small,
 non-intrusive section (`components/sections/substack.tsx`) reusing
-`AnimatedSection` + `SectionHeader`: one card linking the latest post, and a
-plain "Subscribe free" link to `mlubich.substack.com/subscribe`. No feed
-fetch, no popup, no modal.
+`AnimatedSection` + `SectionHeader`: one card linking the latest post, then
+Substack's own subscribe-box embed (`<iframe src="https://mlubich.substack.com/embed">`,
+lazy-loaded, transparent background, wrapped in the same
+`rounded-2xl border border-white/[0.08] bg-white/[0.03]` glass-card style as
+the rest of the section), plus plain links to the publication and to the
+Substack profile (`substack.com/@mlubich`). No feed fetch, no popup, no
+modal.
 
 - `lib/substack.ts` holds the publication constants and `LATEST_POST` as a
   hand-maintained pointer (title, url, one-line summary), not a live RSS
@@ -523,6 +527,37 @@ fetch, no popup, no modal.
   writing, blog posts, or opinions on AI/engineering.
 
 Gate: `__tests__/substack.test.ts`.
+
+## Follow section: X, LinkedIn, Substack, GitHub (2026-09-25)
+
+`#follow` (nav "Follow", right after Writing) is its own top-level section
+(`components/sections/follow.tsx`) — a "find me online" card grid, separate
+from the Writing section's Substack embed. Cards are driven by one
+`FOLLOW_CARDS` array (icon, name, description, action label/href, profile
+href), so adding another platform later (e.g. YouTube) is one array entry,
+not a new layout. Currently: X, LinkedIn, Substack (profile link + subscribe
+CTA), GitHub.
+
+No live feed embeds: X's logged-out timeline widget is unreliable and
+LinkedIn has no public profile-feed embed, so each card is a styled glass
+card (`rounded-2xl border border-white/[0.08] bg-white/[0.03]`, matching the
+rest of the site) with an icon, handle, one-line description, and an
+external "Follow" / "Connect" / "Subscribe" button (`min-h-[48px]`,
+`target="_blank"`, `rel="noopener noreferrer"`). Two columns on desktop
+(`sm:grid-cols-2`), stacked on mobile — verified at 375px with no horizontal
+scroll.
+
+- X has no lucide-react icon; `XIcon` (an inline SVG) lives in
+  `components/social-icons.tsx` and is reused here and in the Contact
+  section's social row.
+- The X, LinkedIn, and Substack profile URLs also appear in
+  `components/social-icons.tsx` (`SOCIAL_LINKS`), `components/sections/contact.tsx`,
+  `components/seo/json-ld.tsx` (Person `sameAs`), and `lib/ai/profile-tools.ts`
+  (`X_URL`, alongside `LINKEDIN_URL`/`GITHUB_URL`) — one set of real profile
+  URLs, referenced everywhere rather than re-typed.
+
+Gate: `__tests__/substack.test.ts` (`describe("Follow section")`,
+`describe("X (Twitter) presence")`).
 
 ## Motion polish pass: blur reveal, breathing orbs, grain, glass terminal (2026-09-24)
 

@@ -31,6 +31,9 @@ const ClientTestimonials = dynamic(
 const Writing = dynamic(() => import("@/components/sections/substack").then(m => m.Writing), {
   loading: () => <SectionSkeleton />,
 })
+const Follow = dynamic(() => import("@/components/sections/follow").then(m => m.Follow), {
+  loading: () => <SectionSkeleton />,
+})
 const Projects = dynamic(() => import("@/components/sections/projects").then(m => m.Projects), {
   loading: () => <SectionSkeleton />,
 })
@@ -106,6 +109,9 @@ export default function Home() {
         <LazySection sectionId="writing" className={`min-h-[760px] md:min-h-[620px] ${LAZY_SECTION_TOP}`}>
           <Writing />
         </LazySection>
+        <LazySection sectionId="follow" className={`min-h-[900px] md:min-h-[560px] ${LAZY_SECTION_TOP}`}>
+          <Follow />
+        </LazySection>
         <LazySection
           sectionId="projects"
           className={`min-h-[1660px] md:min-h-[1870px] border-t border-white/[0.06] ${LAZY_SECTION_TOP}`}
@@ -160,6 +166,7 @@ export default function Home() {
             <li><a href="#consulting">Consulting — client sites and engagements</a></li>
             <li><a href="#testimonials">Client feedback — past consulting engagements</a></li>
             <li><a href="#writing">Writing — essays on Substack about AI and engineering</a></li>
+            <li><a href="#follow">Follow — X, LinkedIn, Substack, and GitHub</a></li>
             <li><a href="#research">Research Publications</a></li>
             <li><a href="#contact">Contact</a></li>
             <li><Link href="/blog">AI Engineering Blog — Perspectives on LLMs, MLOps & Production ML</Link></li>
