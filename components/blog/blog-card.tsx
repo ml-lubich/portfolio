@@ -5,7 +5,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { formatBlogDate, type BlogPostListItem } from "@/lib/blog-shared"
-import { overlays, shadows, blogBg } from "@/lib/theme"
+import { overlays, blogBg } from "@/lib/theme"
 
 interface BlogCardProps {
   post: BlogPostListItem
@@ -135,7 +135,7 @@ export function BlogCard({
           onTouchEnd={handleTouchEnd}
           style={cardMotionStyle}
         >
-          <article className={`blog-glass-card relative overflow-hidden rounded-2xl transition-all duration-500 hover:shadow-[${shadows.blogCardFeatured}]`}>
+          <article className={`blog-glass-card relative overflow-hidden rounded-2xl transition-all duration-500 glow-blog-featured`}>
             <div
               ref={glareRef}
               className="pointer-events-none absolute inset-0 z-20 rounded-2xl"
@@ -204,7 +204,7 @@ export function BlogCard({
       style={cardMotionStyle}
     >
       <Link href={postHref} className="group block h-full cursor-pointer" {...linkWarmHandlers}>
-        <article className={`blog-glass-card flex h-full min-h-[430px] flex-col overflow-hidden rounded-xl transition-all duration-500 hover:shadow-[${shadows.blogCardSmall}]`}>
+        <article className={`blog-glass-card flex h-full min-h-[430px] flex-col overflow-hidden rounded-xl transition-all duration-500 glow-blog-small`}>
           <div
             ref={glareRef}
             className="pointer-events-none absolute inset-0 z-20 rounded-xl"

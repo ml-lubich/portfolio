@@ -297,18 +297,18 @@ export function LiveTerminal() {
         </div>
 
         {/* Terminal window */}
-        <div className={`rounded-xl border border-white/[0.08] bg-[${terminalChrome.bg}] shadow-2xl shadow-black/30 overflow-hidden backdrop-blur-xl`}>
+        <div className="rounded-xl border border-white/[0.08] shadow-2xl shadow-black/30 overflow-hidden backdrop-blur-xl" style={{ backgroundColor: terminalChrome.bg }}>
           {/* Subtle top-edge glow */}
           <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent z-10" />
           {/* Title bar */}
-          <div className={`px-2.5 sm:px-4 py-2 sm:py-2.5 bg-[${terminalChrome.headerBg}] border-b border-white/[0.06]`}>
+          <div className="px-2.5 sm:px-4 py-2 sm:py-2.5 border-b border-white/[0.06]" style={{ backgroundColor: terminalChrome.headerBg }}>
             {/* Desktop: single row */}
             <div className="hidden sm:flex items-center justify-between gap-2 min-w-0">
               <div className="flex items-center gap-2 min-w-0">
                 <div className="flex gap-1.5 shrink-0">
-                  <div className={`w-3 h-3 rounded-full bg-[${terminalChrome.dotClose}]`} />
-                  <div className={`w-3 h-3 rounded-full bg-[${terminalChrome.dotMinimize}]`} />
-                  <div className={`w-3 h-3 rounded-full bg-[${terminalChrome.dotExpand}]`} />
+                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: terminalChrome.dotClose }} />
+                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: terminalChrome.dotMinimize }} />
+                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: terminalChrome.dotExpand }} />
                 </div>
                 <span className="ml-3 text-xs text-muted-foreground/50 font-mono truncate min-w-0">
                   misha@dev ~ {isSnakeMode ? "snake.play" : isShellMode ? "interactive shell" : cur?.label}
@@ -333,9 +333,9 @@ export function LiveTerminal() {
             <div className="sm:hidden">
               <div className="flex items-center gap-2">
                 <div className="flex gap-1.5 shrink-0">
-                  <div className={`w-2.5 h-2.5 rounded-full bg-[${terminalChrome.dotClose}]`} />
-                  <div className={`w-2.5 h-2.5 rounded-full bg-[${terminalChrome.dotMinimize}]`} />
-                  <div className={`w-2.5 h-2.5 rounded-full bg-[${terminalChrome.dotExpand}]`} />
+                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: terminalChrome.dotClose }} />
+                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: terminalChrome.dotMinimize }} />
+                  <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: terminalChrome.dotExpand }} />
                 </div>
                 <span className="ml-1 text-[10px] text-muted-foreground/50 font-mono min-w-0">
                   misha@dev ~ {isSnakeMode ? "snake.play" : isShellMode ? "interactive shell" : cur?.label}
@@ -400,7 +400,7 @@ export function LiveTerminal() {
           </div>
 
           {/* Footer */}
-          <div className={`px-2.5 sm:px-4 py-1 bg-[${terminalChrome.footerBg}] border-t border-white/[0.04] flex items-center justify-between text-[10px] font-mono text-muted-foreground/60`}>
+          <div className="px-2.5 sm:px-4 py-1 border-t border-white/[0.04] flex items-center justify-between text-[10px] font-mono text-muted-foreground/60" style={{ backgroundColor: terminalChrome.footerBg }}>
             <span>SESSION {activeSession + 1}/{S.length}</span>
             <span>{isSnakeMode ? "snake — local" : isShellMode ? "bash — 80×24" : "zsh — 80×24"}</span>
           </div>

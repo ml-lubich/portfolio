@@ -2,7 +2,6 @@
 
 import React from "react"
 import { BLOG_CATEGORIES } from "@/lib/blog-shared"
-import { shadows } from "@/lib/theme"
 
 interface BlogFilterProps {
   activeCategory: string
@@ -24,7 +23,7 @@ export function BlogFilter({ activeCategory, onCategoryChange }: BlogFilterProps
           aria-selected={activeCategory === cat}
           aria-label={`Filter by ${cat}`}
           className={`shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-all duration-300 ${activeCategory === cat
-            ? `bg-primary text-primary-foreground shadow-[${shadows.filterActive}]`
+            ? `bg-primary text-primary-foreground glow-filter-active`
             : "border border-white/[0.06] bg-white/[0.03] text-muted-foreground backdrop-blur-sm hover:border-primary/30 hover:text-foreground hover:bg-white/[0.06]"
             }`}
         >
@@ -53,7 +52,7 @@ export function BlogTagFilter({ activeTags, onTagToggle, allTags }: BlogTagFilte
             onClick={() => onTagToggle(tag)}
             aria-pressed={isActive}
             className={`rounded-full px-3 py-1 text-xs font-medium transition-all duration-300 ${isActive
-              ? `bg-accent/20 text-accent border border-accent/40 shadow-[${shadows.filterTag}]`
+              ? `bg-accent/20 text-accent border border-accent/40 glow-filter-tag`
               : "border border-white/[0.04] bg-white/[0.02] text-muted-foreground/70 backdrop-blur-sm hover:border-accent/20 hover:text-muted-foreground hover:bg-white/[0.04]"
               }`}
           >

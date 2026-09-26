@@ -10,6 +10,7 @@ All notable changes to this project are documented here.
 
 ### Added
 
+- About terminal rewrites itself: the `~/about — misha.bio` card types a bio, holds it, erases it and types the next from a bank of six (`data/about-bio.ts`), forever. Fixed height, pauses off-screen, static first bio under reduced motion. Gates: `__tests__/about-bio-loop.test.ts`, `e2e/about-terminal.spec.ts`.
 - Text glow-pass on scroll (desktop only): section body copy picks up a soft accent glow as it crosses the middle of the viewport. Pure CSS scroll-driven animation (`animation-timeline: view()`), no JS or scroll listener; gated to ≥1024px + fine pointer + hover + motion allowed, so phones/tablets never run it. Section `overflow-hidden` becomes `overflow: clip` in that band so `view()` tracks the page; card/marquee copy is excluded. Guard: `__tests__/text-glow-pass.test.ts`.
 - Agents-build easter egg: type `agents` (or open `#agents`) to spawn predetermined UI “builds” with shuffled order/timing; Esc dismisses. Idle = no DOM. Resume download CTA gated in `__tests__/agents-build-egg.test.ts`.
 - Open-Source Showcase leading `#projects`: animated terminal demos of the public CLI/MCP tool family (imsg-mcp, imail-mcp, inotes-mcp, wa-mcp, bitbucket-cli, twig, confluence-cli, like-fable) using real documented commands with plausible output, per-project stats, copyable install strings, and DetailPanel architecture deep-dives. Only one demo types at a time (highest-intersection card); `prefers-reduced-motion` renders finished frames with no typing loop. New layers: `data/oss-demos.ts` → `lib/demo-terminal.ts` (pure scheduler) → `components/terminal/demo-terminal.tsx` → `oss-demo-card.tsx` → `open-source-showcase.tsx`; the existing marquee remains below as "Selected Work".
@@ -17,6 +18,9 @@ All notable changes to this project are documented here.
 
 ### Fixed
 
+- Terminal traffic lights, the main terminal's window/header/footer colours, and six blog glows never rendered: they were interpolated Tailwind classes, which Tailwind never generates. Now inline styles / plain CSS classes, with a repo-wide guard (`__tests__/terminal-chrome.test.ts`).
+- Hero: removed the floating `~/oss` terminal card (the OSS demo lives in the Open-Source section).
+- Install marquee copy button has its own accessible name ("Copy current install command"), no longer colliding with the imsg card's.
 - Navbar no longer clips "Get In Touch" on iPads: the inline link row assumed desktop from `lg:` (1024px) while 11 links + two dropdowns + the CTA need ≥1280px. The link row, hamburger toggle, and mobile overlay all moved to `xl:` together (the overlay's `lg:hidden` alone would have force-hidden the opened menu in exactly that band). New `e2e/tablet-responsive.spec.ts` guards five tablet widths against nav clipping and horizontal page overflow.
 - Journey/Research card details no longer open below the fold on tablets: the scroll-stack detail panel rendered inline under the full card column and relied on a `scrollIntoView` nudge (the "made to scroll down, flaky" bug). At compact widths ≥768px it is now a fixed right-edge drawer — in-viewport by construction — with the phone full-viewport layer and desktop centered modal unchanged; duplicated dismiss/height bookkeeping in the two scroll-stack variants collapsed into one shared hook.
 

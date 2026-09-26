@@ -53,6 +53,8 @@ All changes ship to the `dev` branch first. Do not push directly to production o
 | Blog date hydration mismatch | Local timezone formatting | Use the shared UTC blog date formatter. |
 | Missing local media | Broken `public/` reference | Run `bun run test` and fix the failing resource-reference test. |
 | Navbar flicker over hero | Scroll surface regression | Check `lib/nav-hero-surface.ts` and `__tests__/nav-hero-surface.test.ts`. |
+| `uncaughtException TypeError: Cannot read properties of undefined (reading 'length')` during `next build --webpack` (pre-commit) or the Playwright web server "was not able to start" (pre-push) | Leftover `.next` / `.next-e2e` build cache from an earlier build | `rm -rf .next .next-e2e` (both are git-ignored caches), then rerun. |
+| Colour or shadow silently missing | Interpolated Tailwind class (`bg-[${…}]`) — never generated | Use `style` or a CSS class; `__tests__/terminal-chrome.test.ts` points at the line. |
 
 ## Credentials
 

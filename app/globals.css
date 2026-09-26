@@ -679,6 +679,29 @@
   transition-delay: 720ms;
 }
 
+/* ── Blog glows ────────────────────────────────────────────────────
+ *  Plain CSS, not `shadow-[${token}]`: Tailwind only generates classes it
+ *  can read literally, so the interpolated versions never existed and these
+ *  glows never rendered. Colours follow the theme's --primary / --accent. */
+.glow-blog-featured:hover {
+  box-shadow: 0 0 60px hsl(var(--primary) / 0.1), 0 0 120px hsl(var(--accent) / 0.05);
+}
+.glow-blog-small:hover {
+  box-shadow: 0 0 40px hsl(var(--primary) / 0.08), 0 0 80px hsl(var(--accent) / 0.04);
+}
+.glow-blog-share:hover {
+  box-shadow: 0 0 15px hsl(var(--primary) / 0.1);
+}
+.glow-blog-avatar {
+  box-shadow: 0 0 20px hsl(var(--primary) / 0.2);
+}
+.glow-filter-active {
+  box-shadow: 0 0 20px hsl(var(--primary) / 0.3);
+}
+.glow-filter-tag {
+  box-shadow: 0 0 12px hsl(var(--accent) / 0.2);
+}
+
 /* Rainbow gradient text */
 .rainbow-text {
   background: linear-gradient(90deg,

@@ -219,12 +219,6 @@ export const shadows = {
     cardHover: `0 30px 80px -12px rgba(0,0,0,0.4), 0 0 50px -8px hsla(${hslComma(hsl.primary)},0.12)`,
     cardDrag: (dy: number) =>
         `0 ${30 + Math.abs(dy) * 0.2}px 80px -12px rgba(0,0,0,0.45), 0 0 60px -10px hsla(${hslComma(hsl.primary)},0.15)`,
-    blogCardFeatured: `0_0_60px_hsla(${hslComma(hsl.primary)},0.1),0_0_120px_hsla(${hslComma(hsl.accent)},0.05)`,
-    blogCardSmall: `0_0_40px_hsla(${hslComma(hsl.primary)},0.08),0_0_80px_hsla(${hslComma(hsl.accent)},0.04)`,
-    blogAvatar: `0_0_20px_hsla(${hslComma(hsl.primary)},0.2)`,
-    blogShare: `0_0_15px_hsla(${hslComma(hsl.primary)},0.1)`,
-    filterActive: `0_0_20px_hsla(${hslComma(hsl.primary)},0.3)`,
-    filterTag: `0_0_12px_hsla(${hslComma(hsl.accent)},0.2)`,
     textGlow: `0 0 6px hsla(${hslComma(hsl.primary)},0.4)`,
 } as const
 

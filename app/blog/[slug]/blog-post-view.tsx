@@ -5,7 +5,6 @@ import Link from "next/link"
 import Image from "next/image"
 import { AUTHOR, formatBlogDate, type BlogPost, type BlogPostListItem } from "@/lib/blog-shared"
 import { BlogCard } from "@/components/blog/blog-card"
-import { shadows } from "@/lib/theme"
 import { SITE_URL } from "@/lib/site-config"
 
 interface BlogPostViewProps {
@@ -71,7 +70,7 @@ export function BlogPostView({ post, relatedPosts, children }: BlogPostViewProps
             </p>
 
             <div className="mt-6 flex items-center gap-4" itemProp="author" itemScope itemType="https://schema.org/Person">
-              <div className={`relative h-10 w-10 overflow-hidden rounded-full ring-2 ring-primary/20 shadow-[${shadows.blogAvatar}]`}>
+              <div className={`relative h-10 w-10 overflow-hidden rounded-full ring-2 ring-primary/20 glow-blog-avatar`}>
                 <Image
                   src="/profile_blog.png"
                   alt={AUTHOR.name}
@@ -141,7 +140,7 @@ export function BlogPostView({ post, relatedPosts, children }: BlogPostViewProps
                 href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(post.title)}&url=${encodeURIComponent(`${SITE_URL}/blog/${post.slug}`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`rounded-lg border border-white/[0.06] bg-white/[0.03] p-2 text-muted-foreground backdrop-blur-sm transition-all hover:border-primary/20 hover:text-foreground hover:shadow-[${shadows.blogShare}]`}
+                className={`rounded-lg border border-white/[0.06] bg-white/[0.03] p-2 text-muted-foreground backdrop-blur-sm transition-all hover:border-primary/20 hover:text-foreground glow-blog-share`}
                 aria-label="Share on Twitter"
               >
                 <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -152,7 +151,7 @@ export function BlogPostView({ post, relatedPosts, children }: BlogPostViewProps
                 href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(`${SITE_URL}/blog/${post.slug}`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`rounded-lg border border-white/[0.06] bg-white/[0.03] p-2 text-muted-foreground backdrop-blur-sm transition-all hover:border-primary/20 hover:text-foreground hover:shadow-[${shadows.blogShare}]`}
+                className={`rounded-lg border border-white/[0.06] bg-white/[0.03] p-2 text-muted-foreground backdrop-blur-sm transition-all hover:border-primary/20 hover:text-foreground glow-blog-share`}
                 aria-label="Share on LinkedIn"
               >
                 <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
