@@ -29,8 +29,11 @@ test("only ever one role line exists, through several swaps", async ({ page }) =
   let worst = 0
   let worstAt: string[] = []
 
-  // ~24s covers two holds and the swaps between them (7.6s hold each).
-  for (let i = 0; i < 240; i++) {
+  // 24s of wall time covers two holds and the swaps between them (7.6s hold
+  // each). Bounded by the clock, not an iteration count: each sample is a page
+  // round-trip, and on a loaded machine 240 of them overran the 90s timeout.
+  const until = Date.now() + 24_000
+  while (Date.now() < until) {
     const now = await lines(page)
     if (now.length > worst) {
       worst = now.length

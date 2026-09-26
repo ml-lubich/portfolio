@@ -114,3 +114,7 @@ No automated visual regression for WebGL is required unless a dedicated snapshot
 ## Automated: no interpolated Tailwind classes
 
 - `__tests__/terminal-chrome.test.ts` — fails on any `-[${…}]` class in `components/` or `app/`. Tailwind only generates classes it can read literally, so an interpolated arbitrary value (`bg-[${terminalChrome.dotClose}]`, `shadow-[${shadows.filterTag}]`) is never generated and silently renders nothing — that is how the terminals' traffic lights and the blog's glows went missing. Theme colours go in `style={{ … }}`; hover/state effects go in a plain CSS class in `app/globals.css`. Also server-renders `TerminalReveal` to check its dots and panel carry real colours, and checks the install marquee's copy button never shares an accessible name with a card's copy button (two identical names failed `e2e/oss-tool-grid.spec.ts` in strict mode and are ambiguous to screen readers).
+
+## E2E timing rule: bound sampling loops by the clock
+
+A spec that samples the page in a loop must stop on elapsed wall time (`const until = Date.now() + N; while (Date.now() < until)`), never on an iteration count. Each sample is a browser round-trip, so on a loaded machine a fixed count stretches past the test timeout — `e2e/hero-role-rotator.spec.ts` (240 × 100ms) timed out at 90s under a full pre-push run while passing alone.
