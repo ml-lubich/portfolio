@@ -121,4 +121,35 @@ describe("mobile performance guardrails", () => {
   it("keeps brain resize listeners width-only", () => {
     expect(_src_brainFiles().every((src) => src.includes("subscribeWidthResize"))).toBe(true)
   })
+
+  /* MLBot (react-markdown + recharts + its own icon set, 150KB+) used to be a
+     static import in the root layout, so every route's first load paid for
+     it whether or not the panel was ever opened — measured before this fix:
+     ~155KB of it showed up as unused JS on the homepage per Lighthouse. */
+  it("keeps MLBot out of the layout's static imports", () => {
+    expect(source("app/layout.tsx")).not.toMatch(/^import\s+\{[^}]*MLBot[^}]*\}\s+from\s+["']@\/components\/ai-chat\/mlbot["']/m)
+    expect(source("app/layout.tsx")).toContain("LazyMLBot")
+  })
+
+  it("keeps MLBot's chunk fetch deferred until idle, not mounted on first paint", () => {
+    const src = source("components/ai-chat/mlbot-lazy.tsx")
+    expect(src).toContain("requestIdleCallback")
+    expect(src).toContain('ready ? <MLBot /> : null')
+  })
+
+  it("keeps the hero's mlbot:open CTA working before MLBot has idled in", () => {
+    // The lazy wrapper must mount immediately on open-intent, not wait for
+    // idle, or an early tap on the hero CTA is a silent no-op.
+    expect(source("components/ai-chat/mlbot-lazy.tsx")).toContain('window.addEventListener("mlbot:open", onOpenIntent)')
+  })
+
+  /* A failed background chunk fetch (stale hash after a redeploy, an
+     ad-blocker rule, a flaky mobile connection) must not take down a page
+     that already rendered successfully — it should leave the chat
+     affordance absent, not replace the whole page with app/error.tsx. */
+  it("keeps a failed MLBot chunk fetch from crashing the whole page", () => {
+    const src = source("components/ai-chat/mlbot-lazy.tsx")
+    expect(_has_all(src, ["getDerivedStateFromError", "componentDidCatch"])).toBe(true)
+    expect(src).toContain("<ChatLoadBoundary>")
+  })
 })

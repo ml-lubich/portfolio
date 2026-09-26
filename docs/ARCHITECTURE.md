@@ -69,6 +69,7 @@ Logical coordinate space: 1000×700px. Canvas applies `ctx.scale(clientW/1000, c
 | **Empty-final recovery** | `finalizeAssistantTurn` | Tools with no following text → grounded fallback from tool JSON. Fallback lists project names, not job titles, when both are present. |
 | **Tools** | `lib/ai/profile-tools.ts` | Structured lookups over `data/*`. `searchTerms` stems plurals; a name hit outranks a body hit so “agents” surfaces Case Triage Agent over a role that merely mentions agents. |
 | **Panel** | `components/ai-chat/mlbot.tsx` | Renders `event: tool` labels and streamed `text`. |
+| **Lazy mount** | `components/ai-chat/mlbot-lazy.tsx` | Root layout renders this, not `MLBot` directly. `MLBot`'s module graph (react-markdown, recharts, its own icons) is code-split via `next/dynamic` and its fetch deferred to `requestIdleCallback` — the panel starts closed, so nothing is lost by not shipping it on first paint. A `mlbot:open` dispatch (the hero CTA) before the idle callback fires mounts immediately instead of waiting, then replays the event so the freshly-mounted panel still opens. |
 
 ## AI tools
 
