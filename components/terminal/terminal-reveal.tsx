@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState, type ReactNode } from "react"
+import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react"
 import { motion, useInView } from "framer-motion"
 import { terminalChrome } from "@/lib/theme"
 
@@ -88,34 +88,7 @@ export function TerminalReveal({
     }, [started, done, revealedLines, currentLineChars, lines.length, plainLines, charSpeed, linePause])
 
     return (
-        <motion.div
-            ref={ref}
-            initial={{ opacity: 0, y: 30, rotateX: 4 }}
-            animate={isInView ? { opacity: 1, y: 0, rotateX: 0 } : {}}
-            transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
-            className={`perspective-[1200px] ${className}`}
-        >
-            {/* `h-full` + column flex so the card fills a definite-height parent
-                (see About, where it sits beside the portrait and has to match
-                its height). With an auto-height parent this resolves to auto,
-                so every other usage is unaffected. */}
-            <div className={`relative flex h-full flex-col overflow-hidden rounded-xl border border-white/[0.08] bg-[${terminalChrome.revealBg}] shadow-2xl shadow-black/40 backdrop-blur-xl`}>
-                {/* Subtle top-edge glow */}
-                <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
-
-                {/* Title bar */}
-                <div className="flex items-center gap-2 border-b border-white/[0.06] px-4 py-2.5">
-                    {/* Traffic lights */}
-                    <span className="flex gap-1.5">
-                        <span className={`h-2.5 w-2.5 rounded-full bg-[${terminalChrome.dotClose}]/90`} />
-                        <span className={`h-2.5 w-2.5 rounded-full bg-[${terminalChrome.dotMinimize}]/90`} />
-                        <span className={`h-2.5 w-2.5 rounded-full bg-[${terminalChrome.dotExpand}]/90`} />
-                    </span>
-                    <span className="ml-2 font-mono text-[11px] text-muted-foreground/60 select-none">
-                        {title}
-                    </span>
-                </div>
-
+        <TerminalWindow ref={ref} visible={isInView} title={title} className={className}>
                 {/* Terminal body */}
                 <div className={`flex-1 px-5 py-4 font-mono text-sm leading-relaxed ${bodyMinHeight}`}>
                     {lines.map((line, i) => {
@@ -169,6 +142,61 @@ export function TerminalReveal({
                         <span className="inline-block w-[7px] h-[1.1em] align-middle bg-emerald-400 animate-terminal-blink" />
                     </div>
                 </div>
+
+        </TerminalWindow>
+    )
+}
+
+/** The window around every terminal card — fade-up entrance, glass panel,
+ *  traffic lights, title bar. The body is the caller's. */
+export function TerminalWindow({
+    ref,
+    visible,
+    title,
+    className = "",
+    children,
+}: {
+    ref: RefObject<HTMLDivElement | null>
+    visible: boolean
+    title: string
+    className?: string
+    children: ReactNode
+}) {
+    return (
+        <motion.div
+            ref={ref}
+            initial={{ opacity: 0, y: 30, rotateX: 4 }}
+            animate={visible ? { opacity: 1, y: 0, rotateX: 0 } : {}}
+            transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
+            className={`perspective-[1200px] ${className}`}
+        >
+            {/* `h-full` + column flex so the card fills a definite-height parent
+                (see About, where it sits beside the portrait and has to match
+                its height). With an auto-height parent this resolves to auto,
+                so every other usage is unaffected. */}
+            {/* Chrome colours inline: an interpolated arbitrary-value class is invisible
+                to Tailwind's scanner, so it was never generated and the dots rendered blank. */}
+            <div
+                className="relative flex h-full flex-col overflow-hidden rounded-xl border border-white/[0.08] shadow-2xl shadow-black/40 backdrop-blur-xl"
+                style={{ backgroundColor: terminalChrome.revealBg }}
+            >
+                {/* Subtle top-edge glow */}
+                <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
+
+                {/* Title bar */}
+                <div className="flex items-center gap-2 border-b border-white/[0.06] px-4 py-2.5">
+                    {/* Traffic lights */}
+                    <span className="flex gap-1.5">
+                        <span className="h-2.5 w-2.5 rounded-full opacity-90" style={{ backgroundColor: terminalChrome.dotClose }} />
+                        <span className="h-2.5 w-2.5 rounded-full opacity-90" style={{ backgroundColor: terminalChrome.dotMinimize }} />
+                        <span className="h-2.5 w-2.5 rounded-full opacity-90" style={{ backgroundColor: terminalChrome.dotExpand }} />
+                    </span>
+                    <span className="ml-2 font-mono text-[11px] text-muted-foreground/60 select-none">
+                        {title}
+                    </span>
+                </div>
+
+                {children}
 
                 {/* Subtle inner glow on bottom-right */}
                 <div className="pointer-events-none absolute -bottom-20 -right-20 h-40 w-40 rounded-full bg-emerald-500/5 blur-3xl" />

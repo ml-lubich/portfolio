@@ -81,6 +81,25 @@ export function installCycleFrame(
     return { index: commands.length - 1, shown: "", erasing: false }
 }
 
+export interface LinesFrame {
+    /** Index into `scripts` of the block currently on screen. */
+    index: number
+    /** Visible lines — finished lines whole, the last one as far as it's typed. */
+    lines: string[]
+    erasing: boolean
+}
+
+/** Same type / hold / erase / next loop for multi-line blocks (the About bio):
+ *  each block is typed as one string with `\n` breaks, then split back into lines. */
+export function linesCycleFrame(
+    scripts: string[][],
+    elapsedMs: number,
+    t: CycleTimings = DEFAULT_CYCLE,
+): LinesFrame {
+    const f = installCycleFrame(scripts.map((s) => s.join("\n")), elapsedMs, t)
+    return { index: f.index, lines: f.shown.split("\n"), erasing: f.erasing }
+}
+
 export interface BrandPart {
     text: string
     /** True for the segments that spell the owner's handle — the page paints these. */

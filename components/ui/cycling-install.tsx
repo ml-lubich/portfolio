@@ -158,7 +158,7 @@ export function CyclingInstall({ items, accentOf, className = "" }: CyclingInsta
                 <button
                     type="button"
                     onClick={copy}
-                    aria-label={`Copy install command: ${command}`}
+                    aria-label={`Copy current install command: ${command}`}
                     className="inline-flex shrink-0 items-center gap-1.5 border-l border-white/[0.08] px-3 font-mono text-[10px] uppercase tracking-wider text-foreground/70 transition-colors hover:bg-white/[0.06] hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary/60"
                 >
                     {copied ? <Check className="h-3.5 w-3.5 text-emerald-400" aria-hidden /> : <Copy className="h-3.5 w-3.5" aria-hidden />}

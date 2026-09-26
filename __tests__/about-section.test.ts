@@ -8,9 +8,10 @@ describe("about — content", () => {
     it("leads with the current EchoStar role", () => {
         expect(source).toMatch(/Staff AI Engineer/)
         expect(source).toMatch(/EchoStar/)
-        // The terminal is the first thing read; it must open on EchoStar.
-        const firstLine = source.slice(source.indexOf("const bio = ["), source.indexOf("const bio = [") + 200)
-        expect(firstLine).toMatch(/EchoStar/)
+        // The terminal is the first thing read; its first bio must open on EchoStar.
+        const bank = readFileSync(join(process.cwd(), "data/about-bio.ts"), "utf8")
+        const firstBio = bank.slice(bank.indexOf("BIO_SCRIPTS"), bank.indexOf("BIO_SCRIPTS") + 200)
+        expect(firstBio).toMatch(/EchoStar/)
     })
 
     it("says staff in under 3 years — never Anduril/Mach chosen-over", () => {
@@ -124,19 +125,7 @@ describe("about — calm, not liquid glass", () => {
 })
 
 describe("about — not a wall of text", () => {
-    const bioBlock = source.slice(source.indexOf("const bio = ["), source.indexOf("]\n", source.indexOf("const bio = [")))
-    const bioLines = [...bioBlock.matchAll(/^\s*"(.*)",$/gm)].map((m) => m[1])
-
-    it("types at most four bio lines", () => {
-        expect(bioLines.length).toBeGreaterThan(0)
-        expect(bioLines.length).toBeLessThanOrEqual(4)
-    })
-
-    it("keeps every bio line short enough to sit on one row", () => {
-        for (const line of bioLines) {
-            expect(line.length, `bio line too long: "${line}"`).toBeLessThanOrEqual(72)
-        }
-    })
+    // Bio line count/length per bio: __tests__/about-bio-loop.test.ts.
 
     it("keeps the section subtitle to a single short sentence pair", () => {
         const subtitle = source.match(/subtitle="([^"]+)"/)?.[1] ?? ""

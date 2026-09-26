@@ -1,22 +1,18 @@
 "use client"
 
-import { memo } from "react"
 import { GraduationCap, BookOpen, Users, Code2, Award, Briefcase } from "lucide-react"
 import Image from "next/image"
 import { useReducedMotion } from "framer-motion"
 import { AnimatedSection } from "../animations/animated-section"
 import { AnimatedCounter } from "../animations/animated-counter"
 import { SectionHeader } from "../layout/section-header"
-import { TerminalReveal as TerminalRevealImpl } from "../terminal/terminal-reveal"
+import { TerminalLoop } from "../terminal/terminal-loop"
+import { BIO_SCRIPTS, BIO_CYCLE } from "@/data/about-bio"
 
-/* memo: TerminalReveal's typing loop re-arms its timers on every render, so a
-   parent re-render inside the ~300ms line pause cancels it and the typing
-   stalls at the end of a line. Stable props + memo keep re-renders out.
-   Static import, not dynamic({ ssr: false }): a client-only chunk mounted the
+/* Static import, not dynamic({ ssr: false }): a client-only chunk mounted the
    card (435px on a phone) AFTER the section was on screen, shoving everything
-   below it — the page "scrolling by itself". Its first render is deterministic
-   (typing starts from useInView), so SSR is safe and it lands at full height. */
-const TerminalReveal = memo(TerminalRevealImpl)
+   below it — the page "scrolling by itself". TerminalLoop sizes its body to
+   the tallest bio from the first render, so SSR lands it at full height. */
 
 const highlights = [
   {
@@ -69,19 +65,6 @@ const highlights = [
   },
 ]
 
-/* Typed into the terminal. Four short lines that each fit one row — the six
-   wrapping lines this replaced read as a wall. The facts they carried that
-   aren't here are in the tiles below (6 papers, the agent-tool family). */
-const bio = [
-  "EchoStar — Staff AI in under 3 years · consumer telecom.",
-  "Before: Polaris Wireless, Apple, Walmart, LBNL, Honda Innovations.",
-  "300M+ customers reached · $100M+ Walmart ad-tech revenue · 6 papers.",
-  "Co-founded Equiverse.ml — tooling for 5,000+ underrepresented students.",
-]
-/* Non-string lines skip TerminalReveal's per-character loop, so this reveals
-   the whole bio at once for reduced-motion visitors. Built once: the memo
-   above only holds if the prop is referentially stable. */
-const bioStatic = bio.map((l, i) => <span key={i}>{l}</span>)
 
 /* Static "now" strip under the terminal — the facts that don't need typing. */
 const now = [
@@ -131,14 +114,13 @@ export function About() {
           </div>
 
           <div className="flex min-w-0 flex-1 flex-col gap-4">
-            <TerminalReveal
-              bodyMinHeight="min-h-[140px]"
+            {/* Rewrites itself from the bio bank in data/about-bio.ts — type, hold,
+                erase, next. Reduced motion gets the first bio, static. */}
+            <TerminalLoop
+              scripts={BIO_SCRIPTS}
+              timings={BIO_CYCLE}
               title="~/about — misha.bio"
               prompt=">"
-              charSpeed={reduce ? 0 : 14}
-              linePause={reduce ? 0 : 320}
-              startDelay={reduce ? 0 : 400}
-              lines={reduce ? bioStatic : bio}
             />
 
             {/* Two columns, two rows — the strip grows with the taller portrait
