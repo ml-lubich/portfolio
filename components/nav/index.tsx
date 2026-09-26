@@ -451,9 +451,9 @@ export function Navigation() {
       >
         <div
           className={[
-            // xl:max-w-7xl — the desktop link row turns on at xl (1280px) and
-            // needs more than max-w-6xl (1152px) can give it, or the CTA clips.
-            "nav-shell pointer-events-auto mx-auto flex w-[calc(100%_-_1rem)] max-w-6xl items-center justify-between px-3 py-2 sm:w-[calc(100%_-_2rem)] sm:px-4 xl:max-w-7xl",
+            // xl:w-fit — the desktop capsule hugs logo + links instead of
+            // stretching edge to edge with a dead gap in the middle.
+            "nav-shell pointer-events-auto mx-auto flex w-[calc(100%_-_1rem)] max-w-6xl items-center justify-between px-3 py-2 sm:w-[calc(100%_-_2rem)] sm:px-4 xl:w-fit xl:max-w-7xl xl:gap-6",
             mobileOpen ? "relative z-[110]" : "",
           ].join(" ")}
         >

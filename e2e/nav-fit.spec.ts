@@ -36,6 +36,14 @@ for (const width of WIDTHS) {
       }
     })
 
+    // The shell hugs logo + pill; no wide empty gap between them.
+    const slack = await pill.evaluate((el) => {
+      const shell = el.closest(".nav-shell")!
+      const used = [...shell.children].reduce((sum, c) => sum + c.getBoundingClientRect().width, 0)
+      return shell.getBoundingClientRect().width - used
+    })
+    expect(slack, "empty space inside the nav shell (px)").toBeLessThanOrEqual(96)
+
     expect(result.clipped, "items clipped by the nav pill").toEqual([])
     expect(result.overflowing, "nav pill content overflows").toBe(false)
     expect(result.offscreen, "nav pill leaves the viewport").toBe(false)
