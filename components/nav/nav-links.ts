@@ -3,6 +3,8 @@
 export interface NavLink {
   label: string
   href: string
+  /** Shown inline in the desktop bar; the rest live under "More" so the row fits. */
+  primary?: true
 }
 
 export interface LiveTool {
@@ -13,18 +15,18 @@ export interface LiveTool {
 }
 
 export const navLinks: NavLink[] = [
-  { label: "About", href: "#about" },
-  { label: "Journey", href: "#journey" },
-  { label: "Consulting", href: "#consulting" },
+  { label: "About", primary: true, href: "#about" },
+  { label: "Journey", primary: true, href: "#journey" },
+  { label: "Consulting", primary: true, href: "#consulting" },
   { label: "Clients", href: "#testimonials" },
   { label: "Writing", href: "#writing" },
   { label: "Follow", href: "#follow" },
-  { label: "Projects", href: "#projects" },
+  { label: "Projects", primary: true, href: "#projects" },
   { label: "OSS", href: "#open-source" },
   { label: "Skills", href: "#skills" },
   { label: "Stats", href: "#github" },
   { label: "Research", href: "#research" },
-  { label: "Blog", href: "/blog" },
+  { label: "Blog", primary: true, href: "/blog" },
   { label: "Contact", href: "#contact" },
 ]
 

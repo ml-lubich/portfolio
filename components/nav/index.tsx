@@ -5,7 +5,7 @@ import { SiteLogoMark } from "@/components/site-logo-mark"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { LIGHT_MODE_ENABLED } from "@/lib/light-mode"
 import { Menu, X, ArrowRight, Zap, ChevronDown, ExternalLink, Gamepad2 } from "lucide-react"
-import { navLinks, liveTools, liveGames } from "./nav-links"
+import { navLinks, liveTools, liveGames, type NavLink } from "./nav-links"
 import { wooshScrollTo, navigateTo } from "./woosh-scroll"
 import { useActiveSection } from "./use-nav-hooks"
 import { ExpandingText } from "./expanding-text"
@@ -102,6 +102,93 @@ function ToolsDropdown() {
               <ExternalLink className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted-foreground/60 transition-colors group-hover/tool:text-muted-foreground/70" />
             </a>
           ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ── More dropdown (desktop) ─────────────────────────────────────
+   Secondary section links. The full list (12 links + Tools + Games + CTA)
+   needs ~1500px, wider than the shell, so only `primary` links sit inline. */
+
+function MoreDropdown({
+  links,
+  activeSection,
+  onLinkClick,
+}: {
+  links: NavLink[]
+  activeSection: string
+  onLinkClick: (e: React.MouseEvent<HTMLAnchorElement>, href: string) => void
+}) {
+  const [open, setOpen] = useState(false)
+  const wrapRef = useRef<HTMLDivElement>(null)
+  const hasActive = links.some((l) => activeSection === l.href.replace("#", ""))
+
+  useEffect(() => {
+    function onOutside(e: MouseEvent) {
+      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) {
+        setOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", onOutside)
+    return () => document.removeEventListener("mousedown", onOutside)
+  }, [])
+
+  return (
+    <div
+      ref={wrapRef}
+      className="relative"
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+    >
+      <button
+        type="button"
+        onClick={() => setOpen(o => !o)}
+        aria-expanded={open ? "true" : "false"}
+        className={[
+          "group/link relative isolate flex items-center gap-1 overflow-hidden whitespace-nowrap rounded-full border px-3 py-2 text-[13px] tracking-[0.01em] transition-[color,background-color,border-color,box-shadow] duration-150 ease-out 2xl:px-3.5 2xl:text-[14px]",
+          open || hasActive
+            ? "border-white/[0.12] bg-white/[0.10] font-medium text-foreground shadow-[0_10px_30px_-18px_rgba(255,255,255,0.8)]"
+            : "border-transparent text-muted-foreground hover:border-white/[0.08] hover:bg-white/[0.06] hover:text-foreground",
+        ].join(" ")}
+      >
+        More
+        <ChevronDown
+          className={[
+            "h-3 w-3 transition-transform duration-200",
+            open ? "rotate-180" : "rotate-0",
+          ].join(" ")}
+        />
+      </button>
+
+      <div
+        data-testid="nav-more-panel"
+        className={[
+          "absolute left-1/2 top-full z-[300] min-w-[180px] pt-2 -translate-x-1/2 transition-[opacity,transform,visibility] duration-150 ease-out",
+          open ? "pointer-events-auto visible translate-y-0 opacity-100" : "pointer-events-none invisible -translate-y-1 opacity-0",
+        ].join(" ")}
+      >
+        <div className="overflow-hidden rounded-2xl border border-[var(--line-soft)] bg-[var(--surface-1)] p-1.5 shadow-[0_20px_60px_-10px_rgba(0,0,0,0.7)] backdrop-blur-2xl">
+          {links.map((link) => {
+            const isActive = activeSection === link.href.replace("#", "")
+            return (
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={(e) => {
+                  setOpen(false)
+                  onLinkClick(e, link.href)
+                }}
+                className={[
+                  "block rounded-xl px-3 py-2 text-[13px] transition-colors",
+                  isActive ? "bg-white/[0.08] text-foreground" : "text-muted-foreground hover:bg-white/[0.04] hover:text-foreground",
+                ].join(" ")}
+              >
+                {link.label}
+              </a>
+            )
+          })}
         </div>
       </div>
     </div>
@@ -408,8 +495,8 @@ export function Navigation() {
           </a>
 
           {/* Desktop links */}
-          <div className="relative hidden items-center gap-1 rounded-full border border-white/[0.06] bg-black/[0.12] p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] xl:flex">
-            {navLinks.filter((l) => l.href !== "#contact").map((link) => {
+          <div data-testid="desktop-nav" className="relative hidden items-center gap-1 rounded-full border border-white/[0.06] bg-black/[0.12] p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] xl:flex">
+            {navLinks.filter((l) => l.primary).map((link) => {
               const isExternal = link.href.startsWith("/")
               const isActive = !isExternal && activeSection === link.href.replace("#", "")
 
@@ -433,6 +520,11 @@ export function Navigation() {
                 </a>
               )
             })}
+            <MoreDropdown
+              links={navLinks.filter((l) => !l.primary && l.href !== "#contact")}
+              activeSection={activeSection}
+              onLinkClick={handleLinkClick}
+            />
             <ToolsDropdown />
             <GamesDropdown />
             <a

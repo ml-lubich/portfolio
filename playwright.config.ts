@@ -16,6 +16,9 @@ import { defineConfig, devices } from "@playwright/test"
 //     already used" — or the two servers killed each other and it surfaced as
 //     ERR_CONNECTION_REFUSED, a failure that reads like broken code and is not.
 const PORT = Number(process.env.PLAYWRIGHT_PORT ?? 3900)
+// Per-port dist dir: a second run building into the first run's .next-e2e
+// would swap the build out from under its live server.
+const DIST = PORT === 3900 ? ".next-e2e" : `.next-e2e-${PORT}`
 
 export default defineConfig({
   testDir: "./e2e",
@@ -54,7 +57,7 @@ export default defineConfig({
     // Always rebuild: this is a push gate, so it must test the code that is
     // actually about to be pushed, not a stale server left over from a
     // previous run.
-    command: `PLAYWRIGHT_DIST_DIR=.next-e2e bunx next build --webpack && git checkout -- next-env.d.ts && PLAYWRIGHT_DIST_DIR=.next-e2e bunx next start -p ${PORT}`,
+    command: `PLAYWRIGHT_DIST_DIR=${DIST} bunx next build --webpack && git checkout -- next-env.d.ts && PLAYWRIGHT_DIST_DIR=${DIST} bunx next start -p ${PORT}`,
     url: `http://localhost:${PORT}`,
     reuseExistingServer: false,
     // Generous: covers a cold build (~2min measured) plus server boot under

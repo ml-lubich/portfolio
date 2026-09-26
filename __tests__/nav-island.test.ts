@@ -25,4 +25,10 @@ describe("island nav", () => {
         expect(css).toMatch(/@keyframes nav-island-in \{[\s\S]*?clip-path: inset\(0 50% 0 50% round/)
         expect(css).toMatch(/\(min-width: 1280px\) and \(prefers-reduced-motion: no-preference\) \{\s*\.nav-shell \{\s*animation: nav-island-in/)
     })
+
+    it("drops the clip once revealed, so dropdown panels and the CTA are not clipped", () => {
+        const decl = css.match(/animation: nav-island-in[^;]*;/)?.[0] ?? ""
+        expect(decl).toMatch(/\bbackwards\b/)
+        expect(decl).not.toMatch(/\b(both|forwards)\b/)
+    })
 })

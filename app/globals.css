@@ -1274,9 +1274,11 @@ nav[data-nav-scrolled="true"] .nav-shell {
   }
 }
 
+/* backwards, not both: a retained end-state clip-path keeps clipping the shell
+   forever, cutting off the CTA and hiding the Tools/Games/More panels below it. */
 @media (min-width: 1280px) and (prefers-reduced-motion: no-preference) {
   .nav-shell {
-    animation: nav-island-in 0.75s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: nav-island-in 0.75s cubic-bezier(0.16, 1, 0.3, 1) backwards;
   }
 }
 

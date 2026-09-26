@@ -62,6 +62,10 @@
 
 - `__tests__/nav-scroll-targets.test.ts` — every in-page anchor used anywhere in `app/`/`components/` (nav links, `navigateTo()` calls, `href="#…"`) must be reachable **before** lazy sections mount: either a `sectionId="…"` on its `LazySection` in `app/page.tsx` (renders an always-present `[data-section]` wrapper) or an always-mounted whitelist id (`hero`, `main-content`). Guards the "nav link looks dead" regression where a target section had no pre-mount placeholder.
 
+## Automated: desktop nav fit
+
+- `e2e/nav-fit.spec.ts` — at 1280–2560px every inline link, dropdown trigger and the "Get In Touch" CTA sit fully inside the nav pill and `.nav-shell` (no clipping), and every section link is reachable either inline or under "More". Run a parallel copy with `PLAYWRIGHT_PORT=<port>`, which also builds into its own `.next-e2e-<port>` dist dir.
+
 ## Automated: navbar surface over hero
 
 - `__tests__/nav-hero-surface.test.ts` — `computeNavPastHero` in `lib/nav-hero-surface.ts`: frosted mode only when `#hero`’s `getBoundingClientRect().bottom <= 0`; transparent while any part of the hero remains below the viewport top. Includes a shallow guard that `components/nav/index.tsx` still calls `computeNavPastHero` and retains blur-off vs blur-on class tokens.
