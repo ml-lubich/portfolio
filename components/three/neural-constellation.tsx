@@ -393,7 +393,6 @@ export function NeuralConstellation({ bars, metrics }: NeuralConstellationProps)
   }, [reduce, hovered, scrubbing, epoch, n])
 
   const active = hovered ?? cycled
-  const bar = nodeBars[active]
 
   const onEnter = (i: number) => setHovered(i)
   const onLeave = () => {
@@ -469,47 +468,59 @@ export function NeuralConstellation({ bars, metrics }: NeuralConstellationProps)
               </span>
             </div>
 
-            <div key={active} className="mt-3 flex flex-1 flex-col">
-              <h4 className="font-display text-2xl font-light leading-tight text-foreground">
-                {bar.label}
-              </h4>
-
-              <div className="mt-3 flex items-baseline gap-3">
-                <span className="font-display text-4xl font-light tabular-nums text-foreground">
-                  {bar.value}
-                  <span className="text-xl text-muted-foreground">%</span>
-                </span>
-                {bar.display && (
-                  <span className="rounded-full border border-white/[0.12] bg-white/[0.04] px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.16em] text-foreground/80">
-                    {bar.display}
-                  </span>
-                )}
-              </div>
-              <div className="mt-2 h-px w-full overflow-hidden bg-white/[0.08]">
+            {/* Every item stacks in the same grid cell — only the active one is
+                visible, but an `invisible` cell still sizes the grid track, so
+                the panel is always as tall as its longest item and never
+                resizes as the cycle moves between shorter/longer entries. */}
+            <div className="mt-3 grid flex-1">
+              {nodeBars.map((b, i) => (
                 <div
-                  className="h-full bg-foreground/70"
-                  style={{
-                    width: `${bar.value}%`,
-                    transition: "width .7s cubic-bezier(.16,1,.3,1)",
-                  }}
-                />
-              </div>
+                  key={i === active ? `${i}-active` : `${i}-idle`}
+                  className={`[grid-area:1/1] flex flex-col ${i === active ? "" : "invisible"}`}
+                  aria-hidden={i === active ? undefined : true}
+                >
+                  <h4 className="font-display text-2xl font-light leading-tight text-foreground">
+                    {b.label}
+                  </h4>
 
-              <ul className="mt-4 space-y-2">
-                {bar.details?.map((d, idx) => (
-                  <li
-                    key={idx}
-                    className="flex items-start gap-2.5 rounded-lg border border-white/[0.05] bg-white/[0.02] px-3 py-2"
-                    style={{
-                      animation: reduce ? undefined : "panel-slide-up 0.35s ease-out both",
-                      animationDelay: `${idx * 50}ms`,
-                    }}
-                  >
-                    <span className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-foreground/60" aria-hidden />
-                    <p className="text-xs leading-relaxed text-muted-foreground">{d}</p>
-                  </li>
-                ))}
-              </ul>
+                  <div className="mt-3 flex items-baseline gap-3">
+                    <span className="font-display text-4xl font-light tabular-nums text-foreground">
+                      {b.value}
+                      <span className="text-xl text-muted-foreground">%</span>
+                    </span>
+                    {b.display && (
+                      <span className="rounded-full border border-white/[0.12] bg-white/[0.04] px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.16em] text-foreground/80">
+                        {b.display}
+                      </span>
+                    )}
+                  </div>
+                  <div className="mt-2 h-px w-full overflow-hidden bg-white/[0.08]">
+                    <div
+                      className="h-full bg-foreground/70"
+                      style={{
+                        width: `${b.value}%`,
+                        transition: "width .7s cubic-bezier(.16,1,.3,1)",
+                      }}
+                    />
+                  </div>
+
+                  <ul className="mt-4 space-y-2">
+                    {b.details?.map((d, idx) => (
+                      <li
+                        key={idx}
+                        className="flex items-start gap-2.5 rounded-lg border border-white/[0.05] bg-white/[0.02] px-3 py-2"
+                        style={{
+                          animation: reduce || i !== active ? undefined : "panel-slide-up 0.35s ease-out both",
+                          animationDelay: `${idx * 50}ms`,
+                        }}
+                      >
+                        <span className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-foreground/60" aria-hidden />
+                        <p className="text-xs leading-relaxed text-muted-foreground">{d}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
             </div>
 
             {/* node selector + cycle progress */}

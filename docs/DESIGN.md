@@ -712,3 +712,13 @@ unused `shadows.*` tokens were removed from `lib/theme.ts`.
 
 Gates: `__tests__/about-bio-loop.test.ts`, `__tests__/terminal-chrome.test.ts`,
 `e2e/about-terminal.spec.ts`.
+
+## Layout rule: no orphaned last card, no dead space (2026-09-26)
+
+Any card grid whose count is odd (or not a multiple of its column count) centers
+the remainder: one leftover card sits in the middle of its row, never
+left-aligned beside an empty cell. CSS grid cannot center a partial row, so card
+lists use `flex flex-wrap justify-center` with explicit widths
+(`md:w-[calc(50%-0.4375rem)]` for two columns at `gap-3.5`), the same pattern as
+the Skills category cards. The Open-Source Agent Tools grid (13 tools) follows it,
+pinned by `e2e/oss-tool-grid.spec.ts` ("odd last card is centered").

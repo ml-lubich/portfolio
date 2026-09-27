@@ -29,6 +29,38 @@ test.describe("OSS agent tool grid", () => {
     expect(clip).toBe("brew install ml-lubich/tap/imsg")
   })
 
+  test("odd last card is centered, not stranded left beside empty space", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 })
+    await page.goto("/", { waitUntil: "domcontentloaded" })
+    await page.waitForFunction(
+      () => {
+        window.dispatchEvent(new Event("portfolio:mount-all"))
+        return document.querySelector("#open-source .oss-tool-grid > ul") !== null
+      },
+      undefined,
+      { timeout: 30_000, polling: 100 },
+    )
+    const list = page.locator("#open-source .oss-tool-grid > ul")
+    await list.scrollIntoViewIfNeeded()
+    const items = list.locator(":scope > li")
+    const count = await items.count()
+    const ul = (await list.boundingBox())!
+    const last = (await items.nth(count - 1).boundingBox())!
+    const prev = (await items.nth(count - 2).boundingBox())!
+    const isMobile = await page.evaluate(() => window.innerWidth < 768)
+    if (isMobile || count % 2 === 0) {
+      // Full last row (single column, or an even count): nothing is stranded.
+      if (!isMobile) expect(Math.abs(last.y - prev.y)).toBeLessThanOrEqual(1)
+      expect(last.width).toBeGreaterThan(0)
+      return
+    }
+    const lastCenter = last.x + last.width / 2
+    expect(Math.abs(lastCenter - (ul.x + ul.width / 2))).toBeLessThanOrEqual(2)
+    // Still half-width like its siblings, not stretched full-row.
+    const first = (await items.first().boundingBox())!
+    expect(Math.abs(last.width - first.width)).toBeLessThanOrEqual(1)
+  })
+
   test("/fork page exposes tap-first install block", async ({ page }) => {
     await page.goto("/fork")
     await expect(page.getByRole("heading", { name: /copy-paste agent tool installs/i })).toBeVisible()

@@ -1,18 +1,12 @@
 /**
- * Regression: tapping a mobile nav link felt delayed. Root cause —
- * navigateTo() always waits for `waitForStableLayout()` before issuing the
- * scroll, and that wait requires LAYOUT_STABLE_POLLS (15) consecutive
- * unchanged polls at LAYOUT_POLL_MS (100ms) from the moment of the tap —
- * a fixed ~1.5s tax before any scroll motion starts, even when the target
- * section needs zero stabilization (nothing above it in the DOM is still
- * mounting). On a real handset the underlying layout churn (WebGL canvases,
- * async data sections) takes even longer to settle, pushing this well past
- * 2s.
+ * Regression: clicking/tapping a nav link felt slow. Root cause —
+ * navigateTo() waits for `waitForStableLayout()` before issuing the scroll,
+ * and desktop required 15 unchanged polls × 100ms of the WHOLE document's
+ * height: a fixed ~1.5s tax before any motion, and sections below the
+ * target (async GitHub stats) kept resetting it.
  *
- * Fix: gate a materially shorter stability window behind `pointer: coarse`
- * (real touch input) so a handset tap starts scrolling almost immediately,
- * while leaving the desktop/mouse constants — and therefore desktop's
- * measured timing — untouched.
+ * Fix: every pointer tracks the TARGET's own Y (sections below it can't move
+ * it) with a short quiet window — after mount-all it settles in ~80ms.
  */
 
 import { describe, it, expect } from "vitest"
@@ -24,28 +18,21 @@ const src = fs.readFileSync(
   "utf8",
 )
 
-describe("mobile nav tap: pre-scroll stability wait", () => {
-  it("branches the layout-stability wait on pointer: coarse", () => {
-    expect(src).toMatch(/pointer:\s*coarse/)
-  })
-
-  it("coarse-pointer stability window is short enough that a tap feels instant (<=700ms)", () => {
+describe("nav click: pre-scroll stability wait", () => {
+  it("stability window is short enough that a click feels instant (<=300ms) on every pointer", () => {
     const pollMs = Number(src.match(/LAYOUT_POLL_MS\s*=\s*(\d+)/)?.[1])
-    const coarsePolls = Number(
-      src.match(/LAYOUT_STABLE_POLLS_COARSE\s*=\s*(\d+)/)?.[1],
-    )
+    const polls = Number(src.match(/LAYOUT_STABLE_POLLS\s*=\s*(\d+)/)?.[1])
     expect(pollMs, "LAYOUT_POLL_MS constant not found").toBeGreaterThan(0)
-    expect(
-      coarsePolls,
-      "LAYOUT_STABLE_POLLS_COARSE constant not found",
-    ).toBeGreaterThan(0)
-    expect(pollMs * coarsePolls).toBeLessThanOrEqual(700)
+    expect(polls, "LAYOUT_STABLE_POLLS constant not found").toBeGreaterThan(0)
+    expect(pollMs * polls).toBeLessThanOrEqual(300)
   })
 
-  it("desktop's stability window is untouched — mouse/trackpad timing must not change", () => {
-    const desktopPolls = Number(
-      src.match(/LAYOUT_STABLE_POLLS\s*=\s*(\d+)/)?.[1],
-    )
-    expect(desktopPolls).toBe(15)
+  it("no pointer-specific slow path remains", () => {
+    expect(src).not.toMatch(/LAYOUT_STABLE_POLLS_COARSE|isCoarsePointer/)
+  })
+
+  it("waits on the target's own position, not the whole document height", () => {
+    expect(src).not.toMatch(/measure\s*=\s*document\.documentElement\.scrollHeight/)
+    expect(src).toMatch(/getBoundingClientRect\(\)\.top \+ window\.scrollY/)
   })
 })

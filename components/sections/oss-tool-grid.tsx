@@ -42,11 +42,13 @@ export function OssToolGrid() {
         accentOf={ossAccent}
       />
 
-      <ul className="relative grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-3.5">
+      {/* flex-wrap + explicit widths (not CSS grid) so an odd last card
+          centers itself instead of sitting left-aligned beside empty space. */}
+      <ul className="relative flex flex-wrap justify-center gap-3 md:gap-3.5">
         {ossAgentTools.map((tool, i) => {
           const accent = ossAccent(i)
           return (
-            <li key={tool.id}>
+            <li key={tool.id} className="w-full md:w-[calc(50%-0.4375rem)]">
               <article
                 className="oss-tool-card group/card relative flex h-full flex-col gap-2.5 rounded-2xl border border-white/[0.12] bg-[#081a36]/80 p-4 backdrop-blur-sm transition-colors hover:border-primary/40"
               >

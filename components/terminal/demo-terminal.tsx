@@ -20,6 +20,23 @@ interface DemoTerminalProps {
   className?: string
 }
 
+/** Reserves a mid-typing line's FINAL wrapped height: a ghost of the full
+ *  line (invisible) and the typed prefix share one grid cell, so the row
+ *  can't grow/shrink as a long line wraps differently mid-type than it does
+ *  once finished. Same trick as ai-expertise's TerminalReveal. */
+function TypingReveal({ full, dl, blink }: { full: string; dl: DemoDisplayLine; blink: boolean }) {
+  if (dl.done) return <>{dl.text}</>
+  return (
+    <span className="grid">
+      <span className="invisible [grid-area:1/1]">{full}</span>
+      <span className="[grid-area:1/1]">
+        {dl.text}
+        {blink && <span className="animate-[terminal-blink_1s_step-end_infinite] text-emerald-400">▊</span>}
+      </span>
+    </span>
+  )
+}
+
 function renderLine(line: Line, dl: DemoDisplayLine, blink: boolean) {
   switch (line.t) {
     case "cmd":
@@ -27,8 +44,7 @@ function renderLine(line: Line, dl: DemoDisplayLine, blink: boolean) {
         <div key={dl.index} className="flex items-start gap-2 min-h-[1.35em]">
           <span className="text-emerald-400 shrink-0 select-none">❯</span>
           <span className="text-foreground/90 whitespace-pre-wrap break-words">
-            {dl.text}
-            {blink && <span className="animate-[terminal-blink_1s_step-end_infinite] text-emerald-400">▊</span>}
+            <TypingReveal full={line.s} dl={dl} blink={blink} />
           </span>
         </div>
       )
@@ -43,12 +59,7 @@ function renderLine(line: Line, dl: DemoDisplayLine, blink: boolean) {
         <div key={dl.index} className="flex items-start min-h-[1.35em]">
           <pre className="m-0 flex-1 min-w-0 whitespace-pre-wrap break-words font-mono leading-relaxed text-foreground/80">
             <code className="font-mono">
-              {dl.done ? highlight(dl.text) : (
-                <>
-                  {dl.text}
-                  {blink && <span className="animate-[terminal-blink_1s_step-end_infinite] text-emerald-400">▊</span>}
-                </>
-              )}
+              {dl.done ? highlight(dl.text) : <TypingReveal full={line.s} dl={dl} blink={blink} />}
             </code>
           </pre>
         </div>
@@ -133,6 +144,14 @@ export function DemoTerminal({ lines, active = true, onDone, charSpeed = 28, cla
         const blink = i === frame.displayLines.length - 1 && !dl.done
         return renderLine(line, dl, blink)
       })}
+      {/* Lines not reached yet render nowhere above — reserve their final
+          height now (invisible), so the terminal (and the section around it)
+          doesn't grow line by line as typing reaches them. */}
+      {lines.slice(frame.displayLines.length).map((line, i) => (
+        <div key={`ghost-${frame.displayLines.length + i}`} className="invisible" aria-hidden>
+          {renderLine(line, { index: frame.displayLines.length + i, text: line.s, done: true }, false)}
+        </div>
+      ))}
     </div>
   )
 }

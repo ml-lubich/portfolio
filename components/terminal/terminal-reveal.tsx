@@ -120,16 +120,23 @@ export function TerminalReveal({
                                         // Fully revealed — render rich content if ReactNode
                                         typeof line === "string" ? line : line
                                     ) : isTypingThis ? (
-                                        <>
-                                            {lineText.slice(0, currentLineChars)}
-                                            {/* Blinking cursor. Zero-width in the line box: a 7px
-                                                inline cursor wrapped a near-full line onto a second
-                                                row while it typed, then unwrapped when it finished —
-                                                everything below the card bounced by a line each time. */}
-                                            <span className="relative inline-block w-0 align-middle">
-                                                <span className="absolute left-px top-1/2 h-[1.1em] w-[7px] -translate-y-1/2 bg-emerald-400 animate-terminal-blink" />
+                                        // Ghost (full line, invisible) reserves this row's final
+                                        // wrapped height; the typed prefix + caret overlay on top in
+                                        // the same grid cell, so the row can't grow/shrink as a long
+                                        // line wraps differently mid-type than it does once finished.
+                                        <span className="grid">
+                                            <span className="invisible [grid-area:1/1]">{lineText}</span>
+                                            <span className="[grid-area:1/1]">
+                                                {lineText.slice(0, currentLineChars)}
+                                                {/* Blinking cursor. Zero-width in the line box: a 7px
+                                                    inline cursor wrapped a near-full line onto a second
+                                                    row while it typed, then unwrapped when it finished —
+                                                    everything below the card bounced by a line each time. */}
+                                                <span className="relative inline-block w-0 align-middle">
+                                                    <span className="absolute left-px top-1/2 h-[1.1em] w-[7px] -translate-y-1/2 bg-emerald-400 animate-terminal-blink" />
+                                                </span>
                                             </span>
-                                        </>
+                                        </span>
                                     ) : null}
                                 </span>
                             </div>

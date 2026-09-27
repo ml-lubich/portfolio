@@ -6,6 +6,9 @@ All notable changes to this project are documented here.
 
 ### Changed
 
+- Nav clicks start scrolling ~1.2s sooner on desktop. `navigateTo` used to wait for the whole document's `scrollHeight` to hold still for 15 × 100ms (plus a 5s cap) before scrolling. It now waits for the target's own Y to hold for 6 × 50ms (1.5s cap), the same on every pointer. Measured on a prod build: after `portfolio:mount-all` the target settles in two steps ~80ms apart, and the GitHub skeleton no longer changes height.
+- Open-Source Agent Tools grid: the odd 13th card sits centered in its row instead of left-aligned beside an empty cell (flex-wrap + explicit widths; pinned in `e2e/oss-tool-grid.spec.ts`).
+
 - Staff AI copy reframed: drop Anduril/Mach “chosen over / offers & final rounds” flex; emphasize **Staff in under 3 years** at EchoStar + consumer-scale agent/RAG for millions (`about`, `profile-intro`, `experiences`, partners strip). GitHub profile README/timeline SVGs match.
 
 ### Added
