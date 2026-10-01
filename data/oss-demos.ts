@@ -7,7 +7,7 @@
 import type { Line } from "@/components/terminal/types"
 
 /** Simulated app windows the renderer can draw. */
-export const SIM_KINDS = ["imessage", "mail", "notes", "whatsapp"] as const
+export const SIM_KINDS = ["imessage", "mail", "notes", "whatsapp", "calendar"] as const
 export type SimKind = (typeof SIM_KINDS)[number]
 
 export interface SimRow {
@@ -352,6 +352,16 @@ export const ossDemos: OssDemo[] = [
             { t: "out", s: "Home" },
             { t: "out", s: "Work" },
         ],
+        sim: {
+            kind: "calendar",
+            app: "Calendar",
+            flow: ["Agent", "ical-cli", "Calendar.app", "Sync"],
+            rows: [
+                { from: "Work", text: "Product Sprint Planning", meta: "10:00 AM" },
+                { from: "Work", text: "1:1 with Joe (Sync & Review)", meta: "02:30 PM" },
+                { from: "Home", text: "Dinner & Drinks", meta: "07:00 PM" },
+            ],
+        },
         stats: [
             { label: "Surfaces", value: "CLI + MCP" },
             { label: "Distribution", value: "PyPI" },

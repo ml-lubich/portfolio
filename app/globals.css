@@ -3744,6 +3744,37 @@ article .blog-prose b a[href],
   color: hsl(48 12% 26%);
 }
 
+.oss-sim-skin-calendar {
+  border-color: hsl(0 68% 42% / 0.35);
+  background: #14171f;
+}
+
+.oss-sim-skin-calendar .oss-sim-titlebar {
+  background: #ff3b30;
+  border-color: hsl(0 68% 45%);
+  color: #ffffff;
+}
+
+.oss-sim-skin-calendar .oss-sim-list-row {
+  border-left: 2px solid #ff3b30;
+  background: hsl(0 0% 100% / 0.05);
+}
+
+.oss-sim-skin-calendar .oss-sim-list-from {
+  color: #ff453a;
+  font-weight: 600;
+}
+
+.oss-sim-skin-calendar .oss-sim-list-text {
+  color: #e5e7eb;
+}
+
+.oss-sim-skin-calendar .oss-sim-list-meta {
+  border: 1px solid hsl(0 68% 50% / 0.3);
+  background: hsl(0 68% 50% / 0.12);
+  color: #ff9f9a;
+}
+
 .oss-sim-skin-whatsapp {
   border-color: hsl(168 52% 22%);
   background: #0b141a;
