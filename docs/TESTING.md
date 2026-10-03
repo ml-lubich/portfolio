@@ -23,6 +23,7 @@
 
 ## Automated: MLBot chat recovery
 
+- `__tests__/agent-storm-logic.test.ts` — agent storm easter egg (`lib/agent-storm/`, mounted by `components/agent-storm/agent-storm-launcher.tsx`, chunk loaded only on first trigger): seeded PRNG, `planStorm` uniqueness/determinism, the queued→thinking→tool_call→writing→shipped reducer, every artifact kind is a full, deterministic, <12 KB document with no network/sound/escape hooks, Konami + typed `spawn` trigger (`agents` already belongs to the cursor egg), and progressive-reveal slicing never cutting mid-tag or mid-script.
 - `__tests__/coding-guard.test.ts` — coding asks ("write a python function", "fix my code", "leetcode", "source code") are refused before the model; "error code", "what languages", and "write me an email" are not.
 - `__tests__/ai-chat-stream.test.ts` — OpenRouter chunk ingest (delta fragments, final `message.content`, array content parts), empty-final-after-tools fallback (must emit grounded text, never a bare `done`), cascade errors name every failed attempt, and `app/api/chat/route.ts` is wired to those helpers.
 - `__tests__/ai-profile-tools.test.ts` — `search_profile` on “What has Misha built with agents?” returns a named agent project (name hit outranks a body mention); `searchTerms` stems `agents` → `agent` and drops question stopwords. `__tests__/ai-model-slugs.test.ts` still checks the cascade slugs exist upstream and advertise tools.

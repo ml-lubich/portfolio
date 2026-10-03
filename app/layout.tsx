@@ -7,6 +7,7 @@ import { JsonLd } from '@/components/seo/json-ld'
 import { LiquidGooFilter } from '@/components/glass-blob-field'
 import { LazyMLBot } from "@/components/ai-chat/mlbot-lazy"
 import { AgentsBuildEgg } from "@/components/easter/agents-build"
+import { AgentStormLauncher } from "@/components/agent-storm/agent-storm-launcher"
 import { ThemeProvider } from "@/components/theme-provider"
 import { LIGHT_MODE_ENABLED } from "@/lib/light-mode"
 
@@ -184,6 +185,7 @@ export default function RootLayout({
           {children}
           <LazyMLBot />
           <AgentsBuildEgg />
+          <AgentStormLauncher />
         </ThemeProvider>
       </body>
     </html>
