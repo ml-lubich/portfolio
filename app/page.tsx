@@ -14,6 +14,9 @@ const LiveTerminal = dynamic(() => import("@/components/terminal").then(m => m.L
 const AIExpertise = dynamic(() => import("@/components/sections/ai-expertise").then(m => m.AIExpertise), {
   loading: () => <SectionSkeleton />,
 })
+const AILab = dynamic(() => import("@/components/ai-viz").then(m => m.AILab), {
+  loading: () => <SectionSkeleton />,
+})
 const About = dynamic(() => import("@/components/sections/about").then(m => m.About), {
   loading: () => <SectionSkeleton />,
 })
@@ -92,6 +95,9 @@ export default function Home() {
         </LazySection>
         <LazySection sectionId="ai-expertise" className={`min-h-[2630px] md:min-h-[2180px] ${LAZY_SECTION_TOP}`}>
           <AIExpertise />
+        </LazySection>
+        <LazySection sectionId="ai-lab" className={`min-h-[1100px] md:min-h-[1010px] ${LAZY_SECTION_TOP}`}>
+          <AILab />
         </LazySection>
         <LazySection sectionId="about" className={`min-h-[2190px] md:min-h-[1050px] ${LAZY_SECTION_TOP}`}>
           <About />

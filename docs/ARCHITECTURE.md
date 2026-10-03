@@ -110,3 +110,14 @@ The terminal section has three modes: **live** (day-in-the-life playback), **sna
 ### Invariant
 
 At most one `DemoTerminal` types at a time — the container's IntersectionObserver-driven `activeId` is the only thing that sets a card's `active` prop to `true`. Do not give a card its own scroll-based `active` state; that would let two terminals type concurrently.
+
+## AI engineering lab (`components/ai-viz/`)
+
+| Concern | Decision |
+|--------|----------|
+| **Mounting** | `app/page.tsx` mounts `AILab` through `next/dynamic` inside a `LazySection` (`#ai-lab`, floors in `__tests__/lazy-section-reservations.test.ts`). Each visual is its own dynamic chunk and only the selected tab is mounted. |
+| **Logic vs drawing** | `model.ts` holds every seeded generator, timeline and layout function as pure functions of the clock `t` (SSR-safe, unit tested). `*.tsx` visuals only draw. |
+| **Motion** | `use-viz.ts` `useClock` runs rAF only while the node is on screen and the tab is visible, never under `prefers-reduced-motion` (a still frame is rendered instead). The terminal uses `useRunning` the same way. |
+| **Theme** | `theme.ts` maps local `--viz-*` tokens onto the site tokens (`--surface-1/2`, `--line-soft`, `--accent-glow`, `--foreground`), so dark and `.light` both work. Accent text is mixed toward the foreground for contrast. |
+| **No layout shift** | Every visual draws in a fixed 3:2 box (`viz.tsx`); tab notes share one grid cell. |
+| **Honesty** | Every visual shows an "illustrative" label and a screen-reader sentence saying it is a simulation. Do not add real-looking metrics. |
