@@ -1,7 +1,7 @@
 import { test, expect, type Page } from "@playwright/test"
 
 /**
- * Scroll devices B — AI expertise opacity reveals + Contact kinetic band.
+ * Scroll devices B — AI expertise opacity reveals (the Contact kinetic band was removed).
  *
  * Wide, mouse-driven, motion-ok viewport: each device publishes
  * `data-sc-verify-state` and it must CHANGE with scroll. Compact (phone) and
@@ -75,15 +75,10 @@ test.describe("desktop: scroll changes what the sections paint", () => {
     expect(minOpacity).toBe(1)
   })
 
-  test("contact band slides with scroll, is aria-hidden, and adds no horizontal scroll", async ({ page }) => {
-    await scrollSectionTo(page, "contact", 0.9)
-    await expect.poll(() => readState(page, "contact", "band:"), { timeout: 8_000 }).toMatch(/^band:-?\d+$/)
-    const a = await readState(page, "contact", "band:")
-    await scrollSectionTo(page, "contact", -0.3)
-    await expect.poll(() => readState(page, "contact", "band:"), { timeout: 8_000 }).not.toBe(a)
-
-    const band = page.locator("#contact [aria-hidden='true'].pointer-events-none", { hasText: "BUILD" })
-    await expect(band).toHaveCount(1)
+  test("contact has no ghost band text and adds no horizontal scroll", async ({ page }) => {
+    await scrollSectionTo(page, "contact", 0.5)
+    await expect(page.locator("#contact", { hasText: /LET['\u2019]S BUILD/i })).toHaveCount(0)
+    expect(await readState(page, "contact", "band:")).toBeNull()
     const noOverflow = await page.evaluate(
       () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
     )

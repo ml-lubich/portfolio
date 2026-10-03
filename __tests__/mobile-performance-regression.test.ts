@@ -46,6 +46,15 @@ describe("mobile performance guardrails", () => {
     expect(_has_all(_src_hero(), ["const showBrain = idleBrain", "const brainRevealGate = idleBrain"])).toBe(true)
   })
 
+  it("defers the brain only on phone/coarse/no-hover; reduced-motion and low-core desktops are not deferred", () => {
+    const hero = _src_hero()
+    expect(hero).toContain("MOBILE_BRAIN_DELAY_MS")
+    expect(hero).toContain('document.readyState === "complete"')
+    expect(hero).toContain('["pointerdown", "keydown", "touchstart"]')
+    expect(hero).not.toContain("hardwareConcurrency")
+    expect(hero).not.toContain("prefers-reduced-motion")
+  })
+
   it("keeps brain reveal untied from name animation", () => {
     expect(_src_hero()).not.toContain("nameRevealStarted")
   })

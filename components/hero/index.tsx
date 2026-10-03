@@ -65,27 +65,40 @@ function useMobilePerformanceMode() {
  *  same runs: 6.8s → 3.5s. */
 const BRAIN_IDLE_TIMEOUT_MS = 1200
 
-/** Phones, coarse pointers, reduced motion and low-core devices do not pay for
- *  Three.js up front: the R3F frame loop alone was ~27s of main-thread work in
- *  a throttled mobile Lighthouse run (TBT 15s). They mount the brain on the
- *  first deliberate touch/key/pointer instead, and download nothing until then.
- *  Desktops keep the idle-mount behaviour above. */
-function brainNeedsInteraction(mobile: boolean): boolean {
-  if (mobile) return true
-  const mq = window.matchMedia("(prefers-reduced-motion: reduce)").matches
-  const lowCore = (navigator.hardwareConcurrency ?? 8) <= 2
-  return mq || lowCore
-}
+/** Phones, coarse pointers and no-hover devices mount Three.js late: the R3F
+ *  frame loop alone was ~27s of main-thread work in a throttled mobile
+ *  Lighthouse run (TBT 15s). They download and mount nothing until the page has
+ *  loaded and gone idle plus MOBILE_BRAIN_DELAY_MS, or until the first
+ *  pointerdown/touchstart/keydown, whichever comes first. The brain still
+ *  appears without a tap (the skeleton holds the slot, so no layout shift).
+ *  Reduced-motion and low-core desktops are NOT deferred: the slow idle orbit is
+ *  the intended accessible experience. */
+const MOBILE_BRAIN_DELAY_MS = 2000
 
 function useDeferBrain(mobile: boolean) {
   const [show, setShow] = useState(false)
   useEffect(() => {
     if (show) return
-    if (brainNeedsInteraction(mobile)) {
+    if (mobile) {
       const events = ["pointerdown", "keydown", "touchstart"] as const
+      let timer = 0
+      let idle = 0
       const go = () => setShow(true)
+      const afterLoad = () => {
+        timer = window.setTimeout(() => {
+          if (typeof requestIdleCallback !== "undefined") idle = requestIdleCallback(go, { timeout: 1500 })
+          else go()
+        }, MOBILE_BRAIN_DELAY_MS)
+      }
       events.forEach((e) => window.addEventListener(e, go, { once: true, passive: true }))
-      return () => events.forEach((e) => window.removeEventListener(e, go))
+      if (document.readyState === "complete") afterLoad()
+      else window.addEventListener("load", afterLoad, { once: true })
+      return () => {
+        events.forEach((e) => window.removeEventListener(e, go))
+        window.removeEventListener("load", afterLoad)
+        clearTimeout(timer)
+        if (idle && typeof cancelIdleCallback !== "undefined") cancelIdleCallback(idle)
+      }
     }
     // Warm the network immediately; neither of these blocks the main thread.
     void import("../brain")
