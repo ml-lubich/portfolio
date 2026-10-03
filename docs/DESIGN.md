@@ -330,6 +330,17 @@ wheel in headless Chromium — `mouse.wheel(0, 500)` lands as one instant jump
 the guard rightly ignores; ten 100px ticks are what a wheel sends. Gates:
 `__tests__/scroll-devices.test.ts`, `e2e/scroll-devices.spec.ts`.
 
+### More scroll devices (2026-10-03)
+
+Four more sections get one device each, all gated through `useSectionProgress` / `isStaticScrollViewport` (`lib/use-section-progress.ts`). Phones, touch, reduced-motion and SSR render exactly the prior markup. The hero and nav are untouched.
+
+- **About** (`about.tsx`, `lib/scroll-depth.ts`): parallax depth. Orbs and portrait drift in `translateY`, capped at 40px. Gate: wide + motion-ok. State: `depth:N`.
+- **Open source** (`open-source-showcase.tsx`, `lib/scroll-depth.ts`): a 2px `aria-hidden` progress rail on the left edge, filled with `scaleY`. Mounts only after hydration, on wide viewports. State: `rail:N`.
+- **AI expertise** (`ai-expertise.tsx`, `lib/scroll-reveal.ts`): staggered opacity reveal per group, floor 0.2, full at progress 0.5, a focused group always 1. Gate: wide + motion-ok. State: `reveal:N`.
+- **Contact** (`contact.tsx`, `lib/scroll-reveal.ts`): kinetic outline band reading "LET'S BUILD", `aria-hidden`, translated horizontally. Mounted only when wide and motion is OK. State: `band:N`.
+
+Gates: `__tests__/scroll-devices-a.test.ts`, `__tests__/scroll-devices-b.test.ts`, `e2e/scroll-devices-a.spec.ts`, `e2e/scroll-devices-b.spec.ts`.
+
 ## Phone hero brain: half the viewport, and a picture — not a control (2026-09-06)
 
 The first phone tier (box `min(190vw,88svh)`, mesh ~80% of the viewport)

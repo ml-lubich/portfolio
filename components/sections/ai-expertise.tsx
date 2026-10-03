@@ -8,6 +8,8 @@ import { type BarItem } from "../animations/animated-bars"
 import { SectionHeader } from "../layout/section-header"
 import { ShimmerOverlay } from "../ui/shimmer-overlay"
 import { gradients as g } from "@/lib/theme"
+import { useSectionProgress } from "@/lib/use-section-progress"
+import { revealAt, revealCount } from "@/lib/scroll-reveal"
 const TerminalReveal = dynamic(
   () => import("../terminal/terminal-reveal").then((mod) => mod.TerminalReveal),
   { ssr: false }
@@ -409,7 +411,31 @@ function DomainArch() {
   )
 }
 
+/** Content groups revealed by scroll, as direct children of the content column:
+ *  terminal, constellation, domain arch, CTA (the header keeps its own entrance). */
+const REVEAL_CHILD_INDEXES = [1, 2, 3, 4] as const
+
 export function AIExpertise() {
+  /* Scroll-linked reveal (desktop only). Each group's opacity follows section
+     progress and is fully 1 from the midpoint on. Opacity only, floored above
+     0, and a group holding keyboard focus is forced fully visible. It is
+     written on the AnimatedSection's first child so the section's own fade is
+     untouched, and the state lands on the last group so it never shadows the
+     constellation's `node:` state. Never attaches on phones / reduced motion. */
+  const columnRef = useRef<HTMLDivElement>(null)
+  useSectionProgress(columnRef, (p, el) => {
+    const groups = REVEAL_CHILD_INDEXES.map((i) => el.children[i] as HTMLElement | undefined)
+    groups.forEach((child, idx) => {
+      if (!child) return
+      const target = child.tagName === "SECTION" ? (child.firstElementChild as HTMLElement | null) : child
+      if (!target) return
+      const focused = target.contains(document.activeElement)
+      target.style.opacity = focused ? "1" : revealAt(p, idx, groups.length).toFixed(3)
+    })
+    const last = groups[groups.length - 1]
+    if (last) last.dataset.scVerifyState = `reveal:${revealCount(p, groups.length)}`
+  })
+
   return (
     <AnimatedSection id="ai-expertise" className="relative section-y">
       {/* Background effects */}
@@ -417,7 +443,7 @@ export function AIExpertise() {
 
 
 
-      <div className="relative mx-auto max-w-7xl px-3 md:px-6">
+      <div ref={columnRef} className="relative mx-auto max-w-7xl px-3 md:px-6">
         <SectionHeader
           icon={<Brain className="h-4 w-4" />}
           label="AI/ML Expertise"

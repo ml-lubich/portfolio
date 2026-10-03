@@ -40,6 +40,8 @@ import { SectionHeader } from "../layout/section-header"
 import { OssDemoCard } from "./oss-demo-card"
 import { OssToolGrid } from "./oss-tool-grid"
 import { ossAccent } from "@/lib/theme"
+import { isStaticScrollViewport, useSectionProgress } from "@/lib/use-section-progress"
+import { railFill } from "@/lib/scroll-depth"
 import { ossDemos, ossInstallAll } from "@/data/oss-demos"
 import { projects } from "@/data/projects"
 
@@ -71,6 +73,32 @@ export function OpenSourceShowcase() {
   const sectionRef = useRef<HTMLElement>(null)
   const onScreenRef = useRef(false)
   const installAll = ossInstallAll()
+
+  /* Progress rail: a hairline on the section's left edge that fills as the
+     section travels through the viewport (scaleY, absolute, aria-hidden — no
+     layout). Mounted after hydration and only where scroll motion is welcome,
+     so SSR, phones, touch and reduced motion keep today's markup. */
+  const [railOn, setRailOn] = useState(false)
+  const railRef = useRef<HTMLDivElement>(null)
+  const fillRef = useRef(0)
+  const paintRail = useCallback((p: number) => {
+    const el = railRef.current
+    if (!el) return
+    const f = railFill(p)
+    fillRef.current = f
+    el.style.transform = `scaleY(${f.toFixed(3)})`
+    el.dataset.scVerifyState = `rail:${Math.round(f * 100)}`
+  }, [])
+  useEffect(() => {
+    if (!isStaticScrollViewport()) setRailOn(true)
+  }, [])
+  useEffect(() => {
+    if (railOn) paintRail(fillRef.current)
+  }, [railOn, paintRail])
+  useSectionProgress(sectionRef, (p) => {
+    fillRef.current = railFill(p)
+    paintRail(p)
+  })
 
   const selected = projects.find((p) => p.id === selectedId) ?? null
   const isOpen = selected !== null
@@ -128,6 +156,18 @@ export function OpenSourceShowcase() {
         <div className="absolute left-1/4 top-20 h-[400px] w-[400px] rounded-full bg-primary/5 blur-[100px]" />
         <div className="absolute right-1/4 bottom-20 h-[400px] w-[400px] rounded-full bg-accent/5 blur-[100px]" />
       </div>
+
+      {railOn && (
+        <div className="pointer-events-none absolute inset-y-0 left-0 w-[2px] bg-border/30" aria-hidden="true">
+          <div
+            ref={railRef}
+            data-sc-verify-state="rail:0"
+            className="h-full w-full origin-top bg-primary/60"
+            style={{ transform: "scaleY(0)" }}
+            aria-hidden="true"
+          />
+        </div>
+      )}
 
       <div className="relative mx-auto max-w-6xl px-3 md:px-4 lg:px-6">
         <SectionHeader

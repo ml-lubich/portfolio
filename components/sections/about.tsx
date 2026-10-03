@@ -2,7 +2,10 @@
 
 import { GraduationCap, BookOpen, Users, Code2, Award, Briefcase } from "lucide-react"
 import Image from "next/image"
+import { useRef } from "react"
 import { useReducedMotion } from "framer-motion"
+import { useSectionProgress } from "@/lib/use-section-progress"
+import { depthOffset } from "@/lib/scroll-depth"
 import { AnimatedSection } from "../animations/animated-section"
 import { AnimatedCounter } from "../animations/animated-counter"
 import { SectionHeader } from "../layout/section-header"
@@ -78,15 +81,34 @@ export function About() {
   // The global CSS zeroes CSS animations, but the typewriter and counter are
   // timer-driven and need their own branch: render the finished state.
   const reduce = useReducedMotion() ?? false
+
+  /* Parallax depth: the two wash orbs and the portrait drift at different
+     rates (translateY only, ≤40px). Refs add no markup; the hook never
+     attaches on phones, touch, reduced motion or SSR, so those render the
+     untouched section and `data-sc-verify-state` is only ever set on wide
+     mouse viewports. */
+  const washRef = useRef<HTMLDivElement>(null)
+  const orbARef = useRef<HTMLDivElement>(null)
+  const orbBRef = useRef<HTMLDivElement>(null)
+  const photoRef = useRef<HTMLDivElement>(null)
+  useSectionProgress(washRef, (p, el) => {
+    const a = depthOffset(p, 1)
+    const b = depthOffset(p, -0.7)
+    const c = depthOffset(p, 0.3)
+    if (orbARef.current) orbARef.current.style.transform = `translate3d(0, ${a.toFixed(1)}px, 0)`
+    if (orbBRef.current) orbBRef.current.style.transform = `translate3d(0, ${b.toFixed(1)}px, 0)`
+    if (photoRef.current) photoRef.current.style.transform = `translate3d(0, ${c.toFixed(1)}px, 0)`
+    el.dataset.scVerifyState = `depth:${Math.round(a)}`
+  })
   return (
     <AnimatedSection id="about" className="relative section-y overflow-hidden">
       {/* Ambient wash — the same two-orb treatment #open-source uses, so the
           two sections read as one page. The old stack (three pulsing orbs on
           the looping glow keyframes, plus a WebGL particle field) is what made
           this section read as lit liquid glass next to everything else. */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-        <div className="absolute left-1/4 top-20 h-[400px] w-[400px] rounded-full bg-primary/5 blur-[100px]" />
-        <div className="absolute right-1/4 bottom-20 h-[400px] w-[400px] rounded-full bg-accent/5 blur-[100px]" />
+      <div ref={washRef} className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+        <div ref={orbARef} className="absolute left-1/4 top-20 h-[400px] w-[400px] rounded-full bg-primary/5 blur-[100px]" />
+        <div ref={orbBRef} className="absolute right-1/4 bottom-20 h-[400px] w-[400px] rounded-full bg-accent/5 blur-[100px]" />
       </div>
 
       <div className="relative mx-auto max-w-7xl px-3 md:px-4 lg:px-6">
@@ -100,7 +122,7 @@ export function About() {
             The frame stays 3/4 at every width (source is 1093×1439). Stretching it
             to the terminal made a wide face crop. */}
         <div className="relative mx-auto mb-10 flex max-w-5xl flex-col items-stretch gap-5 md:flex-row md:items-stretch">
-          <div className="group/photo relative mx-auto aspect-[3/4] w-full max-w-[20rem] shrink-0 overflow-hidden rounded-2xl border border-border shadow-2xl shadow-black/40 md:mx-0 md:w-72 md:max-w-none lg:w-80">
+          <div ref={photoRef} className="group/photo relative mx-auto aspect-[3/4] w-full max-w-[20rem] shrink-0 overflow-hidden rounded-2xl border border-border shadow-2xl shadow-black/40 md:mx-0 md:w-72 md:max-w-none lg:w-80">
             <Image
               src="/misha-desk-laptop.png"
               alt="Misha Lubich at his desk"
