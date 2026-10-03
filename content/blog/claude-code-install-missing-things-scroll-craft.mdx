@@ -1,0 +1,45 @@
+---
+title: "Your Claude Code Install Is Missing a Few Things (Here's What I Actually Run)"
+excerpt: "Charlie Hills mapped 40 repos worth adding to Claude Code. Here is the short list that earns its place in my setup, plus scroll-craft by Nate Herk for scroll-driven sites."
+date: "2026-10-03"
+category: "Engineering Culture"
+coverImage: "https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=1200&h=630&fit=crop"
+tags: ["Claude Code", "Skills", "scroll-craft", "Workflow", "Minimalism"]
+---
+Charlie Hills put together a list of 40 repos worth adding to Claude Code, grouped by what they do: workflows, skills, context, tools, prompts. It is one of the better lists I have seen, and I want to credit it properly: his post is the map, and what follows is my read of it from the driver's seat.
+
+I run a good chunk of it daily. Some of it earns its place. Some of it I tried and removed. Here is the honest version.
+
+## The rule I follow before adding anything
+
+Every skill, plugin, MCP server or memory layer is a dependency. It adds capability, but also code, permissions and something to maintain. So I only install one for a specific failure or workflow gap, test it on a real task, and keep it only if the gain survives the extra complexity. Forty repos is a menu, not a to-do list.
+
+## What earns its place in my setup
+
+**Workflow.** oh-my-claudecode coordinates agent teams, and superpowers gives me the plan, build, test discipline. Ponytail keeps the code simple by asking "does this need to exist?" before anything gets written. That one question deletes more code than any linter.
+
+**Skills.** taste-skill and ui-ux-pro-max stop my interfaces from looking like every other templated site. mattpocock skills cover the engineering habits I would otherwise skip.
+
+**Context.** claude-mem carries what I learned across sessions, and planning-with-files keeps plans on disk where they survive a compaction. This category matters most, because a model that forgets yesterday repeats yesterday's mistakes.
+
+**Tools.** context7 pulls current library docs instead of whatever the model half-remembers. RTK trims command output so the context window is spent on signal, not noise.
+
+## The one that is not on the list: scroll-craft
+
+If you build websites, add [scroll-craft by Nate Herk](https://github.com/nateherkai/scroll-craft).
+
+It is a Claude Code skill for scroll-driven sites: sections that animate as you scroll, numbers that count up, images that transition with scroll position. What I like is that it interviews you first. What vibe? What is the visitor's scroll journey? What real assets exist? What single belief should the site leave someone with? Only then does it build, and it verifies the result rather than assuming it worked.
+
+Its first rule changed how I design pages: if five sections all animate identically, you have one section shown five times. Movement should mean something.
+
+I paired it with my own small scroll-stack pattern (cards that pin under the navbar and stack as you scroll, with phones and reduced-motion users falling back to a plain column). Scroll-craft supplies the grammar for the whole page; the stack is one reusable device inside it.
+
+Nate shares a lot of this work openly. Worth following: [nateherk.com](https://www.nateherk.com).
+
+## How to use a list like this
+
+Pick one repo for the job in front of you. Open it, follow the setup, and run it on a real task before you add the next. The power is not in the collection. It is in the two or three things you reach for without thinking.
+
+Thanks to Charlie Hills for the list. If you have a repo that belongs on it, tell me what it fixed for you.
+
+*Sources: Charlie Hills AI's LinkedIn post "Your Claude Code install is missing a few things"; [scroll-craft on GitHub](https://github.com/nateherkai/scroll-craft); [nateherk.com](https://www.nateherk.com).*

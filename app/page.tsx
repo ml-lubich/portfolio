@@ -3,6 +3,7 @@ import Link from "next/link"
 import { Navigation } from "@/components/nav"
 import { Hero } from "@/components/hero"
 import { ProfileIntro, LogoScroll, WorkMarquee } from "@/components/sections"
+import { SubstackMarquee } from "@/components/sections/substack-marquee"
 import { LazySection } from "@/components/layout"
 import { SectionSkeleton } from "@/components/ui/skeleton"
 
@@ -112,6 +113,7 @@ export default function Home() {
         <LazySection sectionId="testimonials" className={`min-h-[810px] md:min-h-[890px] ${LAZY_SECTION_TOP}`}>
           <ClientTestimonials />
         </LazySection>
+        <SubstackMarquee />
         <LazySection sectionId="writing" className={`min-h-[760px] md:min-h-[620px] ${LAZY_SECTION_TOP}`}>
           <Writing />
         </LazySection>

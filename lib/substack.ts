@@ -1,9 +1,7 @@
 /**
- * Substack publication — a hand-maintained pointer, not a live feed.
- *
- * One post exists today. A fetch/parse/cache layer for an RSS feed is a lot
- * of surface for "link the latest post" — Misha updates this constant when
- * he publishes again.
+ * Substack publication constants. The marquee reads the live RSS feed
+ * (lib/substack-feed.ts); LATEST_POST is the hand-kept card in the Writing
+ * section and the fallback when the feed is unreachable.
  */
 
 export const SUBSTACK_URL = "https://mlubich.substack.com"
