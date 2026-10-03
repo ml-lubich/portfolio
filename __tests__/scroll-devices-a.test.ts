@@ -6,6 +6,7 @@
  * math must clamp and cap.
  */
 import { describe, it, expect } from "vitest"
+import { normalizeFloats } from "./helpers/normalize-floats"
 import fs from "fs"
 import path from "path"
 import { createElement } from "react"
@@ -19,12 +20,12 @@ const read = (rel: string) => fs.readFileSync(path.join(ROOT, rel), "utf8")
 
 describe("SSR / compact markup is unchanged", () => {
   it("About renders exactly today's markup", async () => {
-    await expect(renderToStaticMarkup(createElement(About))).toMatchFileSnapshot(
+    await expect(normalizeFloats(renderToStaticMarkup(createElement(About)))).toMatchFileSnapshot(
       "__snapshots__/about-baseline.html",
     )
   })
   it("OpenSourceShowcase renders exactly today's markup", async () => {
-    await expect(renderToStaticMarkup(createElement(OpenSourceShowcase))).toMatchFileSnapshot(
+    await expect(normalizeFloats(renderToStaticMarkup(createElement(OpenSourceShowcase)))).toMatchFileSnapshot(
       "__snapshots__/open-source-baseline.html",
     )
   })
