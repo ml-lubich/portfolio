@@ -220,8 +220,10 @@ describe("MLBot panel", () => {
     })
 
     it("launches from the site logo mark, not a generic chat glyph", () => {
-        const launcher = source.slice(source.indexOf("mlbot-launcher"), source.indexOf("mlbot-launcher") + 500)
-        expect(launcher).toContain("SiteLogoMark")
+        // The launcher button lives in launcher.tsx (initial bundle); MLBot renders it.
+        const launcherSrc = readFileSync(join(process.cwd(), "components/ai-chat/launcher.tsx"), "utf8")
+        expect(launcherSrc.slice(launcherSrc.indexOf("mlbot-launcher"))).toContain("SiteLogoMark")
+        expect(source).toContain("<LauncherButton")
     })
 
     it("renders diagram segments through the blog's chart renderer", () => {

@@ -93,8 +93,9 @@ export function ProfileIntro() {
                                         alt="Misha Lubich at desk with laptop"
                                         width={1093}
                                         height={1439}
-                                        className="h-full w-full object-cover object-center transition-transform duration-700 group-hover/photo:scale-105"
+                                        sizes="(min-width: 1024px) 352px, (min-width: 640px) 320px, 272px"
                                         priority
+                                        className="h-full w-full object-cover object-center transition-transform duration-700 group-hover/photo:scale-105"
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-80" />
                                     <div className="absolute bottom-3 left-3 text-xs font-medium tracking-wide text-white/90">

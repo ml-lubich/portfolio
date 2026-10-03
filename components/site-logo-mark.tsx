@@ -1,5 +1,7 @@
 "use client"
 
+import Image from "next/image"
+
 /**
  * Single source of truth for header-style logo markup (SSR + client must match).
  *
@@ -25,8 +27,7 @@ export function SiteLogoMark({
   suppressHydrationWarning?: boolean
 }) {
   return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
+    <Image
       src="/logo.png"
       width={width}
       height={height}

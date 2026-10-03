@@ -83,6 +83,7 @@ export function Contact() {
                 alt="Misha Lubich in the studio"
                 width={1120}
                 height={1400}
+                sizes="(min-width: 1024px) 400px, (min-width: 640px) 352px, 320px"
                 className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover/photo:scale-105"
                 style={{ objectPosition: "center center" }}
                 placeholder="blur"

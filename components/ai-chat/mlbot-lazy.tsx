@@ -2,6 +2,7 @@
 
 import { Component, useEffect, useState, type ReactNode } from "react"
 import dynamic from "next/dynamic"
+import { LAUNCHER_STACK_CLASS, LauncherButton } from "./launcher"
 
 /* Code-split from the layout bundle: MLBot's module graph (react-markdown,
  * recharts, its own icon set) is 150KB+ of JS that has zero business in
@@ -35,44 +36,67 @@ class ChatLoadBoundary extends Component<{ children: ReactNode }, { failed: bool
   }
 }
 
-/** Defers *fetching* that chunk past first paint, not just splitting it —
- *  `dynamic()` alone still requests the chunk the instant it mounts, which
- *  is still "on first paint" for a component rendered unconditionally in
- *  the root layout. Same idle-first shape as the hero brain
- *  (components/hero/index.tsx's `useDeferBrain`), minus the ceiling: the
- *  chat has no fold to protect and nothing to reveal, so there is no reason
- *  to force it in before the browser is actually idle. */
+/** The launcher ships in the initial bundle; the chat module (markdown,
+ *  recharts) is fetched only on first intent: hover, focus, touch or click on
+ *  the launcher, the hero CTA's "mlbot:open", or scrolling past the hero (where
+ *  MLBot's back-to-top button takes over). Nothing loads at idle.
+ *
+ *  The static launcher stays mounted (same DOM node) until MLBot reports it has
+ *  mounted, so a click that lands while the chunk is still loading is not lost,
+ *  and it is only rendered after hydration so a pre-hydration click can't be
+ *  dropped either. */
 export function LazyMLBot() {
+  const [hydrated, setHydrated] = useState(false)
   const [ready, setReady] = useState(false)
+  const [mounted, setMounted] = useState(false)
+  // Opened by an explicit tap/click/CTA, as opposed to a hover prefetch.
+  const [openOnMount, setOpenOnMount] = useState(false)
+
+  useEffect(() => setHydrated(true), [])
 
   useEffect(() => {
-    // Once MLBot itself has mounted, its own listener (mlbot.tsx) owns
-    // "mlbot:open" — nothing left for this effect to do.
     if (ready) return
-
-    const cb = () => setReady(true)
-    const id =
-      typeof requestIdleCallback !== "undefined"
-        ? requestIdleCallback(cb, { timeout: 4000 })
-        : window.setTimeout(cb, 300)
-
-    // The hero CTA (components/hero/hero-actions.tsx) can ask for the panel
-    // before the idle callback ever fires — a bare window event with nobody
-    // listening yet, which would otherwise be a silent no-op click. Mount
-    // right now instead, then replay the event once MLBot has attached its
-    // own listener for it.
-    const onOpenIntent = () => {
-      setReady(true)
-      window.setTimeout(() => window.dispatchEvent(new Event("mlbot:open")), 0)
+    const onScroll = () => {
+      if (window.scrollY > 600) setReady(true)
     }
+    const onOpenIntent = () => {
+      setOpenOnMount(true)
+      setReady(true)
+    }
+    window.addEventListener("scroll", onScroll, { passive: true })
     window.addEventListener("mlbot:open", onOpenIntent)
-
     return () => {
-      if (typeof cancelIdleCallback !== "undefined") cancelIdleCallback(id as number)
-      else clearTimeout(id)
+      window.removeEventListener("scroll", onScroll)
       window.removeEventListener("mlbot:open", onOpenIntent)
     }
   }, [ready])
 
-  return <ChatLoadBoundary>{ready ? <MLBot /> : null}</ChatLoadBoundary>
+  const load = () => setReady(true)
+  const openIntent = () => window.dispatchEvent(new Event("mlbot:open"))
+  return (
+    <>
+      {hydrated && !mounted && (
+        <div className={LAUNCHER_STACK_CLASS}>
+          <LauncherButton
+            onPointerEnter={load}
+            onFocus={load}
+            onTouchStart={load}
+            // Same path as the hero CTA: handled by our listener while the
+            // chunk is loading, or by MLBot's own if it mounted a tick ago.
+            // Fires on pointerdown too: if hover-prefetch finishes between
+            // mousedown and mouseup this node is swapped for MLBot's own and
+            // the browser never emits a click. "open" is idempotent, so the
+            // click that follows (and keyboard activation) is harmless.
+            onPointerDown={openIntent}
+            onClick={openIntent}
+          />
+        </div>
+      )}
+      {ready && (
+        <ChatLoadBoundary>
+          <MLBot initialOpen={openOnMount} onMounted={() => setMounted(true)} />
+        </ChatLoadBoundary>
+      )}
+    </>
+  )
 }

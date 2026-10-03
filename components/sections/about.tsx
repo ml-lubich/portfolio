@@ -128,6 +128,7 @@ export function About() {
               alt="Misha Lubich at his desk"
               width={1093}
               height={1439}
+              sizes="(min-width: 1024px) 320px, (min-width: 768px) 288px, 320px"
               className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-700 group-hover/photo:scale-105"
               placeholder="blur"
               blurDataURL="data:image/jpeg;base64,/9j/2wBDACgcHiMeGSgjISMtKygwPGRBPDc3PHtYXUlkkYCZlo+AjIqgtObDoKrarYqMyP/L2u71////m8H////6/+b9//j/2wBDASstLTw1PHZBQXb4pYyl+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj4+Pj/wAARCAAUAA8DASIAAhEBAxEB/8QAFwAAAwEAAAAAAAAAAAAAAAAAAAEDAv/EABYQAQEBAAAAAAAAAAAAAAAAAAABEf/EABUBAQEAAAAAAAAAAAAAAAAAAAEA/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAwDAQACEQMRAD8Appyp6coLAARf/9k="

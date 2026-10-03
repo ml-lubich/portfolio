@@ -15,6 +15,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from "react"
+import { LAUNCHER_STACK_CLASS, LauncherButton } from "./launcher"
 import { X, ArrowUp, ArrowUpToLine, Maximize2, Minimize2, Copy, Check, RotateCcw, Pencil, Square, MessageSquarePlus, Loader2 } from "lucide-react"
 import { SiteLogoMark } from "@/components/site-logo-mark"
 import { BlogChart } from "@/components/blog/charts/blog-chart"
@@ -246,8 +247,9 @@ function AssistantSegments({ content, charts, busy, isLast, onReveal }: Assistan
     )
 }
 
-export function MLBot() {
-    const [open, setOpen] = useState(false)
+export function MLBot({ initialOpen = false, onMounted }: { initialOpen?: boolean; onMounted?: () => void } = {}) {
+    const [open, setOpen] = useState(initialOpen)
+    useEffect(() => onMounted?.(), [onMounted])
     const [turns, setTurns] = useState<Turn[]>([])
     const [input, setInput] = useState("")
     const [busy, setBusy] = useState(false)
@@ -485,7 +487,7 @@ export function MLBot() {
     return (
         <>
             {/* ── Launcher stack, bottom-right ── */}
-            <div className="fixed bottom-6 right-6 z-[60] flex flex-col items-end gap-3">
+            <div className={LAUNCHER_STACK_CLASS}>
                 {showTop && !open && (
                     <button
                         type="button"
@@ -497,27 +499,7 @@ export function MLBot() {
                     </button>
                 )}
 
-                <button
-                    type="button"
-                    onClick={() => setOpen((v) => !v)}
-                    aria-label={open ? "Close MLBot" : "Chat with MLBot"}
-                    aria-expanded={open}
-                    className="mlbot-launcher group relative flex h-14 w-14 items-center justify-center rounded-2xl transition-transform duration-300 hover:scale-[1.06] active:scale-95"
-                >
-                    {open ? (
-                        <X className="h-5 w-5 text-foreground" />
-                    ) : (
-                        <SiteLogoMark width={40} height={40} sizes="40px" alt="" className="h-9 w-9 object-contain" />
-                    )}
-                    {!open && <span className="mlbot-pulse" aria-hidden />}
-                    {/* Names the button. A bare logo does not tell a first-time
-                        visitor that this is a chat they can talk to. */}
-                    {!open && (
-                        <span className="mlbot-tag" aria-hidden>
-                            AI Chat
-                        </span>
-                    )}
-                </button>
+                <LauncherButton open={open} onClick={() => setOpen((v) => !v)} />
             </div>
 
             {/* ── Panel ── */}

@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState, useCallback, useRef } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import { m, LazyMotion, domAnimation, AnimatePresence } from "framer-motion"
 import { shadows } from "@/lib/theme"
 
 /* ── Code snippets per skill (shown as flying particles) ── */
@@ -145,9 +145,10 @@ export function CodeParticles({ skill, isHovered }: CodeParticlesProps) {
     }, [isHovered, spawnBurst])
 
     return (
+        <LazyMotion features={domAnimation}>
         <AnimatePresence>
             {particles.map((p) => (
-                <motion.span
+                <m.span
                     key={p.id}
                     initial={{
                         x: 0,
@@ -173,8 +174,9 @@ export function CodeParticles({ skill, isHovered }: CodeParticlesProps) {
                     style={{ textShadow: shadows.textGlow }}
                 >
                     {p.text}
-                </motion.span>
+                </m.span>
             ))}
         </AnimatePresence>
+        </LazyMotion>
     )
 }

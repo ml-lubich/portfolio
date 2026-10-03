@@ -1,7 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useRef, useState } from "react"
-import { motion, useReducedMotion, useSpring } from "framer-motion"
+import { m, LazyMotion, domAnimation, useReducedMotion, useSpring } from "framer-motion"
 import { useTheme } from "next-themes"
 import { ExternalLink, Flame, Trophy } from "lucide-react"
 import { heroBeatDelay } from "@/components/hero/data"
@@ -85,15 +85,16 @@ export function TokscaleHeroBadge() {
       className="mt-12 flex animate-fade-in-up justify-center pointer-events-auto sm:mt-20"
       style={{ animationDelay: heroBeatDelay("tokscale"), opacity: 0 }}
     >
+      <LazyMotion features={domAnimation}>
       <div ref={sceneRef} className="tokscale-3d-scene relative">
         <div className="tokscale-aura absolute -inset-3 rounded-[1.5rem]" aria-hidden="true" />
-        <motion.div
+        <m.div
           className="relative"
           style={{ transformStyle: "preserve-3d" }}
           animate={reduce ? { y: 0, rotateX: 0, rotateY: 0 } : hovered ? HOVER_POSE : FLOAT_KEYFRAMES}
           transition={hovered || reduce ? HOVER_TRANSITION : FLOAT_TRANSITION}
         >
-          <motion.a
+          <m.a
             href={TOKSCALE_PROFILE_URL}
             target="_blank"
             rel="noopener noreferrer"
@@ -133,9 +134,10 @@ export function TokscaleHeroBadge() {
                 />
               </span>
             </span>
-          </motion.a>
-        </motion.div>
+          </m.a>
+        </m.div>
       </div>
+      </LazyMotion>
     </div>
   )
 }

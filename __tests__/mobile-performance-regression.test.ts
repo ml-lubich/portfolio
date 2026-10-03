@@ -140,10 +140,12 @@ describe("mobile performance guardrails", () => {
     expect(source("app/layout.tsx")).toContain("LazyMLBot")
   })
 
-  it("keeps MLBot's chunk fetch deferred until idle, not mounted on first paint", () => {
+  it("keeps MLBot's chunk fetch deferred until first intent, not idle or first paint", () => {
     const src = source("components/ai-chat/mlbot-lazy.tsx")
-    expect(src).toContain("requestIdleCallback")
-    expect(src).toContain('ready ? <MLBot /> : null')
+    expect(src).not.toContain("requestIdleCallback")
+    for (const intent of ["onPointerEnter", "onFocus", "onTouchStart", "onClick"]) expect(src).toContain(intent)
+    expect(src).toContain("<LauncherButton")
+    expect(src).toContain("<MLBot initialOpen={openOnMount}")
   })
 
   it("keeps the hero's mlbot:open CTA working before MLBot has idled in", () => {

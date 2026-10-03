@@ -58,6 +58,10 @@ Logical coordinate space: 1000×700px. Canvas applies `ctx.scale(clientW/1000, c
 - No three.js / WebGL / canvas particles before `load` + 2s idle (or first interaction) on phones, coarse pointers and no-hover devices.
 - `public/logo.png` is 128px (largest render is 64px); `next.config.mjs` caps `images.deviceSizes` at 1920 so full-bleed `<Image>`s never resolve to 3840w.
 - Remaining known cost: shared icon/framer chunk (~210KB) and the idle-loaded chat chunk (recharts); owned by `components/sections` and `components/ai-chat`.
+- Pass 2 (3 runs each, median): score 84 -> 85, TBT 91ms -> 62ms, total transfer 1746KB -> 1527KB, LCP 4.5s -> 4.37s. LCP element is the hero role text (observed 166ms; the simulated 4.4s is Lantern graph cost, not an image) and did not move; prioritising/removing the below-fold `priority` portrait made no difference.
+  - Chat: `LauncherButton` (`components/ai-chat/launcher.tsx`) ships in the initial bundle; the MLBot chunk loads on first hover/focus/touch/click of it, the hero CTA `mlbot:open`, or scroll past 600px (back-to-top lives in MLBot). Nothing loads at idle. The launcher renders after hydration and stays mounted until MLBot reports mounted, so an early click is not dropped (e2e races hydration otherwise); a click mounts `MLBot initialOpen`.
+  - framer-motion: `m` + `LazyMotion domAnimation` in tokscale-stats, terminal-reveal, animated-blog-content, code-particles (full `motion` runtime was the ~210KB shared chunk).
+  - Images: `sizes` on misha-desk-laptop (profile-intro, about), misha-loft-window, misha-office-window; `SiteLogoMark` now uses `next/image` (was raw 31KB `/logo.png` for a 40px mark).
 
 ## Blog content
 

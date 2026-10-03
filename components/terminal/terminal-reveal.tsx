@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react"
-import { motion, useInView } from "framer-motion"
+import { m, LazyMotion, domAnimation, useInView } from "framer-motion"
 import { terminalChrome } from "@/lib/theme"
 
 interface TerminalRevealProps {
@@ -170,7 +170,8 @@ export function TerminalWindow({
     children: ReactNode
 }) {
     return (
-        <motion.div
+        <LazyMotion features={domAnimation}>
+        <m.div
             ref={ref}
             initial={{ opacity: 0, y: 30, rotateX: 4 }}
             animate={visible ? { opacity: 1, y: 0, rotateX: 0 } : {}}
@@ -208,6 +209,7 @@ export function TerminalWindow({
                 {/* Subtle inner glow on bottom-right */}
                 <div className="pointer-events-none absolute -bottom-20 -right-20 h-40 w-40 rounded-full bg-emerald-500/5 blur-3xl" />
             </div>
-        </motion.div>
+        </m.div>
+        </LazyMotion>
     )
 }

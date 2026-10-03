@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useEffect, useRef, useState, useCallback } from "react"
-import { motion, useInView } from "framer-motion"
+import { m, LazyMotion, domAnimation, useInView } from "framer-motion"
 import { BlogContent } from "./blog-content"
 
 /* ── Helpers ─────────────────────────────────────────────────────── */
@@ -105,7 +105,8 @@ function AnimatedProseSection({
   }, [isInView, revealed, index, onRevealed])
 
   return (
-    <motion.div
+    <LazyMotion features={domAnimation}>
+    <m.div
       ref={ref}
       custom={index}
       initial="hidden"
@@ -115,7 +116,8 @@ function AnimatedProseSection({
     >
       {children}
 
-    </motion.div>
+    </m.div>
+    </LazyMotion>
   )
 }
 
