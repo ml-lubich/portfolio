@@ -1,15 +1,34 @@
+"use client"
+
+import { useRef } from "react"
 import { ArrowUpRight, BookOpen } from "lucide-react"
 import { AnimatedSection } from "../animations/animated-section"
 import { SectionHeader } from "../layout/section-header"
+import { useSectionProgress } from "@/lib/use-section-progress"
+import { depthOffset } from "@/lib/scroll-depth"
 import { LATEST_POST, SUBSTACK_SUBSCRIBE_URL, SUBSTACK_URL } from "@/lib/substack"
 
 /** Small, non-intrusive pointer to the Substack — one card for the latest
  *  post, and Substack's own subscribe-box embed. No feed fetch, no popup,
  *  no modal. */
 export function Writing() {
+  /* Scroll device: parallax-lite. The latest-post card and the subscribe
+     embed drift in opposite directions (<=8px each, under the 24px gap, so
+     they never touch). translateY only; wide mouse viewports only. */
+  const stackRef = useRef<HTMLDivElement>(null)
+  const postRef = useRef<HTMLAnchorElement>(null)
+  const embedRef = useRef<HTMLDivElement>(null)
+  useSectionProgress(stackRef, (p, el) => {
+    const a = depthOffset(p, 0.2)
+    const b = depthOffset(p, -0.2)
+    if (postRef.current) postRef.current.style.transform = `translate3d(0, ${a.toFixed(1)}px, 0)`
+    if (embedRef.current) embedRef.current.style.transform = `translate3d(0, ${b.toFixed(1)}px, 0)`
+    el.dataset.scVerifyState = `drift:${Math.round(a)}`
+  })
+
   return (
     <AnimatedSection id="writing" className="py-16 md:py-24">
-      <div className="container mx-auto max-w-4xl px-4">
+      <div ref={stackRef} className="container mx-auto max-w-4xl px-4">
         <SectionHeader
           label="Writing"
           title={
@@ -24,6 +43,7 @@ export function Writing() {
         />
 
         <a
+          ref={postRef}
           href={LATEST_POST.url}
           target="_blank"
           rel="noopener noreferrer"
@@ -41,7 +61,7 @@ export function Writing() {
           </span>
         </a>
 
-        <div className="mt-6 overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03]">
+        <div ref={embedRef} className="mt-6 overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03]">
           <iframe
             src={`${SUBSTACK_URL}/embed`}
             title="Subscribe to Misha Lubich on Substack"

@@ -212,8 +212,15 @@ export function guardPos(i: number, t: number) {
   const since = age - arrive
   if (since > 1.1) return null
   const done = since >= 0
-  return { x, done, fade: done ? 1 - clamp01(since / 1.1) : 1, req: r, lane: ((i % 3) + 3) % 3 }
+  // fade in over the first GUARD_FADE_IN seconds (no popping on spawn), fade out after the verdict
+  const fade = Math.min(ease(age / GUARD_FADE_IN), done ? 1 - ease(since / 1.1) : 1)
+  return { x, done, fade, mark: done ? ease(since / 0.25) : 0, req: r, lane: ((i % 3) + 3) % 3 }
 }
+export const GUARD_FADE_IN = 0.35
+/** Approx. label width in viewBox units for 12px mono text, plus pill padding. */
+export const guardLabelW = (text: string) => Math.round(text.length * 7.2 + 14)
+/** Left edge of a packet label: trails the packet, clamped continuously inside the track (never jumps). */
+export const guardLabelX = (x: number, w: number) => Math.min(TRACK_X1 + 14 - w, Math.max(TRACK_X0 - 14, x - 14))
 /** Outcome tallies over the last GUARD_REQS.length requests that have finished. */
 export function guardTally(t: number) {
   const cur = Math.floor(t / GUARD_SPAWN)

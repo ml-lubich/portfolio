@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest"
 import {
-  CHUNKS, EVAL_CASES, EVAL_GATE, EVAL_MATRIX, EVAL_SUITES, GATE_X, GUARD_REQS, GUARD_SPAWN, HOLD_TICKS, ROUTE_CYCLE,
+  CHUNKS, EVAL_CASES, EVAL_GATE, EVAL_MATRIX, EVAL_SUITES, GATE_X, GUARD_FADE_IN, GUARD_REQS, GUARD_SPAWN, HOLD_TICKS, ROUTE_CYCLE,
   ROUTE_REQS, ROUTE_THRESHOLD, SPANS, TOKENS, TOTAL_MS, TRACK_X1, WORKERS, agentState, cascadeCost, casesDone,
-  evalGate, evalMatrix, guardPos, guardTally, playheadMs, rerankRank, rng, routeAt, routeSavings, spanFill, stopTier,
+  evalGate, evalMatrix, guardLabelW, guardLabelX, guardPos, guardTally, playheadMs, rerankRank, rng, routeAt, routeSavings, spanFill, stopTier,
   suiteRate, tokensAt, traceState, typedLength, AGENT_STEP,
 } from "@/components/ai-viz/model"
 
@@ -128,6 +128,26 @@ describe("guardrail pipeline", () => {
     expect(pass).toBeNull()
     const end = guardPos(iPass, iPass * GUARD_SPAWN + (TRACK_X1 - 30) / 92 + 0.1)
     expect(end?.x).toBe(TRACK_X1)
+  })
+  it("fades in at spawn, marks the verdict smoothly, and labels never leave the track", () => {
+    expect(guardPos(0, 0)?.fade).toBe(0)
+    expect(guardPos(0, GUARD_FADE_IN / 2)?.fade).toBeGreaterThan(0)
+    expect(guardPos(0, GUARD_FADE_IN + 0.01)?.fade).toBe(1)
+    const iBlock = GUARD_REQS.findIndex((r) => r.fate === "block" && r.at === 0)
+    const arrive = (GATE_X[0] - 10 - 30) / 92
+    expect(guardPos(iBlock, iBlock * GUARD_SPAWN + arrive - 0.01)?.mark).toBe(0)
+    expect(guardPos(iBlock, iBlock * GUARD_SPAWN + arrive + 0.1)?.mark).toBeGreaterThan(0)
+    expect(guardPos(iBlock, iBlock * GUARD_SPAWN + arrive + 0.5)?.mark).toBe(1)
+    let prev = guardLabelX(30, 120)
+    for (let x = 30; x <= 570; x += 5) {
+      const lx = guardLabelX(x, 120)
+      expect(lx).toBeGreaterThanOrEqual(16)
+      expect(lx + 120).toBeLessThanOrEqual(584)
+      expect(lx).toBeGreaterThanOrEqual(prev) // monotone: no horizontal jumps
+      expect(lx - prev).toBeLessThanOrEqual(5)
+      prev = lx
+    }
+    expect(guardLabelW("abcd")).toBeGreaterThan(guardLabelW("ab"))
   })
   it("not-yet-spawned requests return null and tallies stay bounded", () => {
     expect(guardPos(5, 0)).toBeNull()

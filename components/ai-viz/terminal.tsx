@@ -43,13 +43,13 @@ export default function Terminal() {
   }, [running])
   const shown = reduced ? CODE.length : typedLength(tick, CODE.length)
   return (
-    <div ref={ref} className="w-full overflow-hidden rounded-2xl border" style={{ borderColor: 'var(--viz-border)', background: 'var(--viz-surface)' }}>
+    <div ref={ref} className="flex h-full w-full flex-col overflow-hidden rounded-2xl border" style={{ borderColor: 'var(--viz-border)', background: 'var(--viz-surface)' }}>
       <p className="sr-only">Decorative code sample: an agent loop in Python where write tools wait for an approval. Illustrative.</p>
       <div className="flex items-center justify-between border-b px-4 py-2 text-xs" style={{ borderColor: 'var(--viz-border)', background: 'var(--viz-surface-2)', color: 'var(--viz-muted)', fontFamily: MONO }} aria-hidden="true">
         <span>agent.py</span>
         <span>illustrative</span>
       </div>
-      <pre className="m-0 grid overflow-hidden px-4 py-3 text-[11px] leading-[1.6] sm:text-[12.5px]" style={{ fontFamily: MONO, color: 'var(--viz-fg)', whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }} aria-hidden="true">
+      <pre className="m-0 grid flex-1 content-start overflow-hidden px-4 py-4 text-[11px] leading-[1.6] sm:text-[12.5px]" style={{ fontFamily: MONO, color: 'var(--viz-fg)', whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }} aria-hidden="true">
         <code style={{ gridArea: '1 / 1', visibility: 'hidden' }}>{CODE}</code>
         <code style={{ gridArea: '1 / 1' }}>
           {highlight(CODE.slice(0, shown))}

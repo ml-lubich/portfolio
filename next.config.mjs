@@ -27,6 +27,11 @@ const nextConfig = {
   // Use Next.js image optimization (vercel/cloudflare) in production
   images: {
     formats: ["image/avif", "image/webp"],
+    // Cap the srcset ladder at 1920: the default adds 2048/3840, which a
+    // `sizes`-less or full-bleed <Image> resolves to on retina phones/desktops
+    // (a 3840w photo was 40KB+ on the first mobile Lighthouse run).
+    deviceSizes: [360, 414, 640, 750, 828, 1080, 1200, 1920],
+    minimumCacheTTL: 86400,
     remotePatterns: [
       {
         protocol: "https",

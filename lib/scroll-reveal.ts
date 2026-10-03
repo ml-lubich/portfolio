@@ -10,8 +10,6 @@ export const REVEAL_FLOOR = 0.2
 export const REVEAL_DONE_AT = 0.5
 /** Progress span over which one group fades in. */
 export const REVEAL_WINDOW = 0.12
-/** Band travel either side of centre, as a percent of its own width. */
-export const BAND_MAX_PCT = 20
 
 const clamp01 = (n: number): number => (n < 0 ? 0 : n > 1 ? 1 : n)
 
@@ -34,8 +32,14 @@ export function revealCount(p: number, count: number): number {
   return done
 }
 
-/** Band translateX in % of its width: +MAX at progress 0, -MAX at 1. */
-export function bandOffsetPct(p: number): number {
-  if (Number.isNaN(p)) return 0
-  return (0.5 - clamp01(p)) * 2 * BAND_MAX_PCT
+/** Travel, in px, of a rising item at progress 0 (transform-only, no layout). */
+export const RISE_PX = 28
+
+/**
+ * translateY for item `index` of `count`: rides the same stagger and easing
+ * as `revealAt`, so rise and opacity settle together. 0 at rest (and on NaN).
+ */
+export function riseAt(p: number, index: number, count: number): number {
+  const t = (revealAt(p, index, count) - REVEAL_FLOOR) / (1 - REVEAL_FLOOR)
+  return (1 - t) * RISE_PX
 }

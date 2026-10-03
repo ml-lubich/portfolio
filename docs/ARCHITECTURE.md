@@ -47,12 +47,18 @@ Logical coordinate space: 1000×700px. Canvas applies `ctx.scale(clientW/1000, c
 
 | Concern | Decision |
 |--------|----------|
-| **Hero WebGL** | `components/hero/index.tsx` defaults to mobile performance mode on first paint and loads `Brain3D` on mobile only after idle. Desktop can still sync the brain reveal with the name animation. |
+| **Hero WebGL** | `components/hero/index.tsx` `useDeferBrain`: desktop prefetches the chunk + `brain.bin` and mounts `Brain3D` on an idle slot (1200ms ceiling). Mobile performance mode (phone width, coarse pointer, no hover), `prefers-reduced-motion` and <=2-core devices download and mount nothing until the first `pointerdown`/`touchstart`/`keydown`; the CSS `brain-skeleton` holds the slot. Measured cause: the R3F frame loop was ~27s of main-thread work in a throttled mobile Lighthouse run (TBT 15s, score 35 -> TBT 0.2s, score 80 once deferred). |
 | **Hero particles** | `ParticleCanvas` is skipped while mobile performance mode is active; the spectrum background remains as the lightweight visual layer. |
 | **Lazy sections** | `components/layout/lazy-section.tsx` keeps the desktop `400px` preload margin but uses a tighter `120px` default margin on mobile so below-fold chunks mount closer to the viewport. |
 | **Scroll flicker control** | `components/nav/index.tsx` does not render the top scroll-progress strip; `app/layout.tsx` does not mount `ScrollShimmer`; `.nav-shell` in `app/globals.css` uses static gradients/shadows instead of `backdrop-filter` over the WebGL hero. |
 
-## Blog content
+### Mobile perf budget (Lighthouse mobile, simulated 4x CPU / slow 4G, `next build --webpack` + `next start`)
+
+- Performance score >= 80; TBT <= 300ms; CLS 0; initial JS transfer <= ~600KB.
+- No three.js / WebGL / canvas particles before a deliberate interaction on phones, coarse pointers, reduced motion or low-core devices.
+- `public/logo.png` is 128px (largest render is 64px); `next.config.mjs` caps `images.deviceSizes` at 1920 so full-bleed `<Image>`s never resolve to 3840w.
+- Remaining known cost: shared icon/framer chunk (~210KB) and the idle-loaded chat chunk (recharts); owned by `components/sections` and `components/ai-chat`.
+
 
 | Layer | Location | Notes |
 |--------|-----------|--------|

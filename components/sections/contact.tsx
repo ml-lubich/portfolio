@@ -1,14 +1,11 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
 import dynamic from "next/dynamic"
 import Image from "next/image"
 import { Mail, Phone, MapPin, Calendar, Linkedin, Github, GraduationCap, BookOpen } from "lucide-react"
 import { AnimatedSection } from "../animations/animated-section"
 import { SectionHeader } from "../layout/section-header"
 import { XIcon } from "../social-icons"
-import { isStaticScrollViewport, useSectionProgress } from "@/lib/use-section-progress"
-import { bandOffsetPct } from "@/lib/scroll-reveal"
 
 const ParticleField = dynamic(
   () => import("../three/scene-backgrounds").then((mod) => mod.ParticleField),
@@ -61,24 +58,6 @@ const socialLinks = [
 ]
 
 export function Contact() {
-  /* Kinetic band (desktop only). An oversized outline line sits behind the
-     content and slides sideways with scroll: transform only, absolutely
-     positioned (no layout height), clipped by its own box inside the section,
-     and drawn as a faint stroke so it never lowers the text's contrast. It is
-     mounted after hydration on scroll-linked viewports only, so phones, touch,
-     reduced motion and SSR paint today's markup unchanged. */
-  const columnRef = useRef<HTMLDivElement>(null)
-  const bandRef = useRef<HTMLSpanElement>(null)
-  const [showBand, setShowBand] = useState(false)
-  useEffect(() => {
-    setShowBand(!isStaticScrollViewport())
-  }, [])
-  useSectionProgress(columnRef, (p, el) => {
-    const pct = bandOffsetPct(p)
-    if (bandRef.current) bandRef.current.style.transform = `translate3d(${pct.toFixed(2)}%, 0, 0)`
-    el.dataset.scVerifyState = `band:${Math.round(pct)}`
-  })
-
   return (
     <AnimatedSection id="contact" className="relative section-y overflow-hidden">
       {/* 3D particle field background */}
@@ -86,26 +65,7 @@ export function Contact() {
         <ParticleField color="#a855f7" speed={0.08} />
       </div>
 
-      {showBand && (
-        <div
-          className="pointer-events-none absolute inset-0 flex items-center overflow-hidden"
-          aria-hidden="true"
-        >
-          <span
-            ref={bandRef}
-            className="block whitespace-nowrap font-display text-[14vw] font-bold leading-none tracking-tight opacity-[0.06] will-change-transform"
-            style={{
-              transform: "translate3d(0%, 0, 0)",
-              color: "transparent",
-              WebkitTextStroke: "1.5px hsl(var(--foreground))",
-            }}
-          >
-            {"LET'S BUILD"}
-          </span>
-        </div>
-      )}
-
-      <div ref={columnRef} className="relative mx-auto max-w-5xl px-3 md:px-6">
+      <div className="relative mx-auto max-w-5xl px-3 md:px-6">
         <SectionHeader
           label="Let's Connect"
           title={<>Ready to collaborate on{" "}<span className="gradient-text">innovative projects</span></>}

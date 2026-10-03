@@ -4782,3 +4782,6 @@ article .blog-prose b a[href],
       0 0 28px var(--accent-glow-soft);
   }
 }
+
+/* Follow cards: a focused card is always fully shown (scroll device dims the rest). */
+#follow .grid > *:focus-within { opacity: 1 !important; transform: none !important; }

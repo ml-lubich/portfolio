@@ -1,9 +1,9 @@
 /**
- * Scroll devices B — AI expertise opacity reveals + Contact kinetic band.
+ * Scroll devices B — AI expertise opacity reveals.
  *
  * Compact / SSR / reduced-motion must paint exactly the pre-change markup
  * (file snapshots captured BEFORE the devices were written); the pure math
- * must clamp, never hide content past the midpoint, and bound the band.
+ * must clamp, never hide content past the midpoint.
  */
 import { describe, it, expect } from "vitest"
 import { normalizeFloats } from "./helpers/normalize-floats"
@@ -16,10 +16,8 @@ import { Contact } from "@/components/sections/contact"
 import {
   revealAt,
   revealCount,
-  bandOffsetPct,
   REVEAL_FLOOR,
   REVEAL_DONE_AT,
-  BAND_MAX_PCT,
 } from "@/lib/scroll-reveal"
 
 const ROOT = path.resolve(__dirname, "..")
@@ -87,20 +85,6 @@ describe("revealCount (pure)", () => {
   })
 })
 
-describe("bandOffsetPct (pure)", () => {
-  it("is 0 at mid-travel and ±BAND_MAX_PCT at the ends", () => {
-    expect(bandOffsetPct(0.5)).toBeCloseTo(0, 9)
-    expect(bandOffsetPct(0)).toBe(BAND_MAX_PCT)
-    expect(bandOffsetPct(1)).toBe(-BAND_MAX_PCT)
-  })
-  it("clamps out-of-range input and treats NaN/Infinity as rest", () => {
-    expect(bandOffsetPct(-4)).toBe(BAND_MAX_PCT)
-    expect(bandOffsetPct(4)).toBe(-BAND_MAX_PCT)
-    expect(bandOffsetPct(Number.NaN)).toBe(0)
-    expect(Math.abs(bandOffsetPct(Number.POSITIVE_INFINITY))).toBeLessThanOrEqual(BAND_MAX_PCT)
-  })
-})
-
 describe("component contracts", () => {
   const ai = read("components/sections/ai-expertise.tsx")
   const contact = read("components/sections/contact.tsx")
@@ -120,20 +104,8 @@ describe("component contracts", () => {
     expect(ai).toContain("<NeuralConstellation bars={techBars} metrics={metrics} />")
     expect(ai).not.toContain('data-sc-verify-state="reveal')
   })
-  it("Contact: aria-hidden, inert, transform-only band, clipped inside the section, state published", () => {
-    expect(contact).toContain("useSectionProgress(")
-    expect(contact).toContain("bandOffsetPct(")
-    expect(contact).toMatch(/translate3d\(\$\{[^}]+\}%,\s*0,\s*0\)/)
-    expect(contact).toContain("pointer-events-none")
-    expect(contact).toContain('aria-hidden="true"')
-    expect(contact).toContain("overflow-hidden")
-    expect(contact).toContain("dataset.scVerifyState = `band:")
-    expect(contact).toContain("LET")
-  })
-  it("Contact: band is mounted only after the hook says the viewport is scroll-linked", () => {
-    expect(contact).toContain("isStaticScrollViewport()")
-  })
-  it("Contact: band stays behind the content at low opacity", () => {
-    expect(contact).toMatch(/opacity-\[0\.0\d+\]|opacity:\s*0\.0\d+/)
+  it("Contact: no kinetic band (stray ghost text removed)", () => {
+    expect(contact).not.toContain("showBand")
+    expect(contact).not.toContain("LET'S BUILD")
   })
 })

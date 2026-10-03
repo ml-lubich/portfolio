@@ -18,7 +18,7 @@ const LatencyWaterfall = dynamic(() => import("./latency-waterfall"), { loading:
 const GuardrailPipeline = dynamic(() => import("./guardrail-pipeline"), { loading: Placeholder })
 const ModelRouter = dynamic(() => import("./model-router"), { loading: Placeholder })
 const TrainingCurve = dynamic(() => import("./training-curve"), { loading: Placeholder })
-const Terminal = dynamic(() => import("./terminal"), { loading: () => <div className="h-[15rem] w-full rounded-2xl border" style={{ borderColor: "var(--viz-border)", background: "var(--viz-surface)" }} /> })
+const Terminal = dynamic(() => import("./terminal"), { loading: () => <div className="h-full min-h-[15rem] w-full rounded-2xl border" style={{ borderColor: "var(--viz-border)", background: "var(--viz-surface)" }} /> })
 
 const TABS = [
   { id: "agents", label: "Agent orchestration", View: AgentGraph, note: "An orchestrator plans, hands work to specialist agents, and every tool call passes an approval gate: reads go through, writes wait for a human, and a denied step triggers a replan." },
@@ -55,9 +55,9 @@ export function AILab() {
           compact
         />
 
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:items-start">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:items-stretch">
           <div>
-            <div role="tablist" aria-label="AI engineering visuals" className="mb-4 flex flex-wrap gap-2" onKeyDown={onKey}>
+            <div role="tablist" aria-label="AI engineering visuals" className="mb-4 flex flex-wrap gap-x-2 gap-y-2" onKeyDown={onKey}>
               {TABS.map((tab, i) => {
                 const on = i === active
                 return (
@@ -93,8 +93,8 @@ export function AILab() {
             </div>
           </div>
 
-          <div className="flex flex-col gap-4">
-            <Terminal />
+          <div className="flex min-h-0 flex-col gap-4">
+            <div className="min-h-[15rem] flex-1"><Terminal /></div>
             <p className="max-w-prose text-sm" style={{ color: "var(--viz-muted)" }}>
               Sketches, not screenshots: the data is generated from a fixed seed, and nothing on this page is a measurement of a real system.
             </p>

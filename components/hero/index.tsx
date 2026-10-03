@@ -65,9 +65,28 @@ function useMobilePerformanceMode() {
  *  same runs: 6.8s → 3.5s. */
 const BRAIN_IDLE_TIMEOUT_MS = 1200
 
-function useDeferBrain() {
+/** Phones, coarse pointers, reduced motion and low-core devices do not pay for
+ *  Three.js up front: the R3F frame loop alone was ~27s of main-thread work in
+ *  a throttled mobile Lighthouse run (TBT 15s). They mount the brain on the
+ *  first deliberate touch/key/pointer instead, and download nothing until then.
+ *  Desktops keep the idle-mount behaviour above. */
+function brainNeedsInteraction(mobile: boolean): boolean {
+  if (mobile) return true
+  const mq = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  const lowCore = (navigator.hardwareConcurrency ?? 8) <= 2
+  return mq || lowCore
+}
+
+function useDeferBrain(mobile: boolean) {
   const [show, setShow] = useState(false)
   useEffect(() => {
+    if (show) return
+    if (brainNeedsInteraction(mobile)) {
+      const events = ["pointerdown", "keydown", "touchstart"] as const
+      const go = () => setShow(true)
+      events.forEach((e) => window.addEventListener(e, go, { once: true, passive: true }))
+      return () => events.forEach((e) => window.removeEventListener(e, go))
+    }
     // Warm the network immediately; neither of these blocks the main thread.
     void import("../brain")
     void import("../brain/use-brain-data").then((m) => m.getBrainBinPromise()).catch(() => {})
@@ -81,7 +100,7 @@ function useDeferBrain() {
       if (typeof cancelIdleCallback !== "undefined") cancelIdleCallback(id as number)
       else clearTimeout(id)
     }
-  }, [])
+  }, [mobile, show])
   return show
 }
 
@@ -90,7 +109,7 @@ const BRAIN_FADE_MS = Math.round(HERO_NAME_REVEAL.durationMs * 1.12) + 80
 
 export function Hero() {
   const mobilePerformanceMode = useMobilePerformanceMode()
-  const idleBrain = useDeferBrain()
+  const idleBrain = useDeferBrain(mobilePerformanceMode)
   /** Brain mounts only after the idle/timeout signal — never tied to name reveal —
    *  so the rest of the hero is fully painted and interactive before Three.js loads. */
   const showBrain = idleBrain

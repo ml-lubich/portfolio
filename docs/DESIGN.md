@@ -337,7 +337,12 @@ Four more sections get one device each, all gated through `useSectionProgress` /
 - **About** (`about.tsx`, `lib/scroll-depth.ts`): parallax depth. Orbs and portrait drift in `translateY`, capped at 40px. Gate: wide + motion-ok. State: `depth:N`.
 - **Open source** (`open-source-showcase.tsx`, `lib/scroll-depth.ts`): a 2px `aria-hidden` progress rail on the left edge, filled with `scaleY`. Mounts only after hydration, on wide viewports. State: `rail:N`.
 - **AI expertise** (`ai-expertise.tsx`, `lib/scroll-reveal.ts`): staggered opacity reveal per group, floor 0.2, full at progress 0.5, a focused group always 1. Gate: wide + motion-ok. State: `reveal:N`.
-- **Contact** (`contact.tsx`, `lib/scroll-reveal.ts`): kinetic outline band reading "LET'S BUILD", `aria-hidden`, translated horizontally. Mounted only when wide and motion is OK. State: `band:N`.
+- **Follow** (`follow.tsx`, `lib/scroll-reveal.ts` `riseAt`): cards rise 28px and fade in on a stagger tied to progress, settled by 0.5; a focused card is at rest. State: `rise:N`.
+- **Skills** (`skills.tsx`, `riseAt`): the lg+ skill storm rises 28px into place as it enters (settled by ~12% progress). State: `rise:N`.
+- **Writing** (`substack.tsx`, `depthOffset`): parallax-lite; latest-post card and subscribe embed drift in opposite directions, <=8px each (under the 24px gap). State: `drift:N`.
+- `useSectionProgress` now also skips scheduling while its element is outside a 120px viewport margin (IntersectionObserver), catching up with one frame on re-entry.
+Gate: `__tests__/scroll-devices-c.test.ts`.
+- **Contact** (`contact.tsx`): no kinetic band (removed 2026-10: the ghost "LET'S BUILD" outline read as stray letters behind the portrait).
 
 Gates: `__tests__/scroll-devices-a.test.ts`, `__tests__/scroll-devices-b.test.ts`, `e2e/scroll-devices-a.spec.ts`, `e2e/scroll-devices-b.spec.ts`.
 

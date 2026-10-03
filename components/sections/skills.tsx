@@ -9,6 +9,8 @@ import { ShimmerOverlay } from "../ui/shimmer-overlay"
 import { skillCategories } from "@/data/skills"
 import { hex } from "@/lib/theme"
 import { SkillDetailModal } from "./skill-detail-modal"
+import { useSectionProgress } from "@/lib/use-section-progress"
+import { riseAt } from "@/lib/scroll-reveal"
 
 /* Desktop-only and ~114 pill nodes deep. Statically imported it landed in the
    server HTML and the initial bundle on every device, including the phones
@@ -88,6 +90,16 @@ export function Skills() {
     setModalOpen(true)
   }, [])
 
+  /* Scroll device (lg+ only, where the storm shows): the storm rises into
+     place as it enters, translateY only, settled by ~12% progress. Never
+     attaches on phones, touch, reduced motion or low-core machines. */
+  const stormRef = useRef<HTMLDivElement>(null)
+  useSectionProgress(stormRef, (p, el) => {
+    const y = riseAt(p, 0, 1)
+    el.style.transform = `translate3d(0, ${y.toFixed(1)}px, 0)`
+    el.dataset.scVerifyState = `rise:${Math.round(y)}`
+  })
+
   return (
     <AnimatedSection
       id="skills"
@@ -116,7 +128,7 @@ export function Skills() {
         <div className="relative z-10 flex flex-col gap-12 md:gap-16 lg:gap-20">
 
           {/* Desktop (lg+): the skills churn as an orbital "Storm of Skills". */}
-          <div className="hidden lg:block">
+          <div ref={stormRef} className="hidden lg:block">
             <SkillStorm onSelect={handleSelectSkill} />
           </div>
 

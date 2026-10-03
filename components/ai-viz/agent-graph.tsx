@@ -1,6 +1,6 @@
 'use client'
 import { Dot, Viz } from './viz'
-import { AGENT_STEP, WORKERS, agentState, r1 } from './model'
+import { AGENT_STEP, WORKERS, agentState, clamp01, ease, r1, span } from './model'
 
 const CX = 300, CY = 205
 const POS = WORKERS.map((w, i) => {
@@ -16,8 +16,11 @@ export default function AgentGraph() {
       {(t) => {
         const s = agentState(t)
         const w = POS[s.active]
-        const px = CX + (w.x - CX) * s.packet
-        const py = CY + (w.y - CY) * s.packet
+        const k = ease(s.packet)
+        const px = CX + (w.x - CX) * k
+        const py = CY + (w.y - CY) * k
+        // gate diamond fades in after the tool call starts and out as the result merges
+        const gateOp = clamp01(Math.min(span(s.p, 0.34, 0.46), 1 - span(s.p, 0.9, 1)))
         const mx = (CX + w.x) / 2, my = (CY + w.y) / 2
         const gated = s.worker.gate !== 'auto'
         const gateColor = s.verdict === 'denied' ? 'var(--viz-accent-2)' : 'var(--viz-accent)'
@@ -45,9 +48,9 @@ export default function AgentGraph() {
             })}
             <rect x={CX - 70} y={CY - 26} width="140" height="52" rx="16" fill="color-mix(in srgb, var(--viz-accent-2) 16%, var(--viz-surface-2))" stroke="var(--viz-accent-2)" strokeWidth="1.6" />
             <text x={CX} y={CY + 5} textAnchor="middle" fontSize="14.5" fontWeight="600" fill="var(--viz-fg)">Orchestrator</text>
-            {s.packet > 0 && s.packet < 1 && <Dot x={r1(px)} y={r1(py)} />}
-            {(s.phase === 'tool' || s.phase === 'gate' || s.phase === 'merge') && (
-              <g transform={`translate(${r1(mx)} ${r1(my)})`}>
+            {s.packet > 0 && s.packet < 1 && <g opacity={r1(clamp01(Math.min(s.packet, 1 - s.packet) * 6))}><Dot x={r1(px)} y={r1(py)} /></g>}
+            {gateOp > 0 && (
+              <g opacity={r1(gateOp)} transform={`translate(${r1(mx)} ${r1(my)})`}>
                 <path d="M0 -17L17 0L0 17L-17 0Z" fill="var(--viz-surface)" stroke={s.phase === 'gate' ? gateColor : 'var(--viz-border)'} strokeWidth="1.8" />
                 <text y="5" textAnchor="middle" fontSize="15" fontWeight="700" fill={s.phase === 'gate' ? gateColor : 'var(--viz-muted)'}>
                   {s.verdict === 'waiting' ? '?' : s.verdict === 'denied' ? '✕' : '✓'}

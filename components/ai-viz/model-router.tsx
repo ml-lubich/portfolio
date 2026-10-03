@@ -1,6 +1,6 @@
 'use client'
 import { Dot, Viz } from './viz'
-import { ROUTE_THRESHOLD, TIERS, cascadeCost, r1, routeAt, routeSavings, stopTier } from './model'
+import { ROUTE_THRESHOLD, TIERS, cascadeCost, ease, lerp, r1, routeAt, routeSavings, stopTier } from './model'
 
 const TX = [100, 300, 500]
 const BAR_W = 110
@@ -14,7 +14,7 @@ export default function ModelRouter() {
         const conf = s.req.conf[s.attempt] ?? 0
         const shown = conf * s.filled
         const passed = s.settled && s.attempt === stopTier(s.req) && conf >= ROUTE_THRESHOLD
-        const headX = s.arrived ? TX[s.attempt] : 28
+        const headX = s.arrived ? lerp(s.attempt ? TX[s.attempt - 1] : 28, TX[s.attempt], ease(s.filled * 3)) : 28
         return (
           <>
             <text x="16" y="56" fontSize="13" fill="var(--viz-muted)">request</text>

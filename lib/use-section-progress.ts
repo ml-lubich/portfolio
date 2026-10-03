@@ -62,21 +62,35 @@ export function useSectionProgress<T extends HTMLElement>(
     if (!el || isStaticScrollViewport()) return
 
     let raf = 0
+    /* Off-screen sections schedule nothing; one apply on re-entry catches up. */
+    let visible = true
     const apply = () => {
       raf = 0
       const r = el.getBoundingClientRect()
       callback.current(sectionProgress(r.top, r.height, window.innerHeight), el)
     }
     const schedule = () => {
-      if (!raf) raf = requestAnimationFrame(apply)
+      if (visible && !raf) raf = requestAnimationFrame(apply)
     }
 
     apply()
+    const io =
+      typeof IntersectionObserver === "undefined"
+        ? null
+        : new IntersectionObserver(
+            ([entry]) => {
+              visible = entry.isIntersecting
+              if (visible) schedule()
+            },
+            { rootMargin: "120px" },
+          )
+    io?.observe(el)
     window.addEventListener("scroll", schedule, { passive: true })
     window.addEventListener("resize", schedule)
     return () => {
       window.removeEventListener("scroll", schedule)
       window.removeEventListener("resize", schedule)
+      io?.disconnect()
       if (raf) cancelAnimationFrame(raf)
     }
   }, [ref])

@@ -1,3 +1,6 @@
+"use client"
+
+import { useRef } from "react"
 import { ArrowUpRight, BookOpen, Github, Linkedin } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 import type { ComponentType } from "react"
@@ -5,6 +8,8 @@ import { AnimatedSection } from "../animations/animated-section"
 import { SectionHeader } from "../layout/section-header"
 import { XIcon } from "../social-icons"
 import { SUBSTACK_SUBSCRIBE_URL } from "@/lib/substack"
+import { useSectionProgress } from "@/lib/use-section-progress"
+import { revealAt, revealCount, riseAt } from "@/lib/scroll-reveal"
 
 /** One entry per platform. Adding a new one (e.g. YouTube later) is one
  *  object in this array — the grid below just maps over it. */
@@ -61,6 +66,20 @@ const FOLLOW_CARDS: FollowCard[] = [
  *  feed embeds (X's logged-out timeline is unreliable, LinkedIn has no
  *  public feed embed). Each card links out to the real profile. */
 export function Follow() {
+  /* Scroll device: cards rise and fade in on a stagger tied to section
+     progress (transform + opacity only; floor 0.2, rest at 0). Wide
+     mouse-driven viewports only; a focused card is always at rest. */
+  const gridRef = useRef<HTMLDivElement>(null)
+  useSectionProgress(gridRef, (p, el) => {
+    const cards = Array.from(el.children) as HTMLElement[]
+    cards.forEach((card, i) => {
+      const focused = card.contains(document.activeElement)
+      card.style.opacity = focused ? "1" : revealAt(p, i, cards.length).toFixed(3)
+      card.style.transform = `translate3d(0, ${focused ? 0 : riseAt(p, i, cards.length).toFixed(1)}px, 0)`
+    })
+    el.dataset.scVerifyState = `rise:${revealCount(p, cards.length)}`
+  })
+
   return (
     <AnimatedSection id="follow" className="py-16 md:py-24">
       <div className="container mx-auto max-w-4xl px-4">
@@ -75,7 +94,7 @@ export function Follow() {
           compact
         />
 
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div ref={gridRef} className="grid gap-4 sm:grid-cols-2">
           {FOLLOW_CARDS.map((card) => (
             <div
               key={card.id}
