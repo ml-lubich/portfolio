@@ -43,7 +43,7 @@ describe("wiring", () => {
   })
 
   it("Substack is in the Person schema's sameAs", () => {
-    expect(read("components/seo/json-ld.tsx")).toContain("mlubich.substack.com")
+    expect(read("lib/seo.ts")).toContain("mlubich.substack.com")
   })
 
   it("the section links the latest post and embeds Substack's subscribe box, no popup/modal", () => {
@@ -91,7 +91,7 @@ describe("X (Twitter) presence", () => {
   })
 
   it("X is in the Person schema's sameAs, alongside a fixed LinkedIn URL", () => {
-    const jsonLd = read("components/seo/json-ld.tsx")
+    const jsonLd = read("lib/seo.ts")
     expect(jsonLd).toContain("https://x.com/Machine_Lubich")
     expect(jsonLd).toContain("https://substack.com/@mlubich")
     expect(jsonLd).toContain("https://www.linkedin.com/in/misha-lubich/")

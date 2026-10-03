@@ -1,0 +1,24 @@
+# Misha Lubich
+
+> Personal site of Misha Lubich, a Staff AI Engineer at EchoStar, previously Apple, Walmart and Lawrence Berkeley National Lab.
+
+Misha builds production AI systems: machine learning, MLOps, large language models, agents and full-stack web apps. The site has his portfolio, consulting, publications, a blog, free AI tools, an LLM price comparison and small LLM-themed browser games.
+
+## Pages
+
+- [Home](https://www.mishalubich.com/): portfolio, experience, projects, skills, publications, contact
+- [Blog](https://www.mishalubich.com/blog): articles on AI engineering
+- [Tools](https://www.mishalubich.com/tools): AI project cost estimator and system prompt linter
+- [LLM prices](https://www.mishalubich.com/llm-prices): model pricing comparison
+- [Games](https://www.mishalubich.com/games): LLM-themed browser games
+- [RSS feed](https://www.mishalubich.com/feed.xml)
+- [Sitemap](https://www.mishalubich.com/sitemap.xml)
+
+## Profiles
+
+- [GitHub](https://github.com/ml-lubich)
+- [LinkedIn](https://www.linkedin.com/in/misha-lubich/)
+- [X](https://x.com/Machine_Lubich)
+- [Google Scholar](https://scholar.google.com/citations?hl=en&user=Be6ZA78AAAAJ)
+- [ORCID](https://orcid.org/0000-0003-2329-4454)
+- [Substack](https://mlubich.substack.com)

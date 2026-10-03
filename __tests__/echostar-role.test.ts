@@ -49,11 +49,11 @@ describe("partners strip", () => {
 describe("site metadata reflects the new title", () => {
     it("names Staff AI Engineer in the page title and JSON-LD", () => {
         expect(read("app/layout.tsx")).toMatch(/Staff AI Engineer/)
-        expect(read("components/seo/json-ld.tsx")).toMatch(/Staff AI Engineer/)
+        expect(read("lib/seo.ts")).toMatch(/Staff AI Engineer/)
     })
 
     it("declares EchoStar as the current employer in structured data", () => {
-        const jsonLd = read("components/seo/json-ld.tsx")
+        const jsonLd = read("lib/seo.ts")
         expect(jsonLd).toMatch(/worksFor/)
         expect(jsonLd).toMatch(/EchoStar/)
     })

@@ -74,6 +74,7 @@
 
 ## Automated: terminal snake game
 
+- `__tests__/seo.test.ts` — SEO contract: `lib/seo.ts` title <=60 and description 140-160 chars, JSON-LD is one `@graph` with unique `@id`s under `SITE_URL` (Person `#person`, WebSite `#website`), `SITE_URL` defaults to the www host (Vercel redirects apex to www), sitemap includes home with no duplicates and no noindex pages (`/demo`, `/fork`, `/status`), robots emits `Sitemap` + `Host` and keeps `/status` and `/api/` disallowed, `public/llms.txt` exists, and no telephone appears in JSON-LD or llms.txt.
 - `__tests__/snake-game.test.ts` — `lib/snake-game.ts`: verifies initial board placement, laptop keyboard direction mapping, reversal prevention, food growth/scoring, and wall collision loss state.
 - `__tests__/terminal-indentation-regression.test.ts` — guards the live terminal renderer against code indentation regressions, including the multiline TypeScript `streamInference` fixture and `<pre><code>` rendering path.
 

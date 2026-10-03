@@ -41,7 +41,7 @@ Logical coordinate space: 1000×700px. Canvas applies `ctx.scale(clientW/1000, c
 | **Cover images** | Listing cards use `next/image` with responsive `sizes` and `priority` only for the visible featured carousel slide. |
 | **Motion** | Blog listing and article routes avoid Framer Motion; route-level animation is plain CSS/markup so mobile hydration does not pull in the animation runtime. Grid cards avoid `layout` / `popLayout` animations to reduce main-thread layout work on mobile. |
 | **Route prefetch** | Blog cards prefetch on hover/focus only. Touch start does not trigger prefetch, so a mobile tap is not competing with navigation image/JS fetches. |
-| **Canonical vs subdomain** | SEO canonicals and UI labels use apex + path (`getBlogCanonicalUrl()`, `getBlogPublicLabel()` from `lib/site-config.ts`). `blog.*` hosts rewrite to `/blog/*` via `proxy.ts` only. |
+| **Canonical vs subdomain** | SEO canonicals use the `www` host (Vercel 308-redirects apex to www, so apex URLs would be redirecting canonicals); UI labels strip `www` and show host + path (`getBlogCanonicalUrl()`, `getBlogPublicLabel()` from `lib/site-config.ts`). `blog.*` hosts rewrite to `/blog/*` via `proxy.ts` only. |
 
 ## Mobile homepage performance
 

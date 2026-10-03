@@ -3,6 +3,15 @@ import { blogPosts, BLOG_CATEGORIES } from "@/lib/blog-data"
 import { SITE_URL } from "@/lib/site-config"
 import { getBlogDateEpochMs } from "@/lib/blog-format"
 
+/** Indexable game pages under app/games/* (demo, fork, status are noindex and excluded). */
+const GAME_SLUGS = [
+  "context-tetris",
+  "hallucination-detector",
+  "prompt-runner",
+  "snake",
+  "token-invaders",
+] as const
+
 /**
  * Dynamic sitemap generation.
  *
@@ -51,6 +60,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "daily",
       priority: 0.8,
     },
+    {
+      url: `${SITE_URL}/games`,
+      lastModified: now,
+      changeFrequency: "monthly",
+      priority: 0.6,
+    },
+    ...GAME_SLUGS.map((slug) => ({
+      url: `${SITE_URL}/games/${slug}`,
+      lastModified: now,
+      changeFrequency: "monthly" as const,
+      priority: 0.5,
+    })),
     {
       url: `${SITE_URL}/feed.xml`,
       lastModified: latestBlogDate,

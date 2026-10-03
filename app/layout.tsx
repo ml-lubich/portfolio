@@ -10,6 +10,7 @@ import { AgentsBuildEgg } from "@/components/easter/agents-build"
 import { AgentStormLauncher } from "@/components/agent-storm/agent-storm-launcher"
 import { ThemeProvider } from "@/components/theme-provider"
 import { LIGHT_MODE_ENABLED } from "@/lib/light-mode"
+import { SEO_TITLE, SEO_DESCRIPTION } from "@/lib/seo"
 
 /* Two families, matching josephheupler.com. The page used to load seven, three
    of them literary serifs, which is what read as "too literate" — the wordmark
@@ -40,11 +41,10 @@ const BASE_URL = SITE_URL
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    default: "Misha Lubich | Staff AI Engineer — Portfolio",
+    default: SEO_TITLE,
     template: "%s | Misha Lubich",
   },
-  description:
-    "Misha Lubich is a Staff AI Engineer at EchoStar, previously Apple, Walmart and Lawrence Berkeley National Lab. Explore projects in machine learning, MLOps, LLMs, agents, and full-stack development.",
+  description: SEO_DESCRIPTION,
   keywords: [
     "AI Engineer",
     "Machine Learning Engineer",
@@ -76,6 +76,10 @@ export const metadata: Metadata = {
   creator: "Misha Lubich",
   publisher: "Misha Lubich",
   category: "technology",
+  formatDetection: { telephone: false, email: false, address: false },
+  ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+    ? { verification: { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION } }
+    : {}),
   robots: {
     index: true,
     follow: true,
@@ -95,8 +99,7 @@ export const metadata: Metadata = {
     url: BASE_URL,
     siteName: "Misha Lubich — Staff AI Engineer",
     title: "Misha Lubich | Staff AI Engineer",
-    description:
-      "Staff AI Engineer at EchoStar building production AI pipelines, previously Apple and Walmart. Explore innovative projects, research publications, and engineering insights.",
+    description: SEO_DESCRIPTION,
     images: [
       {
         url: SITE_DEFAULT_OG_IMAGE,
@@ -110,8 +113,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Misha Lubich | Staff AI Engineer",
-    description:
-      "Staff AI Engineer at EchoStar building production AI pipelines, previously Apple and Walmart. Projects, research & insights.",
+    description: SEO_DESCRIPTION,
     images: [
       {
         url: SITE_DEFAULT_OG_IMAGE,

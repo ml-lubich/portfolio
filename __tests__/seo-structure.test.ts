@@ -188,7 +188,8 @@ describe("JSON-LD structured data", () => {
         expect(fs.existsSync(jsonLdPath)).toBe(true)
     })
 
-    const jsonLdSrc = fs.readFileSync(jsonLdPath, "utf-8")
+    // The graph data lives in lib/seo.ts; json-ld.tsx only renders it.
+    const jsonLdSrc = fs.readFileSync(path.join(ROOT, "lib/seo.ts"), "utf-8")
 
     it("has Person schema", () => {
         expect(jsonLdSrc).toContain('"@type": "Person"')
