@@ -184,6 +184,10 @@
     "unix-way-of-agent-tooling": {
       "views": "1k",
       "coverImage": "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=1200&h=630&fit=crop"
+    },
+    "why-we-built-pyosascript": {
+      "views": "1k",
+      "coverImage": "https://images.unsplash.com/photo-1544256718-3bcf237f3974?w=1200&h=630&fit=crop"
     }
   }
 }

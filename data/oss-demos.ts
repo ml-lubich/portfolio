@@ -175,6 +175,23 @@ export const ossDemos: OssDemo[] = [
         ],
     },
     {
+        id: "pyosascript",
+        repoUrl: "https://github.com/ml-lubich/pyosascript",
+        packageUrl: "https://pypi.org/project/pyosascript/",
+        install: "pip install pyosascript",
+        tagline: "Type-safe Python bindings & CLI for macOS AppleScript and JXA",
+        demo: [
+            { t: "cmd", s: "osascript-py eval \"return 2 + 2\"" },
+            { t: "out", s: "4" },
+            { t: "cmd", s: "osascript-py eval -j \"return current date\"" },
+            { t: "code", s: "{\"ok\": true, \"output\": \"Tuesday, October 13, 2026\", \"returncode\": 0}" },
+        ],
+        stats: [
+            { label: "Language", value: "AppleScript · JXA" },
+            { label: "Distribution", value: "PyPI" },
+        ],
+    },
+    {
         id: "wa-mcp",
         repoUrl: "https://github.com/ml-lubich/whatsapp-mcp",
         packageUrl: "https://pypi.org/project/mac-wa/",
@@ -339,6 +356,7 @@ export const ossDemos: OssDemo[] = [
         stats: [
             { label: "Install", value: "npm + Homebrew" },
             { label: "Type", value: "CLI + library" },
+            { label: "Downloads", value: "Up to 943/week (npm)" },
         ],
     },
     {
@@ -395,6 +413,86 @@ export const ossDemos: OssDemo[] = [
         stats: [
             { label: "Distribution", value: "Plugin marketplace" },
             { label: "Type", value: "Ruleset" },
+        ],
+    },
+    {
+        id: "linkedin-mcp",
+        repoUrl: "https://github.com/ml-lubich/linkedin-mcp",
+        install: "git clone https://github.com/ml-lubich/linkedin-mcp",
+        tagline: "Unofficial LinkedIn CLI + MCP — Voyager reads/writes plus CDP messaging on your own Chrome",
+        demo: [
+            { t: "cmd", s: "linkedin doctor" },
+            { t: "out", s: "Voyager session OK  |  CDP (9222) reachable" },
+            { t: "cmd", s: "linkedin messages send \"thanks!\" --confirm" },
+            { t: "out", s: "skip --confirm and nothing sends, by design" },
+        ],
+        stats: [
+            { label: "Confirm gate", value: "Every send/publish" },
+            { label: "Surfaces", value: "CLI + MCP" },
+        ],
+    },
+    {
+        id: "rgate",
+        repoUrl: "https://github.com/ml-lubich/railway-mcp",
+        install: "git clone https://github.com/ml-lubich/railway-mcp",
+        tagline: "Switch Railway CLI logins without railway logout — CLI + MCP",
+        demo: [
+            { t: "cmd", s: "rgate ls" },
+            { t: "out", s: "1  you@personal.com   valid    active" },
+            { t: "cmd", s: "rgate switch 2" },
+            { t: "out", s: "switched to ops@client.com" },
+        ],
+        stats: [
+            { label: "Surfaces", value: "CLI + MCP" },
+            { label: "Distribution", value: "Source" },
+        ],
+    },
+    {
+        id: "humanizer",
+        repoUrl: "https://github.com/ml-lubich/humanizer",
+        install: "git clone https://github.com/ml-lubich/humanizer",
+        tagline: "Strips AI-writing tells from prose — 33 patterns, Wikipedia-sourced",
+        demo: [
+            { t: "cmd", s: "/plugin marketplace add ml-lubich/humanizer" },
+            { t: "cmd", s: "/plugin install humanizer@humanizer" },
+            { t: "cmd", s: "/humanizer humanize docs/launch-post.md" },
+            { t: "out", s: "33 'Signs of AI writing' patterns fixed in place" },
+        ],
+        stats: [
+            { label: "Patterns detected", value: "33" },
+            { label: "Distribution", value: "Skills CLI + plugin" },
+        ],
+    },
+    {
+        id: "own-chrome",
+        repoUrl: "https://github.com/ml-lubich/own-chrome",
+        install: "git clone https://github.com/ml-lubich/own-chrome",
+        tagline: "Stdlib-only agent CLI for the Chrome window already open — no Playwright",
+        demo: [
+            { t: "cmd", s: "own-chrome tabs --json --filter linkedin" },
+            { t: "out", s: "3 tabs matched, no browser launched, just read" },
+            { t: "cmd", s: "own-chrome eval \"document.title\" --tab example.com" },
+            { t: "out", s: "stdlib-only: no Playwright, no Chrome for Testing" },
+        ],
+        stats: [
+            { label: "Dependencies", value: "0" },
+            { label: "Type", value: "CLI" },
+        ],
+    },
+    {
+        id: "callgen",
+        repoUrl: "https://github.com/ml-lubich/callgen",
+        install: "git clone https://github.com/ml-lubich/callgen",
+        tagline: "Recorded call → one self-contained HTML report, local whisper.cpp",
+        demo: [
+            { t: "cmd", s: "callgen transcribe call.m4a -m model.bin -o work" },
+            { t: "out", s: "whisper.cpp transcribes locally, audio never leaves" },
+            { t: "cmd", s: "callgen build --content work/content.json -o out.html" },
+            { t: "out", s: "one HTML file, zero external requests" },
+        ],
+        stats: [
+            { label: "Figures per call", value: "8-12" },
+            { label: "External requests", value: "0" },
         ],
     },
 ]

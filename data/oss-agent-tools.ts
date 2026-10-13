@@ -39,6 +39,11 @@ const META: Record<string, { displayName: string; description: string; tag: stri
     description: "Apple Notes CLI + MCP",
     tag: "macOS",
   },
+  "pyosascript": {
+    displayName: "pyosascript",
+    description: "Type-safe Python bindings & CLI for macOS AppleScript & JXA",
+    tag: "macOS · Py",
+  },
   "wa-mcp": {
     displayName: "wa",
     description: "WhatsApp CLI + MCP · imsg pattern",
@@ -89,6 +94,31 @@ const META: Record<string, { displayName: string; description: string; tag: stri
     description: "Model-tiered ruleset · Claude Code plugin marketplace",
     tag: "ruleset",
   },
+  "linkedin-mcp": {
+    displayName: "linkedin",
+    description: "LinkedIn CLI + MCP · Voyager API + CDP Chrome",
+    tag: "Py",
+  },
+  rgate: {
+    displayName: "rgate",
+    description: "Switch Railway CLI logins · CLI + MCP",
+    tag: "Py",
+  },
+  humanizer: {
+    displayName: "humanizer",
+    description: "Strips AI-writing tells · Claude Code skill",
+    tag: "skill",
+  },
+  "own-chrome": {
+    displayName: "own-chrome",
+    description: "Drives your open Chrome · stdlib-only CDP",
+    tag: "Py",
+  },
+  callgen: {
+    displayName: "callgen",
+    description: "Call recording → single-file HTML report",
+    tag: "Py",
+  },
 }
 
 const ORDER = [
@@ -105,6 +135,11 @@ const ORDER = [
   "ical-cli",
   "vgate",
   "claude-tiers",
+  "linkedin-mcp",
+  "rgate",
+  "humanizer",
+  "own-chrome",
+  "callgen",
 ] as const
 
 export const ossAgentTools: OssAgentTool[] = ORDER.map((id) => {

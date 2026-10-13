@@ -1,0 +1,92 @@
+---
+title: "Why We Built pyosascript: Eliminating String Escaping Nightmares in macOS Automation"
+excerpt: "AppleScript is macOS's secret weapon for desktop agent automation, but calling it from Python was filled with quoting bugs, silent failures, and binary stream traps."
+date: "2026-10-13"
+category: "Engineering Culture"
+tags: ["macOS", "AppleScript", "Python", "CLI", "Automation", "Open Source"]
+---
+
+If you build AI agents or developer automation tools that operate natively on macOS, you inevitably discover AppleScript and JXA (JavaScript for Automation).
+
+Nothing else gives you deterministic control over Mail.app, Messages.app, Finder, or System Events without requiring fragile screen coordinate scraping or intrusive UI accessibility hacks.
+
+Yet, almost every Python bridge to `osascript` in the ecosystem makes the same fatal mistake: **blind string interpolation**.
+
+```python
+# The classic disaster: one quote in `subject` or `body` and your script breaks
+os.system(f'osascript -e \'tell application "Mail" to send message with subject "{subject}"\'')
+```
+
+## The Three Traps of AppleScript Automation
+
+### 1. The Quoting Minefield
+AppleScript has idiosyncratic syntax rules:
+- Double quotes must be escaped with backslashes.
+- Single quotes don't escape double quotes the way Bash does.
+- Multiline string literals cannot simply have raw newlines in `-e` parameters without breaking shell interpreters.
+
+When an LLM generates a response containing quotes, emoji, or contractions, unescaped string templates throw syntax error `-2741` or fail silently.
+
+### 2. Silent Failures and Non-Zero Exit Codes
+`osascript` outputs user errors to `stderr` and errors to return code `1`, but standard Python scripts often discard `stderr` or fail to parse return values. Diagnosing whether Mail was missing permissions (`-600`) or the statement had a syntax typo required writing custom regex wrappers every single time.
+
+### 3. Binary Stream Traps in macOS Databases
+On newer versions of macOS, apps like Messages don't even store raw text in `message.text`—they serialize rich text, email addresses, and URLs into binary Cocoa archives (`message.attributedBody`). If your bridge doesn't understand native macOS data types, your agent sees empty strings while the user is staring right at the text on their screen.
+
+---
+
+## Enter `pyosascript`
+
+We built [`pyosascript`](https://github.com/ml-lubich/pyosascript) as a standalone, type-safe Python package and CLI to solve this permanently.
+
+```bash
+pip install pyosascript
+```
+
+### Type-Safe Variable Injection
+Instead of concatenating strings, `pyosascript` formats variables into native AppleScript and JXA literals safely:
+
+```python
+from pyosascript import run_applescript
+
+res = run_applescript(
+    'return "Hello, " & username & "!"',
+    variables={"username": 'Misha "The Builder" Lubich'}
+)
+print(res.output)  # Safely escaped: Hello, Misha "The Builder" Lubich!
+```
+
+### Structured Output and Lists
+AppleScript list outputs (`{"apple", "banana"}`) are parsed cleanly into native Python lists:
+
+```python
+from pyosascript import run_applescript
+
+res = run_applescript('return {"inbox", "archive", "drafts"}')
+print(res.as_list())  # ['inbox', 'archive', 'drafts']
+```
+
+### Native JXA Support
+Need to run modern ES6 JavaScript instead of AppleScript?
+
+```python
+from pyosascript import run_jxa
+
+res = run_jxa("(() => { return [1, 2, 3].map(x => x * 2); })()")
+print(res.output)  # 2, 4, 6
+```
+
+### Clean CLI for Desktop Agents
+It also installs a fast CLI utility (`osascript-py`):
+
+```bash
+# Execute with JSON metadata output
+osascript-py eval "return current date" -j
+
+# Tell applications directly
+osascript-py tell Finder "get name of front window"
+```
+
+The package is fully open source under the MIT license with comprehensive CI/CD test suites on macOS GitHub Actions.
+
+Check out the repository at [github.com/ml-lubich/pyosascript](https://github.com/ml-lubich/pyosascript).

@@ -15,6 +15,7 @@ const ALLOWED_PUBLIC_IDS = new Set([
   "imsg-mcp",
   "imail-mcp",
   "inotes-mcp",
+  "pyosascript",
   "wa-mcp",
   "bitbucket-cli",
   "twig",
@@ -28,6 +29,11 @@ const ALLOWED_PUBLIC_IDS = new Set([
   "imessage-exporter",
   "synthdata-forge",
   "multimodal-captcha-solver",
+  "linkedin-mcp",
+  "rgate",
+  "humanizer",
+  "own-chrome",
+  "callgen",
 ])
 
 const EXCLUDED_IDS = new Set([
