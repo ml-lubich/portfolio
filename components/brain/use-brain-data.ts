@@ -4,8 +4,8 @@ import type { BrainData } from "./types"
 
 /* ── Fetch + parse brain.bin ──────────────────────────────────────── */
 
-async function loadBrainBin(): Promise<BrainData> {
-  const resp = await fetch("/brain.bin")
+async function loadBrainBin(url: string): Promise<BrainData> {
+  const resp = await fetch(url)
   const buf = await resp.arrayBuffer()
   const view = new DataView(buf)
 
@@ -45,22 +45,30 @@ async function loadBrainBin(): Promise<BrainData> {
   }
 }
 
-/** Single in-flight fetch so Canvas shell and wireframe share one network + parse pass. */
-let brainBinPromise: Promise<BrainData> | null = null
+/** Same mesh as desktop, further decimated (scripts/pack-brain-mobile.js) — a measurably
+ *  lighter asset for mobile, not just the desktop one shown later. */
+const DESKTOP_BIN_URL = "/brain.bin"
+const MOBILE_BIN_URL = "/brain-mobile.bin"
 
-export function getBrainBinPromise(): Promise<BrainData> {
-  if (!brainBinPromise) {
-    brainBinPromise = loadBrainBin().catch((err) => {
-      brainBinPromise = null
+/** One in-flight fetch per variant so Canvas shell and wireframe share one network + parse pass. */
+const brainBinPromises = new Map<string, Promise<BrainData>>()
+
+export function getBrainBinPromise(isMobile = false): Promise<BrainData> {
+  const url = isMobile ? MOBILE_BIN_URL : DESKTOP_BIN_URL
+  let promise = brainBinPromises.get(url)
+  if (!promise) {
+    promise = loadBrainBin(url).catch((err) => {
+      brainBinPromises.delete(url)
       throw err
     })
+    brainBinPromises.set(url, promise)
   }
-  return brainBinPromise
+  return promise
 }
 
 /* ── React hook to load brain data ────────────────────────────────── */
 
-export function useBrainData() {
+export function useBrainData(isMobile = false) {
   const [result, setResult] = useState<{
     geo: THREE.BufferGeometry
     brainData: BrainData
@@ -68,7 +76,7 @@ export function useBrainData() {
 
   useEffect(() => {
     let cancelled = false
-    getBrainBinPromise().then((data) => {
+    getBrainBinPromise(isMobile).then((data) => {
       if (cancelled) return
       const g = new THREE.BufferGeometry()
       g.setAttribute("position", new THREE.BufferAttribute(data.positions, 3))
@@ -77,7 +85,7 @@ export function useBrainData() {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [isMobile])
 
   return result
 }

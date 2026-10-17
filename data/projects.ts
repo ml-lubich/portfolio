@@ -410,14 +410,14 @@ export const projects: Project[] = [
         metric: "Global macro research & wealth management",
         coverImage: "/images/projects/nick-pardini-hero.jpg",
         summary:
-            "Personal brand site for Nicholas Pardini — co-founder of Spearhead Advisors, founder of Davos Macro Research, and host of Analyzing Finance with Nick. Composed hero, live YouTube feed, and consultation funnels at nickpardini.vercel.app.",
+            "Personal brand site for Nicholas Pardini — co-founder of Spearhead Advisors, founder of Davos Macro Research, and host of Analyzing Finance with Nick. Composed hero, live YouTube feed, and consultation funnels at nickpardini.com.",
         tags: ["Web", "Next.js", "Finance"],
         gradient: g.primaryViaSkyToAccent,
         accent: accentCycle[4],
         number: "11",
         detail: {
             title: "Nicholas Pardini",
-            subtitle: "Global macro research · wealth management · nickpardini.vercel.app",
+            subtitle: "Global macro research · wealth management · nickpardini.com",
             description:
                 "End-to-end personal brand site for a Newport Beach macro researcher and keynote speaker: warm ivory stationery aesthetic, composed full-viewport hero over harbor photography, auto-synced Analyzing Finance with Nick uploads, and separate doors for consultation, research, media, and speaking.",
             highlights: [
@@ -440,7 +440,7 @@ export const projects: Project[] = [
             diagramType: "fullstack",
             gradient: g.primaryViaSkyToAccent,
             accent: accentCycle[4],
-            link: { label: "nickpardini.vercel.app", url: "https://nickpardini.vercel.app/" },
+            link: { label: "nickpardini.com", url: "https://nickpardini.com/" },
         },
     },
     {

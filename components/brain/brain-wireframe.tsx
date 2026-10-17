@@ -25,10 +25,10 @@ function useInitialScale() {
   return scaleRef.current ?? getBrainMeshViewportScale(1280)
 }
 
-export function BrainWireframe() {
+export function BrainWireframe({ isMobile = false }: { isMobile?: boolean }) {
   const groupRef = useRef<THREE.Group>(null!)
   const hitRef = useRef<THREE.Mesh>(null!)
-  const result = useBrainData()
+  const result = useBrainData(isMobile)
   const brainScale = useInitialScale()
 
   const pull = useMemo(() => createPullUniforms(), [])

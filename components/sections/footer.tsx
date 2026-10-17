@@ -5,6 +5,7 @@ import { ArrowUpRight } from "lucide-react"
 import { AnimatedSection } from "../animations/animated-section"
 import { SiteLogoMark } from "../site-logo-mark"
 import { SOCIAL_LINKS } from "../social-icons"
+import { AgentStormTrigger } from "../easter/agent-storm-trigger"
 
 const footerLinks = [
   { href: "/#about", label: "About" },
@@ -113,6 +114,7 @@ export function Footer() {
                 Start a conversation
                 <ArrowUpRight className="h-3 w-3 transition-transform duration-300 group-hover/mail:-translate-y-0.5 group-hover/mail:translate-x-0.5" />
               </a>
+              <AgentStormTrigger />
             </div>
           </div>
         </div>

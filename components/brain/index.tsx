@@ -163,12 +163,15 @@ type Brain3DProps = {
   revealGate?: boolean
   /** Opacity transition length in ms (match hero `AnimatedName` duration / easing). */
   fadeDurationMs?: number
+  /** Fetches the further-decimated public/brain-mobile.bin instead of the desktop mesh. */
+  isMobile?: boolean
 }
 
 export function Brain3D({
   className = "",
   revealGate = true,
   fadeDurationMs = 2350,
+  isMobile = false,
 }: Brain3DProps) {
   const containerRef = React.useRef<HTMLDivElement>(null)
   const initCam = React.useMemo(() => getInitialCam(), [])
@@ -250,7 +253,7 @@ export function Brain3D({
           <BrainTelemetry />
           <BrainTilt />
           <Suspense fallback={null}>
-            <BrainWireframe />
+            <BrainWireframe isMobile={isMobile} />
             <OrbitControls
               makeDefault
               /* Idle orbit is the hero's motion — perceptible, not a crawl

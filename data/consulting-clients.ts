@@ -113,7 +113,7 @@ export const consultingClients: ConsultingClient[] = [
     {
         id: "nick-pardini",
         name: "Nicholas Pardini",
-        href: "https://nickpardini.vercel.app/",
+        href: "https://nickpardini.com/",
         coverImage: "/images/projects/nick-pardini-hero.jpg",
         summary:
             "Personal brand site for a global macro researcher, wealth-management co-founder, and host of Analyzing Finance with Nick — composed hero, live YouTube feed, speaking funnel, and consultation doors.",
