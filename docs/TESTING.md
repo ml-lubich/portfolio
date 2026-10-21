@@ -1,5 +1,11 @@
 # Testing
 
+## Deployment settings and profile clipping
+
+`VERCEL=1 bun run ci` reproduces the deployment gate: lint, the full Vitest suite, and the production build. Existing external URL probes skip under `VERCEL`; a passing deployment gate does not verify external URL availability. Local fonts in `app/fonts` remove the build's Google Fonts fetch dependency.
+
+`__tests__/profile-card-clipping.test.ts` guards both unclipped profile ancestors. `bun run test:e2e e2e/profile-card-clipping.spec.ts` checks real desktop hover at 1440/834px and phone layout at 390px. Playwright requires permission to bind a local server port; `listen EPERM` is an environment block, not a passing browser check.
+
 ## Commands
 
 - `bun run test` — Vitest suite (also enforced by the `pre-push` git hook).
@@ -125,3 +131,7 @@ No automated visual regression for WebGL is required unless a dedicated snapshot
 ## E2E timing rule: bound sampling loops by the clock
 
 A spec that samples the page in a loop must stop on elapsed wall time (`const until = Date.now() + N; while (Date.now() < until)`), never on an iteration count. Each sample is a browser round-trip, so on a loaded machine a fixed count stretches past the test timeout — `e2e/hero-role-rotator.spec.ts` (240 × 100ms) timed out at 90s under a full pre-push run while passing alone.
+
+## Open-source snapshot maintenance
+
+`scroll-devices-a.test.ts` captures the whole data-driven showcase, including the tool grid, install block, and glyph rail. Refresh `open-source-baseline.html` only after reviewing its diff against the current `ossAgentTools`/`ossDemos` contracts; catalog additions also change the derived tool count, install commands, and index-based rail accents. The baseline covers the current 18-tool catalog. Verify it with `bun run test __tests__/scroll-devices-a.test.ts __tests__/oss-agent-tools.test.ts __tests__/oss-demos.test.ts __tests__/open-source-showcase.test.ts`.

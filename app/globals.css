@@ -4781,6 +4781,16 @@ article .blog-prose b a[href],
     }
   }
 }
+
+/* Profile card tilts in 3D on hover — its rotated corners must not be clipped
+   by the reveal wrapper, which the text-glow rule above forces to
+   `overflow: clip`. Id selector beats the `section.animated-section` rule so
+   only this section opts out (the outer #profile section already dropped
+   overflow-hidden in profile-intro.tsx). */
+#profile section.animated-section {
+  overflow: visible;
+}
+
 @keyframes text-glow-pass {
   0%, 25%, 75%, 100% { text-shadow: none; }
   50% {

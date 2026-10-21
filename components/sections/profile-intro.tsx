@@ -45,7 +45,7 @@ export function ProfileIntro() {
     }, [])
 
     return (
-        <section id="profile" className="relative section-y overflow-hidden min-h-[730px] md:min-h-[870px]">
+        <section id="profile" className="relative section-y min-h-[730px] md:min-h-[870px]">
             <div className="mx-auto max-w-5xl px-3 md:px-6 py-8 md:py-12 lg:py-16">
                 <AnimatedSection>
                     {/* Sleek 3D pannable holographic glass card container — lengthened like terminal window */}

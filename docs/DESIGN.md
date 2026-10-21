@@ -738,3 +738,17 @@ lists use `flex flex-wrap justify-center` with explicit widths
 (`md:w-[calc(50%-0.4375rem)]` for two columns at `gap-3.5`), the same pattern as
 the Skills category cards. The Open-Source Agent Tools grid (13 tools) follows it,
 pinned by `e2e/oss-tool-grid.spec.ts` ("odd last card is centered").
+
+## Profile card clipping boundary (2026-10-19)
+
+The portrait card in `#profile` must remain fully visible during its reveal and
+hover transforms. The outer profile wrapper does not use `overflow-hidden`,
+and `#profile section.animated-section` keeps `overflow: visible`, including
+on desktop where the generic animated-section rule otherwise clips overflow.
+The card's inner rounded surface retains clipping so its image and decorative
+layers respect the rounded corners. Keep clipping at that inner boundary;
+restoring it on either ancestor can crop the card edges.
+
+### Typography hosting (offline production builds)
+
+The two families now use `next/font/local` and the existing Latin variable WOFF2 assets in `app/fonts/`, keeping Oxanium 200–800, JetBrains Mono 100–800, CSS variable names, and swap display. This supersedes the Google import requirement above; the typography gate now verifies local assets and weights.
