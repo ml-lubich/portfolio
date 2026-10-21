@@ -745,9 +745,10 @@ The portrait card in `#profile` must remain fully visible during its reveal and
 hover transforms. The outer profile wrapper does not use `overflow-hidden`,
 and `#profile section.animated-section` keeps `overflow: visible`, including
 on desktop where the generic animated-section rule otherwise clips overflow.
-The card's inner rounded surface retains clipping so its image and decorative
-layers respect the rounded corners. Keep clipping at that inner boundary;
-restoring it on either ancestor can crop the card edges.
+The rounded card itself does not clip overflow: the pointer-driven 3D transform
+can move its edges and contents outside the untransformed box. The portrait image
+frame keeps its own rounded clipping. Keep the outer card and reveal ancestors
+unclipped so neither the card nor its contents are cut off.
 
 ### Typography hosting (offline production builds)
 

@@ -12,9 +12,9 @@ async function checkProfileClipping(page: Page, hover: boolean) {
     await expect(ancestor).toHaveCSS("overflow-x", "visible")
     await expect(ancestor).toHaveCSS("overflow-y", "visible")
   }
-  // Clipping belongs to the rounded card itself, so its glare stays inside.
-  await expect(card).toHaveCSS("overflow-x", "hidden")
-  await expect(card).toHaveCSS("overflow-y", "hidden")
+  // The transformed card and its contents must not be clipped at the card boundary.
+  await expect(card).toHaveCSS("overflow-x", "visible")
+  await expect(card).toHaveCSS("overflow-y", "visible")
   expect(await card.evaluate((el) => parseFloat(getComputedStyle(el).borderTopLeftRadius))).toBeGreaterThan(0)
 
   if (hover) {

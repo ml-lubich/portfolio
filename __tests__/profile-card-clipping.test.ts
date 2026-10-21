@@ -12,6 +12,12 @@ describe("profile card — tilted corners stay visible", () => {
         expect(sectionClasses).not.toMatch(/\boverflow-(?:hidden|clip)\b/)
     })
 
+    it("does not clip the tilted card's own contents", () => {
+        const card = profile.match(/ref={cardRef}[\s\S]*?className="([^"]+)"/)?.[1]
+        expect(card).toBeDefined()
+        expect(card).not.toMatch(/\boverflow-hidden\b/)
+    })
+
     it("overrides the generic animated-section clipping after the text-glow rule", () => {
         // Both selectors have an ID and a class; source order must let the
         // profile exception win over the desktop text-glow clipping rule.

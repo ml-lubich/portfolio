@@ -56,7 +56,7 @@ export function ProfileIntro() {
                         onMouseLeave={handleMouseLeave}
                         onTouchMove={handleTouchMove}
                         onTouchEnd={handleTouchEnd}
-                        className="group relative overflow-hidden rounded-3xl border border-white/30 bg-card/70 p-6 backdrop-blur-2xl transition-transform duration-200 ease-out sm:p-10 md:p-12 will-change-transform shadow-2xl shadow-black/50 h-full"
+                        className="group relative rounded-3xl border border-white/30 bg-card/70 p-6 backdrop-blur-2xl transition-transform duration-200 ease-out sm:p-10 md:p-12 will-change-transform shadow-2xl shadow-black/50 h-full"
                         style={{
                             transform: `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) translateY(${isHovered ? -8 : 0}px) scale3d(${isHovered ? 1.01 : 1}, ${isHovered ? 1.01 : 1}, 1)`,
                             background: "linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.03) 50%, rgba(255,255,255,0.08) 100%)",
