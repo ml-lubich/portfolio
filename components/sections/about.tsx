@@ -63,8 +63,8 @@ const highlights = [
     title: "Open Source",
     subtitleNum: "",
     subtitleText: "MCP Servers + CLIs",
-    detail: "imsg · imail · inotes · wa-mcp · jenkins-mcp",
-    backDescription: "Maintains the agent-tool family — imsg, imail, inotes, wa-mcp, bitbucket-cli, confluence-cli, pdfify-md, jenkins-mcp, ical, vgate — local-first CLIs that double as MCP servers for Claude, Cursor, and VS Code.",
+    detail: "Selected public MCP servers + CLIs",
+    backDescription: "Maintains selected public agent tools, including a WhatsApp bridge, Bitbucket and Confluence clients, a Markdown-to-PDF converter, and CI tooling.",
   },
 ]
 

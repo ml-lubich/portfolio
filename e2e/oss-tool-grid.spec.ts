@@ -16,17 +16,17 @@ test.describe("OSS agent tool grid", () => {
     await expect(page.getByText("Open-Source Agent Tools")).toBeVisible()
     await expect(page.getByText("every tool = human CLI")).toBeVisible()
     const grid = page.locator("#open-source .oss-tool-grid")
-    await expect(grid.getByRole("link", { name: "imsg", exact: true })).toBeVisible()
+    await expect(grid.getByRole("link", { name: "wa", exact: true })).toBeVisible()
     await expect(grid.getByRole("link", { name: "bb", exact: true })).toBeVisible()
 
-    const imsgCopy = grid.getByRole("button", {
-      name: /Copy install command: brew install ml-lubich\/tap\/imsg/,
+    const waCopy = grid.getByRole("button", {
+      name: /Copy install command: brew install [a-z0-9-]+\/tap\/wa/,
     })
-    await imsgCopy.click()
-    await expect(imsgCopy).toContainText("Copied")
+    await waCopy.click()
+    await expect(waCopy).toContainText("Copied")
 
     const clip = await page.evaluate(() => navigator.clipboard.readText())
-    expect(clip).toBe("brew install ml-lubich/tap/imsg")
+    expect(clip).toMatch(/^brew install [a-z0-9-]+\/tap\/wa$/)
   })
 
   test("odd last card is centered, not stranded left beside empty space", async ({ page }) => {

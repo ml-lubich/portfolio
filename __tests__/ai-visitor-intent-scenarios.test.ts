@@ -116,7 +116,7 @@ export function classifyVisitorIntent(query: string): { intent: Intent; args: Re
     }
 
     // 8. Projects & Artifacts
-    if (/\b(project|projects|built|portfolio|apps?|mcp|aigis|equiverse|case triage|flyoneo|confluence-cli|imsg)\b/i.test(q)) {
+    if (/\b(project|projects|built|portfolio|apps?|mcp|aigis|equiverse|case triage|flyoneo|confluence-cli|wa-mcp)\b/i.test(q)) {
         return { intent: "get_projects", args: {} }
     }
 
@@ -278,17 +278,17 @@ describe("MLBot Intent Recognition & Scenario Suite (205 scenarios)", () => {
             primaryIntent: "get_projects",
             expectedTool: "get_projects",
             verifyResult: () => {
-                const s = runTool("search_profile", { query: "macos desktop imsg" }) as { matches: unknown[] }
+                const s = runTool("search_profile", { query: "whatsapp bridge" }) as { matches: unknown[] }
                 expect(s.matches.length).toBeGreaterThan(0)
             },
         },
         {
             id: "proj-16",
-            query: "Tell me about his work on imsg-mcp",
+            query: "Tell me about his work on wa-mcp",
             primaryIntent: "get_projects",
             expectedTool: "get_projects",
             verifyResult: () => {
-                const s = runTool("search_profile", { query: "imsg-mcp" }) as { matches: unknown[] }
+                const s = runTool("search_profile", { query: "wa-mcp" }) as { matches: unknown[] }
                 expect(s.matches.length).toBeGreaterThan(0)
             },
         },

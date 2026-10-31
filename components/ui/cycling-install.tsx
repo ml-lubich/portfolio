@@ -21,7 +21,7 @@ import { DEFAULT_CYCLE, installCycleFrame, splitBrand, type CycleFrame } from "@
 
 export interface CyclingInstallItem {
     id: string
-    /** Short label shown under the line, e.g. "imsg". */
+    /** Short label shown under the line. */
     displayName: string
     description?: string
     install: string

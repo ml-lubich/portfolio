@@ -59,7 +59,7 @@ describe("ToolMemo", () => {
         let executions = 0
         const run = () => {
             executions++
-            return '{"projects":["imsg","brain"]}'
+            return '{"projects":["wa-mcp","brain"]}'
         }
 
         for (let i = 0; i < 9; i++) {

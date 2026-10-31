@@ -53,7 +53,7 @@ function ListRow({ row, style }: { row: SimRow; style: React.CSSProperties }) {
 
 export function OssDemoSim({ sim, active }: { sim: OssSim; active?: boolean }) {
     const delay = (i: number, base: number) => (active ? { animationDelay: `${base + i * ROW_MS}ms` } : {})
-    const isChat = sim.kind === "imessage" || sim.kind === "whatsapp"
+    const isChat = sim.kind === "whatsapp"
 
     return (
         <div className={`oss-sim-window overflow-hidden rounded-xl ${skinClass(sim.kind)}`}>

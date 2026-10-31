@@ -11,12 +11,9 @@ const DEMO_INSTALL: Record<string, string> = Object.fromEntries(
 
 describe("ossAgentTools", () => {
   it("lists the GitHub-profile tools with short display names", () => {
-    expect(ossAgentTools).toHaveLength(18)
+    expect(ossAgentTools).toHaveLength(14)
     const names = ossAgentTools.map((t) => t.displayName)
     expect(names).toEqual([
-      "imsg",
-      "imail",
-      "inotes",
       "wa",
       "bb",
       "confluence-cli",
@@ -24,7 +21,6 @@ describe("ossAgentTools", () => {
       "jenkins-mcp",
       "twig",
       "like-fable",
-      "ical",
       "vgate",
       "claude-tiers",
       "linkedin",

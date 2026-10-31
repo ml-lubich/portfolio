@@ -18,10 +18,15 @@ Append new constraints or decisions as new bullets or dated subsections; do not 
 ### 2026-07-24 — Agent OSS family, denser storm, valuemaxxing
 
 - Skill Storm must remain dense (target ≥110 unique skill pills), tuned toward theodouwes-site layout constants (`PILL_SPACING≈88`, denser ring tiers).
-- Featured open-source projects include the agent family: `imsg-mcp`, `imail-mcp`, `inotes-mcp`, `wa-mcp`, plus `bitbucket-cli` (CLI-named exception — not `*-mcp`), and related tools (`twig`, `confluence-cli`, `like-fable`, `jenkins-mcp`, `pdfify-md`, `ical-cli`, `vgate` as applicable).
+- Featured open-source projects are limited to tools explicitly approved for public release; personal app integrations and private workflow tooling are excluded.
 - Every showcase card ships a real, selectable install command (`brew` / `pip` / `pipx` / `npm i -g` / `git clone`). No card without one. The section also exposes `ossInstallAll()` as a copy-pasteable block of those same commands.
 - Homepage includes `#value-maxxing` (valuemaxxing ≠ tokenmaxxing) and `#tool-matrix` (honest CLI/MCP comparison).
 - Do not invent coverage % or market claims; keep matrix cells conservative (`partial` when incomplete).
+
+### 2026-10-31 — Private workflow tools stay off the public site
+
+- The public portfolio, source showcase, install blocks, skills summaries, demos, and blog do not list or explain personal workflow tools unless they are explicitly approved for public release.
+- A project being technically installable or having an MCP interface does not make it approved for publication.
 
 ### 2026-07-25 — Open-Source Showcase (public-only, no invented metrics)
 
@@ -51,6 +56,5 @@ Append new constraints or decisions as new bullets or dated subsections; do not 
 
 ### 2026-09-24 — Published CLI/MCP footprint
 
-- Showcase and the agent-tool grid include `ical-cli` (PyPI `mac-ical`, Homebrew `ml-lubich/tap/ical`) and `vgate` (PyPI `vercel-mcp`, Homebrew `ml-lubich/tap/vgate`).
-- `twig` install stays `pipx install twig-cli`, and that name resolves on PyPI. `pdfify-md` stays `npm i -g pdfify-md` and links the npm package page; Homebrew `ml-lubich/tap/pdfify-md` is the other install.
-- Install strings stay real package-manager commands. PyPI name `ical-cli` is rejected as too similar to the existing `ical` project, so the package is `mac-ical`.
+- Showcase and install strings include only projects approved for public release.
+- Install strings must match the current package registry or formula and use a real package-manager command.

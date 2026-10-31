@@ -32,7 +32,7 @@ The result? Sluggish execution, hallucinated optional fields, high token bills, 
     "title": "Small CLIs",
     "color": "green",
     "steps": [
-      "imail organize --account google",
+      "mail organize --limit 100",
       "wa contacts search",
       "bb pr list --repo core-api",
       "Exit code plus one stderr line"
@@ -58,7 +58,7 @@ Instead of building massive bespoke MCP wrappers for every internal database que
 
 ```bash
 # Clean, deterministic, zero schema overhead
-imail organize --account google --limit 100
+mail organize --limit 100
 wa contacts search "Alex"
 bb pr list --repo core-api
 ```

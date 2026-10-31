@@ -14,7 +14,7 @@ import {
 } from "@/lib/install-cycle"
 import { ossAgentTools } from "@/data/oss-agent-tools"
 
-const CMDS = ["brew install ml-lubich/tap/imsg", "pipx install twig-cli"]
+const CMDS = ["brew install example/tap/wa", "pipx install twig-cli"]
 
 describe("installCycleFrame", () => {
     it("starts empty and types one character at a time", () => {
@@ -60,17 +60,17 @@ describe("installCycleFrame", () => {
 
 describe("splitBrand", () => {
     it("isolates the handle so it can be accented", () => {
-        expect(splitBrand("brew install ml-lubich/tap/imsg")).toEqual([
+        expect(splitBrand("brew install example/tap/wa", "example")).toEqual([
             { text: "brew install ", brand: false },
-            { text: "ml-lubich", brand: true },
-            { text: "/tap/imsg", brand: false },
+            { text: "example", brand: true },
+            { text: "/tap/wa", brand: false },
         ])
     })
 
     it("accents a half-typed handle instead of flickering", () => {
-        expect(splitBrand("brew install ml-lub")).toEqual([
+        expect(splitBrand("brew install examp", "example")).toEqual([
             { text: "brew install ", brand: false },
-            { text: "ml-lub", brand: true },
+            { text: "examp", brand: true },
         ])
     })
 

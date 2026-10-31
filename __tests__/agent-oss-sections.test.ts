@@ -16,9 +16,6 @@ describe("agent OSS portfolio surface", () => {
   it("includes agent-family OSS projects", () => {
     const ids = new Set(projects.map((p) => p.id))
     for (const id of [
-      "imsg-mcp",
-      "imail-mcp",
-      "inotes-mcp",
       "wa-mcp",
       "bitbucket-cli",
       "like-fable",
@@ -37,9 +34,6 @@ describe("agent OSS portfolio surface", () => {
     const ids = toolMatrix.map((r) => r.id)
     expect(ids).toEqual(
       expect.arrayContaining([
-        "imsg-mcp",
-        "imail-mcp",
-        "inotes-mcp",
         "wa-mcp",
         "bitbucket-cli",
         "twig",

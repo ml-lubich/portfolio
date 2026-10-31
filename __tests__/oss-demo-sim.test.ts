@@ -11,7 +11,7 @@ const withSim = ossDemos.filter((d) => d.sim)
 describe("OSS demo simulations — data", () => {
     it("simulates the tools whose value is visual, not textual", () => {
         const ids = withSim.map((d) => d.id)
-        for (const id of ["imsg-mcp", "imail-mcp", "inotes-mcp", "wa-mcp"]) {
+        for (const id of ["wa-mcp"]) {
             expect(ids).toContain(id)
         }
     })
@@ -80,7 +80,7 @@ describe("OSS demo simulations — renderer", () => {
         const { createElement } = await import("react")
         const { OssDemoSim } = await import("@/components/sections/oss-demo-sim")
 
-        const demo = withSim.find((d) => d.id === "imsg-mcp")!
+        const demo = withSim.find((d) => d.id === "wa-mcp")!
         const html = renderToString(createElement(OssDemoSim, { sim: demo.sim!, active: true }))
 
         for (const row of demo.sim!.rows) expect(html).toContain(row.text)

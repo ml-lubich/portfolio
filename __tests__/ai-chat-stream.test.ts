@@ -47,12 +47,12 @@ describe("OpenRouter stream ingest", () => {
             choices: [
                 {
                     delta: {},
-                    message: { role: "assistant", content: "He shipped Case Triage Agent and imsg-mcp." },
+                    message: { role: "assistant", content: "He shipped Case Triage Agent and wa-mcp." },
                     finish_reason: "stop",
                 },
             ],
         })
-        expect(state.content).toBe("He shipped Case Triage Agent and imsg-mcp.")
+        expect(state.content).toBe("He shipped Case Triage Agent and wa-mcp.")
     })
 
     it("joins array-shaped content parts", () => {
@@ -84,20 +84,20 @@ describe("empty reply after tools", () => {
 
     it("uses the model's own text when it actually wrote some", () => {
         const decision = finalizeAssistantTurn(
-            { content: "He built imsg-mcp and the Case Triage Agent.", tool_calls: [], followups: [] },
+            { content: "He built wa-mcp and the Case Triage Agent.", tool_calls: [], followups: [] },
             ['{"projects":[{"name":"ignored"}]}'],
         )
         expect(decision.kind).toBe("answer")
-        expect(decision.text).toMatch(/imsg-mcp/)
+        expect(decision.text).toMatch(/wa-mcp/)
     })
 
     it("lists search matches before a dumped project catalogue", () => {
         const text = fallbackFromToolPayloads([
-            '{"matches":[{"kind":"project","name":"Case Triage Agent"},{"kind":"project","name":"imsg-mcp"}]}',
+            '{"matches":[{"kind":"project","name":"Case Triage Agent"},{"kind":"project","name":"wa-mcp"}]}',
             '{"projects":[{"name":"Equiverse.ml"},{"name":"Flyoneo.ml"}]}',
         ])
         expect(text).toMatch(/Case Triage Agent/)
-        expect(text).toMatch(/imsg-mcp/)
+        expect(text).toMatch(/wa-mcp/)
         expect(text).not.toMatch(/Equiverse/)
     })
 
@@ -117,7 +117,7 @@ describe("empty reply after tools", () => {
 
     it("fallback text never contains a raw bullet character", () => {
         const text = fallbackFromToolPayloads([
-            '{"matches":[{"kind":"project","name":"Case Triage Agent"},{"kind":"project","name":"imsg-mcp"}]}',
+            '{"matches":[{"kind":"project","name":"Case Triage Agent"},{"kind":"project","name":"wa-mcp"}]}',
         ])
         expect(text).not.toMatch(/•/)
         expect(text).toMatch(/Case Triage Agent/)

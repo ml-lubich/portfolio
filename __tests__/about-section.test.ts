@@ -39,7 +39,7 @@ describe("about — content", () => {
 
     it("describes the real open-source work, not the stale framework list", () => {
         expect(source).not.toMatch(/LangChain, CrewAI, Spring/)
-        expect(source).toMatch(/imsg/)
+        expect(source).toMatch(/Selected public MCP servers \+ CLIs/)
         expect(source).toMatch(/MCP/)
     })
 })

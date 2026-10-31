@@ -8,7 +8,7 @@ import { ossDemos } from "@/data/oss-demos"
 export interface OssAgentTool {
   /** oss-demos id — used for accent lookup and repo links */
   id: string
-  /** Short label on the card (imsg, bb, …) */
+  /** Short label on the card (bb, …) */
   displayName: string
   description: string
   /** Environment / stack pill */
@@ -24,21 +24,6 @@ const DEMO_BY_ID = Object.fromEntries(ossDemos.map((d) => [d.id, d])) as Record<
 
 /** Card metadata keyed by oss-demos id */
 const META: Record<string, { displayName: string; description: string; tag: string }> = {
-  "imsg-mcp": {
-    displayName: "imsg",
-    description: "iMessage CLI + MCP · Rust-accelerated",
-    tag: "macOS",
-  },
-  "imail-mcp": {
-    displayName: "imail",
-    description: "Apple Mail CLI + MCP · guarded LLM auto-reply agent",
-    tag: "macOS",
-  },
-  "inotes-mcp": {
-    displayName: "inotes",
-    description: "Apple Notes CLI + MCP",
-    tag: "macOS",
-  },
   "pyosascript": {
     displayName: "pyosascript",
     description: "Type-safe Python bindings & CLI for macOS AppleScript & JXA",
@@ -46,7 +31,7 @@ const META: Record<string, { displayName: string; description: string; tag: stri
   },
   "wa-mcp": {
     displayName: "wa",
-    description: "WhatsApp CLI + MCP · imsg pattern",
+    description: "WhatsApp CLI + MCP · local bridge",
     tag: "Go · Py",
   },
   "bitbucket-cli": {
@@ -78,11 +63,6 @@ const META: Record<string, { displayName: string; description: string; tag: stri
     displayName: "like-fable",
     description: "portable prompt library for any AI",
     tag: "prompts",
-  },
-  "ical-cli": {
-    displayName: "ical",
-    description: "Calendar.app CLI + MCP",
-    tag: "macOS",
   },
   vgate: {
     displayName: "vgate",
@@ -122,9 +102,6 @@ const META: Record<string, { displayName: string; description: string; tag: stri
 }
 
 const ORDER = [
-  "imsg-mcp",
-  "imail-mcp",
-  "inotes-mcp",
   "wa-mcp",
   "bitbucket-cli",
   "confluence-cli",
@@ -132,7 +109,6 @@ const ORDER = [
   "jenkins-mcp",
   "twig",
   "like-fable",
-  "ical-cli",
   "vgate",
   "claude-tiers",
   "linkedin-mcp",

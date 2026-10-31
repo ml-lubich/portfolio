@@ -99,7 +99,7 @@ describe("search", () => {
         const haystack = JSON.stringify(matches).toLowerCase()
         expect(haystack).toMatch(/agent/)
         expect(
-            matches.some((m) => /agent|mcp|imsg|imail|aigis/i.test(`${m.name ?? ""} ${m.role ?? ""} ${m.title ?? ""}`)),
+            matches.some((m) => /agent|mcp|wa|aigis/i.test(`${m.name ?? ""} ${m.role ?? ""} ${m.title ?? ""}`)),
             `agent work missing from ${JSON.stringify(matches.map((m) => m.name ?? m.role ?? m.title))}`,
         ).toBe(true)
         expect(

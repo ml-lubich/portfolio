@@ -19,7 +19,6 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import {
   BookOpen,
-  Calendar,
   Check,
   Cloud,
   Copy,
@@ -28,10 +27,7 @@ import {
   FileText,
   GitBranch,
   GitPullRequest,
-  Mail,
-  MessageSquare,
   MessagesSquare,
-  NotebookPen,
   Puzzle,
   Terminal,
 } from "lucide-react"
@@ -49,9 +45,6 @@ import { projects } from "@/data/projects"
 const ROTATE_MS = 9000
 
 const TOOL_ICON: Record<string, typeof Terminal> = {
-  "imsg-mcp": MessageSquare,
-  "imail-mcp": Mail,
-  "inotes-mcp": NotebookPen,
   "wa-mcp": MessagesSquare,
   "bitbucket-cli": GitPullRequest,
   twig: GitBranch,
@@ -59,7 +52,6 @@ const TOOL_ICON: Record<string, typeof Terminal> = {
   "like-fable": BookOpen,
   "jenkins-mcp": Factory,
   "pdfify-md": FileText,
-  "ical-cli": Calendar,
   vgate: Cloud,
   "claude-tiers": Puzzle,
 }

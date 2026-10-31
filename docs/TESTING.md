@@ -134,4 +134,4 @@ A spec that samples the page in a loop must stop on elapsed wall time (`const un
 
 ## Open-source snapshot maintenance
 
-`scroll-devices-a.test.ts` captures the whole data-driven showcase, including the tool grid, install block, and glyph rail. Refresh `open-source-baseline.html` only after reviewing its diff against the current `ossAgentTools`/`ossDemos` contracts; catalog additions also change the derived tool count, install commands, and index-based rail accents. The baseline covers the current 18-tool catalog. Verify it with `bun run test __tests__/scroll-devices-a.test.ts __tests__/oss-agent-tools.test.ts __tests__/oss-demos.test.ts __tests__/open-source-showcase.test.ts`.
+`scroll-devices-a.test.ts` captures the data-driven showcase, including the tool grid, install block, and glyph rail. Refresh `open-source-baseline.html` only after reviewing its diff against the current `ossAgentTools`/`ossDemos` contracts; catalog changes affect the derived tool count, install commands, and index-based rail accents. The current catalog contains 14 approved public tools.

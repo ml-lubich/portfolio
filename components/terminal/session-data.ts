@@ -271,18 +271,6 @@ export const sessions: Session[] = [
     ],
   },
   /* 13 ── mcp server */
-  {
-    time: "09:10 PM", label: "MCP Server", icon: "wrench",
-    lines: [
-      { t: "cmd", s: "bun run mcp:dev --server imail" },
-      { t: "out", s: "imail-mcp listening on stdio · 7 tools registered", d: 60 },
-      { t: "code", s: "server.tool('list_messages', { account: z.string(), limit: z.number().max(200) }, list)" },
-      { t: "out", s: "→ claude: list_messages(account='google', limit=50)", d: 40 },
-      { t: "out", s: "← 50 messages · 3 need action · 2 meetings", d: 30 },
-      { t: "out", s: "→ claude: organize(account='google')", d: 40 },
-      { t: "out", s: "← moved 41 · flagged 3 · 0 errors", d: 30, c: "text-emerald-400" },
-    ],
-  },
   /* 14 ── vector reindex */
   {
     time: "09:45 PM", label: "Vector Reindex", icon: "refresh",

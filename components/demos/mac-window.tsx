@@ -1,8 +1,7 @@
 "use client"
 
 /**
- * Mini app window for one `MacDemo` step — each skin mimics the real UI
- * (Messages blue bubbles, Notes yellow paper, Jenkins console, etc.).
+ * Mini app window for one public `MacDemo` step.
  */
 
 import type { CSSProperties } from "react"
@@ -114,7 +113,7 @@ export function MacWindow({ demo, step }: { demo: MacDemo; step: MacDemoStep }) 
 
                 <div
                     key={`detail-${step.command}`}
-                    className={`mac-pane mac-detail min-w-0 flex-1 px-3.5 py-3 ${isConsole ? "mac-jenkins-console" : ""} ${demo.skin === "notes" ? "mac-notes-paper" : ""}`}
+                    className={`mac-pane mac-detail min-w-0 flex-1 px-3.5 py-3 ${isConsole ? "mac-jenkins-console" : ""}`}
                 >
                     <p className="mac-detail-title truncate text-[12.5px] font-semibold">{step.detail.title}</p>
                     {step.detail.subtitle && (

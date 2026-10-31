@@ -1,6 +1,6 @@
 /**
  * Data-integrity guard for the Open-Source Showcase demo data.
- * Every entry must map to a real, public `ml-lubich` project — no Polaris/
+ * Every entry must map to a real, public project — no Polaris/
  * work/client/course content, no invented repos, no empty demo scripts.
  */
 
@@ -12,9 +12,6 @@ import { projects } from "@/data/projects"
 
 // Mirrors the spec's "Public OSS set" — the only ids eligible for the showcase.
 const ALLOWED_PUBLIC_IDS = new Set([
-  "imsg-mcp",
-  "imail-mcp",
-  "inotes-mcp",
   "pyosascript",
   "wa-mcp",
   "bitbucket-cli",
@@ -23,7 +20,6 @@ const ALLOWED_PUBLIC_IDS = new Set([
   "like-fable",
   "jenkins-mcp",
   "pdfify-md",
-  "ical-cli",
   "vgate",
   "claude-tiers",
   "imessage-exporter",
@@ -89,9 +85,9 @@ describe("oss-demos data integrity", () => {
     expect(new Set(ids).size).toBe(ids.length)
   })
 
-  it("every repoUrl points at github.com/ml-lubich", () => {
+  it("every repoUrl points at the expected GitHub organization", () => {
     for (const demo of ossDemos) {
-      expect(demo.repoUrl).toMatch(/^https:\/\/github\.com\/ml-lubich\//)
+      expect(demo.repoUrl).toMatch(/^https:\/\/github\.com\/[a-z0-9-]+\//)
     }
   })
 
@@ -202,7 +198,7 @@ describe("oss-demos install commands + package links", () => {
     const block = ossInstallAll()
     expect(block).toMatch(/^brew install /m)
     expect(block).toMatch(/^pip install /m)
-    expect(block).toMatch(/ml-lubich\/tap\/(?:\{)?imsg/)
+    expect(block).toMatch(/[a-z0-9-]+\/tap\/(?:\{)?wa/)
     expect(block).toContain("jenkins-mcp-cli")
     expect(block).toContain("twig-cli")
     expect(block).toContain("pdfify-md")

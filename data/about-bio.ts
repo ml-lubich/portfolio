@@ -27,9 +27,9 @@ export const BIO_SCRIPTS: string[][] = [
         "Also: Honda Innovations, Polaris Wireless.",
     ],
     [
-        "Off-hours: local-first CLIs that double as MCP servers.",
-        "imsg · imail · inotes · wa-mcp · jenkins-mcp · ical · vgate.",
-        "Rust hot path via PyO3 — imsg search 3.4x faster.",
+        "Off-hours: local-first software and agent tooling.",
+        "Open-source CLIs, MCP servers, and developer tools.",
+        "Rust and Python for performance-sensitive systems.",
         "Built for Claude, Cursor, and VS Code. No cloud, no login.",
     ],
     [

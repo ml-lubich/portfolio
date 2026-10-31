@@ -89,6 +89,10 @@ showcase). That would replace the portfolio's own sections rather than restyle t
 - **Vertical rhythm:** a single spacing knob (`LAZY_SECTION_TOP` in `app/page.tsx`: `pt-4 md:pt-8 lg:pt-10`) governs every LazySection boundary; no per-section ad-hoc margins (guarded by `__tests__/section-rhythm.test.ts`).
 - **Tablet detail drawer:** at compact widths ≥768px the scroll-stack `DetailPanel` presents as a fixed right-edge drawer (in-viewport by construction, `slide-in-from-right`); phones keep the full-viewport layer, desktop ≥1367px keeps the centered modal.
 
+## Public showcase boundary (2026-10-31)
+
+The portfolio lists only projects explicitly approved for public release. Personal app integrations and private workflow tooling stay out of project cards, install commands, demos, skills summaries, and blog listings, even when they have a CLI or MCP interface. Other approved open-source projects remain eligible for the showcase.
+
 ## Motion: hero entrance ladder & reduced motion (2026-09-05)
 
 **Hero entrance is one ladder, not per-component literals.** `HERO_BEAT` in
@@ -270,8 +274,8 @@ its content. The portrait stays `aspect-[3/4]` at every width (source
 NOW / WHERE / SINCE / BUILDING sits under the terminal as a 2×2 grid and
 grows with that portrait. The six tiles are
 token-based (`bg-card`, `border-border`) and current: EXPERIENCE reads
-"EchoStar, Apple, Walmart", OPEN SOURCE reads "MCP Servers + CLIs · imsg ·
-imail · inotes · wa-mcp · jenkins-mcp". Grid is 1/2/3 columns at
+"EchoStar, Apple, Walmart", OPEN SOURCE reads "Selected public MCP servers
+and CLIs". Grid is 1/2/3 columns at
 <640/640–1023/≥1024; the portrait caps at 20rem when stacked. Typing and
 count-ups render their final state immediately under
 `prefers-reduced-motion`. Gate: `__tests__/about-section.test.ts`.
@@ -532,15 +536,15 @@ Gate: `__tests__/text-glow-pass.test.ts`.
 ## Cycling install marquee (2026-09-24)
 
 The Open-Source Agent Tools panel opened on a static install row, so the
-first thing a visitor read was whichever tool happened to sit in card one —
-`brew install ml-lubich/tap/imsg`.
+first thing a visitor read was whichever approved public tool happened to sit
+in card one.
 
 A single prompt now sits above the grid (`components/ui/cycling-install.tsx`)
 and types its way through **every** tool's install command in a loop: type,
 hold long enough to read and copy, erase, next. Mac-window chrome, a
 `ml-lubich/tap` title and a live tool-count counter frame it as one tap rather than
 a ticker; under the line a caption names the tool currently on screen and a row
-of dots marks the position in the roll-call. The count follows `ossAgentTools` (thirteen as of 2026-09-24, including ical, vgate, and claude-tiers).
+of dots marks the position in the roll-call. The count follows `ossAgentTools`.
 
 - Timing is a pure function of elapsed ms — `lib/install-cycle.ts`
   (`installCycleFrame`, `stepDuration`, `cycleDuration`). The component is one
@@ -561,9 +565,9 @@ Gate: `__tests__/install-cycle.test.ts`.
 
 ## Open-Source Showcase: real-output proof, not just links (2026-09-24)
 
-The owner wanted pdfify-md and imail-mcp's OSS tool cards to show what the
-tool actually does, not just a repo link — "REAL output only, no mockups, no
-invented numbers." Both live under the existing featured-card slot
+Public OSS tool cards may show what an approved tool actually does, not just a
+repo link — "REAL output only, no mockups, no invented numbers." Media lives
+under the existing featured-card slot
 (`OssDemoCard`), gated the same way as the terminal and app sim above them:
 an optional `OssMedia` union on `data/oss-demos.ts`'s `OssDemo.media`,
 rendered by the new `components/sections/oss-demo-media.tsx` (no new design
@@ -579,20 +583,10 @@ language).
   The card renders the exact source text beside the rendered page image, plus
   "View sample.md" / "Download PDF" links — literally the input and output of
   one real run, side by side.
-- **imail-mcp (`kind: "eval-table"`)**: the real `imail autodraft-eval`
-  output — 14 synthetic (`example.com`-only, no real inbox data) labeled
-  cases, PASS/FAIL per case, and the harness's own summary line
-  ("13/14 passed, 0 unsafe sends") — plus a guardrail list pulled from
-  `autodraft.py`'s actual gate: `auto_send_allowed()` requires confidence
-  ≥ 0.95, stakes = low, a known contact, a reply ≤ 400 chars, no
-  attachments, and non-recruiter intent, and `validate_decision()` fails
-  closed on the untrusted LLM JSON before any of that runs.
 - Fixing this surfaced two pre-existing inaccuracies, corrected in the same
-  pass: `imail`/`imsg` still linked their pre-rename GitHub slugs
-  (`imail` → `imail-mcp`, `imsg` → `imsg-mcp`; both still 302, this
-  points at the canonical URL), and the pdfify-md terminal demo showed a
-  `--out` flag the CLI doesn't have.
-- `claude-tiers` joins the tool family the same way imsg/imail/pdfify did:
+  pass: project links point at their canonical URLs, and the pdfify-md demo
+  uses supported CLI flags.
+- `claude-tiers` joins the approved public project set:
   entries in `data/projects.ts`, `data/oss-demos.ts` (`git clone` install —
   it ships as a Claude Code plugin marketplace, not a package registry), and
   `data/oss-agent-tools.ts` (13 cards now, was 12).

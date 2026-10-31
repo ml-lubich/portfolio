@@ -24,7 +24,7 @@ When I build or audit AI systems in 2026, every feature has to survive three tes
    If a deterministic script or a simple regex can do the job with 100% reliability in 4ms, sending a prompt across the WAN to an LLM is architectural malpractice.
 
 2. **Is the interface conversational or functional?**  
-   If you need a human-in-the-loop review, conversational MCP interfaces make sense. If you are synchronizing 500 records or organizing mailbox folders, expose a sharp Unix CLI (`imail`, `wa`, `bb`). Stop wrapping batch routines in multi-turn dialogues.
+   If you need a human-in-the-loop review, conversational MCP interfaces make sense. If you are synchronizing records or organizing folders, expose a sharp Unix CLI. Stop wrapping batch routines in multi-turn dialogues.
 
 3. **Who owns the failure boundary?**  
    Autonomous agents must never have ambient write access to unconstrained production surfaces. Strict, typed contracts and explicit human gates beat "trusting the model's intent" every single time.

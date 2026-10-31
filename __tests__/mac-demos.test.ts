@@ -11,11 +11,9 @@ const read = (p: string) => readFileSync(join(process.cwd(), p), "utf8")
 
 describe("mac demo data", () => {
     it("covers every surface the open-source tools drive", () => {
-        expect(macDemos.map((d) => d.app)).toEqual([
-            "Messages", "Mail", "Notes", "WhatsApp", "Bitbucket", "Jenkins",
-        ])
+        expect(macDemos.map((d) => d.app)).toEqual(["WhatsApp", "Bitbucket", "Jenkins"])
         expect(macDemos.map((d) => d.tool)).toEqual([
-            "imsg", "imail", "inotes", "wa", "bb", "jenkins-mcp",
+            "wa", "bb", "jenkins-mcp",
         ])
     })
 
@@ -30,9 +28,7 @@ describe("mac demo data", () => {
     })
 
     it("maps each app to a distinct authentic mini-demo skin", () => {
-        expect(macDemos.map((d) => d.skin)).toEqual([
-            "messages", "mail", "notes", "whatsapp", "bitbucket", "jenkins",
-        ])
+        expect(macDemos.map((d) => d.skin)).toEqual(["whatsapp", "bitbucket", "jenkins"])
     })
 
     it("pairs every step with the command that caused it", () => {

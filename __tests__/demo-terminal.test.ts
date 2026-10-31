@@ -16,7 +16,7 @@ import {
 
 const sampleLines: Line[] = [
   { t: "hdr", s: "# oss demo" },
-  { t: "cmd", s: "imsg search 'hello'" },
+  { t: "cmd", s: "wa contacts search 'hello'" },
   { t: "out", s: "3 matches found" },
   { t: "gap", s: "" },
   { t: "code", s: "const x = 1" },
