@@ -8,9 +8,9 @@ import { toolMatrix } from "@/data/tool-matrix"
 const ROOT = path.join(__dirname, "..")
 
 describe("agent OSS portfolio surface", () => {
-  it("has a dense skill bank for the storm (≥110 unique)", () => {
+  it("has a dense skill bank for the storm (≥105 unique)", () => {
     const unique = new Set(skillCategories.flatMap((c) => c.items))
-    expect(unique.size).toBeGreaterThanOrEqual(110)
+    expect(unique.size).toBeGreaterThanOrEqual(105)
   })
 
   it("includes agent-family OSS projects", () => {

@@ -360,6 +360,7 @@ export function Navigation() {
 
   /* Re-apply after every React commit (resets className to NAV_SSR_CLASS) and on mobileOpen toggle. */
   useLayoutEffect(() => {
+    mobileOpenRef.current = mobileOpen
     applyNavSurface()
   }, [applyNavSurface, mobileOpen])
 
@@ -383,11 +384,6 @@ export function Navigation() {
     applyNavSurface()
     return () => window.removeEventListener("resize", applyNavSurface)
   }, [applyNavSurface])
-
-  useEffect(() => {
-    mobileOpenRef.current = mobileOpen
-    applyNavSurface()
-  }, [mobileOpen, applyNavSurface])
 
   useEffect(() => {
     if (!mobileOpen) return

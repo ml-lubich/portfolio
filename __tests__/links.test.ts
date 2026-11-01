@@ -55,6 +55,7 @@ const BOT_BLOCKED_DOMAINS = [
   "linkedin.com",
   "orcid.org",
   "x.com", // blocks non-browser UAs / requires auth for most paths (profile, intent/follow)
+  "lbl.gov", // Cloudflare managed challenge / 403 on automated requests
 ]
 
 /**
