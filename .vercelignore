@@ -1,9 +1,8 @@
 node_modules
 .next
-.next-e2e
-.next-agent-layout
-.next-agent-*
+.next-*
 .claude
+.omc
 .vercel
 *.log
 .DS_Store
