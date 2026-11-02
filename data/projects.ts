@@ -19,6 +19,8 @@ export interface Project {
     detail: DetailPanelData
     /** Optional hero screenshot on the featured-project card (`public/` path) */
     coverImage?: string
+    /** Accessible description; disclose when an image is illustrative rather than a product screenshot. */
+    coverAlt?: string
     /** True for live demo deployments that are proof-of-concept, not full products */
     prototype?: boolean
 }
@@ -565,34 +567,37 @@ export const projects: Project[] = [
     },
     {
         id: "briopedia",
-        name: "RAG Knowledge Base",
-        metric: "RAG support knowledge base",
+        name: "Briopedia",
+        metric: "Source-grounded support knowledge",
+        coverImage: "/images/projects/briopedia-illustration.webp",
+        coverAlt: "Illustrative 3D artwork for Briopedia, showing knowledge documents connected to a support assistant; not a product screenshot.",
         summary:
-            "Internal support knowledge base—Next.js UI over a FastAPI backend with a git-backed wiki corpus, FAISS retrieval, and provider-agnostic local or cloud LLM chat, deployed as one Docker Compose stack.",
+            "Prior Brio team product work: an internal support knowledge system connecting a maintained wiki to source-grounded chat for manuals, troubleshooting, and product guidance.",
         tags: ["RAG", "FastAPI", "Next.js", "LLM"],
         gradient: g.primaryToMagenta,
         accent: accentCycle[3],
         number: "14",
         detail: {
-            title: "RAG Knowledge Base",
-            subtitle: "Retrieval-augmented support knowledge base",
+            title: "Briopedia",
+            subtitle: "Prior Brio team work · support knowledge copilot",
             description:
-                "An internal support knowledge base combining a Next.js UI, a FastAPI backend, and a git-backed wiki corpus. Documents are indexed into FAISS for retrieval, and answers stream from a provider-agnostic LLM layer that runs either a local Ollama model or a cloud provider—shipped as a single Docker Compose stack that non-technical operators deploy with one command.",
+                "An internal Brio support knowledge system built around a git-backed wiki. A Next.js interface talks to a FastAPI service, which retrieves relevant passages from a Chroma index and streams answers through a provider-agnostic local or cloud model layer. The interface was designed to return source context with answers. This portfolio image is an original illustration, not captured product UI.",
             highlights: [
-                "Git-backed wiki corpus with a FAISS search index that rebuilds and syncs with zero downtime",
-                "Provider-agnostic chat: local Ollama (qwen3) or cloud (OpenRouter) behind one backend",
-                "One-command Docker Compose deploy—web, backend, and Ollama with health checks and auto-restart",
-                "Multi-user auth with per-core uvicorn workers and fully async chat so concurrent users never block",
+                "Versioned wiki content gives the team a maintainable source of truth",
+                "Chroma retrieval connects questions to relevant product and service material",
+                "Next.js frontend and FastAPI backend keep the interface separate from retrieval and model orchestration",
+                "Local and cloud model providers use the same chat service boundary",
+                "Source references help support staff review what an answer used",
             ],
             architecture: [
                 { label: "Next.js UI", icon: "layers", description: "Chat and wiki front end for support staff" },
                 { label: "FastAPI backend", icon: "server", description: "Async API serving retrieval and chat" },
-                { label: "FAISS index", icon: "database", description: "Vector retrieval over the git-backed corpus" },
+                { label: "Chroma index", icon: "database", description: "Vector retrieval over the git-backed corpus" },
                 { label: "LLM layer", icon: "cpu", description: "Provider-agnostic local or cloud generation" },
             ],
-            techStack: ["Python", "FastAPI", "Next.js", "TypeScript", "FAISS", "Ollama", "Docker"],
+            techStack: ["Python", "FastAPI", "Next.js", "TypeScript", "Chroma", "Ollama", "Docker"],
             metrics: [
-                { label: "Retrieval", value: "FAISS RAG" },
+                { label: "Retrieval", value: "Chroma RAG" },
                 { label: "LLM", value: "Local + cloud" },
             ],
             diagramType: "fullstack",
@@ -602,24 +607,27 @@ export const projects: Project[] = [
     },
     {
         id: "brio-bot",
-        name: "Case Triage Agent",
-        metric: "Evidence-bound Salesforce triage",
+        name: "BrioBot",
+        metric: "Salesforce case triage",
+        coverImage: "/images/projects/brio-bot-illustration.webp",
+        coverAlt: "Illustrative 3D artwork for BrioBot, showing a support case moving through retrieval and evidence checks; not a product screenshot.",
         summary:
-            "Evidence-bound Salesforce case triage agent—LangGraph orchestrates gather → reason/tools → extract → deterministic gates → optional live Salesforce write, so the model proposes and Python decides what counts as evidence.",
+            "Prior Brio team product work: a Salesforce support case agent that gathers case context, retrieves product guidance, proposes structured fields, and passes them through deterministic checks before any optional write.",
         tags: ["Agentic AI", "LangGraph", "Python", "Salesforce"],
         gradient: g.primaryViaAccentToCyan,
         accent: accentCycle[1],
         number: "15",
         detail: {
-            title: "Case Triage Agent",
-            subtitle: "Evidence-bound Salesforce triage (LangGraph)",
+            title: "BrioBot",
+            subtitle: "Prior Brio team work · Salesforce case triage",
             description:
-                "An agentic triage system for e-commerce support cases. A LangGraph graph gathers each Salesforce case, retrieves knowledge-base context, reads attached images, plans, reasons with tools, and extracts fields—then deterministic Python gates decide which fields may be written before an optional live Salesforce update. The model proposes; code decides what counts as evidence.",
+                "An agentic triage system for e-commerce support cases. A LangGraph flow gathers Salesforce case context, retrieves knowledge-base material, reads available case images, plans and reasons with constrained tools, and extracts candidate fields. Deterministic Python checks decide whether each field is supported and writable; dry-run and safe-stop paths keep updates explicit, and a person remains responsible for review.",
             highlights: [
-                "LangGraph pipeline: gather → retrieve → image-read → plan → reason/tools → extract → gates → write",
-                "Evidence-bound design: deterministic Python gates decide which fields are writable",
-                "Optional live Salesforce writes with dry-run mode and a safe mid-batch stop file",
-                "~2,500-test verification gate with Langfuse tracing for full observability",
+                "Workflow: gather case context → retrieve guidance → inspect available images → extract candidate fields",
+                "Deterministic checks clear unsupported values and protect fields already completed by a person",
+                "Dry-run by default; live Salesforce writes are optional and gated, with a safe-stop path",
+                "The project deck compares a quoted Agentforce price of $2 per case ($4,000 for 2,000 cases) with a modeled BrioBot inference cost of $0.02 per case ($35 for 2,000 cases). This is model-cost arithmetic, not realized net savings; it excludes labor, implementation, platform costs, and human review.",
+                "Offline 355-case benchmark reported 75% type, 66% reason, and 55% source accuracy; this is a test-set result, not a live customer outcome.",
             ],
             architecture: [
                 { label: "CaseAgent", icon: "cpu", description: "LangGraph gather→reason→extract→write graph" },
@@ -629,12 +637,52 @@ export const projects: Project[] = [
             ],
             techStack: ["Python", "LangGraph", "OpenRouter", "Salesforce API", "Langfuse"],
             metrics: [
-                { label: "Tests", value: "~2,500" },
-                { label: "Type", value: "Agentic AI" },
+                { label: "Modeled inference cost", value: "$0.02 / case" },
+                { label: "Offline benchmark", value: "355 cases" },
             ],
             diagramType: "agents",
             gradient: g.primaryViaAccentToCyan,
             accent: accentCycle[1],
+        },
+    },
+    {
+        id: "brioscope",
+        name: "BrioScope",
+        metric: "Support operations analytics",
+        coverImage: "/images/projects/brioscope-illustration.webp",
+        coverAlt: "Illustrative 3D artwork for BrioScope, showing support signals across an analytics mesh; not a product screenshot.",
+        summary:
+            "Prior Brio team product work: a support analytics platform for finding recurring customer issues and reviewing service trends across support data.",
+        tags: ["Support Analytics", "Speech", "Python", "Dashboard"],
+        gradient: g.cyanViaPrimaryToAccent,
+        accent: accentCycle[2],
+        number: "B",
+        detail: {
+            title: "BrioScope",
+            subtitle: "Prior Brio team work · customer support analytics",
+            description:
+                "A customer support analytics platform built to process support data and surface recurring issues, service metrics, and historical trends. The documented system includes integrations for support platforms such as Gorgias and Aircall, a web dashboard, and speech-to-text processing options that trade off accuracy and speed. This portfolio image is an original 3D illustration, not a live analytics screen.",
+            highlights: [
+                "Groups recurring issue themes so teams can inspect patterns in customer reports",
+                "Provides dashboard views for support analytics and historical service performance",
+                "Documents a four-month customer-service performance view with cursor pagination",
+                "Includes three speech-processing options for different accuracy and speed needs",
+                "README documents API paths for health, trending issues, analytics, and ticket queries",
+            ],
+            architecture: [
+                { label: "Connectors", icon: "server", description: "Ingests data from support systems such as Gorgias and Aircall" },
+                { label: "Analysis", icon: "cpu", description: "Processes tickets and speech-derived text into issue patterns" },
+                { label: "Dashboard", icon: "layers", description: "Presents trends and historical service metrics" },
+                { label: "Storage and cache", icon: "database", description: "Supports persisted analytics and cached results" },
+            ],
+            techStack: ["Python", "Flask", "PostgreSQL", "Redis", "Chart.js", "WhisperX"],
+            metrics: [
+                { label: "Documented speech paths", value: "3" },
+                { label: "History window", value: "4 months" },
+            ],
+            diagramType: "pipeline",
+            gradient: g.cyanViaPrimaryToAccent,
+            accent: accentCycle[2],
         },
     },
     {

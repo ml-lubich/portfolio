@@ -28,6 +28,13 @@ Append new constraints or decisions as new bullets or dated subsections; do not 
 - The public portfolio, source showcase, install blocks, skills summaries, demos, and blog do not list or explain personal workflow tools unless they are explicitly approved for public release.
 - A project being technically installable or having an MCP interface does not make it approved for publication.
 
+### 2026-11-02 — Brio case-study release boundary
+
+- BrioBot, Briopedia, and BrioScope case studies describe prior Brio team product experience, not Teregon client engagements.
+- Publish only project scope, architecture, and visuals explicitly cleared for public use. Never publish authenticated Briopedia/Salesforce screens, customer/account records, internal portal addresses, or unreviewed source-project images.
+- Use illustrative technical diagrams or already-public approved screenshots. A file's presence in a development repo does not grant publication approval.
+- Do not claim product ROI, savings, revenue, or customer impact unless evidence is specific to that product and cleared for public release. Company-level figures are not product outcomes.
+
 ### 2026-07-25 — Open-Source Showcase (public-only, no invented metrics)
 
 - The Open-Source Showcase (`#projects`, `components/sections/open-source-showcase.tsx`) covers public `ml-lubich` repos only — no proprietary, internal, or employer content.

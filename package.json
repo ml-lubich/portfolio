@@ -13,7 +13,7 @@
   "scripts": {
     "prepare": "node scripts/install-hooks.js",
     "dev": "next dev --webpack",
-    "build": "bunx next build --webpack",
+    "build": "vitest run && bunx next build --webpack",
     "start": "next start",
     "lint": "eslint .",
     "test": "vitest run",

@@ -93,6 +93,12 @@ showcase). That would replace the portfolio's own sections rather than restyle t
 
 The portfolio lists only projects explicitly approved for public release. Personal app integrations and private workflow tooling stay out of project cards, install commands, demos, skills summaries, and blog listings, even when they have a CLI or MCP interface. Other approved open-source projects remain eligible for the showcase.
 
+## Brio product case studies
+
+BrioBot, Briopedia, and BrioScope may appear as prior Brio team product experience when the individual project details are approved for public release. Describe the problem, workflow, and verified architecture in project language; do not imply these were Teregon client engagements or attribute company revenue, ROI, or customer outcomes to the tools without project-specific evidence.
+
+Use original diagrams/illustrations or screenshots that are already public and approved. Source-project assets are not automatically public: review each image for customer/account details, internal labels, portal URLs, auth-only UI, and unsupported performance claims before copying it into `public/`. Do not use signed-in Briopedia or Salesforce case screens as public portfolio art. If no approved screenshot exists, use the existing abstract mesh/diagram treatment.
+
 ## Motion: hero entrance ladder & reduced motion (2026-09-05)
 
 **Hero entrance is one ladder, not per-component literals.** `HERO_BEAT` in

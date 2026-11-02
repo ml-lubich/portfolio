@@ -68,7 +68,7 @@ describe("tool-round budget", () => {
             toolCall("search_profile", '{"query":"agents"}'),
             toolCall("get_projects", '{"tag":"agents"}'),
             toolCall("search_profile", '{"query":"agentic"}'),
-            text("He built the Case Triage Agent and SynthData Forge."),
+            text("He built BrioBot and SynthData Forge."),
         ])
 
         const out = await ask("What has Misha built with agents?", "10.1.1.1")
@@ -78,7 +78,7 @@ describe("tool-round budget", () => {
         // The round that has to produce prose is offered nothing to call.
         expect(bodies[3].tools).toBeUndefined()
         expect(bodies[3].tool_choice).toBeUndefined()
-        expect(out).toContain("Case Triage Agent")
+        expect(out).toContain("BrioBot")
         expect(out).not.toContain("couldn't land on a clean answer")
     })
 
@@ -103,7 +103,7 @@ describe("tool-round budget", () => {
 
         const out = await ask("What has Misha built with agents?", "10.1.1.2")
 
-        expect(out).toContain("Case Triage Agent")
+        expect(out).toContain("I found AI Invoice Agent")
         expect(out).not.toContain("couldn't land on a clean answer")
     })
 })

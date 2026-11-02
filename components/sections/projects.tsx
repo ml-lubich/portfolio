@@ -142,7 +142,7 @@ const MarqueeCard = memo(function MarqueeCard({ project, onExplore }: MarqueeCar
         <div className="relative h-32 w-full shrink-0 overflow-hidden border-b border-white/[0.08] bg-black/20 sm:h-36">
           <Image
             src={project.coverImage}
-            alt={`${project.name} — product preview`}
+            alt={project.coverAlt ?? `${project.name} — product preview`}
             width={640}
             height={360}
             className="h-full w-full object-cover object-top transition-transform duration-700 group-hover/card:scale-[1.04]"

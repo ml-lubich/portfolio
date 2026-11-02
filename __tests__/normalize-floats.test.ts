@@ -19,4 +19,15 @@ describe("normalizeFloats", () => {
   it("leaves short numbers and ids untouched", () => {
     expect(normalizeFloats('<svg viewBox="0 0 100 100" r="1.5" id="v1.2.3">')).toBe('<svg viewBox="0 0 100 100" r="1.5" id="v1.2.3">')
   })
+  it("redacts derived personal values while preserving unrelated destinations", () => {
+    const html = '<img alt="Example Person at his desk"><a href="mailto:support@exampleperson.com">support@exampleperson.com</a><a href="https://exampleperson.com/work">personal site</a><code>git clone https://github.com/example-owner/project</code><code>brew install example-owner/tap/package</code><a href="https://support.acme.test/docs">support docs</a><span>unrelated.net</span>'
+    const normalized = normalizeFloats(html)
+    expect(normalized).toContain("[PERSON]")
+    expect(normalized).toContain("[OWNER]")
+    expect(normalized).toContain("[EMAIL]")
+    expect(normalized).toContain("[DOMAIN]")
+    expect(normalized).toContain('href="https://support.acme.test/docs"')
+    expect(normalized).toContain("unrelated.net")
+    expect(normalized).not.toMatch(/Example|example-owner|exampleperson/i)
+  })
 })
