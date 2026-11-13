@@ -30,6 +30,7 @@ const ALLOWED_PUBLIC_IDS = new Set([
   "humanizer",
   "own-chrome",
   "callgen",
+  "taag-cli",
 ])
 
 const EXCLUDED_IDS = new Set([
@@ -198,7 +199,7 @@ describe("oss-demos install commands + package links", () => {
     const block = ossInstallAll()
     expect(block).toMatch(/^brew install /m)
     expect(block).toMatch(/^pip install /m)
-    expect(block).toMatch(/[a-z0-9-]+\/tap\/(?:\{)?wa/)
+    expect(block).toContain("ml-lubich/tap/{taag,wa")
     expect(block).toContain("jenkins-mcp-cli")
     expect(block).toContain("twig-cli")
     expect(block).toContain("pdfify-md")

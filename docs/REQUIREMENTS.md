@@ -9,6 +9,13 @@
 
 ## Amendments
 
+### 2026-11-07 — TAAG-inspired FIGlet tool
+
+- `/go-wtf` provides browser-side FIGlet rendering and TheDraw ANSI rendering, including 332 FIGlet fonts, 1,071 TheDraw fonts, font browsers, custom `.flf` / `.tdf` uploads, color, copy and download.
+- Give visible credit to Patrick Gillespie and [patorjk/figlet.js](https://github.com/patorjk/figlet.js), the inspiration behind the CLI and page. Preserve all upstream font notices.
+- `taag-cli` is approved for the public OSS showcase and install blocks.
+- The font API serves only names from the generated `FIGLET_FONTS` allowlist.
+
 Append new constraints or decisions as new bullets or dated subsections; do not delete historical requirements without a recorded reason.
 
 ### 2026-05-05 — Terminal Snake Mode
@@ -65,3 +72,5 @@ Append new constraints or decisions as new bullets or dated subsections; do not 
 
 - Showcase and install strings include only projects approved for public release.
 - Install strings must match the current package registry or formula and use a real package-manager command.
+
+- The TheDraw render API serves only names in the generated `THEDRAW_FONTS` allowlist and limits custom `.tdf` uploads to 1 MB.

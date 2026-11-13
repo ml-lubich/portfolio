@@ -11,9 +11,10 @@ const DEMO_INSTALL: Record<string, string> = Object.fromEntries(
 
 describe("ossAgentTools", () => {
   it("lists the GitHub-profile tools with short display names", () => {
-    expect(ossAgentTools).toHaveLength(14)
+    expect(ossAgentTools).toHaveLength(15)
     const names = ossAgentTools.map((t) => t.displayName)
     expect(names).toEqual([
+      "taag",
       "wa",
       "bb",
       "confluence-cli",

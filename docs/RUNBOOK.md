@@ -29,11 +29,13 @@ bun run ship:dev
 
 `bun run build` runs the full Vitest suite explicitly (including the asset/media reference checks) before producing the Next.js production build. Vercel runs this same `build` script, so the asset/media tests gate every deployment too.
 
-Git hooks enforce the gate locally (installed by `bun install` via `scripts/install-hooks.js`):
+Git hooks enforce the gate locally (installed by `bun install` via `scripts/install-hooks.js` if no Git `core.hooksPath` is configured; shared hooks are preserved):
 
 - `pre-commit` runs `bun run lint` and `bun run build` (which includes the Vitest suite).
 - `pre-push` runs `bun run test` so no push reaches origin with broken asset/media references or failing tests. Bypassing hooks with `--no-verify` is not an accepted workflow.
 `bun run ship:dev` is the Bun-standard local pre-ship alias for the full CI check.
+
+GitHub Actions runs the same `bun run ci` gate on pushes and pull requests targeting `dev`. Vercel continues to provide preview and production deployments through its Git connection; the workflow validates changes and does not deploy them directly.
 
 ## Deployment flow
 

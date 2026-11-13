@@ -8,6 +8,8 @@
 
 ## Commands
 
+GitHub Actions (`.github/workflows/ci.yml`) runs `bun run ci` with `VERCEL=1` on pushes and pull requests targeting `dev`, and supports manual dispatch. The same lint, Vitest, and production-build gate runs before Vercel deployment.
+
 - `bun run test` — Vitest suite (also enforced by the `pre-push` git hook).
 - `bun run test:e2e` — Playwright suite (also enforced by the `pre-push` git hook). Reuses whatever dev server is already running on `:3000` (`reuseExistingServer`, see `playwright.config.ts`) or boots one itself. Install browsers once with `npx playwright install chromium` if they're missing.
 - `bun run test:add <slug>` — scaffold a new test file in `__tests__/`. Generates a ready-to-run stub with correct imports, naming convention guidance, and fixture path instructions. Accepts `--describe "what you are guarding"`. Example: `bun run test:add nav-scroll --describe "navbar stays transparent over the hero"`.
@@ -16,7 +18,7 @@
 
 ## Git hook enforcement
 
-`bun install` installs both hooks via `scripts/install-hooks.js`:
+`bun install` installs both project hooks via `scripts/install-hooks.js` when Git has no configured `core.hooksPath`; a configured shared hook path takes precedence and is never overwritten:
 
 - `pre-commit` → `bun run lint` + `bun run build` (tests + production build). Kept to Vitest speed — no browser boot — so committing stays fast.
 - `pre-push` → `bun run test` (full Vitest suite, including media/resource reference checks) **then** `bun run test:e2e` (full Playwright suite: runtime-error gate, API guard rails, cross-viewport visual checks). The browser suite is pre-push only because it's slower than the commit loop should be. Do not bypass either with `--no-verify`.
@@ -79,6 +81,11 @@
 - `__tests__/nav-hero-surface.test.ts` — `computeNavPastHero` in `lib/nav-hero-surface.ts`: frosted mode only when `#hero`’s `getBoundingClientRect().bottom <= 0`; transparent while any part of the hero remains below the viewport top. Includes a shallow guard that `components/nav/index.tsx` still calls `computeNavPastHero` and retains blur-off vs blur-on class tokens.
 - The same suite guards that the desktop navbar keeps the floating `.nav-glass.nav-shell` shell, renders no top scroll-progress bar, and keeps `.nav-shell` free of `backdrop-filter` so future edits do not regress to scroll flicker or a flat full-width bar.
 
+## Automated: Go WTF / TAAG
+
+- `__tests__/taag-page.test.ts` checks Isometric1, the 332 FIGlet + 1,071 TheDraw font sets, the FIGfont endpoint allowlist, TheDraw ANSI output, and rejection of unlisted fonts.
+- `bun run build` covers the `/go-wtf` route and both font APIs, including traced font assets.
+
 ## Automated: terminal snake game
 
 - `__tests__/seo.test.ts` — SEO contract: `lib/seo.ts` title <=60 and description 140-160 chars, JSON-LD is one `@graph` with unique `@id`s under `SITE_URL` (Person `#person`, WebSite `#website`), `SITE_URL` defaults to the www host (Vercel redirects apex to www), sitemap includes home with no duplicates and no noindex pages (`/demo`, `/fork`, `/status`), robots emits `Sitemap` + `Host` and keeps `/status` and `/api/` disallowed, `public/llms.txt` exists, and no telephone appears in JSON-LD or llms.txt.
@@ -135,3 +142,8 @@ A spec that samples the page in a loop must stop on elapsed wall time (`const un
 ## Open-source snapshot maintenance
 
 `scroll-devices-a.test.ts` captures the data-driven showcase, including the tool grid, install block, and glyph rail. Refresh `open-source-baseline.html` only after reviewing its diff against the current `ossAgentTools`/`ossDemos` contracts; catalog changes affect the derived tool count, install commands, and index-based rail accents. The current catalog contains 14 approved public tools.
+
+## Go WTF / FIGlet generator
+
+- `__tests__/taag-page.test.ts` checks the font list includes Isometric1 and over 300 fonts, the API serves a FIGfont, and arbitrary paths return 404.
+- The repo CI build checks `/go-wtf` and the dynamic font API compile and prerender correctly.

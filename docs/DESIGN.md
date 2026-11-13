@@ -753,3 +753,18 @@ unclipped so neither the card nor its contents are cut off.
 ### Typography hosting (offline production builds)
 
 The two families now use `next/font/local` and the existing Latin variable WOFF2 assets in `app/fonts/`, keeping Oxanium 200–800, JetBrains Mono 100–800, CSS variable names, and swap display. This supersedes the Google import requirement above; the typography gate now verifies local assets and weights.
+
+## Go WTF / FIGlet generator (2026-11-07)
+
+`/go-wtf` is a public, interactive FIGlet and TheDraw generator and the landing
+page for `taag-cli`. It uses patorjk's `figlet.js` renderer with the upstream
+332-font bundle, plus `tdfonts` for 1,071 TheDraw fonts including Bleach. Both
+formats have a browser picker and test-all browser; FIGlet supports width and
+layout controls, while TheDraw renders original ANSI color. Custom `.flf` and
+`.tdf` uploads, copy and download are supported. FIGlet files load on demand
+through `/api/taag-fonts/[filename]`; TheDraw output is rendered by
+`/api/thedraw` from the allowlisted `data/thedraw-fonts.ts` set. Next output
+tracing includes the source font files. Credit Patrick Gillespie,
+`patorjk/figlet.js`, TAAG, and the TDFiglet/tdfonts contributors visibly.
+Preserve source font headers and package license notices. The Go CLI/package
+and Homebrew install are linked from this page.

@@ -27,6 +27,46 @@ export interface Project {
 
 export const projects: Project[] = [
     {
+        id: "taag-cli",
+        name: "taag-cli",
+        metric: "FIGlet art for Python and the terminal",
+        coverImage: "/images/projects/taag-cli-illustration.svg",
+        coverAlt: "Illustrative terminal card for taag-cli showing FIGlet-style TAAG text",
+        summary:
+            "A Python FIGlet library and Typer CLI inspired by patorjk/figlet.js and TAAG, with colorful ANSI output, nine bundled fonts, custom FIGfont files, and an interactive browser generator.",
+        tags: ["Python", "CLI", "FIGlet", "ASCII art"],
+        gradient: g.primaryToCyan,
+        accent: accentCycle[2],
+        number: "38",
+        detail: {
+            title: "taag-cli",
+            subtitle: "FIGlet text art, as a Python library and terminal CLI",
+            description:
+                "Render text in Isometric, ANSI Shadow, Block, Graffiti, and other FIGlet fonts. The Python library and CLI support rainbow ANSI color and custom .flf fonts. Inspired by Patrick Gillespie’s figlet.js, which powers TAAG.",
+            highlights: [
+                "Install with Homebrew and render text directly in the terminal",
+                "Import the renderer from Python",
+                "Bundle nine FIGlet fonts and support custom FIGfont files",
+                "Give credit to patorjk/figlet.js and retain upstream font notices",
+            ],
+            architecture: [
+                { label: "Python package", icon: "layers", description: "Render FIGlet fonts from Python programs" },
+                { label: "CLI", icon: "cpu", description: "Choose FIGlet fonts, render a custom .flf file, or list fonts" },
+                { label: "Font bundle", icon: "layers", description: "Embedded FIGfont files retain upstream notices" },
+                { label: "TAAG web demo", icon: "zap", description: "A browser generator supports hundreds of fonts and custom .flf uploads" },
+            ],
+            techStack: ["Python", "FIGlet", "Homebrew"],
+            metrics: [
+                { label: "Bundled FIGlet fonts", value: "9" },
+                { label: "Interface", value: "Python package + CLI" },
+            ],
+            diagramType: "pipeline",
+            gradient: g.primaryToCyan,
+            accent: accentCycle[2],
+            link: { label: "GitHub", url: "https://github.com/ml-lubich/taag-cli" },
+        },
+    },
+    {
         id: "equiverse",
         name: "Equiverse.ml",
         metric: "5,000+ students impacted",

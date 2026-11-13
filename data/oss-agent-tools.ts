@@ -24,6 +24,11 @@ const DEMO_BY_ID = Object.fromEntries(ossDemos.map((d) => [d.id, d])) as Record<
 
 /** Card metadata keyed by oss-demos id */
 const META: Record<string, { displayName: string; description: string; tag: string }> = {
+  "taag-cli": {
+    displayName: "taag",
+    description: "FIGlet text art CLI + Python package · inspired by patorjk/figlet.js",
+    tag: "Python · FIGlet",
+  },
   "pyosascript": {
     displayName: "pyosascript",
     description: "Type-safe Python bindings & CLI for macOS AppleScript & JXA",
@@ -102,6 +107,7 @@ const META: Record<string, { displayName: string; description: string; tag: stri
 }
 
 const ORDER = [
+  "taag-cli",
   "wa-mcp",
   "bitbucket-cli",
   "confluence-cli",

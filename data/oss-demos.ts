@@ -71,6 +71,22 @@ export interface OssDemo {
 
 export const ossDemos: OssDemo[] = [
     {
+        id: "taag-cli",
+        repoUrl: "https://github.com/ml-lubich/taag-cli",
+        install: "brew install ml-lubich/tap/taag",
+        tagline: "FIGlet text art Python library + CLI — inspired by patorjk/figlet.js",
+        demo: [
+            { t: "cmd", s: "taag render Hello -f Isometric1" },
+            { t: "out", s: "      ___           ___           ___" },
+            { t: "cmd", s: "taag render Hello -f Block --color" },
+            { t: "out", s: "rainbow ANSI art, right in your terminal" },
+        ],
+        stats: [
+            { label: "Language", value: "Python" },
+            { label: "Fonts", value: "9 CLI · 1,403 browser" },
+        ],
+    },
+    {
         id: "pyosascript",
         repoUrl: "https://github.com/ml-lubich/pyosascript",
         packageUrl: "https://pypi.org/project/pyosascript/",

@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">taag-cli — FIGlet text art in Go</title>
+  <desc id="desc">Illustrative terminal art card showing TAAG and Isometric1-style letters.</desc>
+  <defs>
+    <linearGradient id="glow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#35d7ff" stop-opacity=".2"/>
+      <stop offset="1" stop-color="#7255ff" stop-opacity=".04"/>
+    </linearGradient>
+    <pattern id="grid" width="36" height="36" patternUnits="userSpaceOnUse">
+      <path d="M36 0H0V36" fill="none" stroke="#fff" stroke-opacity=".035"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="#090a10"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <circle cx="930" cy="120" r="380" fill="url(#glow)"/>
+  <rect x="86" y="72" width="1028" height="486" rx="26" fill="#10121b" stroke="#ffffff" stroke-opacity=".14"/>
+  <circle cx="122" cy="108" r="8" fill="#ff6377"/>
+  <circle cx="150" cy="108" r="8" fill="#ffd05b"/>
+  <circle cx="178" cy="108" r="8" fill="#49d8a4"/>
+  <text x="218" y="114" fill="#8e98ad" font-family="ui-monospace,monospace" font-size="17">taag · Isometric1</text>
+  <text x="142" y="297" fill="#69ddff" font-family="ui-monospace,monospace" font-size="128" font-weight="700" letter-spacing="9">TAAG</text>
+  <path d="M144 334h910" stroke="#fff" stroke-opacity=".11"/>
+  <text x="144" y="395" fill="#bac2d3" font-family="ui-monospace,monospace" font-size="25">___           ___           ___</text>
+  <text x="144" y="436" fill="#bac2d3" font-family="ui-monospace,monospace" font-size="25">/\  \         /\  \         /\  \</text>
+  <text x="144" y="477" fill="#bac2d3" font-family="ui-monospace,monospace" font-size="25">\:\ \  \       /::\  \       /::\  \</text>
+  <text x="144" y="522" fill="#758097" font-family="ui-monospace,monospace" font-size="18">A FIGlet renderer for Go · inspired by patorjk/figlet.js</text>
+</svg>

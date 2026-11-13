@@ -1,5 +1,4 @@
 # Architecture
-
 ## Hero 3D brain
 
 | Concern | Where it lives | What to tune |
@@ -81,6 +80,16 @@ Logical coordinate space: 1000×700px. Canvas applies `ctx.scale(clientW/1000, c
 | **Tools** | `lib/ai/profile-tools.ts` | Structured lookups over `data/*`. `searchTerms` stems plurals; a name hit outranks a body hit so “agents” surfaces Case Triage Agent over a role that merely mentions agents. |
 | **Panel** | `components/ai-chat/mlbot.tsx` | Renders `event: tool` labels and streamed `text`. |
 | **Lazy mount** | `components/ai-chat/mlbot-lazy.tsx` | Root layout renders this, not `MLBot` directly. `MLBot`'s module graph (react-markdown, recharts, its own icons) is code-split via `next/dynamic` and its fetch deferred to `requestIdleCallback` — the panel starts closed, so nothing is lost by not shipping it on first paint. A `mlbot:open` dispatch (the hero CTA) before the idle callback fires mounts immediately instead of waiting, then replays the event so the freshly-mounted panel still opens. |
+
+## Go WTF / TAAG
+
+| Layer | Location | Notes |
+|--------|----------|-------|
+| **Page** | `app/go-wtf/page.tsx` + `components/tools/taag-generator.tsx` | Browser-side `figlet.js` renderer and TheDraw ANSI API; 332 FIGlet + 1,071 TheDraw fonts, custom font uploads, copy and download. |
+| **Font API** | `app/api/taag-fonts/[filename]/route.ts` | Serves only names in `data/figlet-fonts.ts` from the installed figlet.js font bundle. |
+| **TheDraw API** | `app/api/thedraw/route.ts` | Renders only names in `data/thedraw-fonts.ts`; `.tdf` uploads are limited to 1 MB and handled in a temporary directory. |
+| **CLI and Python API** | `taag-cli` | Homebrew-installable `taag` command, importable Python package, nine bundled FIGlet fonts and custom `.flf` paths. |
+| **Attribution** | Site page and CLI README | Credits Patrick Gillespie's figlet.js / TAAG and TDFiglet/tdfonts; source font and package license notices are retained. |
 
 ## AI tools
 

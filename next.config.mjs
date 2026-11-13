@@ -16,6 +16,10 @@ const nextConfig = {
   distDir: process.env.PLAYWRIGHT_DIST_DIR || ".next",
   // Webpack dev / output tracing uses this when multiple lockfiles exist (e.g. ~/package-lock.json + ./bun.lock).
   outputFileTracingRoot: __dirname,
+  outputFileTracingIncludes: {
+    "/api/taag-fonts/*": ["./node_modules/figlet/fonts/*.flf"],
+    "/api/thedraw": ["./node_modules/tdfonts/fonts/*.tdf"],
+  },
   // Hide X-Powered-By header for security
   poweredByHeader: false,
   // Enable React strict mode for catching bugs early
