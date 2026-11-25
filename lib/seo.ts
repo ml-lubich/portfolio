@@ -9,7 +9,7 @@ export const SEO_TITLE = "Misha Lubich | Staff AI Engineer — Portfolio"
 
 /** Default meta / og / twitter description (140-160 chars). */
 export const SEO_DESCRIPTION =
-  "Misha Lubich is a Staff AI Engineer at EchoStar, previously Apple, Walmart and Lawrence Berkeley National Lab, working on ML, MLOps, LLMs and agents."
+  "Misha Lubich is a Staff AI Engineer and software engineer at EchoStar, previously Apple and Walmart, building AI, ML, MLOps, LLM and agent systems."
 
 const personSchema = {
   "@type": "Person",
@@ -24,9 +24,9 @@ const personSchema = {
     width: 1122,
     height: 1402,
   },
-  jobTitle: "Staff AI Engineer",
+  jobTitle: ["Staff AI Engineer", "Software Engineer", "Software Developer"],
   description:
-    "Staff AI Engineer at EchoStar, previously Apple, Walmart, and Lawrence Berkeley National Lab. Specialising in machine learning, MLOps, LLMs, agents, and full-stack development.",
+    "Staff AI Engineer, software engineer, and software developer at EchoStar; previously Apple, Walmart, and Lawrence Berkeley National Lab. Builds production AI, ML, MLOps, LLM, agent, and full-stack systems.",
   sameAs: [
     "https://github.com/ml-lubich",
     "https://www.linkedin.com/in/misha-lubich/",
@@ -45,6 +45,9 @@ const personSchema = {
     "Natural Language Processing",
     "Computer Vision",
     "Software Engineering",
+    "Software Engineer",
+    "Software Developer",
+    "Staff AI Engineer",
     "Python",
     "TypeScript",
     "React",

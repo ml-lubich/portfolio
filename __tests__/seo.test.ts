@@ -41,6 +41,11 @@ describe("JSON-LD @graph", () => {
     expect(graph.find((n) => n["@type"] === "Person")?.["@id"]).toBe(`${SITE_URL}/#person`)
     expect(graph.find((n) => n["@type"] === "WebSite")?.["@id"]).toBe(`${SITE_URL}/#website`)
   })
+  it("includes software engineer and software developer role terms", () => {
+    const person = graph.find((node) => node["@type"] === "Person") as Record<string, unknown>
+    expect(person.jobTitle).toEqual(["Staff AI Engineer", "Software Engineer", "Software Developer"])
+    expect(person.knowsAbout).toEqual(expect.arrayContaining(["Software Engineer", "Software Developer"]))
+  })
   it("@ids are unique and live under SITE_URL", () => {
     const ids = graph.map((n) => n["@id"]).filter((x): x is string => !!x)
     expect(new Set(ids).size).toBe(ids.length)
