@@ -50,6 +50,7 @@ Logical coordinate space: 1000×700px. Canvas applies `ctx.scale(clientW/1000, c
 | **Hero particles** | `ParticleCanvas` is skipped while mobile performance mode is active; the spectrum background remains as the lightweight visual layer. |
 | **Lazy sections** | `components/layout/lazy-section.tsx` keeps the desktop `400px` preload margin but uses a tighter `120px` default margin on mobile so below-fold chunks mount closer to the viewport. |
 | **Scroll flicker control** | `components/nav/index.tsx` does not render the top scroll-progress strip; `app/layout.tsx` does not mount `ScrollShimmer`; `.nav-shell` in `app/globals.css` uses static gradients/shadows instead of `backdrop-filter` over the WebGL hero. |
+| **Phone scrolling** | `app/globals.css` disables ambient-orb motion and 3D/blur section reveals on phone, coarse-pointer, or no-hover devices to reduce scroll-time compositing; desktop keeps its existing styling. |
 
 ### Mobile perf budget (Lighthouse mobile, simulated 4x CPU / slow 4G, `next build --webpack` + `next start`)
 

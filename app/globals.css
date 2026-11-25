@@ -585,6 +585,22 @@
   }
 }
 
+/* Keep phone scrolling light without changing the page's visual layout. */
+@media (max-width: 767px), (pointer: coarse), (hover: none) {
+  .ambient-orb {
+    animation-name: none;
+    will-change: auto;
+  }
+
+  .animated-section,
+  .animated-section[data-reveal-3d="false"],
+  .animated-section[data-reveal-visible="true"] {
+    filter: none;
+    transform: none;
+    will-change: auto;
+  }
+}
+
 .animated-section {
   opacity: 0;
   transform: perspective(1200px) translateY(24px) rotateX(4deg) scale(0.985);
