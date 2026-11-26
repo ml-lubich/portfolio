@@ -70,7 +70,7 @@ describe("ossInstallFork", () => {
     expect(block).toContain("jenkins-mcp-cli")
     expect(block).toContain("twig-cli")
     expect(block).toContain("pdfify-md")
-    expect(block).toContain("cargo install --git https://github.com/ml-lubich/zero-grep")
+    expect(block).toMatch(/brew install ml-lubich\/tap\/\{[^}]*zero-grep/)
     expect(block).toContain("git clone https://github.com/ml-lubich/like-fable")
   })
 })

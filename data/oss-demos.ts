@@ -73,7 +73,8 @@ export const ossDemos: OssDemo[] = [
     {
         id: "zero-grep",
         repoUrl: "https://github.com/ml-lubich/zero-grep",
-        install: "cargo install --git https://github.com/ml-lubich/zero-grep",
+        packageUrl: "https://pypi.org/project/zero-grep/",
+        install: "brew install ml-lubich/tap/zero-grep",
         tagline: "Indexed Rust regex search for large code repositories",
         badge: "Rust core",
         demo: [
