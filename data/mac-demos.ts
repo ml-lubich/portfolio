@@ -13,7 +13,7 @@
  */
 
 /** Visual skin for the mini app window — each maps to authentic app chrome in CSS. */
-export type MacDemoSkin = "whatsapp" | "bitbucket" | "jenkins"
+export type MacDemoSkin = "whatsapp" | "bitbucket" | "jenkins" | "vgate"
 
 export interface MacRow {
     title: string
@@ -68,6 +68,47 @@ export interface MacDemo {
 }
 
 export const macDemos: MacDemo[] = [
+    {
+        id: "vgate",
+        app: "Vercel",
+        tool: "vgate",
+        skin: "vgate",
+        repoUrl: "https://github.com/ml-lubich/vercel-mcp",
+        tagline: "Switch saved Vercel CLI logins without logging out or mixing accounts.",
+        sidebarTitle: "Saved accounts",
+        steps: [
+            {
+                command: "vgate ls",
+                caption: "See which saved logins are available before choosing one.",
+                activeRow: 0,
+                rows: [
+                    { title: "personal", preview: "Saved login", meta: "VALID", status: "success" },
+                    { title: "client", preview: "Saved login", meta: "VALID", status: "success" },
+                    { title: "active", preview: "personal", meta: "CURRENT", status: "running" },
+                ],
+                detail: {
+                    title: "Available accounts",
+                    subtitle: "vgate ls",
+                    body: ["personal  ·  valid", "client     ·  valid", "active     ·  personal"],
+                },
+            },
+            {
+                command: "vgate switch client",
+                caption: "Switch the CLI to the selected saved identity without signing out first.",
+                activeRow: 1,
+                rows: [
+                    { title: "personal", preview: "Saved login", meta: "VALID", status: "success" },
+                    { title: "client", preview: "Selected for CLI", meta: "ACTIVE", status: "running" },
+                    { title: "active", preview: "client", meta: "UPDATED", status: "success" },
+                ],
+                detail: {
+                    title: "Account switched",
+                    subtitle: "vgate switch client",
+                    body: ["credentials loaded from local vault", "Vercel CLI identity updated", "other saved accounts unchanged"],
+                },
+            },
+        ],
+    },
     {
         id: "wa-mcp",
         app: "WhatsApp",

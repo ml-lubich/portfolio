@@ -55,7 +55,7 @@ export function AILab() {
           compact
         />
 
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:items-stretch">
+        <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
           <div>
             <div role="tablist" aria-label="AI engineering visuals" className="mb-4 flex flex-wrap gap-x-2 gap-y-2" onKeyDown={onKey}>
               {TABS.map((tab, i) => {
@@ -93,8 +93,8 @@ export function AILab() {
             </div>
           </div>
 
-          <div className="flex min-h-0 flex-col gap-4">
-            <div className="min-h-[15rem] flex-1"><Terminal /></div>
+          <div className="flex min-w-0 flex-col gap-4">
+            <Terminal />
             <p className="max-w-prose text-sm" style={{ color: "var(--viz-muted)" }}>
               Sketches, not screenshots: the data is generated from a fixed seed, and nothing on this page is a measurement of a real system.
             </p>

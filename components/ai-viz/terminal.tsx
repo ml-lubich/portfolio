@@ -43,7 +43,7 @@ export default function Terminal() {
   }, [running])
   const shown = reduced ? CODE.length : typedLength(tick, CODE.length)
   return (
-    <div ref={ref} className="flex h-full w-full flex-col overflow-hidden rounded-2xl border" style={{ borderColor: 'var(--viz-border)', background: 'var(--viz-surface)' }}>
+    <div ref={ref} className="flex min-h-[15rem] w-full flex-col overflow-hidden rounded-2xl border" style={{ borderColor: 'var(--viz-border)', background: 'var(--viz-surface)' }}>
       <p className="sr-only">Decorative code sample: an agent loop in Python where write tools wait for an approval. Illustrative.</p>
       <div className="flex items-center justify-between border-b px-4 py-2 text-xs" style={{ borderColor: 'var(--viz-border)', background: 'var(--viz-surface-2)', color: 'var(--viz-muted)', fontFamily: MONO }} aria-hidden="true">
         <span>agent.py</span>

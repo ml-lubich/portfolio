@@ -124,13 +124,18 @@ The terminal section has three modes: **live** (day-in-the-life playback), **sna
 | **Scheduler** | `lib/demo-terminal.ts` | Pure, no DOM — `Line[]` + a "characters revealed" count in, a render-ready frame out. `cmd`/`code` lines type character-by-character; `out`/`hdr`/`gap` render instantly. |
 | **Primitive** | `components/terminal/demo-terminal.tsx` | `"use client"`. Wraps the scheduler with an IntersectionObserver (starts typing once in view) + rAF loop gated by an `active` prop. Under `prefers-reduced-motion: reduce`, skips the scroll gate and typing loop entirely and renders the fully-revealed frame on first paint. |
 | **Card** | `components/sections/oss-demo-card.tsx` | Glass card matching `MarqueeCard`'s visual language; header (repo link + install copy), a `DemoTerminal`, and a stats/tags footer. Takes `active` and forwards it straight through — does not own any typing state itself. |
-| **Container** | `components/sections/open-source-showcase.tsx` | Features one `OssDemoCard` at a time from a glyph rail. `ossInstallAll()` renders above the rail as a selectable `<pre><code>` block. Reuses `DetailPanel` in the same fixed-overlay modal pattern as `projects.tsx`. |
+| **Container** | `components/sections/open-source-showcase.tsx` | Features one `OssDemoCard` at a time from a glyph rail. Each `ossInstallAll()` command is its own copy button, with a separate Copy All action. Reuses `DetailPanel` in the same fixed-overlay modal pattern as `projects.tsx`. |
+| **Account routing demo** | `data/oss-demos.ts` + `components/sections/oss-demo-sim.tsx` | vgate shows account listing/switching and a small animated SVG route from saved account to Vercel CLI; packet motion stops for reduced-motion users. |
 | **Install strings** | `data/oss-demos.ts` `install` + `ossInstallAll()` | Per-card command is the source of truth; the family block is derived from it. |
 | **Integration** | `components/sections/projects.tsx` | `<OpenSourceShowcase />` renders at the top of `#projects`, above the existing marquee. |
 
 ### Invariant
 
 At most one `DemoTerminal` types at a time — the container's IntersectionObserver-driven `activeId` is the only thing that sets a card's `active` prop to `true`. Do not give a card its own scroll-based `active` state; that would let two terminals type concurrently.
+
+## App-driving demos
+
+`components/sections/mac-app-demos.tsx` rotates through the app-driving demos in `data/mac-demos.ts` only while visible. vgate is a fourth demo, showing saved Vercel account selection and an SVG token route into the CLI; its packet uses transform-only motion and stops under reduced motion. On phones the demo selector is a native horizontal scroll-snap rail, copy and step controls reach 44px touch targets, and the simulated window uses a shorter minimum height to keep the section easy to scan vertically.
 
 ## AI engineering lab (`components/ai-viz/`)
 

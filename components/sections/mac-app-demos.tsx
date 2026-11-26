@@ -10,7 +10,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from "react"
-import { Github } from "lucide-react"
+import { Check, Copy, Github } from "lucide-react"
 import { AnimatedSection } from "@/components/animations"
 import { SectionHeader } from "@/components/layout/section-header"
 import { MacWindow } from "@/components/demos/mac-window"
@@ -22,6 +22,7 @@ const STEP_MS = 3800
 export function MacAppDemos() {
     const [activeDemo, setActiveDemo] = useState(0)
     const [step, setStep] = useState(0)
+    const [copiedCommand, setCopiedCommand] = useState(false)
     const [inView, setInView] = useState(false)
     // Assume reduced until the client says otherwise, so SSR never claims to
     // be mid-animation.
@@ -61,6 +62,12 @@ export function MacAppDemos() {
     const current = demo.steps[step]
     const typed = useTypewriter(current.command)
     const playing = inView && !still
+    const copyCommand = useCallback(() => {
+        navigator.clipboard.writeText(current.command).then(() => {
+            setCopiedCommand(true)
+            window.setTimeout(() => setCopiedCommand(false), 1600)
+        })
+    }, [current.command])
 
     return (
         <AnimatedSection id="mac-demos" className="relative section-y">
@@ -80,14 +87,14 @@ export function MacAppDemos() {
                 />
 
                 {/* App switcher */}
-                <div className="mb-5 flex flex-wrap justify-center gap-2">
+                <div className="mac-demo-switcher mb-5 flex flex-wrap justify-center gap-2">
                     {macDemos.map((d, i) => (
                         <button
                             key={d.id}
                             type="button"
                             onClick={() => pickDemo(i)}
                             aria-pressed={i === activeDemo}
-                            className={`rounded-full border px-3.5 py-1.5 text-[12px] transition-colors ${
+                            className={`mac-demo-switcher-button rounded-full border px-3.5 py-1.5 text-[12px] transition-colors ${
                                 i === activeDemo
                                     ? "border-[var(--line-strong)] bg-foreground/[0.08] text-foreground"
                                     : "border-[var(--line-soft)] text-muted-foreground hover:text-foreground"
@@ -106,8 +113,8 @@ export function MacAppDemos() {
                         <p className="text-[13px] leading-relaxed text-muted-foreground">{demo.tagline}</p>
 
                         {/* The command that produced the window state on the left. */}
-                        <div className="rounded-lg border border-[var(--line-soft)] bg-[var(--surface-1)] px-3 py-2.5">
-                            <code className="block min-h-[1.4em] break-words font-mono text-[11.5px] leading-relaxed text-foreground/90">
+                        <div className="flex min-w-0 items-center gap-2 rounded-lg border border-[var(--line-soft)] bg-[var(--surface-1)] px-3 py-2.5">
+                            <code className="block min-h-[1.4em] min-w-0 flex-1 break-words font-mono text-[11.5px] leading-relaxed text-foreground/90">
                                 <span className="text-[var(--accent-glow)]">$</span>{" "}
                                 {/* The typed text is decoration mid-animation; assistive
                                     tech reads the whole command instead. */}
@@ -119,6 +126,15 @@ export function MacAppDemos() {
                                     </span>
                                 )}
                             </code>
+                            <button
+                                type="button"
+                                onClick={copyCommand}
+                                aria-label={`Copy command: ${current.command}`}
+                                className="mac-demo-copy inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-md border border-[var(--line-soft)] bg-white/[0.04] px-2.5 font-mono text-[9px] uppercase tracking-wider text-muted-foreground transition-colors hover:border-primary/40 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary/60"
+                            >
+                                {copiedCommand ? <Check className="h-3.5 w-3.5 text-emerald-400" aria-hidden /> : <Copy className="h-3.5 w-3.5" aria-hidden />}
+                                {copiedCommand ? "Copied" : "Copy"}
+                            </button>
                         </div>
 
                         <p className="text-[12px] leading-relaxed text-muted-foreground">{current.caption}</p>
@@ -133,17 +149,15 @@ export function MacAppDemos() {
                                     onClick={() => setStep(i)}
                                     aria-label={`Step ${i + 1}: ${s.command}`}
                                     aria-current={i === step}
-                                    className={`h-1.5 overflow-hidden rounded-full transition-all duration-300 ${
-                                        i === step ? "w-6 bg-foreground/25" : "w-1.5 bg-foreground/25 hover:bg-foreground/40"
-                                    }`}
+                                    className="mac-demo-step-button flex h-8 w-8 items-center justify-center rounded-full"
                                 >
-                                    {i === step && (
+                                    {i === step ? (
                                         <span
                                             key={`${demo.id}-${step}`}
                                             style={{ animationDuration: `${STEP_MS}ms` }}
-                                            className="mac-progress block h-full w-full rounded-full bg-foreground/70"
+                                            className="mac-progress block h-1.5 w-6 overflow-hidden rounded-full bg-foreground/25"
                                         />
-                                    )}
+                                    ) : <span className="h-1.5 w-1.5 rounded-full bg-foreground/25 transition-colors hover:bg-foreground/40" />}
                                 </button>
                             ))}
                         </div>

@@ -3825,6 +3825,54 @@ article .blog-prose b a[href],
   color: hsl(200 6% 58%);
 }
 
+.oss-sim-skin-vercel {
+  border: 1px solid hsl(264 80% 72% / .28);
+  background: linear-gradient(145deg, hsl(264 30% 11%), #0b0d13 65%);
+  box-shadow: inset 0 1px 0 hsl(0 0% 100% / .06), 0 0 30px hsl(264 80% 72% / .06);
+}
+
+.oss-sim-skin-vercel .oss-sim-titlebar {
+  color: #e6ddff;
+  border-color: hsl(264 80% 72% / .18);
+  background: hsl(264 36% 18% / .7);
+}
+
+.oss-sim-skin-vercel .oss-sim-flow-stage {
+  color: #d7c5ff;
+  border: 1px solid hsl(264 80% 72% / .22);
+  background: hsl(264 80% 72% / .08);
+}
+
+.oss-vgate-flow {
+  display: block;
+  width: 100%;
+  padding: 12px 14px 2px;
+}
+
+.oss-vgate-title {
+  fill: #f4efff;
+  font: 12px var(--font-jetbrains), monospace;
+}
+
+.oss-vgate-detail {
+  fill: #a9a0bd;
+  font: 9px var(--font-jetbrains), monospace;
+}
+
+.oss-vgate-packet {
+  filter: drop-shadow(0 0 5px hsl(var(--primary) / .9));
+  animation: vgate-token-route 2.4s cubic-bezier(.45, 0, .55, 1) infinite alternate;
+}
+
+@keyframes vgate-token-route {
+  to { transform: translateX(316px); }
+}
+
+.oss-demo-card {
+  border-color: hsl(var(--primary) / .2);
+  box-shadow: inset 0 1px 0 hsl(0 0% 100% / .07), 0 22px 70px -46px hsl(var(--primary) / .28);
+}
+
 /* ── OSS demo simulation rows ────────────────────────────────────
  *  Rows and flow stages fade up in sequence; the inline animationDelay the
  *  component sets is what staggers them. `forwards` holds the end state, so a
@@ -3842,6 +3890,10 @@ article .blog-prose b a[href],
     opacity: 1;
     transform: none;
   }
+
+  .oss-vgate-packet {
+    animation: none;
+  }
 }
 
 /* ── macOS window chrome ───────────────────────────────────────────────
@@ -3853,6 +3905,97 @@ article .blog-prose b a[href],
   box-shadow:
     inset 0 1px 0 hsl(0 0% 100% / 0.05),
     0 24px 60px -28px hsl(0 0% 0% / 0.85);
+}
+
+@media (max-width: 639px) {
+  .mac-demo-switcher {
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    scroll-snap-type: x proximity;
+    padding: 2px 2px 6px;
+  }
+
+  .mac-demo-switcher::-webkit-scrollbar { display: none; }
+  .mac-demo-switcher-button { min-height: 44px; flex: 0 0 auto; scroll-snap-align: start; }
+  .mac-demo-copy { min-height: 44px; }
+  .mac-demo-step-button { min-height: 44px; min-width: 44px; }
+}
+
+.mac-skin-vgate {
+  border-color: hsl(264 75% 72% / .32);
+  box-shadow: inset 0 1px 0 hsl(0 0% 100% / .08), 0 0 0 1px hsl(264 75% 72% / .08), 0 24px 60px -28px #000;
+}
+
+.mac-skin-vgate .mac-titlebar {
+  background: linear-gradient(110deg, hsl(264 35% 17%), var(--surface-2));
+}
+
+.mac-vgate-route {
+  display: block;
+  width: 100%;
+  border-top: 1px solid hsl(264 75% 72% / .15);
+  background: radial-gradient(ellipse at 50% 50%, hsl(264 70% 55% / .08), transparent 70%);
+}
+
+.mac-vgate-track {
+  fill: none;
+  stroke: hsl(264 55% 65% / .32);
+  stroke-width: 2;
+}
+
+.mac-vgate-track--glow {
+  stroke: hsl(264 85% 76% / .7);
+  stroke-dasharray: 2 18;
+}
+
+.mac-vgate-node rect {
+  fill: #11131b;
+  stroke: hsl(264 70% 72% / .34);
+}
+
+.mac-vgate-node text,
+.mac-vgate-core text {
+  fill: #eee8ff;
+  font: 12px var(--font-jetbrains), monospace;
+}
+
+.mac-vgate-node .mac-vgate-small {
+  fill: #aaa1bd;
+  font-size: 9px;
+}
+
+.mac-vgate-core circle {
+  fill: hsl(264 40% 18%);
+  stroke: hsl(264 90% 75% / .75);
+  stroke-width: 1.5;
+}
+
+.mac-vgate-core path {
+  stroke: hsl(264 90% 82%);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.mac-vgate-core text {
+  font-size: 10px;
+  text-anchor: middle;
+}
+
+.mac-vgate-packet {
+  fill: #d9c3ff;
+  filter: drop-shadow(0 0 5px hsl(264 100% 80% / .95));
+  animation: mac-vgate-route 2.6s cubic-bezier(.45, 0, .55, 1) infinite alternate;
+}
+
+@keyframes mac-vgate-route {
+  to { transform: translateX(320px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mac-vgate-packet { animation: none; }
 }
 
 .mac-titlebar {

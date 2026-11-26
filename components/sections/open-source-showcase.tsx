@@ -35,6 +35,7 @@ import { DetailPanel } from "../detail-panel"
 import { SectionHeader } from "../layout/section-header"
 import { OssDemoCard } from "./oss-demo-card"
 import { OssToolGrid } from "./oss-tool-grid"
+import { CopyCommand } from "@/components/ui/copy-command"
 import { ossAccent } from "@/lib/theme"
 import { isStaticScrollViewport, useSectionProgress } from "@/lib/use-section-progress"
 import { railFill } from "@/lib/scroll-depth"
@@ -65,6 +66,7 @@ export function OpenSourceShowcase() {
   const sectionRef = useRef<HTMLElement>(null)
   const onScreenRef = useRef(false)
   const installAll = ossInstallAll()
+  const installCommands = installAll.split("\n").filter(Boolean)
 
   /* Progress rail: a hairline on the section's left edge that fills as the
      section travels through the viewport (scaleY, absolute, aria-hidden — no
@@ -190,15 +192,17 @@ export function OpenSourceShowcase() {
               type="button"
               onClick={copyAll}
               aria-label={`Copy all install commands: ${installAll}`}
-              className="inline-flex items-center gap-1.5 rounded-md border border-white/[0.12] bg-white/[0.04] px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-foreground/80 transition-colors hover:border-primary/40 hover:text-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary/60"
+              className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-primary/35 bg-primary/10 px-3 font-mono text-[10px] font-semibold uppercase tracking-wider text-primary transition-colors hover:border-primary/60 hover:bg-primary/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary/60"
             >
               {copiedAll ? <Check className="h-3 w-3 text-emerald-400" aria-hidden /> : <Copy className="h-3 w-3" aria-hidden />}
-              {copiedAll ? "Copied" : "Copy all"}
+              {copiedAll ? "Copied all" : "Copy all commands"}
             </button>
           </div>
-          <pre className="oss-install-all select-all overflow-x-auto px-3 py-3 sm:px-4">
-            <code className="font-mono text-[12px] leading-6 text-foreground/90 sm:text-[13px]">{installAll}</code>
-          </pre>
+          <div className="grid gap-1.5 px-3 py-3 sm:px-4">
+            {installCommands.map((command) => (
+              <CopyCommand key={command} command={command} className="min-h-10 bg-white/[0.025] hover:bg-white/[0.07]" />
+            ))}
+          </div>
         </div>
 
         {/* Tool rail — glyph tiles, one active */}

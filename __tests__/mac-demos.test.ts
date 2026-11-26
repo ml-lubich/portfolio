@@ -11,9 +11,9 @@ const read = (p: string) => readFileSync(join(process.cwd(), p), "utf8")
 
 describe("mac demo data", () => {
     it("covers every surface the open-source tools drive", () => {
-        expect(macDemos.map((d) => d.app)).toEqual(["WhatsApp", "Bitbucket", "Jenkins"])
+        expect(macDemos.map((d) => d.app)).toEqual(["Vercel", "WhatsApp", "Bitbucket", "Jenkins"])
         expect(macDemos.map((d) => d.tool)).toEqual([
-            "wa", "bb", "jenkins-mcp",
+            "vgate", "wa", "bb", "jenkins-mcp",
         ])
     })
 
@@ -28,7 +28,7 @@ describe("mac demo data", () => {
     })
 
     it("maps each app to a distinct authentic mini-demo skin", () => {
-        expect(macDemos.map((d) => d.skin)).toEqual(["whatsapp", "bitbucket", "jenkins"])
+        expect(macDemos.map((d) => d.skin)).toEqual(["vgate", "whatsapp", "bitbucket", "jenkins"])
     })
 
     it("pairs every step with the command that caused it", () => {
@@ -106,12 +106,13 @@ describe("mac demo section", () => {
         expect(window).toContain("mac-wa-header")
         expect(window).toContain("mac-jenkins-header")
         expect(window).toContain("mac-bb-header")
+        expect(window).toContain("VgateRoute")
     })
 
     it("applies per-app skin classes for authentic mini-demo chrome", () => {
         expect(window).toContain("mac-skin-${demo.skin}")
         const css = read("app/globals.css")
-        for (const skin of ["messages", "mail", "notes", "whatsapp", "bitbucket", "jenkins"]) {
+        for (const skin of ["messages", "mail", "notes", "whatsapp", "bitbucket", "jenkins", "vgate"]) {
             expect(css).toContain(`.mac-skin-${skin}`)
         }
     })

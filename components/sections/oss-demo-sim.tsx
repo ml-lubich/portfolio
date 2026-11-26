@@ -51,6 +51,22 @@ function ListRow({ row, style }: { row: SimRow; style: React.CSSProperties }) {
     )
 }
 
+function VercelAccountFlow() {
+    return (
+        <svg className="oss-vgate-flow" viewBox="0 0 480 92" role="img" aria-label="Saved account token routes through vgate to the Vercel CLI">
+            <path d="M82 45H398" fill="none" stroke="hsl(var(--primary) / .35)" strokeWidth="2" />
+            {[{ x: 18, title: "Account", detail: "personal" }, { x: 188, title: "vgate", detail: "secure switch" }, { x: 358, title: "Vercel CLI", detail: "authenticated" }].map((node) => (
+                <g key={node.title}>
+                    <rect x={node.x} y="18" width="106" height="54" rx="12" fill="#10131b" stroke="hsl(var(--primary) / .48)" />
+                    <text x={node.x + 53} y="40" textAnchor="middle" className="oss-vgate-title">{node.title}</text>
+                    <text x={node.x + 53} y="57" textAnchor="middle" className="oss-vgate-detail">{node.detail}</text>
+                </g>
+            ))}
+            <circle className="oss-vgate-packet" cx="83" cy="45" r="4" fill="hsl(var(--primary))" />
+        </svg>
+    )
+}
+
 export function OssDemoSim({ sim, active }: { sim: OssSim; active?: boolean }) {
     const delay = (i: number, base: number) => (active ? { animationDelay: `${base + i * ROW_MS}ms` } : {})
     const isChat = sim.kind === "whatsapp"
@@ -74,6 +90,8 @@ export function OssDemoSim({ sim, active }: { sim: OssSim; active?: boolean }) {
             <div className="oss-sim-titlebar border-b px-3 py-1.5">
                 <p className="font-mono text-[10px] uppercase tracking-[0.14em]">{sim.app}</p>
             </div>
+
+            {sim.kind === "vercel" && <VercelAccountFlow />}
 
             <div className={`oss-sim-body space-y-2 p-3 ${isChat ? "" : "space-y-1.5"}`}>
                 {sim.rows.map((row, i) =>

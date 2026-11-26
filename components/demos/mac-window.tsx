@@ -71,6 +71,31 @@ function MacTitleBar({ demo, step }: { demo: MacDemo; step: MacDemoStep }) {
     )
 }
 
+function VgateRoute() {
+    return (
+        <svg className="mac-vgate-route" viewBox="0 0 560 132" role="img" aria-label="vgate routes one saved account through a secure switch into the Vercel CLI">
+            <path d="M120 66H440" className="mac-vgate-track" />
+            <path d="M120 66H440" className="mac-vgate-track mac-vgate-track--glow" />
+            <g className="mac-vgate-node">
+                <rect x="22" y="37" width="138" height="58" rx="14" />
+                <text x="91" y="61" textAnchor="middle">Saved login</text>
+                <text x="91" y="79" textAnchor="middle" className="mac-vgate-small">personal · client</text>
+            </g>
+            <g className="mac-vgate-core">
+                <circle cx="280" cy="66" r="36" />
+                <path d="M268 66h24m-12-12v24" />
+                <text x="280" y="117" textAnchor="middle">vgate</text>
+            </g>
+            <g className="mac-vgate-node">
+                <rect x="400" y="37" width="138" height="58" rx="14" />
+                <text x="469" y="61" textAnchor="middle">Vercel CLI</text>
+                <text x="469" y="79" textAnchor="middle" className="mac-vgate-small">active identity</text>
+            </g>
+            <circle className="mac-vgate-packet" cx="120" cy="66" r="5" />
+        </svg>
+    )
+}
+
 export function MacWindow({ demo, step }: { demo: MacDemo; step: MacDemoStep }) {
     const isChat = Boolean(step.detail.bubbles)
     const isConsole = demo.skin === "jenkins" && Boolean(step.detail.body)
@@ -79,7 +104,7 @@ export function MacWindow({ demo, step }: { demo: MacDemo; step: MacDemoStep }) 
         <div className={`mac-window mac-skin-${demo.skin} overflow-hidden rounded-xl`}>
             <MacTitleBar demo={demo} step={step} />
 
-            <div className="flex min-h-[15rem]">
+            <div className="flex min-h-[12rem] sm:min-h-[15rem]">
                 <div className="mac-sidebar w-[38%] shrink-0 py-2 sm:w-[40%]">
                     <p className="mac-sidebar-label px-3 pb-1.5 text-[10px] font-semibold uppercase tracking-wider">
                         {demo.sidebarTitle}
@@ -94,7 +119,7 @@ export function MacWindow({ demo, step }: { demo: MacDemo; step: MacDemoStep }) 
                                 }`}
                             >
                                 <div className="flex items-center gap-1.5">
-                                    {demo.skin === "jenkins" ? (
+                                    {demo.skin === "jenkins" || demo.skin === "vgate" ? (
                                         <JenkinsOrb status={row.status} />
                                     ) : (
                                         row.unread && <span className="mac-unread-dot h-1.5 w-1.5 shrink-0 rounded-full" />
@@ -153,6 +178,7 @@ export function MacWindow({ demo, step }: { demo: MacDemo; step: MacDemoStep }) 
                     )}
                 </div>
             </div>
+            {demo.skin === "vgate" && <VgateRoute />}
         </div>
     )
 }

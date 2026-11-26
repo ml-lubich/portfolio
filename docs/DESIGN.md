@@ -600,6 +600,12 @@ language).
 Gates: `__tests__/oss-demos.test.ts` (`ALLOWED_PUBLIC_IDS` includes
 `claude-tiers`), `__tests__/oss-agent-tools.test.ts` (13-tool list).
 
+## Open-source installs and vgate account flow (2026-11-25)
+
+The install block exposes each command as a full-row copy button plus a clearly weighted Copy All action, so commands read as actions instead of inert terminal text. The featured vgate demo shows the real `vgate ls` and `vgate switch` flow alongside an account-to-CLI SVG route. Keep its packet transform-only and static under reduced motion. Both featured demo cards use a restrained inset edge highlight to separate their rounded outlines from the page background.
+
+The app-driving selector includes vgate beside WhatsApp, Bitbucket, and Jenkins. Each presents account or app state that matches its CLI command; vgate's animated route distinguishes saved identities, the account switch, and the Vercel CLI destination.
+
 ## Writing section: Substack pointer + subscribe embed (2026-09-24, updated 2026-09-25)
 
 `#writing` (nav "Writing", between Clients and Projects) is a small,

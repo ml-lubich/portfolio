@@ -7,7 +7,7 @@
 import type { Line } from "@/components/terminal/types"
 
 /** Simulated app windows the renderer can draw. */
-export const SIM_KINDS = ["whatsapp"] as const
+export const SIM_KINDS = ["whatsapp", "vercel"] as const
 export type SimKind = (typeof SIM_KINDS)[number]
 
 export interface SimRow {
@@ -278,9 +278,24 @@ export const ossDemos: OssDemo[] = [
         install: "brew install ml-lubich/tap/vgate",
         tagline: "Switch Vercel CLI logins without logging out",
         demo: [
+            { t: "cmd", s: "vgate ls" },
+            { t: "out", s: "personal · valid" },
+            { t: "out", s: "client · valid" },
+            { t: "cmd", s: "vgate switch personal" },
+            { t: "out", s: "active account → personal" },
             { t: "cmd", s: "vgate whoami" },
-            { t: "out", s: "you@personal.com  valid" },
+            { t: "out", s: "personal · authenticated" },
         ],
+        sim: {
+            kind: "vercel",
+            app: "Vercel CLI account routing",
+            flow: ["Choose identity", "Load saved token", "Vercel CLI"],
+            rows: [
+                { from: "personal", text: "Saved login is ready", meta: "valid" },
+                { from: "client", text: "Separate account stays stored", meta: "valid" },
+                { from: "active", text: "Personal token routed to CLI", meta: "selected" },
+            ],
+        },
         stats: [
             { label: "Surfaces", value: "CLI + MCP" },
             { label: "Distribution", value: "PyPI" },

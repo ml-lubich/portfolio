@@ -164,7 +164,7 @@ export function OssDemoCard({ demo, index = 0, active = true, onExplore }: OssDe
   if (!project) return null
 
   return (
-    <article className="relative overflow-hidden rounded-3xl border border-white/[0.10] bg-[var(--card-fill)] backdrop-blur-2xl">
+    <article className="oss-demo-card relative overflow-hidden rounded-3xl border border-white/[0.10] bg-[var(--card-fill)] backdrop-blur-2xl">
       <div className={`h-[2px] w-full bg-gradient-to-r ${project.gradient} opacity-80`} />
 
       {/* Corner brackets */}
