@@ -71,6 +71,21 @@ export interface OssDemo {
 
 export const ossDemos: OssDemo[] = [
     {
+        id: "zero-grep",
+        repoUrl: "https://github.com/ml-lubich/zero-grep",
+        install: "cargo install --git https://github.com/ml-lubich/zero-grep",
+        tagline: "Indexed Rust regex search for large code repositories",
+        badge: "Rust core",
+        demo: [
+            { t: "cmd", s: "zg --no-index -l 'ACPI_COMPANION' ." },
+            { t: "out", s: "./Documentation/firmware-guide/acpi/enumeration.rst" },
+        ],
+        stats: [
+            { label: "Benchmark", value: "3 selective wins" },
+            { label: "Coverage", value: "95.79%" },
+        ],
+    },
+    {
         id: "taag-cli",
         repoUrl: "https://github.com/ml-lubich/taag-cli",
         install: "brew install ml-lubich/tap/taag",
@@ -279,17 +294,14 @@ export const ossDemos: OssDemo[] = [
         tagline: "Switch Vercel CLI logins without logging out",
         demo: [
             { t: "cmd", s: "vgate ls" },
-            { t: "out", s: "personal · valid" },
-            { t: "out", s: "client · valid" },
+            { t: "out", s: "personal · valid  |  client · valid" },
             { t: "cmd", s: "vgate switch personal" },
             { t: "out", s: "active account → personal" },
-            { t: "cmd", s: "vgate whoami" },
-            { t: "out", s: "personal · authenticated" },
         ],
         sim: {
             kind: "vercel",
             app: "Vercel CLI account routing",
-            flow: ["Choose identity", "Load saved token", "Vercel CLI"],
+            flow: ["Agent", "Choose identity", "Load saved token", "Vercel CLI"],
             rows: [
                 { from: "personal", text: "Saved login is ready", meta: "valid" },
                 { from: "client", text: "Separate account stays stored", meta: "valid" },

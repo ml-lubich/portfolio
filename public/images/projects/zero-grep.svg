@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">zero-grep — indexed Rust code search</title>
+  <desc id="desc">An illustrative terminal search flows through a sparse n-gram index to regex-verified results.</desc>
+  <defs>
+    <linearGradient id="glow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#38d9ff" stop-opacity=".22"/>
+      <stop offset="1" stop-color="#9a70ff" stop-opacity=".05"/>
+    </linearGradient>
+    <pattern id="grid" width="36" height="36" patternUnits="userSpaceOnUse">
+      <path d="M36 0H0V36" fill="none" stroke="#fff" stroke-opacity=".035"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="#090a10"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <circle cx="930" cy="120" r="380" fill="url(#glow)"/>
+  <rect x="72" y="62" width="1056" height="506" rx="26" fill="#10121b" stroke="#fff" stroke-opacity=".14"/>
+  <circle cx="110" cy="101" r="8" fill="#ff6377"/>
+  <circle cx="138" cy="101" r="8" fill="#ffd05b"/>
+  <circle cx="166" cy="101" r="8" fill="#49d8a4"/>
+  <text x="204" y="107" fill="#8e98ad" font-family="ui-monospace,monospace" font-size="17">zg · indexed regex search</text>
+  <text x="112" y="177" fill="#69ddff" font-family="ui-monospace,monospace" font-size="25" font-weight="700">❯ zg 'ACPI_COMPANION' linux/</text>
+  <rect x="112" y="213" width="278" height="220" rx="14" fill="#141722" stroke="#fff" stroke-opacity=".12"/>
+  <text x="136" y="255" fill="#8e98ad" font-family="ui-monospace,monospace" font-size="14">1 · PARSE REGEX</text>
+  <text x="136" y="302" fill="#d9deeb" font-family="ui-monospace,monospace" font-size="19">required grams</text>
+  <text x="136" y="347" fill="#69ddff" font-family="ui-monospace,monospace" font-size="21">ACPI · CPI_</text>
+  <text x="136" y="383" fill="#69ddff" font-family="ui-monospace,monospace" font-size="21">PI_C · I_CO</text>
+  <path d="M404 323h62m-14-14 14 14-14 14" fill="none" stroke="#49d8a4" stroke-width="3"/>
+  <rect x="480" y="213" width="278" height="220" rx="14" fill="#141722" stroke="#49d8a4" stroke-opacity=".42"/>
+  <text x="504" y="255" fill="#8e98ad" font-family="ui-monospace,monospace" font-size="14">2 · PRUNE FILES</text>
+  <text x="504" y="302" fill="#d9deeb" font-family="ui-monospace,monospace" font-size="19">sparse postings</text>
+  <path d="M510 338h208m-208 20h144m-144 20h177m-177 20h91" stroke="#49d8a4" stroke-opacity=".72" stroke-width="7" stroke-linecap="round"/>
+  <path d="M772 323h62m-14-14 14 14-14 14" fill="none" stroke="#49d8a4" stroke-width="3"/>
+  <rect x="848" y="213" width="244" height="220" rx="14" fill="#141722" stroke="#fff" stroke-opacity=".12"/>
+  <text x="872" y="255" fill="#8e98ad" font-family="ui-monospace,monospace" font-size="14">3 · VERIFY</text>
+  <text x="872" y="302" fill="#d9deeb" font-family="ui-monospace,monospace" font-size="18">regex scan</text>
+  <text x="872" y="350" fill="#49d8a4" font-family="ui-monospace,monospace" font-size="18">✓ exact lines</text>
+  <text x="112" y="495" fill="#bac2d3" font-family="ui-monospace,monospace" font-size="17">Rust engine · local index · macOS · Linux · Windows</text>
+  <text x="112" y="530" fill="#758097" font-family="ui-monospace,monospace" font-size="14">Measured on a pinned Linux kernel snapshot; benchmark scope in the repository.</text>
+</svg>

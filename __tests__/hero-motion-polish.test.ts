@@ -15,10 +15,13 @@ const css = readFileSync(resolve(__dirname, "../app/globals.css"), "utf8")
 describe("AnimatedSection blur reveal", () => {
   it("starts blurred and settles to sharp", () => {
     const base = css.match(/\.animated-section \{[^}]*\}/)?.[0] ?? ""
-    const visible = css.match(/\.animated-section\[data-reveal-visible="true"\] \{[^}]*\}/)?.[0] ?? ""
+    const visibleRules = [...css.matchAll(/\.animated-section\[data-reveal-visible="true"\] \{[^}]*\}/g)].map(
+      ([rule]) => rule,
+    )
     expect(base).toMatch(/filter:\s*blur\(/)
-    expect(visible).toMatch(/transition-property:[^;]*filter/)
-    expect(visible).toMatch(/filter:\s*none/)
+    expect(visibleRules.some((rule) => /transition-property:[^;]*filter/.test(rule) && /filter:\s*none/.test(rule))).toBe(
+      true,
+    )
   })
 })
 

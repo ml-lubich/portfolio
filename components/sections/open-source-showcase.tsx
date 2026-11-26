@@ -35,7 +35,6 @@ import { DetailPanel } from "../detail-panel"
 import { SectionHeader } from "../layout/section-header"
 import { OssDemoCard } from "./oss-demo-card"
 import { OssToolGrid } from "./oss-tool-grid"
-import { CopyCommand } from "@/components/ui/copy-command"
 import { ossAccent } from "@/lib/theme"
 import { isStaticScrollViewport, useSectionProgress } from "@/lib/use-section-progress"
 import { railFill } from "@/lib/scroll-depth"
@@ -66,7 +65,6 @@ export function OpenSourceShowcase() {
   const sectionRef = useRef<HTMLElement>(null)
   const onScreenRef = useRef(false)
   const installAll = ossInstallAll()
-  const installCommands = installAll.split("\n").filter(Boolean)
 
   /* Progress rail: a hairline on the section's left edge that fills as the
      section travels through the viewport (scaleY, absolute, aria-hidden — no
@@ -137,12 +135,12 @@ export function OpenSourceShowcase() {
     setActiveId(id)
   }, [])
 
-  const copyAll = useCallback(() => {
+  const copyAll = () => {
     navigator.clipboard.writeText(installAll).then(() => {
       setCopiedAll(true)
       window.setTimeout(() => setCopiedAll(false), 1600)
     })
-  }, [installAll])
+  }
 
   return (
     <section ref={sectionRef} id="open-source" className="relative scroll-mt-24 section-y">
@@ -198,10 +196,10 @@ export function OpenSourceShowcase() {
               {copiedAll ? "Copied all" : "Copy all commands"}
             </button>
           </div>
-          <div className="grid gap-1.5 px-3 py-3 sm:px-4">
-            {installCommands.map((command) => (
-              <CopyCommand key={command} command={command} className="min-h-10 bg-white/[0.025] hover:bg-white/[0.07]" />
-            ))}
+          <div className="px-3 py-3 sm:px-4">
+            <pre className="max-h-64 overflow-auto rounded-lg border border-white/[0.06] bg-white/[0.025] p-3 font-mono text-[11px] leading-relaxed text-foreground/80 sm:text-xs">
+              <code className="select-all">{installAll}</code>
+            </pre>
           </div>
         </div>
 

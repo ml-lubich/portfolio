@@ -24,6 +24,11 @@ const DEMO_BY_ID = Object.fromEntries(ossDemos.map((d) => [d.id, d])) as Record<
 
 /** Card metadata keyed by oss-demos id */
 const META: Record<string, { displayName: string; description: string; tag: string }> = {
+  "zero-grep": {
+    displayName: "zg",
+    description: "Indexed Rust regex search · public ripgrep benchmarks",
+    tag: "Rust · Search",
+  },
   "taag-cli": {
     displayName: "taag",
     description: "FIGlet text art CLI + Python package · inspired by patorjk/figlet.js",
@@ -107,6 +112,7 @@ const META: Record<string, { displayName: string; description: string; tag: stri
 }
 
 const ORDER = [
+  "zero-grep",
   "taag-cli",
   "wa-mcp",
   "bitbucket-cli",
@@ -158,6 +164,7 @@ export function ossInstallFork(): string {
   }
 
   for (const tool of ossAgentTools) {
+    if (tool.install.startsWith("cargo install ")) lines.push(tool.install)
     if (tool.install.startsWith("pip install ")) lines.push(tool.install)
     if (tool.install.startsWith("pipx install ")) lines.push(tool.install)
     if (tool.install.startsWith("npm i -g ") || tool.install.startsWith("npm install -g ")) {

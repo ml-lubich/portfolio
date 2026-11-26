@@ -38,7 +38,7 @@ GitHub Actions (`.github/workflows/ci.yml`) runs `bun run ci` with `VERCEL=1` on
 - A chat is working only when one real lookup question produces at least one `event: tool`, non-empty `event: text`, and zero `event: error`. HTTP 200 plus `event: done` with no text is a fail — that was the 2026-09-14 production blank-bubble.
 - `__tests__/hero-scrim-halo.test.ts` — `.hero-copy-halo` filter includes a white light bloom (`0 0 34px`) as well as the dark ink halo.
 - `__tests__/oss-demos.test.ts` — every showcase entry has a real install command; `ossInstallAll()` is a copy-pasteable brew/pip/pipx/npm/git block. `__tests__/open-source-showcase.test.ts` — install lines render as selectable `<pre><code>`, not a truncated button label.
-- `__tests__/oss-agent-tools.test.ts` — thirteen grid tools with short display names; `ossInstallFork()` leads with `brew tap ml-lubich/tap`. `__tests__/fork-page.test.ts` — `/fork` ships the fork block + grid. `e2e/oss-tool-grid.spec.ts` — grid visible on `#open-source`, click-to-copy works, `/fork` shows tap line.
+- `__tests__/oss-agent-tools.test.ts` — sixteen grid tools with short display names; `ossInstallFork()` leads with `brew tap ml-lubich/tap`. `__tests__/fork-page.test.ts` — `/fork` ships the fork block + grid. `e2e/oss-tool-grid.spec.ts` — grid visible on `#open-source`, click-to-copy works, `/fork` shows tap line.
 - `e2e/visual-integrity.spec.ts` — no horizontal overflow at 390/834/1440px, every `<img>` loads (`naturalWidth > 0`), and no `bg-card`-styled panel resolves to the same computed background color as the page (the "ghosting"/"black cards" bug class) across all eight routes. Only dark mode is checked: light mode ships disabled (`lib/light-mode.ts`, `forcedTheme="dark"`, toggle not even rendered), so testing it here would just run dark mode twice. Once light mode is re-enabled by default, extend this file to cover it too.
 - `e2e/wide-layout.spec.ts`, `e2e/tablet-responsive.spec.ts`, `e2e/scroll-navigation.spec.ts` — pre-existing homepage-specific layout/motion regression specs (see file headers for what each guards).
 - `__tests__/scroll-devices-a.test.ts`, `__tests__/scroll-devices-b.test.ts` — pure math and contract checks for the four below-hero scroll devices (`depth`/`rail`/`reveal`/`band`), plus SSR-markup regression snapshots in `__tests__/__snapshots__/*-baseline.html` (static viewports must render the prior markup). `e2e/scroll-devices-a.spec.ts`, `e2e/scroll-devices-b.spec.ts` — each device's state attribute changes with scroll at wide viewports and holds still under reduced motion.
@@ -141,7 +141,7 @@ A spec that samples the page in a loop must stop on elapsed wall time (`const un
 
 ## Open-source snapshot maintenance
 
-`scroll-devices-a.test.ts` captures the data-driven showcase, including the tool grid, install block, and glyph rail. Refresh `open-source-baseline.html` only after reviewing its diff against the current `ossAgentTools`/`ossDemos` contracts; catalog changes affect the derived tool count, install commands, and index-based rail accents. The current catalog contains 14 approved public tools.
+`scroll-devices-a.test.ts` captures the data-driven showcase, including the tool grid, install block, and glyph rail. Refresh `open-source-baseline.html` only after reviewing its diff against the current `ossAgentTools`/`ossDemos` contracts; catalog changes affect the derived tool count, install commands, and index-based rail accents. The current catalog contains 16 approved public tools.
 
 ## Go WTF / FIGlet generator
 

@@ -80,6 +80,8 @@ showcase). That would replace the portfolio's own sections rather than restyle t
 - `#value-maxxing` — short manifesto (valuemaxxing over tokenmaxxing).
 - `#tool-matrix` — table from `data/tool-matrix.ts`; yes / partial / — cells only.
 
+`zero-grep` adds a Rust code-search card to the approved public set. The family install block renders selectable `ossInstallAll()` text in `<pre><code>` with a separate Copy All button; individual tool cards retain their own install controls.
+
 ## Open-Source Showcase & chrome fixes (2026-07-25)
 
 - `#open-source` leads the projects section: an **Open-Source Agent Tools** grid (`data/oss-agent-tools.ts`, `components/sections/oss-tool-grid.tsx`) — thirteen cards in a two-column layout matching the GitHub profile TOOLS panel, each with a **click-to-copy** install row (`components/ui/copy-command.tsx`). `/fork` repeats the grid plus `ossInstallFork()` (explicit `brew tap ml-lubich/tap` first) for USB-agent / fork checkouts. Below that: curated public CLI/MCP projects (`data/oss-demos.ts`) as glass demo cards — an animated terminal demo per card (`DemoTerminal`: IntersectionObserver-gated typing; `prefers-reduced-motion` renders the final frame immediately), stats via `AnimatedCounter` (numeric values only; text stats render plain), tags, GitHub link, and a **selectable** `<pre><code>` install line (click-to-copy is extra, not the only path). A copy-pasteable `ossInstallAll()` block sits above the rail so brew / pip / pipx / npm / git lines can be pasted as a family. **One terminal types at a time** — the featured card is the only typer. The marquee below is retitled "Selected Work" and reads as the breadth tier.
@@ -602,7 +604,7 @@ Gates: `__tests__/oss-demos.test.ts` (`ALLOWED_PUBLIC_IDS` includes
 
 ## Open-source installs and vgate account flow (2026-11-25)
 
-The install block exposes each command as a full-row copy button plus a clearly weighted Copy All action, so commands read as actions instead of inert terminal text. The featured vgate demo shows the real `vgate ls` and `vgate switch` flow alongside an account-to-CLI SVG route. Keep its packet transform-only and static under reduced motion. Both featured demo cards use a restrained inset edge highlight to separate their rounded outlines from the page background.
+The install block exposes the complete command list as selectable `<pre><code>` text plus a clearly weighted Copy All action. Individual project cards keep their own install buttons. The featured vgate demo shows the real `vgate ls` and `vgate switch` flow alongside an account-to-CLI SVG route. Keep its packet transform-only and static under reduced motion. Both featured demo cards use a restrained inset edge highlight to separate their rounded outlines from the page background.
 
 The app-driving selector includes vgate beside WhatsApp, Bitbucket, and Jenkins. Each presents account or app state that matches its CLI command; vgate's animated route distinguishes saved identities, the account switch, and the Vercel CLI destination.
 

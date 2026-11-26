@@ -12,6 +12,7 @@ import { projects } from "@/data/projects"
 
 // Mirrors the spec's "Public OSS set" — the only ids eligible for the showcase.
 const ALLOWED_PUBLIC_IDS = new Set([
+  "zero-grep",
   "pyosascript",
   "wa-mcp",
   "bitbucket-cli",
@@ -168,7 +169,7 @@ describe("oss-demos data integrity", () => {
  * `git clone` (for tools with no published package) are allowed shapes.
  */
 const INSTALL_COMMAND_RE =
-  /^(brew install |pip install |pipx install |npm (?:i|install) -g |git clone )\S/
+  /^(brew install |pip install |pipx install |npm (?:i|install) -g |git clone |cargo install )\S/
 
 describe("oss-demos install commands + package links", () => {
   it("every entry ships a copy-pasteable install — no card without a command", () => {

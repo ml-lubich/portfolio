@@ -45,8 +45,13 @@ Append new constraints or decisions as new bullets or dated subsections; do not 
 ### 2026-07-25 — Open-Source Showcase (public-only, no invented metrics)
 
 - The Open-Source Showcase (`#projects`, `components/sections/open-source-showcase.tsx`) covers public `ml-lubich` repos only — no proprietary, internal, or employer content.
-- Each demo's terminal script (`data/oss-demos.ts`) must use real, documented commands for that tool with plausible, representative output — not fabricated benchmark numbers or invented flags.
+- Each demo's terminal script (`data/oss-demos.ts`) must use real, documented commands for that tool with plausible, representative output — not fabricated benchmark numbers or invented flags. Direct Rust source installs may use `cargo install --git`.
 - `stats` values shown per card must be real (e.g. published test coverage, measured speedups) or omitted; do not invent metrics to fill a stat slot.
+
+### 2026-11-25 — zero-grep showcase claims
+
+- `zero-grep` may be listed after the source repository is public. Benchmark claims must link to the method and checked-in results, preserve the query/corpus scope, and distinguish warm search time from index construction.
+- Do not state that it is universally faster than ripgrep; the current results show gains on three selective patterns and a tie on a common-word pattern.
 
 ### 2026-09-14 — Hero brain 1:1 with josephheupler.com
 

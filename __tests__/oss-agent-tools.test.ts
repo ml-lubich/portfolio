@@ -3,7 +3,7 @@ import { ossDemos } from "@/data/oss-demos"
 import { ossAgentTools, ossInstallFork } from "@/data/oss-agent-tools"
 
 const INSTALL_COMMAND_RE =
-  /^(brew install |pip install |pipx install |npm (?:i|install) -g |git clone )\S/
+  /^(brew install |pip install |pipx install |npm (?:i|install) -g |git clone |cargo install )\S/
 
 const DEMO_INSTALL: Record<string, string> = Object.fromEntries(
   ossDemos.map((d) => [d.id, d.install ?? ""]),
@@ -11,9 +11,10 @@ const DEMO_INSTALL: Record<string, string> = Object.fromEntries(
 
 describe("ossAgentTools", () => {
   it("lists the GitHub-profile tools with short display names", () => {
-    expect(ossAgentTools).toHaveLength(15)
+    expect(ossAgentTools).toHaveLength(16)
     const names = ossAgentTools.map((t) => t.displayName)
     expect(names).toEqual([
+      "zg",
       "taag",
       "wa",
       "bb",
@@ -69,6 +70,7 @@ describe("ossInstallFork", () => {
     expect(block).toContain("jenkins-mcp-cli")
     expect(block).toContain("twig-cli")
     expect(block).toContain("pdfify-md")
+    expect(block).toContain("cargo install --git https://github.com/ml-lubich/zero-grep")
     expect(block).toContain("git clone https://github.com/ml-lubich/like-fable")
   })
 })

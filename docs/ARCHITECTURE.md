@@ -118,6 +118,8 @@ The terminal section has three modes: **live** (day-in-the-life playback), **sna
 
 ## Open-Source Showcase
 
+`zero-grep` appears in `data/projects.ts`, `data/oss-demos.ts`, and `data/oss-agent-tools.ts` after its public repository is available. Its project detail cites the checked-in benchmark method and measured scope; do not present selective warm-query wins as a general-purpose speed guarantee. The showcase copies the complete install list from a selectable `<pre><code>` block.
+
 | Layer | Location | Notes |
 |--------|-----------|--------|
 | **Data** | `data/oss-demos.ts` | Public `ml-lubich` projects only. Each entry's terminal script (`demo: Line[]`) and `stats`. Gradient/accent/tags/detail content are NOT duplicated here — looked up on `data/projects.ts` by matching `id`. |

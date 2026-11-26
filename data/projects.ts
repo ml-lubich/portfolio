@@ -1465,4 +1465,44 @@ export const projects: Project[] = [
             link: { label: "GitHub", url: "https://github.com/ml-lubich/callgen" },
         },
     },
+    {
+        id: "zero-grep",
+        name: "zero-grep",
+        coverImage: "/images/projects/zero-grep.svg",
+        coverAlt: "Illustrative terminal view of zero-grep searching code with a sparse Rust index",
+        metric: "Indexed regex search for large codebases",
+        summary:
+            "A Rust CLI that builds a local sparse n-gram index to skip files that cannot match, then verifies every candidate with regex. Includes reproducible comparisons against ripgrep on a pinned Linux kernel snapshot.",
+        tags: ["Rust", "CLI", "Code Search", "Performance"],
+        gradient: g.primaryToCyan,
+        accent: accentCycle[2],
+        number: "40",
+        detail: {
+            title: "zero-grep",
+            subtitle: "Indexed regex search, written in Rust",
+            description:
+                "zero-grep (zg) indexes selective three-byte n-grams, uses regex structure to find candidate files, then verifies results with the Rust regex engine. The public benchmark compares exact output against ripgrep on a pinned Linux kernel checkout; selective warm searches were 8.9×–26.3× faster in that measured workload, while a common-word search was effectively tied. The initial index build is reported separately.",
+            highlights: [
+                "Search with regular expressions and preserve line-level output semantics",
+                "Build a local mmap-backed sparse index and safely fall back to scanning",
+                "Reproduce benchmark runs and inspect the checked-in data and chart",
+                "Build the Rust CLI for macOS, Linux, and Windows",
+            ],
+            architecture: [
+                { label: "Regex analysis", icon: "cpu", description: "Extract mandatory grams from regex syntax, intersecting across alternatives" },
+                { label: "Sparse index", icon: "database", description: "Keep selective postings in a compact, delta-encoded local index" },
+                { label: "Candidate scan", icon: "zap", description: "Use parallel search and verify each candidate with regex" },
+                { label: "Benchmark", icon: "shield", description: "Alternate runs, report medians, and check output hashes before timing" },
+            ],
+            techStack: ["Rust", "Regex", "Memory-mapped index", "Python benchmark harness"],
+            metrics: [
+                { label: "Selective queries faster than ripgrep", value: "3 of 3" },
+                { label: "Measured test line coverage", value: "95.79%" },
+            ],
+            diagramType: "pipeline",
+            gradient: g.primaryToCyan,
+            accent: accentCycle[2],
+            link: { label: "GitHub", url: "https://github.com/ml-lubich/zero-grep" },
+        },
+    },
 ]
